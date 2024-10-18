@@ -1,11 +1,49 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
 import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 
 function EmergencyResponseTrainingPage() {
+  const navigate = useNavigate();  // Initialize useNavigate hook
+
   const handleButtonClick = (section) => {
     console.log(`Button clicked for: ${section}`);
     // Add logic for handling button click, e.g., open a modal or navigate
+
+    switch (section) {
+      case 'Scenerio-based Training':
+        navigate('/scenerio-based-training');
+        break;
+      case 'Response Protocols':
+        navigate('/response-protocols');
+        break;
+      case 'Post-Incident Support':
+        navigate('/post-incident-support');
+        break;
+      case 'First Aid/CPR Training':
+        navigate('/first-aid-CPR-training2');
+        break;
+      case 'Basic First Aid Techniques':
+        navigate('/basic-first-aid-techniques');
+        break;
+      case 'CPR Certification':
+        navigate('/CPR-certification');
+        break;
+      case 'AED Training':
+        navigate('/AED-training');
+        break;
+      case 'Active Shooter Response':
+        navigate('/active-shooter-response');
+        break;
+      case 'Response Protocols':
+        navigate('/response-protocols');
+        break;
+      case 'Evacuation Procedures':
+        navigate('/evacuation-procedures');
+        break;
+      default:
+        console.log('Unknown section');
+    }
   };
 
   return (

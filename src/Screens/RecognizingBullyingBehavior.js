@@ -1,11 +1,28 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
 import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 
 function RecognizingBullyingBehavoirPage() {
+  const navigate = useNavigate();  // Initialize useNavigate hook
+
   const handleButtonClick = (section) => {
     console.log(`Button clicked for: ${section}`);
     // Add logic for handling button click, e.g., open a modal or navigate
+
+    switch (section) {
+      case 'Verbal Bullying':
+        navigate('/verbal-bullying');
+        break;
+      case 'Physical Bullying':
+        navigate('/physical-bullying');
+        break;
+      case 'Cyber Bullying':
+        navigate('/cyber-bullying');
+        break;
+      default:
+        console.log('Unknown section');
+    }
   };
 
   return (

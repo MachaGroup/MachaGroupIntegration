@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';  // Import useNavigate for navig
 import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 
-function TextEmailAlertsPage() {
+function CybersecurityTrainingPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook
 
   const handleButtonClick = (section) => {
@@ -11,18 +11,18 @@ function TextEmailAlertsPage() {
     // Add logic for handling button click, e.g., open a modal or navigate
 
     switch (section) {
-      case 'Contact Information Database':
-        navigate('/contact-information-database');
-        break;
-      case 'Alert Activation Procedures':
-        navigate('/alert-activation-procedures');
-        break;
-      case 'Integration with Parent Communication':
-        navigate('/integration-with-parent-communication');
-        break;
-      default:
-        console.log('Unknown section');
-    }
+        case 'Phishing Awareness':
+            navigate('/phishing-awareness2');
+            break;
+        case 'Password Security':
+            navigate('/password-security2');
+            break;
+        case 'Data Protection':
+            navigate('/data-protection2');
+            break;
+        default:
+          console.log('Unknown section');
+  }
   };
 
   return (
@@ -34,12 +34,12 @@ function TextEmailAlertsPage() {
         <img src={logo} alt="Logo" className="logo" />
       </header>
 
-      {/* Text/Email Alerts Section */}
+      {/* Security Awareness Training Section */}
       <main className="form-container">
-        <h2>Text/Email Alerts</h2>
+        <h2>Security Awareness Training</h2>
         <form>
-          {/* Text/Email Alerts Buttons */}
-          {['Contact Information Database', 'Alert Activation Procedures', 'Integration with Parent Communication'].map((section, index) => (
+          {/* Security Awareness Training Buttons */}
+          {['Phishing Awareness', 'Password Security', 'Data Protection'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>
@@ -53,4 +53,4 @@ function TextEmailAlertsPage() {
   );
 }
 
-export default TextEmailAlertsPage;
+export default CybersecurityTrainingPage;

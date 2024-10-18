@@ -107,6 +107,8 @@ import AccessibilityCompliance from './Screens/AccessibilityCompliance';
 import PolicyEvaluationCriteria from './Screens/PolicyEvaluationCriteria';
 import StakeholderFeedback from './Screens/StakeholderFeedback';
 import ChangeManagementProcess from './Screens/ChangeManagementProcess';
+import ThreatRecognition from './Screens/ThreatRecognition';
+import CybersecurityTraining from './Screens/CybersecurityTraining';
 
 function App() {
   return (
@@ -221,6 +223,8 @@ function App() {
         <Route path="/policy-evaluation-criteria" element={<PolicyEvaluationCriteria />} />
         <Route path="/stakeholder-feedback" element={<StakeholderFeedback />} />
         <Route path="/change-management-process" element={<ChangeManagementProcess />} />
+        <Route path="/threat-recognition" element={<ThreatRecognition />} />
+        <Route path="/cybersecurity-training" element={<CybersecurityTraining />} />
       </Routes>
     </Router>
   );
