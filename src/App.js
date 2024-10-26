@@ -66,7 +66,7 @@ import PhishingAwareness from './Screens/PhishingAwareness';
 import PasswordManagement from './Screens/PasswordManagement';
 import IncidentIdentification from './Screens/IncidentIdentification';
 import IncidentResponsePlanning from './Screens/IncidentResponsePlanning';
-import FirewallConfiguratinon from './Screens/FirewallConfiguration';
+import FirewallConfiguration from './Screens/FirewallConfiguration';
 import IntrusionDetectionSystems from './Screens/IntrusionDectecitonSystems';
 import AntivirusAndMalwareProtection from './Screens/AntivirusAndMalwareProtection';
 import DeviceManagement from './Screens/DeviceManagement';
@@ -109,6 +109,38 @@ import StakeholderFeedback from './Screens/StakeholderFeedback';
 import ChangeManagementProcess from './Screens/ChangeManagementProcess';
 import ThreatRecognition from './Screens/ThreatRecognition';
 import CybersecurityTraining from './Screens/CybersecurityTraining';
+import ConflictResolution from './Screens/ConflictResolution';
+import EmergencyCommunication from './Screens/EmergencyCommunnication';
+import FirstAidResponse from './Screens/FirstAidResponse';
+import EvacuationProcedures from './Screens/EvacuationProcedures';
+import FireExtinguisherLocations from './Screens/FireExtinguisherLocations';
+import AlarmSystems from './Screens/AlarmSystems';
+import ClassroomLockdownProtocols from './Screens/ClassroomLockdownProtocols';
+import CommunicationProtocols2 from './Screens/CommunicationProtocols2';
+import LawEnforcementCoordination from './Screens/LawEnforcementCoordination';
+import DisasterDrills from './Screens/DisasterDrills';
+import TornadoShelterLocations from './Screens/TornadoShelterLocations';
+import SevereWeatherMonitoring from './Screens/SevereWeatherMonitoring';
+import TornadoDrills from './Screens/TornadoDrills';
+import EarthquakeDrills from './Screens/EarthquakeDrills';
+import FireDrill from './Screens/FireDrill';
+import DrillScenerios from './Screens/DrillScenerios';
+import LockdownSignalRecognition from './Screens/LockdownSignalRecognition';
+import StaffRolesAndResponsibilities from './Screens/StaffRolesAndResponsibilities';
+import DebriefingAndFeedback from './Screens/DebriefingAndFeedback';
+import EvacuationRoutesReview from './Screens/EvacuationRoutesReview';
+import DrillFrequency from './Screens/DrillFrequency';
+import SpeakerLocations from './Screens/SpeakerLocations';
+import EmergencyAnnouncementProtocols from './Screens/EmergencyAnnouncementProtocols';
+import BackupPowerSystems from './Screens/BackupPowerSystems';
+import ContactInformationDatabase from './Screens/ContactInformationDatabase';
+import AlertActivationProcedures from './Screens/AlertActivationProcedures';
+import IntegrationWithParentCommunication from './Screens/IntegrationWithParentCommunication';
+import TwoWayRadios from './Screens/TwoWayRadios';
+import EmergencyCommunicationTraining from './Screens/EmergencyCommunicationTraining';
+import CommunicationPlatforms from './Screens/CommunicationPlatforms';
+import ParentNotificationProcedures from './Screens/ParentNotificationProcedures';
+import CommunicationLanguage from './Screens/CommunicationLanguage';
 
 function App() {
   return (
@@ -144,7 +176,7 @@ function App() {
         <Route path="/drill-execution" element={<DrillExecution />} />
         <Route path="/alert-systems" element={<AlertSystems />} />
         <Route path="/communication-protocols" element={<CommunicationProtocols />} />
-        <Route path="/fire-emergency-plans" element={<FireEmergencyPlans />} />
+        <Route path="/fire-emergency-plan" element={<FireEmergencyPlans />} />
         <Route path="/lockdown-procedures" element={<LockdownProcedures />} />
         <Route path="/natural-disaster-plans" element={<NaturalDisasterPlans />} />
         <Route path="/natural-disaster-drills" element={<NaturalDisasterDrills />} />
@@ -182,7 +214,7 @@ function App() {
         <Route path="/password-management" element={<PasswordManagement />} />
         <Route path="/incident-identification" element={<IncidentIdentification />} />
         <Route path="/incident-response-planning" element={<IncidentResponsePlanning />} />
-        <Route path="/firewall-configuration" element={<FirewallConfiguratinon />} />
+        <Route path="/firewall-configuration" element={<FirewallConfiguration />} />
         <Route path="/intrusion-detection-systems" element={<IntrusionDetectionSystems />} />
         <Route path="/antivirus-and-malware-protection" element={<AntivirusAndMalwareProtection />} />
         <Route path="/device-management" element={<DeviceManagement />} />
@@ -225,6 +257,38 @@ function App() {
         <Route path="/change-management-process" element={<ChangeManagementProcess />} />
         <Route path="/threat-recognition" element={<ThreatRecognition />} />
         <Route path="/cybersecurity-training" element={<CybersecurityTraining />} />
+        <Route path="/conflict-resolution" element={<ConflictResolution />} />
+        <Route path="/emergency-communication" element={<EmergencyCommunication />} />
+        <Route path="/first-aid-response" element={<FirstAidResponse />} />
+        <Route path="/evacuation-procedures" element={<EvacuationProcedures />} />
+        <Route path="/fire-extinguisher-locations" element={<FireExtinguisherLocations />} />
+        <Route path="/alarm-systems" element={<AlarmSystems />} />
+        <Route path="/classroom-lockdown-protocols" element={<ClassroomLockdownProtocols />} />
+        <Route path="/communication-protocols2" element={<CommunicationProtocols2 />} />
+        <Route path="/law-enforcement-coordination" element={<LawEnforcementCoordination />} />
+        <Route path="/disaster-drills" element={<DisasterDrills />} />
+        <Route path="/tornado-shelter-locations" element={<TornadoShelterLocations />} />
+        <Route path="/severe-weather-monitoring" element={<SevereWeatherMonitoring />} />
+        <Route path="/tornado-drills" element={<TornadoDrills />} />
+        <Route path="/earthquake-drills" element={<EarthquakeDrills />} />
+        <Route path="/fire-drill" element={<FireDrill />} />
+        <Route path="/drill-scenerios" element={<DrillScenerios />} />
+        <Route path="/lockdown-signal-recognition" element={<LockdownSignalRecognition />} />
+        <Route path="/staff-roles-and-responsibilities" element={<StaffRolesAndResponsibilities />} />
+        <Route path="/debriefing-and-feedback" element={<DebriefingAndFeedback />} />
+        <Route path="/evacuation-routes-review" element={<EvacuationRoutesReview />} />
+        <Route path="/drill-frequency" element={<DrillFrequency />} />
+        <Route path="/speaker-locations" element={<SpeakerLocations />} />
+        <Route path="/emergency-announcement-protocols" element={<EmergencyAnnouncementProtocols />} />
+        <Route path="/backup-power-systems" element={<BackupPowerSystems />} />
+        <Route path="/contact-information-database" element={<ContactInformationDatabase />} />
+        <Route path="/alert-activation-procedures" element={<AlertActivationProcedures />} />
+        <Route path="/integration-with-parent-communication" element={<IntegrationWithParentCommunication />} />
+        <Route path="/two-way-radios" element={<TwoWayRadios />} />
+        <Route path="/emergency-communication-training" element={<EmergencyCommunicationTraining />} />
+        <Route path="/communication-platforms" element={<CommunicationPlatforms />} />
+        <Route path="/parent-notification-procedures" element={<ParentNotificationProcedures />} />
+        <Route path="/communication-language" element={<CommunicationLanguage />} />
       </Routes>
     </Router>
   );

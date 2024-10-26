@@ -4,8 +4,10 @@ import './AccessControl.css'; // Reuse the same CSS file for consistency in styl
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 
 function LockdownProceduresPage() {
+  const navigate = useNavigate();  // Initialize useNavigate hook
+  
   const handleButtonClick = (section) => {
-    const navigate = useNavigate();  // Initialize useNavigate hook
+    
 
     console.log(`Button clicked for: ${section}`);
     // Add logic for handling button click, e.g., open a modal or navigate
@@ -15,7 +17,7 @@ function LockdownProceduresPage() {
         navigate('/classroom-lockdown-protocols');
         break;
       case 'Communication Protocols':
-        navigate('/communication-protocols');
+        navigate('/communication-protocols2');
         break;
       case 'Law Enforcement Coordination':
         navigate('/law-enforcement-coordination');

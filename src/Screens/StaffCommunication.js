@@ -17,6 +17,9 @@ function StaffCommunicationPage() {
       case 'Communication Channels':
         navigate('/communication-channels');
         break;
+      case 'Emergency Communication Training':
+        navigate('/emergency-communication-training');
+        break;  
       default:
         console.log('Unknown section');
     }
@@ -36,7 +39,7 @@ function StaffCommunicationPage() {
         <h2>Staff Communication</h2>
         <form>
           {/* Staff Communication Buttons */}
-          {['Two-way Radios', 'Communication Channels'].map((section, index) => (
+          {['Two-way Radios', 'Communication Channels', 'Emergency Communication Training'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>

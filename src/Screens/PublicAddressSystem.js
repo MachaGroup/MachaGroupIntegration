@@ -15,7 +15,7 @@ function PublicAddressSystemPage() {
         navigate('/speaker-locations');
         break;
       case 'Emergency Announcement Protocols':
-        navigate('/emergency-annoucement-protocols');
+        navigate('/emergency-announcement-protocols');
         break;
       case 'Backup Power Systems':
         navigate('/backup-power-systems');
