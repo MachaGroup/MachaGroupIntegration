@@ -293,7 +293,7 @@ function App() {
         <Route path="/AlarmS" element={<AlarmSystems />} />
         <Route path="/OnSite" element={<OnSiteSecurity />} />
         <Route path="/MainE" element={<MainEntrance />} />
-        <Route path="/SecondaryEntrances" element={<SecondaryEntrances />} />
+        path="/SecondaryEntrances" element={<SecondaryEntrances />} />
         <Route path="/FencingandBarriers" element={<FencingandBarriers />} />
         <Route path="/LockingMechanisms" element={<LockingMechanisms />} />
         <Route path="/Lighting" element={<Lighting />} />
@@ -335,7 +335,7 @@ function App() {
         <Route path="/VisitorCheckin" element={<VisitorCheckin />} />
       </Routes>
     </Router>
-    </div>
+  </div>
   );
 }
 

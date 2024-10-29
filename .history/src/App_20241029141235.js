@@ -335,7 +335,7 @@ function App() {
         <Route path="/VisitorCheckin" element={<VisitorCheckin />} />
       </Routes>
     </Router>
-    </div>
+  </div>
   );
 }
 

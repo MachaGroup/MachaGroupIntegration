@@ -1,5 +1,3 @@
-import logo from './logo.svg';
-import './App.css';
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
@@ -159,22 +157,6 @@ import VisitorCheckin from "./Screens/VisitorCheckin";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-
     <Router>
       <Routes>
         {/* Default route for the main screen */}
@@ -293,7 +275,7 @@ function App() {
         <Route path="/AlarmS" element={<AlarmSystems />} />
         <Route path="/OnSite" element={<OnSiteSecurity />} />
         <Route path="/MainE" element={<MainEntrance />} />
-        <Route path="/SecondaryEntrances" element={<SecondaryEntrances />} />
+        path="/SecondaryEntrances" element={<SecondaryEntrances />} />
         <Route path="/FencingandBarriers" element={<FencingandBarriers />} />
         <Route path="/LockingMechanisms" element={<LockingMechanisms />} />
         <Route path="/Lighting" element={<Lighting />} />
@@ -335,6 +317,30 @@ function App() {
         <Route path="/VisitorCheckin" element={<VisitorCheckin />} />
       </Routes>
     </Router>
+  );
+}
+
+export default App;
+import logo from './logo.svg';
+import './App.css';
+
+function App() {
+  return (
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
     </div>
   );
 }
