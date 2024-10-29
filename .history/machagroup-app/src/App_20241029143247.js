@@ -156,7 +156,6 @@ import OnSiteGuards from "./Screens/OnSiteGuards";
 import RovingPatrols from "./Screens/RovingPatrols";
 import FrontDeskSecurity from "./Screens/FrontDeskSecurity";
 import VisitorCheckin from "./Screens/VisitorCheckin";
-import CreateanAccount from "./Screens/CreateanAccount";
 
 function App() {
   return (
@@ -334,7 +333,6 @@ function App() {
         <Route path="/RovingPatrols" element={<RovingPatrols />} />
         <Route path="/FrontDeskSecurity" element={<FrontDeskSecurity />} />
         <Route path="/VisitorCheckin" element={<VisitorCheckin />} />
-        <Route path="/CreateanAccount" element={<CreateanAccount />} />
       </Routes>
     </Router>
     </div>

@@ -1,0 +1,136 @@
+/* General Page Styling */
+.contact-us-page {
+    background-color: white;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center content horizontally */
+  }
+  
+  /* Header Styling */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #b0d3e6;
+    padding: 10px;
+    width: 100%;
+    max-width: 800px; /* Ensure the header stays within the container width */
+    box-sizing: border-box;
+  }
+  
+  /* Back Button Styling */
+  .back-button {
+    background: none;
+    border: none;
+    font-size: 2em;
+    cursor: pointer;
+    color: #333;
+  }
+  
+  /* Title Styling */
+  .title {
+    font-size: 1.8em;
+    color: #333;
+    margin: 0;
+  }
+  
+  /* Logo Styling */
+  .logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+  }
+  
+  /* Form Container */
+  .form-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the form fields */
+  }
+  
+  /* Form Styling */
+  .contact-form {
+    width: 100%; /* Form takes up full container width */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center form fields horizontally */
+  }
+  
+  .form-row {
+    width: 100%; /* Make sure each row takes up the full width */
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+  
+  .form-row input,
+  .form-row textarea {
+    width: 100%; /* Full width for inputs */
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  
+  .form-row input {
+    margin-bottom: 10px; /* Add space between input fields */
+  }
+  
+  textarea {
+    resize: none;
+  }
+  
+  /* File Upload Styling */
+  .file-upload {
+    display: flex;
+    justify-content: center; /* Center the upload label */
+    align-items: center;
+    width: 100%;
+    margin-left: 10px;
+  }
+  
+  .file-upload input[type="file"] {
+    display: none;
+  }
+  
+  .file-upload label {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #74b9ff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .file-upload label:hover {
+    background-color: #0984e3;
+  }
+  
+  /* Submit Button Styling */
+  .submit-button {
+    background-color: #74b9ff;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2em;
+    margin-top: 15px;
+    transition: background-color 0.3s;
+  }
+  
+  .submit-button:hover {
+    background-color: #0984e3;
+  }
