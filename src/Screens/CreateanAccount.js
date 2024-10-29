@@ -15,7 +15,7 @@ function CreateanAccount() {
   const passwordRef = useRef();
   const confirmPasswordRef = useRef();
   const buildingNameRef = useRef();
-  const streetAddressRef = useRef();
+  const AddressRef = useRef();
   const cityAddressRef = useRef();
   const stateRef= useRef();
   const countryRef = useRef();
@@ -123,7 +123,7 @@ function CreateanAccount() {
           <div className="address-inputs">
             <div>
               <label htmlFor="street">Street</label>
-              <input type="text" ref={streetAddressRef} id="street" placeholder="Enter Here" />
+              <input type="text" ref={AddressRef} id="street" placeholder="Enter Here" />
             </div>
 
             <div>
