@@ -1,0 +1,137 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Container */
+  .pricing-container {
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: #b0d3e6;
+  }
+  
+  .title {
+    font-size: 2em;
+    color: #333;
+  }
+  
+  .logo {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .back-button {
+    background: none;
+    border: none;
+    font-size: 1.8em;
+    cursor: pointer;
+    color: #333;
+  }
+  
+  /* Pricing Plans */
+  .pricing-plans {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+  
+  .pricing-card {
+    background-color: #f0f4f8;
+    padding: 20px;
+    width: 30%;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .pricing-card h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+  }
+  
+  .pricing-card h3 {
+    font-size: 2em;
+    margin-bottom: 10px;
+  }
+  
+  .pricing-card ul {
+    list-style: none;
+    margin-bottom: 10px;
+  }
+  
+  .pricing-card ul li {
+    font-size: 1em;
+    margin-bottom: 5px;
+  }
+  
+  .get-started {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .get-started:hover {
+    background-color: #45a049;
+  }
+  
+  /* Comparison Table */
+  .comparison-table {
+    margin: 20px 0;
+    overflow-x: auto; /* Add horizontal scrolling on small screens */
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* Ensure table columns have equal width */
+  }
+  
+  th, td {
+    padding: 15px;
+    border: 1px solid #ddd;
+    text-align: center;
+    white-space: nowrap; /* Prevent text from wrapping in table cells */
+  }
+  
+  th {
+    background-color: #f0f4f8;
+    font-weight: bold;
+  }
+  
+  td {
+    background-color: #ffffff;
+  }
+  
+  table th, table td {
+    min-width: 120px; /* Set a minimum width for each column */
+  }
+  
+  @media (max-width: 768px) {
+    .pricing-plans {
+      flex-direction: column; /* Stack plans vertically on small screens */
+    }
+  
+    .pricing-card {
+      width: 100%; /* Make pricing cards take full width on mobile */
+      margin-bottom: 20px;
+    }
+  }
+  
+  
+  

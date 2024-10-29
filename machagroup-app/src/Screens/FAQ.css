@@ -1,0 +1,135 @@
+/* Reset all elements to remove any padding or margin affecting layout */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* General styling for body and html */
+body, html {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Prevent horizontal scrollbars */
+}
+
+/* Full-width Header Styling */
+.header {
+  display: flex;
+  justify-content: space-between; /* Align title to the left, logo to the right */
+  align-items: center;
+  width: 100%; /* Ensure full width across the screen */
+  padding: 15px; /* Padding inside the header */
+  background-color: #b0d3e6; /* Light blue background */
+  box-sizing: border-box;
+  margin: 0 auto; /* Center the header, just in case */
+}
+
+/* Title Styling */
+.title {
+  font-size: 2em;
+  color: #333;
+  text-align: left;
+  flex-grow: 1; /* Allow title to take the available space */
+}
+
+/* Logo Styling */
+.logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+}
+
+/* Back Button Styling */
+.back-button {
+  background: none;
+  border: none;
+  font-size: 1.8em;
+  cursor: pointer;
+  color: #333;
+}
+
+/* Responsive Container for FAQ */
+.faq-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  width: 90%; /* Take up most of the screen, but not the full width */
+  max-width: 1000px; /* Limit max width for larger screens */
+  margin: 20px auto;
+  text-align: center;
+}
+
+/* Input Container Styling */
+.input-container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 0 10px;
+}
+
+.question-input {
+  width: 100%;
+  height: 200px;
+  padding: 15px;
+  font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+/* Responsive Header Styling */
+@media (max-width: 768px) {
+  .header {
+    padding: 10px;
+  }
+
+  .title {
+    font-size: 1.5em;
+  }
+
+  .logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .back-button {
+    font-size: 1.5em;
+  }
+
+  .faq-container {
+    width: 95%; /* Adjust for small screens */
+  }
+}
+
+@media (min-width: 769px) {
+  .header {
+    padding: 20px; /* Increase padding for desktop */
+  }
+
+  .title {
+    font-size: 2.5em;
+  }
+
+  .logo {
+    width: 70px;
+    height: 70px; /* Larger logo for desktop */
+  }
+
+  .back-button {
+    font-size: 2em;
+  }
+}
+
+
+
+
+
+
+
+
+
+

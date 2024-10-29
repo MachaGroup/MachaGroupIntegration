@@ -1,0 +1,85 @@
+/* General Page Styling */
+.about-page {
+    background-color: white; /* Set the background color to white */
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  /* Header Styling */
+  .header {
+    display: flex;
+    justify-content: space-between; /* Align title to the left, logo to the right */
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    background-color: #b0d3e6;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .title {
+    font-size: 2em;
+    color: #333;
+    margin: 0;
+  }
+  
+  .logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+  }
+  
+  
+  /* About Container Styling */
+  .about-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto; /* Center the about section */
+  }
+  
+  .back-button {
+    margin-top: 20px; /* Add space between header and back button */
+    background: none;
+    border: none;
+    font-size: 2em;
+    cursor: pointer;
+    color: #333;
+    padding: 5px 10px;
+    text-align: left; /* Align button to the left */
+    padding-left: 20px; /* Add padding to the left */
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .about-content h3 {
+    margin-top: 15px;
+    color: #333;
+  }
+  
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  
+  ul li {
+    margin: 5px 0;
+  }
+  
+  p {
+    margin: 10px 0;
+    color: #333;
+    line-height: 1.6;
+  }
+  
+  strong {
+    font-weight: bold;
+  }
+  
