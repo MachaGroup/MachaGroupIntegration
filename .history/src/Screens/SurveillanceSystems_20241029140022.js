@@ -12,7 +12,7 @@ function SurveillanceSystemsPage() {
       case 'CCTV Cameras':
         navigate('/CCTV');
         break;
-      case 'Alarm Systems':
+      //case 'Alarm Systems':
         navigate('/Alarm');
         break;
       default:

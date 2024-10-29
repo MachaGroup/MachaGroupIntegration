@@ -12,7 +12,7 @@ function PerimeterSecurityPage() {
       case 'Fencing and Barriers':
         navigate('/AccessP');
         break;
-      //case 'Lighting':
+      case 'Lighting':
         navigate('/surveillance');
         break;
       default:

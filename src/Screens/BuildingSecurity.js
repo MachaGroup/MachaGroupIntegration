@@ -9,9 +9,9 @@ function BuildingSecurityPage() {
   const handleButtonClick = (section) => {
     // Navigate to specific routes based on section
     switch (section) {
-      //case 'Locking Mechanisms':
-        //navigate('/AccessP');
-        //break;
+      case 'Locking Mechanisms':
+        navigate('/AccessP');
+        break;
       default:
         console.log('Unknown section');
     }
