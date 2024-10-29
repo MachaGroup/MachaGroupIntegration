@@ -1,0 +1,115 @@
+/* Main container for the form */
+.create-account-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Back button styling */
+  .back-button {
+    align-self: flex-start;
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  /* Title styling */
+  .create-account-title {
+    font-size: 32px;
+    font-weight: bold;
+    color: #4A79E8;
+    margin-bottom: 20px;
+  }
+  
+  /* Form styling */
+  .account-form {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Grouping each input field with label */
+  .form-group {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  
+  label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+    color: #333;
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  
+  /* Styling for the address section */
+  .address-section {
+    width: 100%;
+    margin-top: 20px;
+  }
+  
+  .address-section h3 {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #4A79E8;
+  }
+  
+  /* Grid styling for the address input fields */
+  .address-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    width: 100%;
+  }
+  
+  /* Full-width button styling */
+  .create-account-button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    background-color: #4A79E8;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .create-account-button:hover {
+    background-color: #3a5bb5;
+  }
+  
+  /* Link styling */
+  .skip-link, .cancel-link {
+    color: #4A79E8;
+    text-decoration: none;
+    margin-top: 10px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .skip-link:hover, .cancel-link:hover {
+    text-decoration: underline;
+  }
