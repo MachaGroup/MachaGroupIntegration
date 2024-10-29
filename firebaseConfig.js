@@ -1,19 +1,17 @@
-const { initializeApp } = require('firebase/app');
-const { getFirestore } = require('firebase/firestore');
-const { getAuth } = require("firebase/auth");
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import {getFirestore} from "@firebase/firestore";
  
+// Your web app's Firebase configuration
 const firebaseConfig = {
- apiKey: "AIzaSyC14LD9TO-ps_GTOVTv2_IZOyGhOoqEARs",
- authDomain: "machagroupwebapp-96c79.firebaseapp.com",
- projectId: "machagroupwebapp-96c79",
- storageBucket: "machagroupwebapp-96c79.appspot.com",
- messagingSenderId: "40616609712",
- appId: "1:40616609712:web:f3a79f268402b4fb7eb875",
- measurementId: "G-XB38RKBCEX"
+  apiKey: "AIzaSyDqfOFhLiU2wGNzuBQMjz3NbcIbdzEk_Io",
+  authDomain: "studentdatabaseproject-5433d.firebaseapp.com",
+  projectId: "studentdatabaseproject-5433d",
+  storageBucket: "studentdatabaseproject-5433d.appspot.com",
+  messagingSenderId: "516564451945",
+  appId: "1:516564451945:web:4d4f590513680797be18f8"
 };
  
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-
-module.exports = { db, auth };
+export const firestore = getFirestore(app);
