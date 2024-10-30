@@ -33,7 +33,7 @@ function CreateanAccount() {
         Password: passwordRef.current.value,
         ConfirmPassword: confirmPasswordRef.current.value,
         BuildingName: buildingNameRef.current.value,
-        StreetAddress: AddressRef.current.value,
+        StreetAddress: streetAddressRef.current.value,
         City: cityAddressRef.current.value,
         State: stateRef.current.value,
         Country: countryRef.current.value,

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {firestore} from '../firebaseConfig';
+import {firestore} from "../firebaseConfig";
 import { addDoc, collection } from '@firebase/firestore';
 import './CreateanAccount.css';
  
@@ -33,7 +33,7 @@ function CreateanAccount() {
         Password: passwordRef.current.value,
         ConfirmPassword: confirmPasswordRef.current.value,
         BuildingName: buildingNameRef.current.value,
-        StreetAddress: AddressRef.current.value,
+        StreetAddress: streetAddressRef.current.value,
         City: cityAddressRef.current.value,
         State: stateRef.current.value,
         Country: countryRef.current.value,
