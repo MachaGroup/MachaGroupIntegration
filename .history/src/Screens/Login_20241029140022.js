@@ -1,30 +1,21 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import './Login.css';
+import './Login.css';  // Assume the CSS is already updated
 import logo from '../assets/MachaLogo.png';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
-
-    const auth = getAuth();
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log('Login successful');
-      navigate('/main');  // Redirect to the main screen on successful login
-    } catch (error) {
-      console.error('Error logging in:', error.message);
-      // Optionally, display an error message to the user here
-    }
+    // Add logic for handling login (e.g., Firebase Authentication)
+    console.log('Email:', email);
+    console.log('Password:', password);
   };
 
   const handleCreateAccount = () => {
-    navigate('/create-account');  // Redirect to the create account page
+    // Add logic for handling account creation
+    console.log('Redirect to Create Account');
   };
 
   return (
@@ -64,6 +55,7 @@ function Login() {
         {/* Create Account button */}
         <button type="button" onClick={handleCreateAccount}>Create an Account</button>
       </form>
+
     </div>
   );
 }
