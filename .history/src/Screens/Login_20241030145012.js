@@ -16,7 +16,7 @@ function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log('Login successful');
-      navigate('/Main');  // Redirect to the main screen on successful login
+      navigate('/main');  // Redirect to the main screen on successful login
     } catch (error) {
       console.error('Error logging in:', error.message);
       // Optionally, display an error message to the user here

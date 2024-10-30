@@ -1,62 +1,96 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { firestore } from '../firebaseConfig';
-import { addDoc, collection } from '@firebase/firestore';
-import './CreateanAccount.css';
+import { getAuth } from 'firebase/auth';
+import { doc, updateDoc, getDoc } from '@firebase/firestore';
+import './EditProfile.css';
+import logo from '../assets/MachaLogo.png';
 
-function CreateanAccount() {
+function EditProfile() {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [buildingName, setBuildingName] = useState('');
-  const [streetAddress, setStreetAddress] = useState('');
+  const [street, setStreet] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [country, setCountry] = useState('');
   const [zipCode, setZipCode] = useState('');
+  const [userDocId, setUserDocId] = useState(null);
 
-  const ref = collection(firestore, 'users');
+  // Fetch user's document ID and profile data on component mount
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+
+      if (currentUser) {
+        const userRef = doc(firestore, 'users', currentUser.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          setUserDocId(currentUser.uid); // Set document ID to the user's UID
+          setUsername(userData.username || '');
+          setEmail(userData.email || '');
+          setPhoneNumber(userData.phoneNumber || '');
+          setBuildingName(userData.buildingName || '');
+          setStreet(userData.street || '');
+          setCity(userData.city || '');
+          setState(userData.state || '');
+          setCountry(userData.country || '');
+          setZipCode(userData.zipCode || '');
+        } else {
+          console.log('No user document found');
+        }
+      } else {
+        console.log('User not authenticated');
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
-      alert("Passwords do not match");
+    if (!userDocId) {
+      console.error('User document ID is not set');
       return;
     }
 
-    const data = {
-      Username: username,
-      Email: email,
-      Password: password,
-      BuildingName: buildingName,
-      StreetAddress: streetAddress,
-      City: city,
-      State: state,
-      Country: country,
-      ZipCode: zipCode,
+    const profileData = {
+      username,
+      email,
+      phoneNumber,
+      buildingName,
+      street,
+      city,
+      state,
+      country,
+      zipCode,
     };
 
     try {
-      await addDoc(ref, data);
-      console.log('Account created successfully');
-      navigate('/Main'); // Redirect to the main screen
-    } catch (e) {
-      console.error('Error creating account:', e);
+      const userDoc = doc(firestore, 'users', userDocId);
+      await updateDoc(userDoc, profileData);
+      console.log('Profile updated successfully');
+      navigate('/main');
+    } catch (error) {
+      console.error('Error updating profile:', error);
     }
   };
 
   return (
-    <div className="create-account-container">
+    <div className="edit-profile-container">
       <button className="back-button" onClick={() => navigate(-1)}>
         ←
       </button>
-      <h1 className="create-account-title">Create Account</h1>
-     
-      <form onSubmit={handleSubmit} className="account-form">
-        {/* User Information Fields */}
+      <h1 className="edit-profile-title">Edit Profile</h1>
+      <img src={logo} alt="Logo" className="logo" />
+
+      <form onSubmit={handleSubmit} className="profile-form">
         <div className="form-group">
           <label htmlFor="username">Username</label>
           <input
@@ -70,7 +104,7 @@ function CreateanAccount() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="email">Email Address</label>
+          <label htmlFor="email">Email</label>
           <input
             type="email"
             id="email"
@@ -82,34 +116,16 @@ function CreateanAccount() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="phoneNumber">Phone Number</label>
           <input
-            type="password"
-            id="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
+            type="text"
+            id="phoneNumber"
+            placeholder="Phone Number"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="confirmPassword">Confirm Password</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-        </div>
-
-       <div>
-        <label>This part of the form is optional*</label>
-       </div>
-       
-       {/* Address Fields */}
         <div className="form-group">
           <label htmlFor="buildingName">Building Name</label>
           <input
@@ -122,13 +138,13 @@ function CreateanAccount() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="streetAddress">Street</label>
+          <label htmlFor="street">Street</label>
           <input
             type="text"
-            id="streetAddress"
+            id="street"
             placeholder="Enter Here"
-            value={streetAddress}
-            onChange={(e) => setStreetAddress(e.target.value)}
+            value={street}
+            onChange={(e) => setStreet(e.target.value)}
           />
         </div>
 
@@ -176,11 +192,11 @@ function CreateanAccount() {
           />
         </div>
 
-        <button type="submit" className="create-account-button">Create Account</button>
+        <button type="submit" className="save-profile-button">Save Changes</button>
         <a href="/" className="cancel-link">Cancel</a>
       </form>
     </div>
   );
 }
 
-export default CreateanAccount;
+export default EditProfile;

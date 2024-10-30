@@ -16,14 +16,14 @@ function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log('Login successful');
-      navigate('/Main');  // Redirect to the main screen on successful login
+      navigate('/main');  // Redirect to the main screen on successful login
     } catch (error) {
       console.error('Error logging in:', error.message);
       // Optionally, display an error message to the user here
     }
   };
 
-  const handleCreateanAccount = () => {
+  const handleCreateAccount = () => {
     navigate('/CreateanAccount');  // Redirect to the create account page
   };
 
@@ -62,7 +62,7 @@ function Login() {
         <p className="or-text">or</p>
 
         {/* Create Account button */}
-        <button type="button" onClick={handleCreateanAccount}>Create an Account</button>
+        <button type="button" onClick={handleCreateAccount}>Create an Account</button>
       </form>
     </div>
   );

@@ -42,7 +42,7 @@ function CreateanAccount() {
     try {
       await addDoc(ref, data);
       console.log('Account created successfully');
-      navigate('/Main'); // Redirect to the main screen
+      navigate('/main'); // Redirect to the main screen
     } catch (e) {
       console.error('Error creating account:', e);
     }
