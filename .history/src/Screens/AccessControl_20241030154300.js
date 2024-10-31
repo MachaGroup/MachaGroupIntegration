@@ -15,14 +15,11 @@ function AccessControlPage() {
       case 'Perimeter Security':
         navigate('/PerimeterS');
         break;
-      case 'Building Security':
-        navigate('/BuildingS');
-        break;
       default:
         console.log('Unknown section');
     }
   };
-  
+
   return (
     <div className="form-page">
       {/* Header Section */}

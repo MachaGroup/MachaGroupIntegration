@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import './Login.css';
@@ -16,13 +16,7 @@ function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log('Login successful');
-      
-      // Listen for authentication state changes
-      auth.onAuthStateChanged((user) => {
-        if (user) {
-          navigate('/Main');  // Redirect to the main screen
-        }
-      });
+      navigate('/Main');  // Redirect to the main screen on successful login
     } catch (error) {
       console.error('Error logging in:', error.message);
       // Optionally, display an error message to the user here
@@ -68,11 +62,10 @@ function Login() {
         <p className="or-text">or</p>
 
         {/* Create Account button */}
-        <button type="button" onClick={handleCreateAccount}>Create Account</button>
+        <button type="button" onClick={handleCreateAccount}>Create an Account</button>
       </form>
     </div>
   );
 }
 
 export default Login;
-

@@ -10,7 +10,7 @@ function LightingPage() {
     // Navigate to specific routes based on section
     switch (section) {
       case 'Motion-Activated Lights':
-        navigate('/Motion-ActivatedLights');
+        navigate('/MotionActivatedLights');
         break;
       case 'Floodlights':
         navigate('/Floodlights');

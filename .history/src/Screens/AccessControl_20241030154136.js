@@ -1,28 +1,23 @@
 import React from 'react';
 import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
-import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 
 function AccessControlPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook
-
   const handleButtonClick = (section) => {
+    console.log(`Button clicked for: ${section}`);
     // Navigate to specific routes based on section
     switch (section) {
-      case 'Access Points':
-        navigate('/AccessP');
+      case 'Motion-Activated Lights':
+        navigate('/MotionActivatedLights');
         break;
-      case 'Perimeter Security':
-        navigate('/PerimeterS');
-        break;
-      case 'Building Security':
-        navigate('/BuildingS');
+      case 'Floodlights':
+        navigate('/Floodlights');
         break;
       default:
         console.log('Unknown section');
     }
   };
-  
+
   return (
     <div className="form-page">
       {/* Header Section */}

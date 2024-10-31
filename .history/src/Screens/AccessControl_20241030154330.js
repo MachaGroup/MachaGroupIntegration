@@ -22,7 +22,7 @@ function AccessControlPage() {
         console.log('Unknown section');
     }
   };
-  
+
   return (
     <div className="form-page">
       {/* Header Section */}
