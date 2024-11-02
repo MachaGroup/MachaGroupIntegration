@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
 // import './EditProfile.css';  // Ensure this links to your CSS file
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
+import { updateDoc, collection } from '@firebase/firestore';
+import {firestore} from "../firebaseConfig";
 
 function EditProfile() {
     const navigate = useNavigate();  // Initialize useNavigate hook
@@ -27,6 +29,41 @@ function EditProfile() {
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [phone_number, setPhoneNumber] = useState('');
+    const userNameRef = useRef();
+    const emailRef = useRef();
+    const buildingNameRef = useRef();
+    const AddressRef = useRef();
+    const cityAddressRef = useRef();
+    const stateRef= useRef();
+    const countryRef = useRef();
+    const zipCodeRef = useRef();
+    const phoneNumberRef = useRef();
+    const ref = collection(firestore, "users")
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        //handle account update logic here
+        console.log('Account Update:', {username, email})
+    
+        let data = {
+            Username: userNameRef.current.value,
+            Email: emailRef.current.value,
+            BuildingName: buildingNameRef.current.value,
+            StreetAddress: AddressRef.current.value,
+            City: cityAddressRef.current.value,
+            State: stateRef.current.value,
+            Country: countryRef.current.value,
+            ZipCode: zipCodeRef.current.value,
+            phoneNumber: phoneNumberRef.current.value
+        };
+    
+        try{
+            updateDoc(ref, data);
+        } catch(e) {
+            console.log(e)
+        }
+    };
+
 
     return (
         <div className="editprofile-page">
@@ -59,6 +96,7 @@ function EditProfile() {
                 <label>Username</label>
                 <input
                     type="username"
+                    ref={userNameRef}
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Username"
@@ -69,6 +107,7 @@ function EditProfile() {
                 <label>Email</label>
                 <input
                     type="email"
+                    ref={emailRef}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Email"
@@ -79,6 +118,7 @@ function EditProfile() {
                 <label>Phone Number (Optional) </label>
                 <input
                     type="phone number"
+                    ref={phoneNumberRef}
                     value={phone_number}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     placeholder="Ex. (123)456-7890"

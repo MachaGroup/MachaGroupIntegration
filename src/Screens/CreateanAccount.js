@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {firestore} from "../firebaseConfig";
+import {firestore, auth} from "../firebaseConfig";
 import { addDoc, collection } from '@firebase/firestore';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import './CreateanAccount.css';
 
 function CreateanAccount() {
@@ -12,8 +13,6 @@ function CreateanAccount() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const userNameRef = useRef();
   const emailRef = useRef();
-  const passwordRef = useRef();
-  const confirmPasswordRef = useRef();
   const buildingNameRef = useRef();
   const AddressRef = useRef();
   const cityAddressRef = useRef();
@@ -22,18 +21,21 @@ function CreateanAccount() {
   const zipCodeRef = useRef();
   const ref = collection(firestore, "users")
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     // Handle account creation logic here
+    try {
+        await createUserWithEmailAndPassword(auth, email, password);
+    } catch(e) {
+        console.log('Account creation error:', e)
+    }
     console.log('Account created:', { username, email, password, confirmPassword });
 
     let data = {
         Username: userNameRef.current.value,
         Email: emailRef.current.value,
-        Password: passwordRef.current.value,
-        ConfirmPassword: confirmPasswordRef.current.value,
         BuildingName: buildingNameRef.current.value,
-        StreetAddress: streetAddressRef.current.value,
+        StreetAddress: AddressRef.current.value,
         City: cityAddressRef.current.value,
         State: stateRef.current.value,
         Country: countryRef.current.value,
@@ -42,6 +44,7 @@ function CreateanAccount() {
 
     try {
         addDoc(ref, data);
+        navigate('/Main')
     } catch(e) {
         console.log(e)
     }
@@ -86,7 +89,6 @@ function CreateanAccount() {
           <label htmlFor="password">Password</label>
           <input
             type="password"
-            ref={passwordRef}
             id="password"
             placeholder="Password"
             value={password}
@@ -99,7 +101,6 @@ function CreateanAccount() {
           <label htmlFor="confirmPassword">Confirm Password</label>
           <input
             type="password"
-            ref={confirmPasswordRef}
             id="confirmPassword"
             placeholder="Confirm Password"
             value={confirmPassword}

@@ -1,3 +1,5 @@
+import logo from './logo.svg';
+import './App.css';
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
@@ -155,12 +157,10 @@ import RovingPatrols from "./Screens/RovingPatrols";
 import FrontDeskSecurity from "./Screens/FrontDeskSecurity";
 import VisitorCheckin from "./Screens/VisitorCheckin";
 import CreateanAccount from "./Screens/CreateanAccount";
-import './App.css';
-
-
 
 function App() {
   return (
+    <div className="App">
     <Router>
       <Routes>
         {/* Default route for the main screen */}
@@ -322,6 +322,7 @@ function App() {
         <Route path="/CreateanAccount" element={<CreateanAccount />} />
       </Routes>
     </Router>
+    </div>
   );
 }
 
