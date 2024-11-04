@@ -1,0 +1,82 @@
+.create-account-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .back-button {
+    align-self: flex-start;
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .create-account-title {
+    font-size: 36px;
+    font-weight: bold;
+    color: #b0b8d6;
+    margin-bottom: 20px;
+  }
+  
+  .account-form {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  
+  .address-section h3 {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .address-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    width: 100%;
+  }
+  
+  .create-account-button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    background-color: #d0d8f6;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .skip-link, .cancel-link {
+    color: #4a79e8;
+    text-decoration: none;
+    margin-top: 10px;
+    font-size: 14px;
+  }
+  
+  .cancel-link {
+    margin-top: 20px;
+  }
+  
