@@ -7,7 +7,7 @@ import logo from '../assets/MachaLogo.png';
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // New state for toggling password visibility
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -35,7 +35,6 @@ function Login() {
   return (
     <div className="login-container">
       <img src={logo} alt="Logo" className="logo" />
-
       <h1>Login</h1>
       <form onSubmit={handleLogin}>
         <div className="form-group">
@@ -63,7 +62,7 @@ function Login() {
               className="password-toggle"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? '👁️' : '👁️‍🗨️'}
+              {showPassword ? '🙈' : '👁️'}
             </span>
           </div>
         </div>

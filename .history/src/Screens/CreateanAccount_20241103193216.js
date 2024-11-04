@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {firestore, auth} from "../firebaseConfig";
-import { addDoc, collection, serverTimestamp } from '@firebase/firestore';
+import { addDoc, collection } from '@firebase/firestore';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import './CreateanAccount.css';
  
@@ -40,7 +40,7 @@ function CreateanAccount() {
         State: stateRef.current.value,
         Country: countryRef.current.value,
         ZipCode: zipCodeRef.current.value,
-        Timestamp: serverTimestamp(),
+        Timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     };
  
     try {

@@ -14,8 +14,6 @@
 }
 .password-container {
   position: relative;
-  display: flex;
-  align-items: center;
 }
 
 .password-container input {
@@ -26,11 +24,10 @@
 .password-toggle {
   position: absolute;
   right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
   cursor: pointer;
   font-size: 1.2em;
-  display: flex;
-  align-items: center; /* Ensures icon centers vertically */
-  height: 100%; /* Matches the height of the input for better alignment */
 }
 
 
