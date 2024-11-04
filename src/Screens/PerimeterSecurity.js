@@ -10,10 +10,10 @@ function PerimeterSecurityPage() {
     // Navigate to specific routes based on section
     switch (section) {
       case 'Fencing and Barriers':
-        navigate('/AccessP');
+        navigate('/FencingandBarriers');
         break;
       case 'Lighting':
-        navigate('/surveillance');
+        navigate('/Lighting');
         break;
       default:
         console.log('Unknown section');

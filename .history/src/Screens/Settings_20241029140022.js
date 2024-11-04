@@ -18,7 +18,7 @@ function Settings() {
 
   // Handle logout navigation
   const handleLogout = () => {
-    navigate('/Login');  // Navigate to the login page after logging out
+    navigate('/login');  // Navigate to the login page after logging out
   };
 
   // Handle image upload and preview

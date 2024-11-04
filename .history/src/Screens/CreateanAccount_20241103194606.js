@@ -18,7 +18,7 @@ function CreateanAccount() {
   const stateRef = useRef();
   const countryRef = useRef();
   const zipCodeRef = useRef();
-  const ref = collection(firestore, "users"); // Use "users" collection
+  const ref = collection(firestore, "contact-us"); // Use "contact-us" collection
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,24 +32,15 @@ function CreateanAccount() {
       State: stateRef.current.value,
       Country: countryRef.current.value,
       ZipCode: zipCodeRef.current.value,
+      Timestamp: serverTimestamp().current.value,
     };
 
     try {
       await addDoc(ref, data); // Add document to "contact-us" collection
       console.log('Data added successfully:', data);
-
-      // Attempt to navigate to the main page
-      navigate('/Main');
-
-      // Check if navigation didn't occur and alert if necessary
-      setTimeout(() => {
-        if (window.location.pathname !== '/Main') {
-          alert('Redirection failed. Please try again.');
-        }
-      }, 1000); // 1 second delay to verify navigation
+      navigate('/Main'); // Redirect to main page on success
     } catch (e) {
       console.log('Error adding document:', e);
-      alert('There was an error creating your account. Please try again.');
     }
   };
 
@@ -160,6 +151,5 @@ function CreateanAccount() {
 }
 
 export default CreateanAccount;
-
 
  

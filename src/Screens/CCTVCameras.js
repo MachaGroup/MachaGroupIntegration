@@ -10,10 +10,10 @@ function CCTVCamerasPage() {
     // Navigate to specific routes based on section
     switch (section) {
       case 'Indoor Cameras':
-        navigate('/AccessP');
+        navigate('/IndoorCameras');
         break;
       case 'Outdoor Cameras':
-        navigate('/PerimeterS');
+        navigate('/OutdoorCameras');
         break;
       default:
         console.log('Unknown section');

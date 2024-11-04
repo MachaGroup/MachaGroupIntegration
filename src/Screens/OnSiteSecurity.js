@@ -10,10 +10,10 @@ function OnSiteSecurityPage() {
     // Navigate to specific routes based on section
     switch (section) {
       case 'Security Guards':
-        navigate('/Access');
+        navigate('/SecurityGuards');
         break;
       case 'Reception Staff':
-        navigate('/surveillance');
+        navigate('/ReceptionStaff');
         break;
       default:
         console.log('Unknown section');

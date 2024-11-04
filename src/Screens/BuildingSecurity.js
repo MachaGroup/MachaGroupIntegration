@@ -10,7 +10,7 @@ function BuildingSecurityPage() {
     // Navigate to specific routes based on section
     switch (section) {
       case 'Locking Mechanisms':
-        navigate('/AccessP');
+        navigate('/LockingMechanisms');
         break;
       default:
         console.log('Unknown section');

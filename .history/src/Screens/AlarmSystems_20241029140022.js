@@ -3,24 +3,21 @@ import { useNavigate } from 'react-router-dom';  // Import useNavigate for navig
 import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 
-function AlertSystemPage() {
+function AlarmSystemsPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook
+
   const handleButtonClick = (section) => {
-    
-
-    console.log(`Button clicked for: ${section}`);
-    // Add logic for handling button click, e.g., open a modal or navigate
-
+    // Navigate to specific routes based on section
     switch (section) {
-      case 'Public Address System':
-          navigate('/PublicAddressAystem');
-          break;
-      case 'Text/Email Alerts':
-          navigate('/TextEmailAlerts');
-          break;
+      case 'Intrusion Alarms':
+        navigate('/AccessP');
+        break;
+      case 'Perimeter Alarms':
+        navigate('/PerimeterS');
+        break;
       default:
-          console.log('Unknown section');
-  }
+        console.log('Unknown section');
+    }
   };
 
   return (
@@ -32,12 +29,12 @@ function AlertSystemPage() {
         <img src={logo} alt="Logo" className="logo" />
       </header>
 
-      {/* Alert Systems Section */}
+      {/* Physical Security Section */}
       <main className="form-container">
-        <h2>Alert Systems</h2>
+        <h2>Alarm Systems</h2>
         <form>
-          {/* Alert Systems Buttons */}
-          {['Public Address System', 'Text/Email Alerts'].map((section, index) => (
+          {/* Physical Security Buttons */}
+          {['Intrusion Alarms', 'Perimeter Alarms'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>
@@ -51,4 +48,5 @@ function AlertSystemPage() {
   );
 }
 
-export default AlertSystemPage;
+export default AlarmSystemsPage;
+

@@ -10,10 +10,10 @@ function AlarmSystemsPage() {
     // Navigate to specific routes based on section
     switch (section) {
       case 'Intrusion Alarms':
-        navigate('/AccessP');
+        navigate('/IntrusionAlarms');
         break;
       case 'Perimeter Alarms':
-        navigate('/PerimeterS');
+        navigate('/PerimeterAlarms');
         break;
       default:
         console.log('Unknown section');

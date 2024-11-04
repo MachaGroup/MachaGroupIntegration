@@ -2,8 +2,6 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';  // Import useNavigate
 import './ContactUs.css'; // Ensure you create this CSS file
 import logo from '../assets/MachaLogo.png'; // Ensure the correct logo path
-import { addDoc, collection, Timestamp } from '@firebase/firestore';
-import {firestore} from "../firebaseConfig";
 
 function ContactUs() {
   const navigate = useNavigate();  // Initialize useNavigate hook

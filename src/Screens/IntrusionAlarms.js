@@ -13,7 +13,7 @@ function IntrusionAlarmsPage() {
         navigate('/MotionSensors');
         break;
       case 'Glass Break Sensors':
-        navigate('/Glass Break Sensors');
+        navigate('/GlassBreakSensors');
         break;
       case 'Door Alarms':
         navigate('/DoorAlarms');

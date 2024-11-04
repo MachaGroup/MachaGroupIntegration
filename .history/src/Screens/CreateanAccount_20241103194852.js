@@ -18,7 +18,7 @@ function CreateanAccount() {
   const stateRef = useRef();
   const countryRef = useRef();
   const zipCodeRef = useRef();
-  const ref = collection(firestore, "users"); // Use "users" collection
+  const ref = collection(firestore, "contact-us"); // Use "contact-us" collection
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,6 +32,7 @@ function CreateanAccount() {
       State: stateRef.current.value,
       Country: countryRef.current.value,
       ZipCode: zipCodeRef.current.value,
+      Timestamp: serverTimestamp(),
     };
 
     try {

@@ -1,9 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';  // Import useNavigate
 import './ContactUs.css'; // Ensure you create this CSS file
 import logo from '../assets/MachaLogo.png'; // Ensure the correct logo path
-import { addDoc, collection, Timestamp } from '@firebase/firestore';
-import {firestore} from "../firebaseConfig";
 
 function ContactUs() {
   const navigate = useNavigate();  // Initialize useNavigate hook
@@ -75,7 +73,6 @@ function ContactUs() {
           <div className="form-row">
             <input
               type="text"
-              ref={firstNameRef}
               name="firstName"
               value={formData.firstName}
               onChange={handleChange}
@@ -84,7 +81,6 @@ function ContactUs() {
             />
             <input
               type="text"
-              ref={lastNameRef}
               name="lastName"
               value={formData.lastName}
               onChange={handleChange}
@@ -96,7 +92,6 @@ function ContactUs() {
           <div className="form-row">
             <input
               type="email"
-              ref={emailRef}
               name="email"
               value={formData.email}
               onChange={handleChange}
@@ -108,7 +103,6 @@ function ContactUs() {
           <div className="form-row">
             <input
               type="text"
-              ref={companyRef}
               name="company"
               value={formData.company}
               onChange={handleChange}
@@ -123,7 +117,6 @@ function ContactUs() {
           <div className="form-row">
             <input
               type="text"
-              ref={subjectRef}
               name="subject"
               value={formData.subject}
               onChange={handleChange}
@@ -135,7 +128,6 @@ function ContactUs() {
           <div className="form-row">
             <textarea
               name="message"
-              ref={messageRef}
               value={formData.message}
               onChange={handleChange}
               placeholder="Your Message"
