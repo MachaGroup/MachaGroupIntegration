@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
@@ -174,7 +173,7 @@ function App() {
         <Route path="/FAQ" element={<FAQ />} />
         <Route path="/ContactUs" element={<ContactUs />} />
         <Route path="/Settings" element={<Settings />} />
-        <Route path="/editprofile" element={<EditProfile />} />
+        <Route path="/EditProfile" element={<EditProfile />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/Pricing" element={<Pricing />} />
         <Route path="/Physical" element={<PhysicalSecurity />} />

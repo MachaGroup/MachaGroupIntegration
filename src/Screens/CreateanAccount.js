@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {firestore, auth} from "../firebaseConfig";
-import { addDoc, collection } from '@firebase/firestore';
+import { addDoc, collection, Timestamp } from '@firebase/firestore';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import './CreateanAccount.css';
 
@@ -19,7 +19,7 @@ function CreateanAccount() {
   const stateRef= useRef();
   const countryRef = useRef();
   const zipCodeRef = useRef();
-  const ref = collection(firestore, "users")
+  const ref = collection(firestore, "users");
 
   const handleSubmit = async(e) => {
     e.preventDefault();
@@ -40,6 +40,7 @@ function CreateanAccount() {
         State: stateRef.current.value,
         Country: countryRef.current.value,
         ZipCode: zipCodeRef.current.value,
+        Timestamp: Timestamp.now(),
     };
 
     try {

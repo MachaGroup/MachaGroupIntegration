@@ -1,28 +1,48 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
-import './MainScreen.css';  // Assume the CSS is already updated
-import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './MainScreen.css';
+import logo from '../assets/MachaLogo.png';
+import { signOut, getAuth, onAuthStateChanged } from 'firebase/auth';
 
 function MainScreen() {
-  const navigate = useNavigate();  // Initialize useNavigate hook
+  const navigate = useNavigate();
+  const auth = getAuth(); // Initialize Firebase Authentication
+  const [user, setUser] = useState(null); // State to track the logged-in user
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user); // Update the user state
+      if (!user) {
+        // User is not logged in, redirect to the login page
+        navigate('/login');
+      }
+    });
+
+    return () => unsubscribe(); // Clean up the listener
+  }, []);
 
   const navigateTo = (path) => {
-    navigate(path);  // Use navigate to navigate to the specified route
+    navigate(path);
   };
 
-  const handleLogout = () => {
-    // Perform any logout logic here (e.g., clearing user session or tokens)
-    navigate('/login');  // Redirect to the Login screen after logging out
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // Sign out the user
+      setUser(null); // Clear the user state
+      navigate('/login'); // Redirect to the login page
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   const handleBack = () => {
-    navigate(-1);  // Navigate back to the previous page
+    navigate(-1);
   };
 
   return (
     <div className="main-container">
       <header className="header">
-      <button className="back-button" onClick={handleBack}>←</button>
+        <button className="back-button" onClick={handleBack}>←</button>
         <h1>The MACHA Group</h1>
         <img src={logo} alt="Logo" className="logo" />
       </header>
@@ -41,7 +61,9 @@ function MainScreen() {
       </div>
 
       <footer>
-      <a href="#logout" onClick={handleLogout}>Log out</a>
+        {user ? ( // Only show the logout link if a user is logged in
+          <a href="#logout" onClick={handleLogout}>Log out</a>
+        ) : null}
       </footer>
     </div>
   );

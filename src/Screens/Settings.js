@@ -1,55 +1,81 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
-import './Settings.css';  // Ensure this links to your CSS file
-import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './Settings.css';
+import logo from '../assets/MachaLogo.png';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Import Firebase Authentication
 
 function Settings() {
-  const navigate = useNavigate();  // Initialize useNavigate hook
-  const [profilePic, setProfilePic] = useState(null); // Start with no picture, null by default
+  const navigate = useNavigate();
+  const [profilePic, setProfilePic] = useState(null); // State for preview
+  const [profilePicUrl, setProfilePicUrl] = useState(null); // State for uploaded URL
+  const [user, setUser] = useState(null); // State to store the current user
+
+  const auth = getAuth(); // Initialize Firebase Authentication
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+  }, []);
 
   const navigateTo = (path) => {
-    navigate(path);  // Use navigate to navigate to the specified route
+    navigate(path);
   };
 
-  // Handle back navigation
   const handleBack = () => {
-    navigate(-1);  // Navigate back to the previous page
+    navigate(-1);
   };
 
-  // Handle logout navigation
   const handleLogout = () => {
-    navigate('/login');  // Navigate to the login page after logging out
+    navigate('/login');
   };
 
-  // Handle image upload and preview
   const handleImageUpload = (e) => {
-    const file = e.target.files[0]; // Get the first file selected
+    const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        setProfilePic(reader.result); // Set the preview to the uploaded image
+        setProfilePic(reader.result); // Set the preview image
       };
-      reader.readAsDataURL(file); // Convert file to a data URL for preview
+      reader.readAsDataURL(file); // Convert to data URL for preview
+
+      // Upload to Firebase Storage
+      const storage = getStorage();
+      const storageRef = ref(storage, `profilePictures/${user?.uid}/${file.name}`);
+      uploadBytes(storageRef, file)
+        .then((snapshot) => {
+          getDownloadURL(snapshot.ref)
+            .then((url) => {
+              setProfilePicUrl(url); // Update the uploaded URL
+            })
+            .catch((error) => {
+              console.error('Error getting download URL:', error);
+            });
+        })
+        .catch((error) => {
+          console.error('Error uploading file:', error);
+        });
     }
   };
 
+  // Removed handleSubmit function
+
   return (
     <div className="settings-page">
-      {/* Header Section */}
       <header className="header">
         <button className="back-button" onClick={handleBack}>←</button>
         <h1 className="title">The MACHA Group</h1>
         <img src={logo} alt="Logo" className="logo" />
       </header>
 
-      {/* Settings Section */}
       <main className="settings-container">
         <h2>Settings</h2>
 
         {/* Profile Picture */}
         <div className="profile-pic-container">
           <img
-            src={profilePic || 'https://via.placeholder.com/100'} // Use a placeholder when no profilePic is available
+            src={profilePic || profilePicUrl || 'https://via.placeholder.com/100'} // Use preview or uploaded URL
             alt="Profile"
             className="profile-pic"
           />
