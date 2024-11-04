@@ -1,56 +1,81 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getFirestore, doc, updateDoc, query, where, getDocs, collection } from 'firebase/firestore';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
-import logo from '../assets/MachaLogo.png';
+import logo from '../assets/MachaLogo.png'; // Adjust the path to your logo
 
 function EditProfile() {
     const navigate = useNavigate();
-
-    // State variables for profile information
-    const [profilePic, setProfilePic] = useState(null);
-    const [email, setEmail] = useState('');
+    const [profilePicURL, setProfilePicURL] = useState(null);
     const [username, setUsername] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [buildingName, setBuildingName] = useState('');
-    const [street, setStreet] = useState('');
-    const [city, setCity] = useState('');
-    const [state, setState] = useState('');
-    const [country, setCountry] = useState('');
-    const [zipCode, setZipCode] = useState('');
+    const [email, setEmail] = useState(''); // Store email in lowercase
+    const [phone_number, setPhoneNumber] = useState('');
 
-    // Handle back navigation
+    const auth = getAuth();
+    const db = getFirestore();
+    const storage = getStorage();
+
+    // Removed the section that fetches existing user data from Firestore
+
     const handleBack = () => {
         navigate(-1);
     };
 
-    // Handle image upload and preview
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = () => {
-                setProfilePic(reader.result);
+                setProfilePicURL(reader.result);
             };
             reader.readAsDataURL(file);
         }
     };
 
+    const handleSaveChanges = async () => {
+        const userEmail = auth.currentUser.email.toLowerCase(); // Get the logged-in user's email
+
+        // Create a query to find the document with the matching email
+        const q = query(collection(db, 'users'), where('Email', '==', userEmail));
+
+        try {
+            const querySnapshot = await getDocs(q);
+            if (querySnapshot.empty) {
+                console.log('No matching document found.');
+                return; // Or handle the case where no document is found
+            }
+
+            // Get the first matching document (assuming there's only one)
+            const docRef = querySnapshot.docs[0].ref;
+
+            // Update the document
+            await updateDoc(docRef, {
+                username: username, // Update username without forcing lowercase
+                phone_number: phone_number,
+                profilePictureURL: profilePicURL,
+            });
+
+            console.log('Document updated successfully!');
+        } catch (error) {
+            console.error('Error updating document:', error);
+        }
+    };
+
     return (
         <div className="editprofile-page">
-            {/* Header Section */}
             <header className="header">
                 <button className="back-button" onClick={handleBack}>←</button>
                 <h1 className="title">The MACHA Group</h1>
                 <img src={logo} alt="Logo" className="logo" />
             </header>
-      
-            {/* Edit Profile Section */}
+
             <main className="editprofile-container">
                 <h2>Edit Profile</h2>
 
-                {/* Profile Picture */}
                 <div className="profile-pic-container">
                     <img
-                        src={profilePic || 'https://via.placeholder.com/100'}
+                        src={profilePicURL || 'https://via.placeholder.com/100'}
                         alt="Profile"
                         className="profile-pic"
                     />
@@ -62,11 +87,10 @@ function EditProfile() {
                     />
                 </div>
 
-                {/* Profile Form Fields */}
                 <div className="form-group">
                     <label>Username</label>
                     <input
-                        type="text"
+                        type="username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         placeholder="Username"
@@ -78,77 +102,23 @@ function EditProfile() {
                     <input
                         type="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => setEmail(e.target.value.toLowerCase())} // Convert to lowercase on input
                         placeholder="Email"
                         required
+                        disabled // Make email field read-only
                     />
                 </div>
                 <div className="form-group">
-                    <label>Phone Number (Optional)</label>
+                    <label>Phone Number (Optional) </label>
                     <input
-                        type="tel"
-                        value={phoneNumber}
+                        type="phone number"
+                        value={phone_number}
                         onChange={(e) => setPhoneNumber(e.target.value)}
-                        placeholder="Ex. (123)456-7890"
-                    />
-                </div>
-                <div className="form-group">
-                    <label>Building Name (Optional)</label>
-                    <input
-                        type="text"
-                        value={buildingName}
-                        onChange={(e) => setBuildingName(e.target.value)}
-                        placeholder="Enter Here"
-                    />
-                </div>
-                <div className="form-group">
-                    <label>Street (Optional)</label>
-                    <input
-                        type="text"
-                        value={street}
-                        onChange={(e) => setStreet(e.target.value)}
-                        placeholder="Enter Here"
-                    />
-                </div>
-                <div className="form-group">
-                    <label>City (Optional)</label>
-                    <input
-                        type="text"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        placeholder="Enter Here"
-                    />
-                </div>
-                <div className="form-group">
-                    <label>State (Optional)</label>
-                    <input
-                        type="text"
-                        value={state}
-                        onChange={(e) => setState(e.target.value)}
-                        placeholder="Enter Here"
-                    />
-                </div>
-                <div className="form-group">
-                    <label>Country (Optional)</label>
-                    <input
-                        type="text"
-                        value={country}
-                        onChange={(e) => setCountry(e.target.value)}
-                        placeholder="Enter Here"
-                    />
-                </div>
-                <div className="form-group">
-                    <label>Zip Code (Optional)</label>
-                    <input
-                        type="text"
-                        value={zipCode}
-                        onChange={(e) => setZipCode(e.target.value)}
-                        placeholder="Enter Here"
+                        placeholder="Ex. (123) 456-7890"
                     />
                 </div>
 
-                {/* Save Changes button */}
-                <button className="savechanges-button">Save Changes</button>
+                <button className="savechanges-button" onClick={handleSaveChanges}>Save Changes</button>
             </main>
         </div>
     );

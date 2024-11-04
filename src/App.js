@@ -159,7 +159,7 @@ import CreateanAccount from "./Screens/CreateanAccount";
 
 function App() {
   return (
-    <div>
+    <div className="App">
     <Router>
       <Routes>
         {/* Default route for the main screen */}
@@ -173,7 +173,7 @@ function App() {
         <Route path="/FAQ" element={<FAQ />} />
         <Route path="/ContactUs" element={<ContactUs />} />
         <Route path="/Settings" element={<Settings />} />
-        <Route path="/editprofile" element={<EditProfile />} />
+        <Route path="/EditProfile" element={<EditProfile />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/Pricing" element={<Pricing />} />
         <Route path="/Physical" element={<PhysicalSecurity />} />

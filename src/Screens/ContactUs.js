@@ -7,6 +7,13 @@ import {firestore} from "../firebaseConfig";
 
 function ContactUs() {
   const navigate = useNavigate();  // Initialize useNavigate hook
+  const firstNameRef = useRef();
+  const lastNameRef = useRef();
+  const emailRef = useRef();
+  const companyRef = useRef();
+  const subjectRef = useRef();
+  const messageRef = useRef();
+  const ref = collection(firestore, 'contact-us');
 
   const firstNameRef = useRef();
   const lastNameRef = useRef();
@@ -40,6 +47,11 @@ function ContactUs() {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Form Data Submitted:', formData);
+<<<<<<< HEAD
+=======
+    // Add form submission logic here
+
+>>>>>>> 1ad06898d43e67f7144c15e8fc9cf79d92079f77
     let data = {
       FirstName: firstNameRef.current.value,
       LastName: lastNameRef.current.value,
@@ -49,7 +61,11 @@ function ContactUs() {
       Message: messageRef.current.value,
       Timestamp: Timestamp.now(),
     }
+<<<<<<< HEAD
  
+=======
+
+>>>>>>> 1ad06898d43e67f7144c15e8fc9cf79d92079f77
     try {
       addDoc(ref, data);
       navigate('/Main')
