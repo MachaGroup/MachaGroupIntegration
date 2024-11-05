@@ -80,14 +80,13 @@ function Login() {
         </div>
 
         <button type="submit">Login</button>
-
-      </form>
-
+        
         {/* or text */}
         <p className="or-text">or</p>
 
         {/* Create Account button */}
         <button type="button" onClick={handleCreateanAccount}>Create an Account</button>
+      </form>
     </div>
   );
 }
