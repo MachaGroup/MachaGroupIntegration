@@ -3,18 +3,24 @@ import { useNavigate } from 'react-router-dom';  // Import useNavigate for navig
 import './SurveillanceSystems.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 
-function SurveillanceSystemsPage() {
+function MainEntrancePage() {
   const navigate = useNavigate();  // Initialize useNavigate hook
 
   const handleButtonClick = (section) => {
     // Navigate to specific routes based on section
     switch (section) {
-      case 'CCTV Camera':
-        navigate('/CCTV');
+      case 'Security Gates':
+        navigate('/SecurityGates');
         break;
-      case 'Alarm Systems':
-        navigate('/AlarmS');
+      case 'Turnstiles':
+        navigate('/Turnstiles');
         break;
+        case 'Access Control Systems':
+          navigate('/AccessControlSystems');
+          break;
+        case 'Security Guard':
+          navigate('SecurityGuard');
+          break;
       default:
         console.log('Unknown section');
     }
@@ -34,7 +40,7 @@ function SurveillanceSystemsPage() {
         <h2>Surveillance Systems</h2>
         <form>
           {/* Physical Security Buttons */}
-          {['CCTV Camera', 'Alarm Systems'].map((section, index) => (
+          {['Security Gates', 'Turnstiles', 'Access Control Systems'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>
@@ -48,5 +54,5 @@ function SurveillanceSystemsPage() {
   );
 }
 
-export default SurveillanceSystemsPage;
+export default MainEntrancePage;
 

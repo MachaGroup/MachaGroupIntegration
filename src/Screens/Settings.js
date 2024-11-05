@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './Settings.css';
 import logo from '../assets/MachaLogo.png';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Import Firebase Authentication
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth'; // Import Firebase Authentication
 
 function Settings() {
   const navigate = useNavigate();
@@ -27,8 +27,14 @@ function Settings() {
     navigate(-1);
   };
 
-  const handleLogout = () => {
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // Sign out the user
+      setUser(null); // Clear the user state
+      navigate('/Login'); // Redirect to the login page
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   const handleImageUpload = (e) => {
