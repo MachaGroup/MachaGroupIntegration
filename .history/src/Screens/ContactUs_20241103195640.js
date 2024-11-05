@@ -7,6 +7,7 @@ import {firestore} from "../firebaseConfig";
 
 function ContactUs() {
   const navigate = useNavigate();  // Initialize useNavigate hook
+
   const firstNameRef = useRef();
   const lastNameRef = useRef();
   const emailRef = useRef();

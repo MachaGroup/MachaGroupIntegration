@@ -1,28 +1,24 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
-import './SurveillanceSystems.css'; // Reuse the same CSS file for consistency in styling
+import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
+import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
 
-function MainEntrancePage() {
+function AccessPointsPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook
 
   const handleButtonClick = (section) => {
     // Navigate to specific routes based on section
     switch (section) {
-      case 'Security Gates':
-        navigate('/SecurityGates');
+      case 'Main Entrance':
+        navigate('/MainEntrance');
         break;
-      case 'Turnstiles':
-        navigate('/Turnstiles');
-        break;
-      case 'Access Control Systems':
-        navigate('/AccessControlSystems');
+      case 'Secondary Entrances':
+        navigate('/SecondaryEntrances');
         break;
       default:
         console.log('Unknown section');
     }
   };
-
   return (
     <div className="form-page">
       {/* Header Section */}
@@ -32,12 +28,12 @@ function MainEntrancePage() {
         <img src={logo} alt="Logo" className="logo" />
       </header>
 
-      {/* Physical Security Section */}
+      {/* Access Control Section */}
       <main className="form-container">
-        <h2>Main Entrance</h2>
+        <h2>Access Points</h2>
         <form>
           {/* Physical Security Buttons */}
-          {['Security Gates','Turnstiles', 'Access Control Systems'].map((section, index) => (
+          {['Main Entrance', 'Secondary Entrances'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>
@@ -51,5 +47,4 @@ function MainEntrancePage() {
   );
 }
 
-export default MainEntrancePage;
-
+export default AccessPointsPage;

@@ -1,26 +1,26 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
-import './SurveillanceSystems.css'; // Reuse the same CSS file for consistency in styling
+import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 
-function MainEntrancePage() {
+function AlertSystemPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook
-
   const handleButtonClick = (section) => {
-    // Navigate to specific routes based on section
+    
+
+    console.log(`Button clicked for: ${section}`);
+    // Add logic for handling button click, e.g., open a modal or navigate
+
     switch (section) {
-      case 'Security Gates':
-        navigate('/SecurityGates');
-        break;
-      case 'Turnstiles':
-        navigate('/Turnstiles');
-        break;
-      case 'Access Control Systems':
-        navigate('/AccessControlSystems');
-        break;
+      case 'Public Address System':
+          navigate('/public-address-system');
+          break;
+      case 'Text/Email Alerts':
+          navigate('/text-email-alerts');
+          break;
       default:
-        console.log('Unknown section');
-    }
+          console.log('Unknown section');
+  }
   };
 
   return (
@@ -32,12 +32,12 @@ function MainEntrancePage() {
         <img src={logo} alt="Logo" className="logo" />
       </header>
 
-      {/* Physical Security Section */}
+      {/* Alert Systems Section */}
       <main className="form-container">
-        <h2>Main Entrance</h2>
+        <h2>Alert Systems</h2>
         <form>
-          {/* Physical Security Buttons */}
-          {['Security Gates','Turnstiles', 'Access Control Systems'].map((section, index) => (
+          {/* Alert Systems Buttons */}
+          {['Public Address System', 'Text/Email Alerts'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>
@@ -51,5 +51,4 @@ function MainEntrancePage() {
   );
 }
 
-export default MainEntrancePage;
-
+export default AlertSystemPage;

@@ -18,6 +18,9 @@ function MainEntrancePage() {
       case 'Access Control Systems':
         navigate('/AccessControlSystems');
         break;
+      case 'Security Guards':
+        navigate('/SecurityGuards');
+        break;
       default:
         console.log('Unknown section');
     }
@@ -37,7 +40,7 @@ function MainEntrancePage() {
         <h2>Main Entrance</h2>
         <form>
           {/* Physical Security Buttons */}
-          {['Security Gates','Turnstiles', 'Access Control Systems'].map((section, index) => (
+          {['Security Gates','Turnstiles', 'Access Control Systems', 'Security Guards'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>

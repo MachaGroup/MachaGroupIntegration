@@ -1,8 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {firestore, auth} from "../firebaseConfig";
-import { addDoc, collection, Timestamp } from '@firebase/firestore';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { firestore } from "../firebaseConfig";  // Import Firestore config
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import './CreateanAccount.css';
 
 function CreateanAccount() {
@@ -19,28 +18,20 @@ function CreateanAccount() {
   const stateRef = useRef();
   const countryRef = useRef();
   const zipCodeRef = useRef();
-  const ref = collection(firestore, "users");
+  const ref = collection(firestore, "users"); // Use "users" collection
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle account creation logic here
-    try {
-        await createUserWithEmailAndPassword(auth, email, password);
-    } catch(e) {
-        console.log('Account creation error:', e)
-    }
-    console.log('Account created:', { username, email, password, confirmPassword });
 
     let data = {
-        Username: userNameRef.current.value,
-        Email: emailRef.current.value,
-        BuildingName: buildingNameRef.current.value,
-        StreetAddress: AddressRef.current.value,
-        City: cityAddressRef.current.value,
-        State: stateRef.current.value,
-        Country: countryRef.current.value,
-        ZipCode: zipCodeRef.current.value,
-        Timestamp: Timestamp.now(),
+      Username: userNameRef.current.value,
+      Email: emailRef.current.value,
+      BuildingName: buildingNameRef.current.value,
+      StreetAddress: AddressRef.current.value,
+      City: cityAddressRef.current.value,
+      State: stateRef.current.value,
+      Country: countryRef.current.value,
+      ZipCode: zipCodeRef.current.value,
     };
 
     try {
@@ -68,7 +59,7 @@ function CreateanAccount() {
         ←
       </button>
       <h1 className="create-account-title">Create Account</h1>
-      
+
       <form onSubmit={handleSubmit} className="account-form">
         {/* User Information Fields */}
         <div className="form-group">
@@ -121,40 +112,40 @@ function CreateanAccount() {
           />
         </div>
 
-       <div>
-        <label htmlfor="This part of the form is optional">This part of the form is optional*</label>
-       </div>
-        {/* Existing Form Fields */}
         <div>
           <label htmlFor="optionalInfo">This part of the form is optional*</label>
         </div>
-        <input type="text" ref={buildingNameRef} id="buildingName" placeholder="Enter Here" />
+
+        <div className="form-group">
+          <label htmlFor="buildingName">Building Name</label>
+          <input type="text" ref={buildingNameRef} id="buildingName" placeholder="Enter Here" />
+        </div>
 
         <div className="address-section">
           <h3>Address</h3>
-          
+
           <div className="address-inputs">
             <div className="form-group">
               <label htmlFor="street">Street</label>
               <input type="text" ref={AddressRef} id="street" placeholder="Enter Here" />
             </div>
 
-            <div>
+            <div className="form-group">
               <label htmlFor="city">City</label>
               <input type="text" ref={cityAddressRef} id="city" placeholder="Enter Here" />
             </div>
 
-            <div>
+            <div className="form-group">
               <label htmlFor="state">State</label>
               <input type="text" ref={stateRef} id="state" placeholder="Enter Here" />
             </div>
 
-            <div>
+            <div className="form-group">
               <label htmlFor="country">Country</label>
               <input type="text" ref={countryRef} id="country" placeholder="Enter Here" />
             </div>
 
-            <div>
+            <div className="form-group">
               <label htmlFor="zipCode">ZIP Code</label>
               <input type="text" ref={zipCodeRef} id="zipCode" placeholder="Enter Here" />
             </div>
@@ -169,3 +160,6 @@ function CreateanAccount() {
 }
 
 export default CreateanAccount;
+
+
+ 
