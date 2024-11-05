@@ -1,22 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, doc, updateDoc, query, where, getDocs, collection } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+// import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'; // Commented out
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/MachaLogo.png'; // Adjust the path to your logo
 
 function EditProfile() {
     const navigate = useNavigate();
-    const [profilePicURL, setProfilePicURL] = useState(null);
+    const [profilePicURL, setProfilePicURL] = useState(null); // Keep the state
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState(''); // Store email in lowercase
     const [phone_number, setPhoneNumber] = useState('');
+    const [userId, setUserId] = useState(null); //State to store the user's document ID
 
     const auth = getAuth();
     const db = getFirestore();
-    const storage = getStorage();
+    // const storage = getStorage(); // Commented out
 
-    // Removed the section that fetches existing user data from Firestore
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            if (currentUser) {
+                setEmail(currentUser.email.toLowerCase()); // Set email from the logged-in user
+                // Fetch the user's document ID based on their email
+                const q = query(collection(db, 'users'), where('Email', '==', currentUser.email.toLowerCase()));
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    const userDoc = querySnapshot.docs[0];
+                    setUserId(userDoc.id); // Store the document ID
+                    setUsername(userDoc.data().Username); // Fetch username from Firestore
+                    // setEmail(userDoc.data().Email); // Fetch email from Firestore (No need to fetch again)
+                    setPhoneNumber(userDoc.data().phone_number);
+                    // setProfilePicURL(userDoc.data().profilePictureURL); // Commented out
+                }
+            }
+        });
+
+        return () => unsubscribe();
+    }, []);
 
     const handleBack = () => {
         navigate(-1);
@@ -34,29 +54,19 @@ function EditProfile() {
     };
 
     const handleSaveChanges = async () => {
-        const userEmail = auth.currentUser.email.toLowerCase(); // Get the logged-in user's email
-
-        // Create a query to find the document with the matching email
-        const q = query(collection(db, 'users'), where('Email', '==', userEmail));
-
         try {
-            const querySnapshot = await getDocs(q);
-            if (querySnapshot.empty) {
-                console.log('No matching document found.');
-                return; // Or handle the case where no document is found
+            if (userId) { // Make sure userId is defined before updating
+                const userDocRef = doc(db, 'users', userId); // Use the fetched document ID
+                await updateDoc(userDocRef, {
+                    Username: username, // Update username without forcing lowercase
+                    phone_number: phone_number,
+                    // profilePictureURL: profilePicURL, // Commented out
+                });
+
+                console.log('Document updated successfully!');
+            } else {
+                console.error('User ID not found. Cannot update document.');
             }
-
-            // Get the first matching document (assuming there's only one)
-            const docRef = querySnapshot.docs[0].ref;
-
-            // Update the document
-            await updateDoc(docRef, {
-                username: username, // Update username without forcing lowercase
-                phone_number: phone_number,
-                profilePictureURL: profilePicURL,
-            });
-
-            console.log('Document updated successfully!');
         } catch (error) {
             console.error('Error updating document:', error);
         }
@@ -90,7 +100,7 @@ function EditProfile() {
                 <div className="form-group">
                     <label>Username</label>
                     <input
-                        type="username"
+                        type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         placeholder="Username"
@@ -101,8 +111,7 @@ function EditProfile() {
                     <label>Email</label>
                     <input
                         type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value.toLowerCase())} // Convert to lowercase on input
+                        value={email} // Display the logged-in user's email
                         placeholder="Email"
                         required
                         disabled // Make email field read-only

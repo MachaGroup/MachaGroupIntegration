@@ -163,7 +163,7 @@ function App() {
     <Router>
       <Routes>
         {/* Default route for the main screen */}
-        <Route path="/" element={<MainScreen />} />
+        <Route path="/" element={<Login />} />
 
         {/* Other Routes */}
         <Route path="/Login" element={<Login />} />

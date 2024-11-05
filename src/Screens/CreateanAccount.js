@@ -121,10 +121,6 @@ function CreateanAccount() {
           />
         </div>
 
-       <div>
-        <label htmlfor="This part of the form is optional">This part of the form is optional*</label>
-       </div>
-        {/* Existing Form Fields */}
         <div>
           <label htmlFor="optionalInfo">This part of the form is optional*</label>
         </div>

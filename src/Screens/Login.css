@@ -1,7 +1,11 @@
 /* Main container styling */
+h1 {
+  padding-bottom: 15px;
+}
+
 .logo{
   width: 300px;  /* Adjust size as needed */
-  margin-bottom: 20px;  /* Spacing below the logo */
+  margin-bottom: 15px;  /* Spacing below the logo */
 }
 .login-container {
   display: flex;
