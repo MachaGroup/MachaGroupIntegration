@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, doc, updateDoc, query, where, getDocs, collection } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+// import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'; // Commented out
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/MachaLogo.png'; // Adjust the path to your logo
 
 function EditProfile() {
     const navigate = useNavigate();
     const [profilePicURL, setProfilePicURL] = useState(null); // Keep the state
-    const [username, setUsername] = useState(''); // Start with empty string
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState(''); // Store email in lowercase
     const [phone_number, setPhoneNumber] = useState('');
     const [buildingName, setBuildingName] = useState('');
@@ -26,22 +27,24 @@ function EditProfile() {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             if (currentUser) {
                 setEmail(currentUser.email.toLowerCase()); // Set email from the logged-in user
+                // Fetch the user's document ID based on their email
                 const q = query(collection(db, 'users'), where('Email', '==', currentUser.email.toLowerCase()));
                 const querySnapshot = await getDocs(q);
                 if (!querySnapshot.empty) {
                     const userDoc = querySnapshot.docs[0];
                     setUserId(userDoc.id); // Store the document ID
+                    setUsername(userDoc.data().Username); // Fetch username from Firestore
+                    // setEmail(userDoc.data().Email); // Fetch email from Firestore (No need to fetch again)
+                    setPhoneNumber(userDoc.data().phone_number);
+                    // setProfilePicURL(userDoc.data().profilePictureURL); // Commented out
                 }
             }
         });
 
         return () => unsubscribe();
-    }, [auth, db]);
+    }, []);
 
     const handleBack = () => {
-        // Clear input fields when navigating back
-        setUsername('');
-        setPhoneNumber('');
         navigate(-1);
     };
 
@@ -56,22 +59,23 @@ function EditProfile() {
         }
     };
 
+    
     const validatePhoneNumber = (number) => {
         const phoneRegex = /^\(\d{3}\) \d{3}-\d{4}$/;
         return phoneRegex.test(number);
     };
-
+    
     const handleSaveChanges = async () => {
         if (phone_number && !validatePhoneNumber(phone_number)) {
             alert("Please enter the phone number in the format (843) 290-4585.");
             return;
         }
-
+    
         try {
             if (userId) {
                 const userDocRef = doc(db, 'users', userId);
                 const updateData = {};
-
+    
                 // Update only the fields that have values (skipping empty fields)
                 if (username) updateData.Username = username;
                 if (phone_number) updateData.phone_number = phone_number;
@@ -81,17 +85,12 @@ function EditProfile() {
                 if (state) updateData.State = state;
                 if (StreetAddress) updateData.StreetAddress = StreetAddress;
                 if (zipCode) updateData.ZipCode = zipCode;
-
+    
                 await updateDoc(userDocRef, updateData);
-
+    
                 console.log('Document updated successfully!');
                 alert("Profile updated successfully!");
                 navigate('/Main'); // Navigate back to main page after saving
-                // Clear the input fields immediately after saving
-                setUsername('');
-                setPhoneNumber('');
-                // setProfilePicURL(null); // Clear the profile picture if needed
-                navigate('/Main');
             } else {
                 console.error('User ID not found. Cannot update document.');
             }
@@ -99,6 +98,8 @@ function EditProfile() {
             console.error('Error updating document:', error);
         }
     };
+    
+   
 
     return (
         <div className="editprofile-page">
@@ -146,26 +147,26 @@ function EditProfile() {
                     />
                 </div>
                 <div className="form-group">
-                    <label>Phone Number (Optional)</label>
-                    <input
-                        type="text"
-                        value={phone_number}
-                        onChange={(e) => {
-                            const value = e.target.value;
-                            setPhoneNumber(value);
-                            if (value && !validatePhoneNumber(value)) {
-                                console.log("Invalid phone number format");
-                            }
-                        }}
-                        placeholder="Ex. (123) 456-7890"
-                    />
-                    {!validatePhoneNumber(phone_number) && phone_number && (
-                        <small style={{ color: 'red' }}>Please use the format (843) 290-4585</small>
-                    )}
-                </div>
+    <label>Phone Number (Optional)</label>
+    <input
+        type="text"
+        value={phone_number}
+        onChange={(e) => {
+            const value = e.target.value;
+            setPhoneNumber(value);
+            if (value && !validatePhoneNumber(value)) {
+                console.log("Invalid phone number format");
+            }
+        }}
+        placeholder="Ex. (123) 456-7890"
+    />
+    {!validatePhoneNumber(phone_number) && phone_number && (
+        <small style={{ color: 'red' }}>Please use the format (843) 290-4585</small>
+    )}
+</div>
 
                 <div className="form-group">
-                    <label>Building Name (Optional)</label>
+                    <label>Building Name (Optional) </label>
                     <input
                         type="text"
                         value={buildingName}
@@ -174,7 +175,7 @@ function EditProfile() {
                     />
                 </div>
                 <div className="form-group">
-                    <label>City (Optional)</label>
+                    <label>City (Optional) </label>
                     <input
                         type="text"
                         value={city}
@@ -183,7 +184,7 @@ function EditProfile() {
                     />
                 </div>
                 <div className="form-group">
-                    <label>Country (Optional)</label>
+                    <label>Country (Optional) </label>
                     <input
                         type="text"
                         value={country}
@@ -192,7 +193,7 @@ function EditProfile() {
                     />
                 </div>
                 <div className="form-group">
-                    <label>State (Optional)</label>
+                    <label>State (Optional) </label>
                     <input
                         type="text"
                         value={state}
@@ -201,7 +202,7 @@ function EditProfile() {
                     />
                 </div>
                 <div className="form-group">
-                    <label>Street Address (Optional)</label>
+                    <label>Street Address (Optional) </label>
                     <input
                         type="text"
                         value={StreetAddress}
@@ -210,7 +211,7 @@ function EditProfile() {
                     />
                 </div>
                 <div className="form-group">
-                    <label>Zip Code (Optional)</label>
+                    <label>Zip Code (Optional) </label>
                     <input
                         type="text"
                         value={zipCode}
