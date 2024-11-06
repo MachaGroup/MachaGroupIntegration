@@ -7,7 +7,7 @@ import logo from '../assets/MachaLogo.png'; // Adjust the path to your logo
 function EditProfile() {
     const navigate = useNavigate();
     const [profilePicURL, setProfilePicURL] = useState(null); // Keep the state
-    const [username, setUsername] = useState(''); // Start with empty string
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState(''); // Store email in lowercase
     const [phone_number, setPhoneNumber] = useState('');
     const [buildingName, setBuildingName] = useState('');
@@ -20,7 +20,6 @@ function EditProfile() {
 
     const auth = getAuth();
     const db = getFirestore();
-    // const storage = getStorage(); // Commented out
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -36,12 +35,9 @@ function EditProfile() {
         });
 
         return () => unsubscribe();
-    }, [auth, db]);
+    }, [auth, db]); // Include `auth` and `db` as dependencies
 
     const handleBack = () => {
-        // Clear input fields when navigating back
-        setUsername('');
-        setPhoneNumber('');
         navigate(-1);
     };
 
@@ -86,20 +82,7 @@ function EditProfile() {
 
                 console.log('Document updated successfully!');
                 alert("Profile updated successfully!");
-
-                // Clear the input fields
-                setUsername('');
-                setPhoneNumber('');
-                setBuildingName('');
-                setCity('');
-                setCountry('');
-                setState('');
-                setStreetAddress('');
-                setZipCode('');
-            
-                
-                // setProfilePicURL(null); // Clear the profile picture if needed
-                navigate('/Main');
+                navigate('/Main'); // Navigate back to main page after saving
             } else {
                 console.error('User ID not found. Cannot update document.');
             }
