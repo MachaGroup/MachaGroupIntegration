@@ -85,11 +85,10 @@ function EditProfile() {
                 await updateDoc(userDocRef, updateData);
 
                 console.log('Document updated successfully!');
-                alert("Profile updated successfully!");
-                navigate('/Main'); // Navigate back to main page after saving
                 // Clear the input fields immediately after saving
                 setUsername('');
                 setPhoneNumber('');
+                alert("Profile updated successfully!");
                 // setProfilePicURL(null); // Clear the profile picture if needed
                 navigate('/Main');
             } else {
