@@ -82,17 +82,6 @@ function EditProfile() {
 
                 console.log('Document updated successfully!');
                 alert("Profile updated successfully!");
-
-                // Clear the input fields
-            setUsername('');
-            setPhoneNumber('');
-            setBuildingName('');
-            setCity('');
-            setCountry('');
-            setState('');
-            setStreetAddress('');
-            setZipCode('');
-            
                 navigate('/Main'); // Navigate back to main page after saving
             } else {
                 console.error('User ID not found. Cannot update document.');
