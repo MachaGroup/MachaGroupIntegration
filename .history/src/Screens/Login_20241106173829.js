@@ -80,14 +80,11 @@ function Login() {
         <button type="button" onClick={handleCreateanAccount}>Create an Account</button>
       </form>
 
-       {/* Forgot Password link */}
-       <p className="forgot-password-text">
-        <a href="#" onClick={(e) => {
-          e.preventDefault();
-          handleForgotPassword();
-        }}>
+      {/* Forgot Password link - moved below the form */}
+      <p className="forgot-password-text">
+        <button type="button" className="forgot-password-link" onClick={handleForgotPassword}>
           Forgot Password?
-        </a>
+        </button>
       </p>
     </div>
   );

@@ -77,7 +77,7 @@
   
   .settings-button {
     padding: 10px;
-    background-color: #74b9ff;
+    background-color: #4CAF50;
     border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
@@ -86,7 +86,7 @@
   }
   
   .settings-button:hover {
-    background-color: #1b578c;
+    background-color: #ccc;
   }
   
   /* Log out Link */

@@ -120,7 +120,7 @@ input[type="radio"] {
 }
 
 .form-button:hover {
-    background-color: #1b578c;
+    background-color: #0984e3;
 }
 
 /* Submit Button Styling */
@@ -137,7 +137,7 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-    background-color: #1b578c;
+    background-color: #0984e3;
 }
 
 /* Back Button Styling */
