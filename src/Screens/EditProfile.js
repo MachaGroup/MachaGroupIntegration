@@ -8,14 +8,14 @@ import logo from '../assets/MachaLogo.png'; // Adjust the path to your logo
 function EditProfile() {
     const navigate = useNavigate();
     const [profilePicURL, setProfilePicURL] = useState(null); // Keep the state
-    const [username, setUsername] = useState('');
+    const [username, setUsername] = useState(''); // Start with empty string
     const [email, setEmail] = useState(''); // Store email in lowercase
-    const [phone_number, setPhoneNumber] = useState('');
+    const [phone_number, setPhoneNumber] = useState(''); // Start with empty string
     const [userId, setUserId] = useState(null); //State to store the user's document ID
 
     const auth = getAuth();
     const db = getFirestore();
-    // const storage = getStorage(); // Commented out
+    // const storage = getStorage(); // Code to be used in the Future, for storing the profile pictures.
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -27,18 +27,17 @@ function EditProfile() {
                 if (!querySnapshot.empty) {
                     const userDoc = querySnapshot.docs[0];
                     setUserId(userDoc.id); // Store the document ID
-                    setUsername(userDoc.data().Username); // Fetch username from Firestore
-                    // setEmail(userDoc.data().Email); // Fetch email from Firestore (No need to fetch again)
-                    setPhoneNumber(userDoc.data().phone_number);
-                    // setProfilePicURL(userDoc.data().profilePictureURL); // Commented out
                 }
             }
         });
 
         return () => unsubscribe();
-    }, []);
+    }, [auth, db]);
 
     const handleBack = () => {
+        // Clear input fields when navigating back
+        setUsername('');
+        setPhoneNumber('');
         navigate(-1);
     };
 
@@ -57,13 +56,25 @@ function EditProfile() {
         try {
             if (userId) { // Make sure userId is defined before updating
                 const userDocRef = doc(db, 'users', userId); // Use the fetched document ID
-                await updateDoc(userDocRef, {
-                    Username: username, // Update username without forcing lowercase
-                    phone_number: phone_number,
-                    // profilePictureURL: profilePicURL, // Commented out
-                });
+                const updateData = {}; // Create an empty object to store updates
+
+                // Only add the field to the updateData object if it has changed
+                if (username !== '') {
+                    updateData.Username = username;
+                }
+                if (phone_number !== '') {
+                    updateData.phone_number = phone_number;
+                }
+
+                // Update only the fields that have changed
+                await updateDoc(userDocRef, updateData);
 
                 console.log('Document updated successfully!');
+                // Clear the input fields immediately after saving
+                setUsername('');
+                setPhoneNumber('');
+                // setProfilePicURL(null); // Clear the profile picture if needed
+                navigate('/Main');
             } else {
                 console.error('User ID not found. Cannot update document.');
             }
