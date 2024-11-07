@@ -141,6 +141,33 @@ import EmergencyCommunicationTraining from './Screens/EmergencyCommunicationTrai
 import CommunicationPlatforms from './Screens/CommunicationPlatforms';
 import ParentNotificationProcedures from './Screens/ParentNotificationProcedures';
 import CommunicationLanguage from './Screens/CommunicationLanguage';
+import TrainingProviders from './Screens/TrainingProviders';
+import TrainingMaterials from './Screens/TrainingMaterials';
+import RecertificationSchedule from './Screens/RecertificationSchedule';
+import ScenarioBasedTraining from './Screens/ScenerioBasedTraining';
+import ResponseProtocols from './Screens/ResponseProtocols';
+import PostIncidentSupport from './Screens/PostIncidentSupport';
+import CurriculumIntegration from './Screens/CurriculumIntegration';
+import StudentHandbooks from './Screens/StudentHandbooks';
+import ParentInvolvement2 from './Screens/ParentInvolvement2';
+import SafetyDemonstrations from './Screens/SafetyDemonstrations';
+import RolePlayingScenarios from './Screens/RolePlayingScenarios';
+import StudentLeadership from './Screens/StudentLeadership';
+import SafetyWorkshops from './Screens/SafetyWorkshops';
+import ParentVolunteerPrograms from './Screens/ParentVolunteerPrograms';
+import ParentAdvisoryCommittees from './Screens/ParentAdvisoryCommittees';
+import ParentTeacherAssociations from './Screens/ParentTeacherAssociations';
+import EmergencyContacts from './Screens/EmergencyContacts';
+import ParentFeedbackMechanisms from './Screens/ParentFeedbackMechanisms';
+import LawEnforcementPartnership from './Screens/LawEnforcementPartnership';
+import FireDepartmentCollaboration from './Screens/FireDepartmentCollaboration';
+import HealthcareProviderEngagement from './Screens/HealthcareProviderEngagement';
+import EmergencyShelters from './Screens/EmergencyShelters';
+import MedicalFacilities from './Screens/MedicalFacilities';
+import MentalHealthServices from './Screens/MentalHealthServices';
+import FirstAidCPRTraining2 from './Screens/FirstAidCPRTraining2';
+import BasicFirstAidTechniques from './Screens/BasicFirstAidTechniques';
+import CPRCertification from './Screens/CPRCertification';
 
 function App() {
   return (
@@ -289,6 +316,33 @@ function App() {
         <Route path="/communication-platforms" element={<CommunicationPlatforms />} />
         <Route path="/parent-notification-procedures" element={<ParentNotificationProcedures />} />
         <Route path="/communication-language" element={<CommunicationLanguage />} />
+        <Route path="/training-providers" element={<TrainingProviders />} />
+        <Route path="/training-materials" element={<TrainingMaterials />} />
+        <Route path="/recertification-schedule" element={<RecertificationSchedule />} />
+        <Route path="/scenerio-based-training" element={<ScenarioBasedTraining />} />
+        <Route path="/response-protocols" element={<ResponseProtocols />} />
+        <Route path="/post-incident-support" element={<PostIncidentSupport />} />
+        <Route path="/curriculum-integration" element={<CurriculumIntegration />} />
+        <Route path="/student-handbooks" element={<StudentHandbooks />} />
+        <Route path="/parent-involvement2" element={<ParentInvolvement2 />} />
+        <Route path="/safety-demonstrations" element={<SafetyDemonstrations />} />
+        <Route path="/role-playing-scenarios" element={<RolePlayingScenarios />} />
+        <Route path="/student-leadership" element={<StudentLeadership />} />
+        <Route path="/safety-workshops" element={<SafetyWorkshops />} />
+        <Route path="/parent-volunteer-programs" element={<ParentVolunteerPrograms />} />
+        <Route path="/parent-advisory-committees" element={<ParentAdvisoryCommittees />} />
+        <Route path="/parent-teacher-associations" element={<ParentTeacherAssociations />} />
+        <Route path="/emergency-contacts" element={<EmergencyContacts />} />
+        <Route path="/parent-feedback-mechanisms" element={<ParentFeedbackMechanisms />} />
+        <Route path="/law-enforcement-partnership" element={<LawEnforcementPartnership />} />
+        <Route path="/fire-department-collaboration" element={<FireDepartmentCollaboration />} />
+        <Route path="/healthcare-provider-engagement" element={<HealthcareProviderEngagement />} />
+        <Route path="/emergency-shelters" element={<EmergencyShelters />} />
+        <Route path="/medical-facilities" element={<MedicalFacilities />} />
+        <Route path="/mental-health-services" element={<MentalHealthServices />} />
+        <Route path="/first-aid-CPR-training2" element={<FirstAidCPRTraining2 />} />
+        <Route path="/basic-first-aid-techniques" element={<BasicFirstAidTechniques />} />
+        <Route path="/CPR-certification" element={<CPRCertification />} />
       </Routes>
     </Router>
   );

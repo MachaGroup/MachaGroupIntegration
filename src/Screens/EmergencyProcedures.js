@@ -18,7 +18,7 @@ function EmergencyProceduresPage() {
         navigate('/student-handbooks');
         break;
       case 'Parent Involvement':
-        navigate('/parent-involvement');
+        navigate('/parent-involvement2');
         break;
       case 'Fire Drills':
         navigate('/fire-drills');

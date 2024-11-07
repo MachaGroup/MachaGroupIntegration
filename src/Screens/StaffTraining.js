@@ -18,7 +18,7 @@ function StaffTrainingPage() {
           navigate('/emergency-response-training');
           break;
         case 'Emergency Communication':
-          navigate('/emergency-communication');
+          navigate('/emergency-communication2');
           break;
         case 'Security Policies and Procedures':
           navigate('/security-policies-and-procedures');
