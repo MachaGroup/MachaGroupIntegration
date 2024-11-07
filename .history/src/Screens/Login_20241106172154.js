@@ -10,12 +10,16 @@ function Login() {
   const navigate = useNavigate();
   const auth = getAuth();
 
+  // Check if the user is already logged in on component mount
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
+        // User is logged in, redirect to the main screen
         navigate('/Main');
       }
     });
+
+    // Clean up the listener when the component unmounts
     return () => unsubscribe();
   }, [auth, navigate]);
 
@@ -24,9 +28,10 @@ function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log('Login successful');
-      navigate('/Main');
+      navigate('/Main');  // Redirect to the main screen on successful login
     } catch (error) {
       console.error('Error logging in:', error.message);
+      // Display appropriate error messages
       if (error.code === 'auth/user-not-found') {
         alert('No user found with that email');
       } else if (error.code === 'auth/wrong-password') {
@@ -38,16 +43,18 @@ function Login() {
   };
 
   const handleCreateanAccount = () => {
-    navigate('/CreateanAccount');
+    navigate('/CreateanAccount');  // Redirect to the create account page
   };
 
   const handleForgotPassword = () => {
-    navigate('/ForgotPassword');
+    navigate('/ForgotPassword');  // Redirect to the forgot password page
   };
 
   return (
     <div className="login-container">
+      {/* Logo image */}
       <img src={logo} alt="Logo" className="logo" />
+
       <h1>Login</h1>
       <form onSubmit={handleLogin}>
         <div className="form-group">
@@ -74,25 +81,22 @@ function Login() {
 
         <button type="submit">Login</button>
 
+        {/* Forgot Password link */}
+        <p className="forgot-password-text">
+          <button type="button" className="forgot-password-link" onClick={handleForgotPassword}>
+            Forgot Password?
+          </button>
+        </p>
+
         {/* or text */}
         <p className="or-text">or</p>
 
+        {/* Create Account button */}
         <button type="button" onClick={handleCreateanAccount}>Create an Account</button>
       </form>
-
-       {/* Forgot Password link */}
-       <p className="forgot-password-text">
-        <a href="#" onClick={(e) => {
-          e.preventDefault();
-          handleForgotPassword();
-        }}>
-          Forgot Password?
-        </a>
-      </p>
     </div>
   );
 }
 
 export default Login;
-
 

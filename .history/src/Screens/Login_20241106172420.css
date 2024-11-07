@@ -72,7 +72,7 @@ form {
 button {
   width: 100%;
   padding: 10px;
-  background-color: #74b9ff;
+  background-color: #4CAF50;
   color: white;
   border: none;
   border-radius: 5px;
@@ -82,7 +82,7 @@ button {
 }
 
 button:hover {
-  background-color: #1b578c;
+  background-color: #45a049;
 }
 
 /* "or" text styling */
@@ -101,7 +101,7 @@ p {
 }
 
 a {
-  color: #74b9ff;
+  color: #4CAF50;
   text-decoration: none;
 }
 
