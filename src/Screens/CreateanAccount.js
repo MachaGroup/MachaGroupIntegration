@@ -40,7 +40,7 @@ function CreateanAccount() {
         State: stateRef.current.value,
         Country: countryRef.current.value,
         ZipCode: zipCodeRef.current.value,
-        Timestamp: Timestamp.now(),
+        AccountCreation_timestamp: Timestamp.now(),
     };
 
     try {
