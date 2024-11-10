@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import React, { useState } from 'react';
+import { getFirestore, doc, collection, addDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 
 function SecurityGatesPage() {
     const navigate = useNavigate();
-    const { buildingId } = useBuilding(); // Access buildingId from context
     const db = getFirestore();
 
     const [formData, setFormData] = useState({
@@ -32,13 +30,6 @@ function SecurityGatesPage() {
         reportingProcess: '',
     });
 
-    useEffect(() => {
-        if (!buildingId) {
-            alert('No building selected. Redirecting to Building Info...');
-            navigate('/BuildingandAddress');
-        }
-    }, [buildingId, navigate]);
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -54,17 +45,14 @@ function SecurityGatesPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!buildingId) {
-            alert('Building ID is missing. Please start the assessment from the correct page.');
-            return;
-        }
-
         try {
-            const formsRef = collection(db, `Buildings/${buildingId}/Forms`);
-            await addDoc(formsRef, formData);
+            const physicalSecurityRef = doc(db, 'Physical Security', 'SecurityGatesAssessment');
+            const subCollectionRef = collection(physicalSecurityRef, 'Security Gates');
+            await addDoc(subCollectionRef, formData);
 
             console.log('Form data submitted successfully!');
             alert('Form submitted successfully!');
+
             navigate('/Main');
         } catch (error) {
             console.error('Error submitting form:', error);
@@ -83,7 +71,6 @@ function SecurityGatesPage() {
                 <form onSubmit={handleSubmit}>
                     <h2>1.1.1.1.1 Security Gates (e.g., automated sliding gates)</h2>
 
-                    {/* Functionality and Operation */}
                     <h3>1.1.1.1.1.1 Functionality and Operation:</h3>
                     <div className="form-section">
                         <label>1.1.1.1.1.1.1. Are the security gates operational and functioning as intended?</label>
@@ -119,7 +106,6 @@ function SecurityGatesPage() {
                         </div>
                     </div>
 
-                    {/* Access Control */}
                     <h3>1.1.1.1.1.2 Access Control:</h3>
                     <div className="form-section">
                         <label>1.1.1.1.1.2.1. How is access to the security gates controlled?</label>
@@ -155,7 +141,6 @@ function SecurityGatesPage() {
                         </div>
                     </div>
 
-                    {/* Safety Features */}
                     <h3>1.1.1.1.1.3 Safety Features:</h3>
                     <div className="form-section">
                         <label>1.1.1.1.1.3.1. Are there safety features in place to prevent accidents or injuries, such as sensors to detect obstructions or emergency stop buttons?</label>
@@ -181,7 +166,6 @@ function SecurityGatesPage() {
                         </div>
                     </div>
 
-                    {/* Compliance with Regulations */}
                     <h3>1.1.1.1.1.4 Compliance with Regulations:</h3>
                     <div className="form-section">
                         <label>1.1.1.1.1.4.1. Do the security gates comply with relevant safety and security regulations, codes, and standards?</label>
@@ -209,7 +193,6 @@ function SecurityGatesPage() {
                         </div>
                     </div>
 
-                    {/* Maintenance and Upkeep */}
                     <h3>1.1.1.1.1.5 Maintenance and Upkeep:</h3>
                     <div className="form-section">
                         <label>1.1.1.1.1.5.1. Is there a regular maintenance schedule in place for the security gates?</label>
@@ -235,7 +218,6 @@ function SecurityGatesPage() {
                         </div>
                     </div>
 
-                    {/* User Training and Awareness */}
                     <h3>1.1.1.1.1.6 User Training and Awareness:</h3>
                     <div className="form-section">
                         <label>1.1.1.1.1.6.1. Have users, such as security personnel or authorized staff, received training on how to operate the security gates safely and effectively?</label>
@@ -269,7 +251,5 @@ function SecurityGatesPage() {
 }
 
 export default SecurityGatesPage;
-
-
 
 

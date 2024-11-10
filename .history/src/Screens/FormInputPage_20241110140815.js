@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
-import { useBuilding } from '../Context/BuildingContext'; // Import the custom hook for BuildingContext
+import { useBuilding } from '../context/BuildingContext'; // Import the custom hook for BuildingContext
 import './FormInputPage.css'; // CSS file for styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 

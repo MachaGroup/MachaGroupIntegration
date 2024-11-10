@@ -2,7 +2,6 @@ import './App.css';
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-import { BuildingProvider } from './Context/BuildingContext';
 // Correct the import paths for all screens
 import Login from './Screens/Login';
 import FormInputPage from './Screens/FormInputPage';
@@ -163,7 +162,6 @@ import BuildingandAddress from "./Screens/BuildingandAddress";
 function App() {
   return (
     <div className="App">
-    <BuildingProvider>
     <Router>
       <Routes>
         {/* Default route for the main screen */}
@@ -327,8 +325,7 @@ function App() {
         <Route path="/BuildingandAddress" element={<BuildingandAddress />} />
       </Routes>
     </Router>
-   </BuildingProvider>
- </div>
+    </div>
   );
 }
 
