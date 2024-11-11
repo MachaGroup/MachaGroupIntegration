@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, doc, addDoc, getDoc } from 'firebase/firestore';
+import { getFirestore, doc, addDoc, getDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
@@ -34,16 +34,16 @@ function SecurityGatesPage() {
     });
 
     useEffect(() => {
-        const fetchBuildingIdFromBuildings = async () => {
+        const fetchBuildingIdFromOtherCollection = async () => {
             if (!buildingId) {
                 try {
-                    // Replace 'BuildingDocumentID' with your actual document ID in the Buildings collection
+                    // Replace 'Buildings' and 'BuildingDocumentID' with your actual collection and document ID
                     const buildingDocRef = doc(db, 'Buildings', 'BuildingDocumentID'); 
                     const buildingSnapshot = await getDoc(buildingDocRef);
 
                     if (buildingSnapshot.exists()) {
                         const buildingData = buildingSnapshot.data();
-                        setBuildingId(buildingData.buildingId); // Set buildingId from the fetched document
+                        setBuildingId(buildingData.buildingId); // Store the retrieved buildingId in context
                     } else {
                         alert('Building information not found. Redirecting...');
                         navigate('/BuildingandAddress');
@@ -55,7 +55,7 @@ function SecurityGatesPage() {
             }
         };
 
-        fetchBuildingIdFromBuildings();
+        fetchBuildingIdFromOtherCollection();
     }, [buildingId, navigate, setBuildingId, db]);
 
     const handleChange = (e) => {
@@ -78,7 +78,6 @@ function SecurityGatesPage() {
             return;
         }
 
-
         try {
           // Store the form data in the specified Firestore structure
           const formsRef = collection(db, 'forms/Physical Security/Security Gates');
@@ -89,7 +88,7 @@ function SecurityGatesPage() {
 
           console.log('Form data submitted successfully!');
           alert('Form submitted successfully!');
-          navigate('/Form');
+          navigate('/Main');
         } catch (error) {
             console.error('Error submitting form:', error);
             alert('Failed to submit the form. Please try again.');
