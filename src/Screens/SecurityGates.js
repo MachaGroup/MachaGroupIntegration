@@ -61,28 +61,16 @@ function SecurityGatesPage() {
         }
 
         try {
-            // Increment the form count in Firestore for the specific building
-            const counterRef = doc(db, `PhysicalSecurity/${buildingId}/FormCounter`, 'SecurityGates');
-            const counterSnapshot = await getDoc(counterRef);
+          // Store the form data in the specified Firestore structure
+          const formsRef = collection(db, 'forms/Physical Security/Security Gates');
+          await addDoc(formsRef, {
+              buildingId: buildingId, // Include the buildingId for reference
+              formData: formData, // Store the form data as a nested object
+          });
 
-            let formNumber;
-            if (counterSnapshot.exists()) {
-                const currentCounter = counterSnapshot.data().count;
-                formNumber = currentCounter + 1;
-                await setDoc(counterRef, { count: increment(1) }, { merge: true });
-            } else {
-                formNumber = 1;
-                await setDoc(counterRef, { count: 1 });
-            }
-
-            // Save the form data in PhysicalSecurity collection
-            const securityGatesCollection = collection(db, `PhysicalSecurity/${buildingId}/SecurityGates`);
-            const formRef = doc(securityGatesCollection, `Form-${formNumber}`);
-            await setDoc(formRef, formData);
-
-            console.log(`Form data submitted successfully under Form-${formNumber}!`);
-            alert(`Form submitted successfully as Form-${formNumber}!`);
-            navigate('/Main');
+          console.log('Form data submitted successfully!');
+          alert('Form submitted successfully!');
+          navigate('/Main');
         } catch (error) {
             console.error('Error submitting form:', error);
             alert('Failed to submit the form. Please try again.');
