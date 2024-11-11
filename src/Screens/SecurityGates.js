@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
@@ -60,10 +60,13 @@ function SecurityGatesPage() {
         }
 
         try {
+          // Create a document reference to the building in the 'Buildings' collection
+          const buildingRef = doc(db, 'Buildings', buildingId); 
+
           // Store the form data in the specified Firestore structure
           const formsRef = collection(db, 'forms/Physical Security/Security Gates');
           await addDoc(formsRef, {
-              buildingId: buildingId, // Include the buildingId for reference
+              building: buildingRef, // Reference to the building document
               formData: formData, // Store the form data as a nested object
           });
 

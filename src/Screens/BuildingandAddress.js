@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, Timestamp } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Import the custom hook
 import './FormQuestions.css';
@@ -35,6 +35,7 @@ function BuildingInfoPage() {
                 buildingName,
                 buildingAddress,
                 companyName,
+                timestamp: Timestamp.now()
             });
 
             console.log('Building info submitted successfully! Document ID:', buildingRef.id);
