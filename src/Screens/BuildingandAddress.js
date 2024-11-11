@@ -26,8 +26,12 @@ function BuildingInfoPage() {
         }
 
         try {
+            // Generate a unique building ID (you can use a library or a custom function)
+            const buildingId = generateUniqueBuildingId(); // Implement this function
+
             // Add a new building document in the Buildings collection
             const buildingRef = await addDoc(collection(db, 'Buildings'), {
+                buildingId, // Include the generated ID
                 buildingName,
                 buildingAddress,
                 companyName,
@@ -45,6 +49,18 @@ function BuildingInfoPage() {
             alert('Failed to save building info. Please try again.');
         }
     };
+
+    // Function to generate a unique building ID (you can customize this)
+    const generateUniqueBuildingId = () => {
+        // Option 1: Using a library like `uuid`
+        // import { v4 as uuidv4 } from 'uuid';
+        // return uuidv4().slice(0, 10); // Shorten the UUID
+      
+        // Option 2: Create a custom ID generator
+        const timestamp = Date.now().toString().slice(-8); // Get last 8 digits of timestamp
+        const randomPart = Math.floor(Math.random() * 100000).toString().padStart(3, '0'); // Pad with zeros
+        return `B-${timestamp}-${randomPart}`; // Customize the format
+      };
 
     return (
         <div className="form-page">
@@ -97,7 +113,3 @@ function BuildingInfoPage() {
 }
 
 export default BuildingInfoPage;
-
-
-
-
