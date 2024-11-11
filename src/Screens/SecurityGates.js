@@ -60,12 +60,16 @@ function SecurityGatesPage() {
         }
 
         try {
-            const formsRef = collection(db, `Buildings/${buildingId}/Forms`);
-            await addDoc(formsRef, formData);
+          // Store the form data in the specified Firestore structure
+          const formsRef = collection(db, 'forms/Physical Security/Security Gates');
+          await addDoc(formsRef, {
+              buildingId: buildingId, // Include the buildingId for reference
+              formData: formData, // Store the form data as a nested object
+          });
 
-            console.log('Form data submitted successfully!');
-            alert('Form submitted successfully!');
-            navigate('/Main');
+          console.log('Form data submitted successfully!');
+          alert('Form submitted successfully!');
+          navigate('/Main');
         } catch (error) {
             console.error('Error submitting form:', error);
             alert('Failed to submit the form. Please try again.');
