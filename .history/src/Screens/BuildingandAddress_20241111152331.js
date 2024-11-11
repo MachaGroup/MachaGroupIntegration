@@ -47,7 +47,6 @@ function BuildingInfoPage() {
                 buildingName,
                 buildingAddress,
                 companyName,
-                buildingID: `Building-${newBuildingId}` // Add buildingID field
             });
 
             console.log('Building info submitted successfully! Document ID:', buildingRef.id);
@@ -114,3 +113,9 @@ function BuildingInfoPage() {
 }
 
 export default BuildingInfoPage;
+
+
+
+
+
+

@@ -62,7 +62,7 @@ function SecurityGatesPage() {
 
         try {
             // Increment the form count in Firestore for the specific building
-            const counterRef = doc(db, `PhysicalSecurity/${buildingId}/FormCounter`, 'SecurityGates');
+            const counterRef = doc(db, `Buildings/${buildingId}/FormCounter`, 'SecurityGates');
             const counterSnapshot = await getDoc(counterRef);
 
             let formNumber;
@@ -75,9 +75,8 @@ function SecurityGatesPage() {
                 await setDoc(counterRef, { count: 1 });
             }
 
-            // Save the form data in PhysicalSecurity collection
-            const securityGatesCollection = collection(db, `PhysicalSecurity/${buildingId}/SecurityGates`);
-            const formRef = doc(securityGatesCollection, `Form-${formNumber}`);
+            // Save the form data under the incremented document number
+            const formRef = doc(db, `Buildings/${buildingId}/SecurityGates`, `Form-${formNumber}`);
             await setDoc(formRef, formData);
 
             console.log(`Form data submitted successfully under Form-${formNumber}!`);

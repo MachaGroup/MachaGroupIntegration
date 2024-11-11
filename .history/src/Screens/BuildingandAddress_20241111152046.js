@@ -26,8 +26,7 @@ function BuildingInfoPage() {
         }
 
         try {
-            // Reference to the counter document for Buildings collection
-            const counterRef = doc(db, 'Buildings', 'BuildingCounter');
+            const counterRef = doc(db, 'Counters', 'BuildingCounter');
 
             const newBuildingId = await runTransaction(db, async (transaction) => {
                 const counterDoc = await transaction.get(counterRef);
@@ -41,13 +40,11 @@ function BuildingInfoPage() {
                 return newCount;
             });
 
-            // Create a new building document with the incremented ID
             const buildingRef = doc(db, 'Buildings', `Building-${newBuildingId}`);
             await setDoc(buildingRef, {
                 buildingName,
                 buildingAddress,
                 companyName,
-                buildingID: `Building-${newBuildingId}` // Add buildingID field
             });
 
             console.log('Building info submitted successfully! Document ID:', buildingRef.id);
@@ -114,3 +111,8 @@ function BuildingInfoPage() {
 }
 
 export default BuildingInfoPage;
+
+
+
+
+
