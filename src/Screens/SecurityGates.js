@@ -72,7 +72,7 @@ function SecurityGatesPage() {
 
           console.log('Form data submitted successfully!');
           alert('Form submitted successfully!');
-          navigate('/Main');
+          navigate('/Form');
         } catch (error) {
             console.error('Error submitting form:', error);
             alert('Failed to submit the form. Please try again.');

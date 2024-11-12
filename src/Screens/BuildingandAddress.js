@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import { getFirestore, collection, addDoc, Timestamp } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, Timestamp, query, where, getDocs } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Import the custom hook
+import { useBuilding } from '../Context/BuildingContext'; 
 import './FormQuestions.css';
-import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
+import logo from '../assets/MachaLogo.png'; 
 
 function BuildingInfoPage() {
     const [buildingName, setBuildingName] = useState('');
     const [buildingAddress, setBuildingAddress] = useState('');
     const [companyName, setCompanyName] = useState('');
-    const { setBuildingId } = useBuilding(); // Get the setBuildingId function from context
+    const { setBuildingId } = useBuilding(); 
     const navigate = useNavigate();
     const db = getFirestore();
 
     const handleBack = () => {
-        navigate(-1); // Navigate to the previous page
+        navigate(-1); 
     };
 
     const handleSubmit = async (e) => {
@@ -26,12 +26,27 @@ function BuildingInfoPage() {
         }
 
         try {
-            // Generate a unique building ID (you can use a library or a custom function)
-            const buildingId = generateUniqueBuildingId(); // Implement this function
+            // Check for existing building with matching data
+            const q = query(
+                collection(db, 'Buildings'),
+                where('buildingName', '==', buildingName),
+                where('buildingAddress', '==', buildingAddress),
+                where('companyName', '==', companyName)
+            );
+            const querySnapshot = await getDocs(q);
 
-            // Add a new building document in the Buildings collection
+            if (!querySnapshot.empty) {
+                // Existing building found
+                const existingBuildingDoc = querySnapshot.docs[0];
+                setBuildingId(existingBuildingDoc.id);
+                navigate('/form'); // Navigate to the form page
+                return; // Stop further processing
+            }
+
+            // No existing building found, create a new one
+            const buildingId = generateUniqueBuildingId(); 
             const buildingRef = await addDoc(collection(db, 'Buildings'), {
-                buildingId, // Include the generated ID
+                buildingId, 
                 buildingName,
                 buildingAddress,
                 companyName,
@@ -39,11 +54,7 @@ function BuildingInfoPage() {
             });
 
             console.log('Building info submitted successfully! Document ID:', buildingRef.id);
-
-            // Set the buildingId in context
             setBuildingId(buildingRef.id);
-
-            // Navigate to the form page
             navigate('/form');
         } catch (error) {
             console.error('Error saving building info:', error);
