@@ -53,7 +53,7 @@ import ParentEducationEvents from './Screens/ParentEducationEvents';
 import ParentComm from './Screens/ParentComm';
 import CollaborationWithLocalAgenices from './Screens/CollaborationWithLocalAgencies';
 import AccessToCommunityResources from './Screens/AccessToCommunityResources';
-import RecognizingBullyingBehavoir from './Screens/RecognizingBullyingBehavior';
+import RecognizingBullyingBehavior from './Screens/RecognizingBullyingBehavior';
 import ReportingProcedures from './Screens/ReportingProcedures';
 import NetworkSecurity from './Screens/NetworkSecurity';
 import DataProtection from './Screens/DataProtection';
@@ -110,7 +110,7 @@ import ChangeManagementProcess from './Screens/ChangeManagementProcess';
 import ThreatRecognition from './Screens/ThreatRecognition';
 import CybersecurityTraining from './Screens/CybersecurityTraining';
 import ConflictResolution from './Screens/ConflictResolution';
-import EmergencyCommunication from './Screens/EmergencyCommunnication';
+import EmergencyCommunication from './Screens/EmergencyCommunication';
 import FirstAidResponse from './Screens/FirstAidResponse';
 import EvacuationProcedures from './Screens/EvacuationProcedures';
 import FireExtinguisherLocations from './Screens/FireExtinguisherLocations';
@@ -168,6 +168,29 @@ import MentalHealthServices from './Screens/MentalHealthServices';
 import FirstAidCPRTraining2 from './Screens/FirstAidCPRTraining2';
 import BasicFirstAidTechniques from './Screens/BasicFirstAidTechniques';
 import CPRCertification from './Screens/CPRCertification';
+import AEDTraining from './Screens/AEDTraining';
+import ActiveShooterResponse from './Screens/ActiveShooterResponse';
+import ResponseProtocols2 from './Screens/ResponseProtocols2';
+import EvacuationProcedures2 from './Screens/EvacuationProcedures2';
+import EmergencyCommunication2 from './Screens/EmergencyCommunication2';
+import IdentifyingSuspiciousBehavior from './Screens/IdentifyingSuspiciousBehavior';
+import RecognizingSecurityBreaches from './Screens/RecognizingSecurityBreaches';
+import PhishingAwareness2 from './Screens/PhishingAwareness2';
+import PasswordSecurity2 from './Screens/PasswordSecurity2';
+import DataProtection2 from './Screens/DataProtection2';
+import FireDrills from './Screens/FireDrills';
+import LockdownDrills2 from './Screens/LockdownDrills2';
+import SevereWeatherPreparedness from './Screens/SevereWeatherPreparedness';
+import StangerDangerAwareness from './Screens/StrangerDangerAwareness';
+import InternetSafety from './Screens/InternetSafety';
+import VerbalBullying from './Screens/VerbalBullying';
+import PhysicalBullying from './Screens/PhysicalBullying';
+import CyberBullying from './Screens/CyberBullying';
+import TrustedAdults from './Screens/TrustedAdults';
+import AnonymousReportingSystems from './Screens/AnonymousReportingSystems';
+import PeerSupportNetworks from './Screens/PeerSupportNetworks';
+import RecognizingSecurityIncidents from './Screens/RecognizingSecurityIncidents';
+import IncidentReportingProcedures from './Screens/IncidentReportingProcedures';
 
 function App() {
   return (
@@ -228,7 +251,7 @@ function App() {
         <Route path="/parent-comm" element={<ParentComm />} />
         <Route path="/collaboration-with-local-agencies" element={<CollaborationWithLocalAgenices />} />
         <Route path="/access-to-community-resources" element={<AccessToCommunityResources />} />
-        <Route path="/recognizing-bullying-behavior" element={<RecognizingBullyingBehavoir />} />
+        <Route path="/recognizing-bullying-behavior" element={<RecognizingBullyingBehavior />} />
         <Route path="/reporting-procedures" element={<ReportingProcedures />} />
         <Route path="/network-security" element={<NetworkSecurity />} />
         <Route path="/data-protection" element={<DataProtection />} />
@@ -343,6 +366,29 @@ function App() {
         <Route path="/first-aid-CPR-training2" element={<FirstAidCPRTraining2 />} />
         <Route path="/basic-first-aid-techniques" element={<BasicFirstAidTechniques />} />
         <Route path="/CPR-certification" element={<CPRCertification />} />
+        <Route path="/AED-training" element={<AEDTraining />} />
+        <Route path="/active-shooter-response" element={<ActiveShooterResponse />} />
+        <Route path="/response-protocols2" element={<ResponseProtocols2 />} />
+        <Route path="/evacuation-procedures2" element={<EvacuationProcedures2 />} />
+        <Route path="/emergency-communication2" element={<EmergencyCommunication2 />} />
+        <Route path="/identifying-suspicious-behavior" element={<IdentifyingSuspiciousBehavior />} />
+        <Route path="/recognizing-security-breaches" element={<RecognizingSecurityBreaches />} />
+        <Route path="/phishing-awareness2" element={<PhishingAwareness2 />} />
+        <Route path="/password-security2" element={<PasswordSecurity2 />} />
+        <Route path="/data-protection2" element={<DataProtection2 />} />
+        <Route path="/fire-drills" element={<FireDrills />} />
+        <Route path="/lockdown-drills2" element={<LockdownDrills2 />} />
+        <Route path="/severe-weather-preparedness" element={<SevereWeatherPreparedness />} />
+        <Route path="/stranger-danger-awareness" element={<StangerDangerAwareness />} />
+        <Route path="/internet-safety" element={<InternetSafety />} />
+        <Route path="/verbal-bullying" element={<VerbalBullying />} />
+        <Route path="/physical-bullying" element={<PhysicalBullying />} />
+        <Route path="/cyber-bullying" element={<CyberBullying />} />
+        <Route path="/trusted-adults" element={<TrustedAdults />} />
+        <Route path="/anonymous-reporting-systems" element={<AnonymousReportingSystems />} />
+        <Route path="/peer-support-networks" element={<PeerSupportNetworks />} />
+        <Route path="/recognizing-security-incidents" element={<RecognizingSecurityIncidents />} />
+        <Route path="/incident-reporting-procedures" element={<IncidentReportingProcedures />} />
       </Routes>
     </Router>
   );

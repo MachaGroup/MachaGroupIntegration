@@ -27,7 +27,7 @@ function EmergencyProceduresPage() {
         navigate('/lockdown-drills2');
         break;
       case 'Severe Weather Preparedness':
-        navigate('/servere-weather-preparedness');
+        navigate('/severe-weather-preparedness');
         break;
       default:
         console.log('Unknown section');

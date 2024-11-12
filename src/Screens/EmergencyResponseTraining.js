@@ -36,10 +36,10 @@ function EmergencyResponseTrainingPage() {
         navigate('/active-shooter-response');
         break;
       case 'Response Protocols':
-        navigate('/response-protocols');
+        navigate('/response-protocols2');
         break;
       case 'Evacuation Procedures':
-        navigate('/evacuation-procedures');
+        navigate('/evacuation-procedures2');
         break;
       default:
         console.log('Unknown section');

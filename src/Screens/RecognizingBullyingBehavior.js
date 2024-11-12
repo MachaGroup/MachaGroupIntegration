@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';  // Import useNavigate for navig
 import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 
-function RecognizingBullyingBehavoirPage() {
+function RecognizingBullyingBehaviorPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook
 
   const handleButtonClick = (section) => {
@@ -53,4 +53,4 @@ function RecognizingBullyingBehavoirPage() {
   );
 }
 
-export default RecognizingBullyingBehavoirPage;
+export default RecognizingBullyingBehaviorPage;
