@@ -28,7 +28,11 @@ function BuildingInfoPage() {
         try {
             // Generate a unique building ID (you can use a library or a custom function)
             const buildingId = generateUniqueBuildingId(); // Implement this function
+<<<<<<< HEAD
+ 
+=======
 
+>>>>>>> 298b1bb5aac458970a8f7d64a4f5ed2321c0f037
             // Add a new building document in the Buildings collection
             const buildingRef = await addDoc(collection(db, 'Buildings'), {
                 buildingId, // Include the generated ID
@@ -50,19 +54,31 @@ function BuildingInfoPage() {
             alert('Failed to save building info. Please try again.');
         }
     };
+<<<<<<< HEAD
+ 
+=======
 
+>>>>>>> 298b1bb5aac458970a8f7d64a4f5ed2321c0f037
     // Function to generate a unique building ID (you can customize this)
     const generateUniqueBuildingId = () => {
         // Option 1: Using a library like `uuid`
         // import { v4 as uuidv4 } from 'uuid';
         // return uuidv4().slice(0, 10); // Shorten the UUID
+<<<<<<< HEAD
+     
+=======
       
+>>>>>>> 298b1bb5aac458970a8f7d64a4f5ed2321c0f037
         // Option 2: Create a custom ID generator
         const timestamp = Date.now().toString().slice(-8); // Get last 8 digits of timestamp
         const randomPart = Math.floor(Math.random() * 100000).toString().padStart(3, '0'); // Pad with zeros
         return `B-${timestamp}-${randomPart}`; // Customize the format
       };
+<<<<<<< HEAD
+  
+=======
 
+>>>>>>> 298b1bb5aac458970a8f7d64a4f5ed2321c0f037
     return (
         <div className="form-page">
             <header className="header">
@@ -113,4 +129,8 @@ function BuildingInfoPage() {
     );
 }
 
+<<<<<<< HEAD
 export default BuildingInfoPage;
+=======
+export default BuildingInfoPage;
+>>>>>>> 298b1bb5aac458970a8f7d64a4f5ed2321c0f037
