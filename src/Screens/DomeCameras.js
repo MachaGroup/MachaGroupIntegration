@@ -7,24 +7,24 @@ import './FormQuestions.css';
 function DomeCamerasPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding(); // Access buildingId from context
-    const db = getFirestore();
+  const db = getFirestore();
 
-    const [formData, setFormData] = useState();
+  const [formData, setFormData] = useState();
 
-    useEffect(() => {
-        if (!buildingId) {
-            alert('No building selected. Redirecting to Building Info...');
-            navigate('/BuildingandAddress');
-        }
-    }, [buildingId, navigate]);
+  useEffect(() => {
+      if (!buildingId) {
+          alert('No building selected. Redirecting to Building Info...');
+          navigate('/BuildingandAddress');
+      }
+  }, [buildingId, navigate]);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
+  const handleChange = (e) => {
+      const { name, value } = e.target;
+      setFormData((prevData) => ({
+          ...prevData,
+          [name]: value,
+      }));
+  };
 
   // Function to handle back button
   const handleBack = () => {
