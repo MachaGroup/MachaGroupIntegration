@@ -9,32 +9,7 @@ function CardReadersPage() {
   const { buildingId } = useBuilding();
   const db = getFirestore();
 
-  const [formData, setFormData] = useState({
-    operationalCardReader: '',
-    authentication: '',
-    malfunction: '',
-    backupSystems: '',
-    accessControlMethods: '',
-    issuedCards: '',
-    restrictedAccess: '',
-    deactivationProcess: '',
-    integration: '',
-    communication: '',
-    monitoring: '',
-    centralManagement: '',
-    securityFeatures: '',
-    encryption: '',
-    physicalSecurity: '',
-    compliance: '',
-    regulatoryRequirements: '',
-    testingCertification: '',
-    maintenanceSchedule: '',
-    maintenanceTasks: '',
-    maintenanceRecords: '',
-    userTraining: '',
-    instructions: '',
-    reportingProcess: '',
-  });
+  const [formData, setFormData] = useState();
 
   useEffect(() => {
     if(!buildingId) {

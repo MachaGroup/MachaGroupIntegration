@@ -9,26 +9,7 @@ function TurnstilesPage() {
   const { buildingId } = useBuilding();
   const db = getFirestore();
 
-  const [formData, setFormData] = useState({
-    turnstilesOperational: '',
-    turnstilesSmooth: '',
-    turnstilesDamage: '',
-    backupSystemsTurnstiles: '',
-    accessControlTurnstiles: '',
-    authMechanismsTurnstiles: '',
-    integratedSystemsTurnstiles: '',
-    logEntriesTurnstiles: '',
-    safetyFeaturesTurnstiles: '',
-    antiTailgating: '',
-    safetySignageTurnstiles: '',
-    complianceRegulationsTurnstiles: '',
-    regulatoryRequirementsTurnstiles: '',
-    inspectionsCertificationsTurnstiles: '',
-    maintenanceScheduleTurnstiles: '',
-    userTrainingTurnstiles: '',
-    instructionsGuidelinesTurnstiles: '',
-    reportingProcessTurnstiles: '',
-  })
+  const [formData, setFormData] = useState();
 
   useEffect(() => {
     if (!buildingId) {

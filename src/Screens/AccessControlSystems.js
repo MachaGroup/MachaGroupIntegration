@@ -9,31 +9,7 @@ function AccessControlSystemsPage() {
   const { buildingId } = useBuilding();
   const db = getFirestore();
 
-  const [formData, setFormData] = useState({
-    accessControlOperational: '',
-    authAccurate: '',
-    malfunctionSigns: '',
-    authMechanisms: '',
-    mechanismsReliable: '',
-    multiFactor: '',
-    accessRights: '',
-    processDefined: '',
-    accessReviewed: '',
-    systemsIntegrated: '',
-    integrationEnhance: '',
-    integrationIssues: '',
-    monitoringSystem: '',
-    accessLogs: '',
-    logsReview: '',
-    complianceRegs: '',
-    audits: '',
-    maintenanceSchedule: '',
-    maintenanceTasks: '',
-    maintenanceRecords: '',
-    userTraining: '',
-    instructionsGuidelines: '',
-    reportingProcess: '',
-  });
+  const [formData, setFormData] = useState();
 
   useEffect(() => {
     if(!buildingId) {
