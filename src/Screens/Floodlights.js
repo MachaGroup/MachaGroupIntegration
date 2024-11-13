@@ -73,23 +73,23 @@ function FloodlightsPage() {
           <div className="form-section">
             <label>Are floodlights strategically placed throughout the parking lots to provide uniform illumination?</label>
             <div>
-              <input type="radio" name="strategic-placement" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="strategic-placement" value="no" onChange={handleChange}/> No
+              <input type="radio" name="strategicPlacement" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="strategicPlacement" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Do the floodlights cover all areas of the parking lots, including entrances, exits, pathways, and blind spots?</label>
             <div>
-              <input type="radio" name="coverage-areas" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="coverage-areas" value="no" onChange={handleChange}/> No
+              <input type="radio" name="coverageAreas" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="coverageAreas" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there any areas where lighting coverage is inadequate, posing potential security risks?</label>
             <div>
-              <input type="text" name="inadequate-coverage" placeholder="Describe inadequate areas" onChange={handleChange}/>
+              <input type="text" name="inadequateCoverage" placeholder="Describe inadequate areas" onChange={handleChange}/>
             </div>
           </div>
 
@@ -106,15 +106,15 @@ function FloodlightsPage() {
           <div className="form-section">
             <label>Do they provide clear visibility for pedestrians and vehicles to navigate safely?</label>
             <div>
-              <input type="radio" name="clear-visibility" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="clear-visibility" value="no" onChange={handleChange}/> No
+              <input type="radio" name="clearVisibility" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="clearVisibility" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there measures in place to prevent glare or shadows that could affect visibility?</label>
             <div>
-              <input type="text" name="glare-shadows" placeholder="Describe glare/shadow issues" onChange={handleChange}/>
+              <input type="text" name="glareShadows" placeholder="Describe glare/shadow issues" onChange={handleChange}/>
             </div>
           </div>
 
@@ -131,16 +131,16 @@ function FloodlightsPage() {
           <div className="form-section">
             <label>Are lighting schedules adjusted based on usage patterns and security requirements, such as during non-operating hours?</label>
             <div>
-              <input type="radio" name="lighting-schedules" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="lighting-schedules" value="no" onChange={handleChange}/> No
+              <input type="radio" name="lightingSchedules" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="lightingSchedules" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Is there flexibility in controlling individual floodlights or zones to optimize energy usage and security coverage?</label>
             <div>
-              <input type="radio" name="control-flexibility" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="control-flexibility" value="no" onChange={handleChange}/> No
+              <input type="radio" name="controlFlexibility" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="controlFlexibility" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -149,16 +149,16 @@ function FloodlightsPage() {
           <div className="form-section">
             <label>Are floodlights integrated with other security systems, such as surveillance cameras or intrusion detection systems?</label>
             <div>
-              <input type="radio" name="integrated-systems" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="integrated-systems" value="no" onChange={handleChange}/> No
+              <input type="radio" name="integratedSystems" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="integratedSystems" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Do they trigger recording or alerting mechanisms upon activation to provide real-time notification of potential security threats?</label>
             <div>
-              <input type="radio" name="trigger-recording" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="trigger-recording" value="no" onChange={handleChange}/> No
+              <input type="radio" name="triggerRecording" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="triggerRecording" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -175,24 +175,24 @@ function FloodlightsPage() {
           <div className="form-section">
             <label>Are the floodlights energy-efficient, utilizing LED technology or other low-power lighting solutions?</label>
             <div>
-              <input type="radio" name="energy-efficient" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="energy-efficient" value="no" onChange={handleChange}/> No
+              <input type="radio" name="energyEfficient" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="energyEfficient" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there measures in place to optimize energy consumption, such as dimming or motion-sensing capabilities during periods of low activity?</label>
             <div>
-              <input type="radio" name="energy-optimization" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="energy-optimization" value="no" onChange={handleChange}/> No
+              <input type="radio" name="energyOptimization" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="energyOptimization" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Is there a monitoring system in place to track energy usage and identify opportunities for further efficiency improvements?</label>
             <div>
-              <input type="radio" name="monitoring-system" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="monitoring-system" value="no" onChange={handleChange}/> No
+              <input type="radio" name="monitoringSystem" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="monitoringSystem" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -201,24 +201,24 @@ function FloodlightsPage() {
           <div className="form-section">
             <label>Is there a regular maintenance schedule in place for floodlights?</label>
             <div>
-              <input type="radio" name="maintenance-schedule" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="maintenance-schedule" value="no" onChange={handleChange}/> No
+              <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are maintenance tasks, such as cleaning, bulb replacement, and inspection of wiring and fixtures, performed according to schedule?</label>
             <div>
-              <input type="radio" name="maintenance-tasks" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="maintenance-tasks" value="no" onChange={handleChange}/> No
+              <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there records documenting maintenance activities, repairs, and any issues identified during inspections?</label>
             <div>
-              <input type="radio" name="maintenance-records" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="maintenance-records" value="no" onChange={handleChange}/> No
+              <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -227,24 +227,24 @@ function FloodlightsPage() {
           <div className="form-section">
             <label>Are floodlight installations secure from tampering or vandalism?</label>
             <div>
-              <input type="radio" name="secure-installations" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="secure-installations" value="no" onChange={handleChange}/> No
+              <input type="radio" name="secureInstallations" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="secureInstallations" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are fixtures and mounting structures adequately reinforced to withstand environmental conditions and potential impact?</label>
             <div>
-              <input type="radio" name="reinforced-structures" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="reinforced-structures" value="no" onChange={handleChange}/> No
+              <input type="radio" name="reinforcedStructures" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="reinforcedStructures" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there measures in place to prevent unauthorized access to floodlight controls or wiring?</label>
             <div>
-              <input type="radio" name="unauthorized-access" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="unauthorized-access" value="no" onChange={handleChange}/> No
+              <input type="radio" name="unauthorizedAccess" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="unauthorizedAccess" value="no" onChange={handleChange}/> No
             </div>
           </div>
 

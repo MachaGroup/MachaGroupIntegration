@@ -81,8 +81,8 @@ function DoorLocksPage() {
           <div className="form-section">
             <label>Do the locks reliably secure doors to prevent unauthorized access?</label>
             <div>
-              <input type="radio" name="secure-locks" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="secure-locks" value="no" onChange={handleChange}/> No
+              <input type="radio" name="secureLocks" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="secureLocks" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -97,8 +97,8 @@ function DoorLocksPage() {
           <div className="form-section">
             <label>Are backup systems in place in case of power outages or malfunctions?</label>
             <div>
-              <input type="radio" name="backup-systems" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="backup-systems" value="no" onChange={handleChange}/> No
+              <input type="radio" name="backupSystems" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="backupSystems" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -107,23 +107,23 @@ function DoorLocksPage() {
           <div className="form-section">
             <label>What authentication methods are used with the electronic door locks (e.g., RFID cards, key codes, biometric scans)?</label>
             <div>
-              <input type="text" name="authentication-methods" placeholder="Enter authentication methods" onChange={handleChange}/>
+              <input type="text" name="authenticationMethods" placeholder="Enter authentication methods" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>Are these authentication methods secure and resistant to unauthorized duplication or bypass?</label>
             <div>
-              <input type="radio" name="auth-secure" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="auth-secure" value="no" onChange={handleChange}/> No
+              <input type="radio" name="authSecure" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="authSecure" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Is multi-factor authentication implemented to enhance security (e.g., combining a PIN code with a biometric scan)?</label>
             <div>
-              <input type="radio" name="mfa" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="mfa" value="no" onChange={handleChange}/> No
+              <input type="radio" name="MFA" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="MFA" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -132,23 +132,23 @@ function DoorLocksPage() {
           <div className="form-section">
             <label>How are access rights managed and enforced through the electronic door locks?</label>
             <div>
-              <input type="text" name="access-rights-management" placeholder="Describe access rights management" onChange={handleChange}/>
+              <input type="text" name="accessRightsManagement" placeholder="Describe access rights management" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>Is access restricted to individuals with valid credentials or authorization?</label>
             <div>
-              <input type="radio" name="valid-credentials" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="valid-credentials" value="no" onChange={handleChange}/> No
+              <input type="radio" name="validCredentials" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="validCredentials" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Is there a process for granting, modifying, or revoking access permissions as needed?</label>
             <div>
-              <input type="radio" name="access-permissions" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="access-permissions" value="no" onChange={handleChange}/> No
+              <input type="radio" name="accessPermissions" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="accessPermissions" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -157,24 +157,24 @@ function DoorLocksPage() {
           <div className="form-section">
             <label>Are the electronic door locks integrated with other security systems, such as access control software, surveillance cameras, or alarm systems?</label>
             <div>
-              <input type="radio" name="integration-security-systems" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="integration-security-systems" value="no" onChange={handleChange}/> No
+              <input type="radio" name="integrationSecuritySystems" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="integrationSecuritySystems" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Do they communicate seamlessly with these systems to provide real-time monitoring and response to security events?</label>
             <div>
-              <input type="radio" name="real-time-monitoring" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="real-time-monitoring" value="no" onChange={handleChange}/> No
+              <input type="radio" name="realTimeMonitoring" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="realTimeMonitoring" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are access events logged and recorded for audit and analysis purposes?</label>
             <div>
-              <input type="radio" name="access-events-logging" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="access-events-logging" value="no" onChange={handleChange}/> No
+              <input type="radio" name="accessEventsLogging" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="accessEventsLogging" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -191,16 +191,16 @@ function DoorLocksPage() {
           <div className="form-section">
             <label>Are there anti-tamper features or sensors to detect and respond to unauthorized manipulation?</label>
             <div>
-              <input type="radio" name="anti-tamper" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="anti-tamper" value="no" onChange={handleChange}/> No
+              <input type="radio" name="antiTamper" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="antiTamper" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are the locks resistant to environmental factors such as moisture, temperature extremes, or physical wear?</label>
             <div>
-              <input type="radio" name="environmental-resistance" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="environmental-resistance" value="no" onChange={handleChange}/> No
+              <input type="radio" name="environmentalResistance" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="environmentalResistance" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -209,24 +209,24 @@ function DoorLocksPage() {
           <div className="form-section">
             <label>Is there a regular maintenance schedule in place for the electronic door locks?</label>
             <div>
-              <input type="radio" name="maintenance-schedule" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="maintenance-schedule" value="no" onChange={handleChange}/> No
+              <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are maintenance tasks, such as battery replacement, software updates, and inspection of locking mechanisms, performed according to schedule?</label>
             <div>
-              <input type="radio" name="maintenance-tasks" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="maintenance-tasks" value="no" onChange={handleChange}/> No
+              <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there records documenting maintenance activities, repairs, and any issues identified during inspections?</label>
             <div>
-              <input type="radio" name="maintenance-records" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="maintenance-records" value="no" onChange={handleChange}/> No
+              <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -235,24 +235,24 @@ function DoorLocksPage() {
           <div className="form-section">
             <label>Have users, such as security personnel, staff, and authorized individuals, received training on how to use the electronic door locks properly?</label>
             <div>
-              <input type="radio" name="user-training" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="user-training" value="no" onChange={handleChange}/> No
+              <input type="radio" name="userTraining" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="userTraining" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there instructions or guidelines available to users regarding proper door access procedures and security protocols?</label>
             <div>
-              <input type="radio" name="user-instructions" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="user-instructions" value="no" onChange={handleChange}/> No
+              <input type="radio" name="userInstructions" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="userInstructions" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Is there a process for reporting malfunctions, damage, or security incidents related to the electronic door locks?</label>
             <div>
-              <input type="radio" name="reporting-process" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="reporting-process" value="no" onChange={handleChange}/> No
+              <input type="radio" name="reportingProcess" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="reportingProcess" value="no" onChange={handleChange}/> No
             </div>
           </div>
 

@@ -44,7 +44,7 @@ function AccessControlKeypadsPage() {
       const buildingRef = doc(db, 'Buildings', buildingId);
 
       // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Physical Security/Door Locks');
+      const formsRef = collection(db, 'forms/Physical Security/Access Control Keypads');
       await addDoc(formsRef, {
         buildling: buildingRef,
         formData: formData,
@@ -81,8 +81,8 @@ function AccessControlKeypadsPage() {
           <div className="form-section">
             <label>Do the keypads reliably authenticate users and grant access to restricted areas?</label>
             <div>
-              <input type="radio" name="reliably-authenticate" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="reliably-authenticate" value="no" onChange={handleChange}/> No
+              <input type="radio" name="reliablyAuthenticate" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="reliablyAuthenticate" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -97,8 +97,8 @@ function AccessControlKeypadsPage() {
           <div className="form-section">
             <label>Are backup systems in place in case of power outages or malfunctions?</label>
             <div>
-              <input type="radio" name="backup-systems" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="backup-systems" value="no" onChange={handleChange}/> No
+              <input type="radio" name="backupSystems" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="backupSystems" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -107,8 +107,8 @@ function AccessControlKeypadsPage() {
           <div className="form-section">
             <label>Are access codes used with the keypads sufficiently secure and resistant to unauthorized access or guessing?</label>
             <div>
-              <input type="radio" name="secure-codes" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="secure-codes" value="no" onChange={handleChange}/> No
+              <input type="radio" name="secureCodes" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="secureCodes" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -123,8 +123,8 @@ function AccessControlKeypadsPage() {
           <div className="form-section">
             <label>Is there a process for periodically changing access codes to enhance security?</label>
             <div>
-              <input type="radio" name="change-codes" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="change-codes" value="no" onChange={handleChange}/> No
+              <input type="radio" name="changeCodes" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="changeCodes" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -141,24 +141,24 @@ function AccessControlKeypadsPage() {
           <div className="form-section">
             <label>Do they communicate seamlessly with access control software and databases?</label>
             <div>
-              <input type="radio" name="communicate-seamlessly" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="communicate-seamlessly" value="no" onChange={handleChange}/> No
+              <input type="radio" name="communicateSeamlessly" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="communicateSeamlessly" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Is there real-time monitoring and logging of access events captured by the keypads?</label>
             <div>
-              <input type="radio" name="real-time-monitoring" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="real-time-monitoring" value="no" onChange={handleChange}/> No
+              <input type="radio" name="realTimeMonitoring" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="realTimeMonitoring" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are access rights managed centrally and synchronized with the keypad system?</label>
             <div>
-              <input type="radio" name="access-rights-managed" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="access-rights-managed" value="no" onChange={handleChange}/> No
+              <input type="radio" name="accessRightsManaged" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="accessRightsManaged" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -167,24 +167,24 @@ function AccessControlKeypadsPage() {
           <div className="form-section">
             <label>Are the access control keypads made from durable materials capable of withstanding physical force or tampering attempts?</label>
             <div>
-              <input type="radio" name="durable-materials" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="durable-materials" value="no" onChange={handleChange}/> No
+              <input type="radio" name="durableMaterials" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="durableMaterials" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there additional security features, such as tamper alarms or anti-tamper enclosures, to deter unauthorized access or vandalism?</label>
             <div>
-              <input type="radio" name="tamper-alarms" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="tamper-alarms" value="no" onChange={handleChange}/> No
+              <input type="radio" name="tamperAlarms" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="tamperAlarms" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Have the keypads been tested for reliability and resistance to environmental factors such as moisture, temperature extremes, or physical wear?</label>
             <div>
-              <input type="radio" name="tested-reliability" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="tested-reliability" value="no" onChange={handleChange}/> No
+              <input type="radio" name="testedReliability" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="testedReliability" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -201,16 +201,16 @@ function AccessControlKeypadsPage() {
           <div className="form-section">
             <label>Do they provide clear instructions for entering access codes and accessing restricted areas?</label>
             <div>
-              <input type="radio" name="clear-instructions" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="clear-instructions" value="no" onChange={handleChange}/> No
+              <input type="radio" name="clearInstructions" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="clearInstructions" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there any accessibility features or considerations for individuals with disabilities?</label>
             <div>
-              <input type="radio" name="disability-accessibility" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="disability-accessibility" value="no" onChange={handleChange}/> No
+              <input type="radio" name="disabilityAccessibility" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="disabilityAccessibility" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -219,24 +219,24 @@ function AccessControlKeypadsPage() {
           <div className="form-section">
             <label>Is there a regular maintenance schedule in place for the access control keypads?</label>
             <div>
-              <input type="radio" name="maintenance-schedule" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="maintenance-schedule" value="no" onChange={handleChange}/> No
+              <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are maintenance tasks, such as cleaning, inspection of keypads and wiring, and replacement of worn-out components, performed according to schedule?</label>
             <div>
-              <input type="radio" name="maintenance-tasks" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="maintenance-tasks" value="no" onChange={handleChange}/> No
+              <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there records documenting maintenance activities, repairs, and any issues identified during inspections?</label>
             <div>
-              <input type="radio" name="maintenance-records" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="maintenance-records" value="no" onChange={handleChange}/> No
+              <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -245,24 +245,24 @@ function AccessControlKeypadsPage() {
           <div className="form-section">
             <label>Have users, such as security personnel and authorized individuals, received training on how to use the access control keypads properly?</label>
             <div>
-              <input type="radio" name="user-training" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="user-training" value="no" onChange={handleChange}/> No
+              <input type="radio" name="userTraining" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="userTraining" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there instructions or guidelines available to users regarding proper access code usage and security protocols?</label>
             <div>
-              <input type="radio" name="instructions-available" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="instructions-available" value="no" onChange={handleChange}/> No
+              <input type="radio" name="instructionsAvailable" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="instructionsAvailable" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Is there a process for reporting malfunctions, damage, or security incidents related to the access control keypads?</label>
             <div>
-              <input type="radio" name="reporting-process" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="reporting-process" value="no" onChange={handleChange}/> No
+              <input type="radio" name="reportingProcess" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="reportingProcess" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
