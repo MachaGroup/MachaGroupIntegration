@@ -1,13 +1,61 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate
-import './FormQuestions.css';  // Ensure this is linked to your universal CSS
+import React, { useState, useEffect } from 'react';
+import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
+import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import './FormQuestions.css';
 
 function WindowLocksPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
+  const { buildingId } = useBuilding();
+  const db = getFirestore();
+
+  const [formData, setFormData] = useState();
+
+  useEffect(() => {
+    if(!buildingId) {
+      alert('No builidng selected. Redirecting to Building Info...');
+      navigate('BuildingandAddress');
+    }
+  }, [buildingId, navigate]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
   // Function to handle back button
   const handleBack = () => {
     navigate(-1);  // Navigates to the previous page
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if(!buildingId) {
+      alert('Building ID is missing. Please start the assessment from the correct page.');
+      return;
+    }
+
+    try {
+      // Create a document reference to the building in the 'Buildings' collection
+      const buildingRef = doc(db, 'Buildings', buildingId);
+
+      // Store the form data in the specified Firestore structure
+      const formsRef = collection(db, 'forms/Physical Security/Door Locks');
+      await addDoc(formsRef, {
+        buildling: buildingRef,
+        formData: formData,
+      });
+      console.log('From Data submitted successfully!')
+      alert('Form Submitted successfully!');
+      navigate('/Form');
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to submit the form. Please try again.');
+    }
   };
 
   return (
@@ -19,37 +67,37 @@ function WindowLocksPage() {
       </header>
 
       <main className="form-container">
-        <form>
+        <form onSubmit={handleSubmit}>
           {/* Functionality and Reliability */}
           <h2>Functionality and Reliability:</h2>
           <div className="form-section">
             <label>Are the window locks operational and functioning properly?</label>
             <div>
-              <input type="radio" name="operational-locks" value="yes" /> Yes
-              <input type="radio" name="operational-locks" value="no" /> No
+              <input type="radio" name="operational-locks" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="operational-locks" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Do the locks securely fasten windows to prevent unauthorized entry?</label>
             <div>
-              <input type="radio" name="secure-fastening" value="yes" /> Yes
-              <input type="radio" name="secure-fastening" value="no" /> No
+              <input type="radio" name="secure-fastening" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="secure-fastening" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there any signs of damage, wear, or malfunction in the locking mechanisms?</label>
             <div>
-              <input type="text" name="damage-locks" placeholder="Describe any damage or malfunction" />
+              <input type="text" name="damage-locks" placeholder="Describe any damage or malfunction" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>Are backup systems in place in case of lock failure or tampering?</label>
             <div>
-              <input type="radio" name="backup-systems" value="yes" /> Yes
-              <input type="radio" name="backup-systems" value="no" /> No
+              <input type="radio" name="backup-systems" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="backup-systems" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -58,24 +106,24 @@ function WindowLocksPage() {
           <div className="form-section">
             <label>Are the window locks suitable for the type of windows installed (e.g., sliding windows, casement windows)?</label>
             <div>
-              <input type="radio" name="window-lock-suitability" value="yes" /> Yes
-              <input type="radio" name="window-lock-suitability" value="no" /> No
+              <input type="radio" name="window-lock-suitability" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="window-lock-suitability" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Do they provide a secure fit and effective locking mechanism for each window style?</label>
             <div>
-              <input type="radio" name="secure-fit" value="yes" /> Yes
-              <input type="radio" name="secure-fit" value="no" /> No
+              <input type="radio" name="secure-fit" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="secure-fit" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Have considerations been made for windows of varying sizes and configurations?</label>
             <div>
-              <input type="radio" name="window-sizes" value="yes" /> Yes
-              <input type="radio" name="window-sizes" value="no" /> No
+              <input type="radio" name="window-sizes" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="window-sizes" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -84,24 +132,24 @@ function WindowLocksPage() {
           <div className="form-section">
             <label>Are the window locks easily accessible and operable for occupants, particularly in emergency situations?</label>
             <div>
-              <input type="radio" name="accessible-locks" value="yes" /> Yes
-              <input type="radio" name="accessible-locks" value="no" /> No
+              <input type="radio" name="accessible-locks" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="accessible-locks" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Do they allow for quick and convenient opening and closing of windows when needed?</label>
             <div>
-              <input type="radio" name="convenient-use" value="yes" /> Yes
-              <input type="radio" name="convenient-use" value="no" /> No
+              <input type="radio" name="convenient-use" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="convenient-use" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there any accessibility features or considerations for individuals with disabilities?</label>
             <div>
-              <input type="radio" name="accessibility-features" value="yes" /> Yes
-              <input type="radio" name="accessibility-features" value="no" /> No
+              <input type="radio" name="accessibility-features" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="accessibility-features" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -110,24 +158,24 @@ function WindowLocksPage() {
           <div className="form-section">
             <label>Are the window locks made from durable materials capable of withstanding physical force or tampering attempts?</label>
             <div>
-              <input type="radio" name="durable-materials" value="yes" /> Yes
-              <input type="radio" name="durable-materials" value="no" /> No
+              <input type="radio" name="durable-materials" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="durable-materials" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there additional security features, such as reinforced bolts or tamper-resistant screws, to enhance resistance to forced entry?</label>
             <div>
-              <input type="radio" name="additional-security-features" value="yes" /> Yes
-              <input type="radio" name="additional-security-features" value="no" /> No
+              <input type="radio" name="additional-security-features" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="additional-security-features" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Have the locks been tested for reliability and resistance to environmental factors such as corrosion or wear?</label>
             <div>
-              <input type="radio" name="reliability-testing" value="yes" /> Yes
-              <input type="radio" name="reliability-testing" value="no" /> No
+              <input type="radio" name="reliability-testing" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="reliability-testing" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -136,24 +184,24 @@ function WindowLocksPage() {
           <div className="form-section">
             <label>Are the window locks integrated with the overall building security system?</label>
             <div>
-              <input type="radio" name="integration-security-system" value="yes" /> Yes
-              <input type="radio" name="integration-security-system" value="no" /> No
+              <input type="radio" name="integration-security-system" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="integration-security-system" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Do they trigger alerts or notifications in the event of tampering or attempted unauthorized entry?</label>
             <div>
-              <input type="radio" name="tamper-alerts" value="yes" /> Yes
-              <input type="radio" name="tamper-alerts" value="no" /> No
+              <input type="radio" name="tamper-alerts" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="tamper-alerts" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there surveillance cameras or other monitoring devices positioned to monitor windows for security breaches?</label>
             <div>
-              <input type="radio" name="surveillance-monitoring" value="yes" /> Yes
-              <input type="radio" name="surveillance-monitoring" value="no" /> No
+              <input type="radio" name="surveillance-monitoring" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="surveillance-monitoring" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -162,24 +210,24 @@ function WindowLocksPage() {
           <div className="form-section">
             <label>Is there a regular maintenance schedule in place for window locks?</label>
             <div>
-              <input type="radio" name="maintenance-schedule" value="yes" /> Yes
-              <input type="radio" name="maintenance-schedule" value="no" /> No
+              <input type="radio" name="maintenance-schedule" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="maintenance-schedule" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are maintenance tasks, such as lubrication, inspection of locking mechanisms, and replacement of worn-out parts, performed according to schedule?</label>
             <div>
-              <input type="radio" name="maintenance-tasks" value="yes" /> Yes
-              <input type="radio" name="maintenance-tasks" value="no" /> No
+              <input type="radio" name="maintenance-tasks" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="maintenance-tasks" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there records documenting maintenance activities, repairs, and any issues identified during inspections?</label>
             <div>
-              <input type="radio" name="maintenance-records" value="yes" /> Yes
-              <input type="radio" name="maintenance-records" value="no" /> No
+              <input type="radio" name="maintenance-records" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="maintenance-records" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -188,23 +236,23 @@ function WindowLocksPage() {
           <div className="form-section">
             <label>Do the window locks comply with relevant regulations, codes, and standards for building security?</label>
             <div>
-              <input type="radio" name="compliance" value="yes" /> Yes
-              <input type="radio" name="compliance" value="no" /> No
+              <input type="radio" name="compliance" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="compliance" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there specific requirements or guidelines for window locks outlined by regulatory authorities or industry associations?</label>
             <div>
-              <input type="text" name="regulatory-requirements" placeholder="Enter any regulatory requirements" />
+              <input type="text" name="regulatory-requirements" placeholder="Enter any regulatory requirements" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>Have the locks undergone testing or certification to verify compliance with applicable standards?</label>
             <div>
-              <input type="radio" name="certifications" value="yes" /> Yes
-              <input type="radio" name="certifications" value="no" /> No
+              <input type="radio" name="certifications" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="certifications" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
