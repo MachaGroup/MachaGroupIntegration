@@ -44,7 +44,7 @@ function FrontDeskSecurityPage() {
       const buildingRef = doc(db, 'Buildings', buildingId); 
 
       // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Physical Security/Security Gates');
+      const formsRef = collection(db, 'forms/Physical Security/Front Desk Security');
       await addDoc(formsRef, {
           building: buildingRef, // Reference to the building document
           formData: formData, // Store the form data as a nested object
