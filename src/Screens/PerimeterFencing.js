@@ -6,24 +6,24 @@ import './FormQuestions.css';
 
 function PerimeterFencingPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
+  const { buildingId } = useBuilding(); // Access buildingId from context
   const db = getFirestore();
 
   const [formData, setFormData] = useState();
 
   useEffect(() => {
-    if(!buildingId) {
-      alert('No building selected. Redirecting to Building Info...');
-      navigate('/BuildingandAddress');
-    }
+      if (!buildingId) {
+          alert('No building selected. Redirecting to Building Info...');
+          navigate('/BuildingandAddress');
+      }
   }, [buildingId, navigate]);
 
   const handleChange = (e) => {
-    const { name,value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+      const { name, value } = e.target;
+      setFormData((prevData) => ({
+          ...prevData,
+          [name]: value,
+      }));
   };
 
   // Function to handle back button
@@ -34,29 +34,30 @@ function PerimeterFencingPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if(buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+    if (!buildingId) {
+        alert('Building ID is missing. Please start the assessment from the correct page.');
+        return;
     }
 
-    try{
+    try {
       // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
+      const buildingRef = doc(db, 'Buildings', buildingId); 
 
       // Store the form data in the specified Firestore structure
       const formsRef = collection(db, 'forms/Physical Security/Perimeter Fencing');
       await addDoc(formsRef, {
-        building: buildingRef, // Reference to the building document
-        formData: formData, // Store the form data as a nested object
+          building: buildingRef, // Reference to the building document
+          formData: formData, // Store the form data as a nested object
       });
+
       console.log('Form data submitted successfully!');
       alert('Form submitted successfully!');
       navigate('/Form');
     } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Faied to submit the form. Please try again.');
+        console.error('Error submitting form:', error);
+        alert('Failed to submit the form. Please try again.');
     }
-  };
+};
 
   return (
     <div className="form-page">
