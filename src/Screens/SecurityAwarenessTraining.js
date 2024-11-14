@@ -20,6 +20,9 @@ function SecurityAwarenessTrainingPage() {
         case 'Security Policies and Procedures':
             navigate('/security-policies-and-procedures')
             break;
+        case 'Security Policies and Procedures':
+            navigate('/security-policies-and-procedures')
+            break;
         default:
           console.log('Unknown section');
   }
@@ -39,6 +42,7 @@ function SecurityAwarenessTrainingPage() {
         <h2>Security Awareness Training</h2>
         <form>
           {/* Security Awareness Training Buttons */}
+          {['Threat Recognition', 'Cybersecurity Training', 'Security Policies and Procedures'].map((section, index) => (
           {['Threat Recognition', 'Cybersecurity Training', 'Security Policies and Procedures'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>

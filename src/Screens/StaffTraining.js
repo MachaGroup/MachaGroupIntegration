@@ -19,7 +19,10 @@ function StaffTrainingPage() {
           break;
         case 'Emergency Communication':
           navigate('/emergency-communication2');
+          navigate('/emergency-communication2');
           break;
+        case 'Security Awareness Training':
+          navigate('/security-awareness-training');
         case 'Security Awareness Training':
           navigate('/security-awareness-training');
           break;
@@ -45,6 +48,7 @@ function StaffTrainingPage() {
         <h2>Staff Training</h2>
         <form>
           {/* Staff Training Buttons */}
+          {['First Aid/CPR Training', 'Emergency Response Training', 'Emergency Communication', 'Security Awareness Training', 'Incident Response Training'].map((section, index) => (
           {['First Aid/CPR Training', 'Emergency Response Training', 'Emergency Communication', 'Security Awareness Training', 'Incident Response Training'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>

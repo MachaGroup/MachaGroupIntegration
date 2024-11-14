@@ -1,6 +1,8 @@
+import './App.css';
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
+import { BuildingProvider } from './Context/BuildingContext';
 // Correct the import paths for all screens
 import Login from './Screens/Login';
 import FormInputPage from './Screens/FormInputPage';
@@ -194,13 +196,65 @@ import IncidentReportingProcedures from './Screens/IncidentReportingProcedures';
 import AcceptableUsePolicyTraining from './Screens/AcceptableUsePolicyTraining';
 import DataHandlingGuidelines from './Screens/DataHandlingGuidelines';
 import AccessRestrictions from './Screens/AccessRestrictions';
+import AccessPoints from './Screens/AccessPoints';
+import BuildingSecurity from './Screens/BuildingSecurity';
+import PerimeterSecurity from './Screens/PerimeterSecurity';
+import CCTVCameras from './Screens/CCTVCameras';
+import AlarmSystems from './Screens/AlarmSystems';
+import OnSiteSecurity from './Screens/OnSiteSecurity';
+//Tier 4 PS
+import MainEntrance from './Screens/MainEntrance';
+import SecondaryEntrances from './Screens/SecondaryEntrances';
+import FencingandBarriers from './Screens/FencingandBarriers';
+import LockingMechanisms from './Screens/LockingMechanisms';
+import Lighting from './Screens/Lighting';
+import IndoorCameras from './Screens/IndoorCameras';
+import OutdoorCameras from './Screens/OutdoorCameras';
+import IntrusionAlarms from './Screens/IntrusionAlarms';
+import PerimeterAlarms from './Screens/PerimeterAlarms';
+import SecurityGuards from './Screens/SecurityGuards';
+import ReceptionStaff from './Screens/ReceptionStaff';
+import SecurityGates from './Screens/SecurityGates';
+import Turnstiles from './Screens/Turnstiles';
+import AccessControlSystems from './Screens/AccessControlSystems';
+import StationedGuards from './Screens/StationedGuards';
+import CardReaders from "./Screens/CardReaders";
+import BiometricScanners from "./Screens/BiometricScanners";
+import AccessControlSoftware from "./Screens/AccessControlSoftware";
+import PerimeterFencing from "./Screens/PerimeterFencing";
+import VehicleBarriers from "./Screens/VehicleBarriers";
+import RazorWire from "./Screens/RazorWire";
+import MotionActivatedLights from "./Screens/MotionActivatedLights";
+import Floodlights from "./Screens/Floodlights";
+import DoorLocks from "./Screens/DoorLocks";
+import WindowLocks from "./Screens/WindowLocks";
+import AccessControlKeypads from "./Screens/AccessControlKeypads";
+import DomeCameras from "./Screens/DomeCameras";
+import PTZCameras from "./Screens/PTZCameras";
+import BulletCameras from "./Screens/BulletCameras";
+import WeatherproofCameras from "./Screens/WeatherproofCameras";
+import InfraredCameras from "./Screens/InfraredCameras";
+import MotionSensors from "./Screens/MotionSensors";
+import GlassBreakSensors from "./Screens/GlassBreakSensors";
+import DoorAlarms from "./Screens/DoorAlarms";
+import FenceSensors from "./Screens/FenceSensors";
+import GateAlarms from "./Screens/GateAlarms";
+import OnSiteGuards from "./Screens/OnSiteGuards";
+import RovingPatrols from "./Screens/RovingPatrols";
+import FrontDeskSecurity from "./Screens/FrontDeskSecurity";
+import VisitorCheckin from "./Screens/VisitorCheckin";
+import CreateanAccount from "./Screens/CreateanAccount";
+import ForgotPassword from "./Screens/ForgotPassword";
+import BuildingandAddress from "./Screens/BuildingandAddress";
 
 function App() {
   return (
+    <div className="App">
+    <BuildingProvider>
     <Router>
       <Routes>
         {/* Default route for the main screen */}
-        <Route path="/" element={<MainScreen />} />
+        <Route path="/" element={<Login />} />
 
         {/* Other Routes */}
         <Route path="/Login" element={<Login />} />
@@ -210,7 +264,7 @@ function App() {
         <Route path="/FAQ" element={<FAQ />} />
         <Route path="/ContactUs" element={<ContactUs />} />
         <Route path="/Settings" element={<Settings />} />
-        <Route path="/editprofile" element={<EditProfile />} />
+        <Route path="/EditProfile" element={<EditProfile />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/Pricing" element={<Pricing />} />
         <Route path="/Physical" element={<PhysicalSecurity />} />
@@ -308,95 +362,60 @@ function App() {
         <Route path="/policy-evaluation-criteria" element={<PolicyEvaluationCriteria />} />
         <Route path="/stakeholder-feedback" element={<StakeholderFeedback />} />
         <Route path="/change-management-process" element={<ChangeManagementProcess />} />
-        <Route path="/threat-recognition" element={<ThreatRecognition />} />
-        <Route path="/cybersecurity-training" element={<CybersecurityTraining />} />
-        <Route path="/conflict-resolution" element={<ConflictResolution />} />
-        <Route path="/emergency-communication" element={<EmergencyCommunication />} />
-        <Route path="/first-aid-response" element={<FirstAidResponse />} />
-        <Route path="/evacuation-procedures" element={<EvacuationProcedures />} />
-        <Route path="/fire-extinguisher-locations" element={<FireExtinguisherLocations />} />
-        <Route path="/alarm-systems" element={<AlarmSystems />} />
-        <Route path="/classroom-lockdown-protocols" element={<ClassroomLockdownProtocols />} />
-        <Route path="/communication-protocols2" element={<CommunicationProtocols2 />} />
-        <Route path="/law-enforcement-coordination" element={<LawEnforcementCoordination />} />
-        <Route path="/disaster-drills" element={<DisasterDrills />} />
-        <Route path="/tornado-shelter-locations" element={<TornadoShelterLocations />} />
-        <Route path="/severe-weather-monitoring" element={<SevereWeatherMonitoring />} />
-        <Route path="/tornado-drills" element={<TornadoDrills />} />
-        <Route path="/earthquake-drills" element={<EarthquakeDrills />} />
-        <Route path="/fire-drill" element={<FireDrill />} />
-        <Route path="/drill-scenerios" element={<DrillScenerios />} />
-        <Route path="/lockdown-signal-recognition" element={<LockdownSignalRecognition />} />
-        <Route path="/staff-roles-and-responsibilities" element={<StaffRolesAndResponsibilities />} />
-        <Route path="/debriefing-and-feedback" element={<DebriefingAndFeedback />} />
-        <Route path="/evacuation-routes-review" element={<EvacuationRoutesReview />} />
-        <Route path="/drill-frequency" element={<DrillFrequency />} />
-        <Route path="/speaker-locations" element={<SpeakerLocations />} />
-        <Route path="/emergency-announcement-protocols" element={<EmergencyAnnouncementProtocols />} />
-        <Route path="/backup-power-systems" element={<BackupPowerSystems />} />
-        <Route path="/contact-information-database" element={<ContactInformationDatabase />} />
-        <Route path="/alert-activation-procedures" element={<AlertActivationProcedures />} />
-        <Route path="/integration-with-parent-communication" element={<IntegrationWithParentCommunication />} />
-        <Route path="/two-way-radios" element={<TwoWayRadios />} />
-        <Route path="/emergency-communication-training" element={<EmergencyCommunicationTraining />} />
-        <Route path="/communication-platforms" element={<CommunicationPlatforms />} />
-        <Route path="/parent-notification-procedures" element={<ParentNotificationProcedures />} />
-        <Route path="/communication-language" element={<CommunicationLanguage />} />
-        <Route path="/training-providers" element={<TrainingProviders />} />
-        <Route path="/training-materials" element={<TrainingMaterials />} />
-        <Route path="/recertification-schedule" element={<RecertificationSchedule />} />
-        <Route path="/scenerio-based-training" element={<ScenarioBasedTraining />} />
-        <Route path="/response-protocols" element={<ResponseProtocols />} />
-        <Route path="/post-incident-support" element={<PostIncidentSupport />} />
-        <Route path="/curriculum-integration" element={<CurriculumIntegration />} />
-        <Route path="/student-handbooks" element={<StudentHandbooks />} />
-        <Route path="/parent-involvement2" element={<ParentInvolvement2 />} />
-        <Route path="/safety-demonstrations" element={<SafetyDemonstrations />} />
-        <Route path="/role-playing-scenarios" element={<RolePlayingScenarios />} />
-        <Route path="/student-leadership" element={<StudentLeadership />} />
-        <Route path="/safety-workshops" element={<SafetyWorkshops />} />
-        <Route path="/parent-volunteer-programs" element={<ParentVolunteerPrograms />} />
-        <Route path="/parent-advisory-committees" element={<ParentAdvisoryCommittees />} />
-        <Route path="/parent-teacher-associations" element={<ParentTeacherAssociations />} />
-        <Route path="/emergency-contacts" element={<EmergencyContacts />} />
-        <Route path="/parent-feedback-mechanisms" element={<ParentFeedbackMechanisms />} />
-        <Route path="/law-enforcement-partnership" element={<LawEnforcementPartnership />} />
-        <Route path="/fire-department-collaboration" element={<FireDepartmentCollaboration />} />
-        <Route path="/healthcare-provider-engagement" element={<HealthcareProviderEngagement />} />
-        <Route path="/emergency-shelters" element={<EmergencyShelters />} />
-        <Route path="/medical-facilities" element={<MedicalFacilities />} />
-        <Route path="/mental-health-services" element={<MentalHealthServices />} />
-        <Route path="/first-aid-CPR-training2" element={<FirstAidCPRTraining2 />} />
-        <Route path="/basic-first-aid-techniques" element={<BasicFirstAidTechniques />} />
-        <Route path="/CPR-certification" element={<CPRCertification />} />
-        <Route path="/AED-training" element={<AEDTraining />} />
-        <Route path="/active-shooter-response" element={<ActiveShooterResponse />} />
-        <Route path="/response-protocols2" element={<ResponseProtocols2 />} />
-        <Route path="/evacuation-procedures2" element={<EvacuationProcedures2 />} />
-        <Route path="/emergency-communication2" element={<EmergencyCommunication2 />} />
-        <Route path="/identifying-suspicious-behavior" element={<IdentifyingSuspiciousBehavior />} />
-        <Route path="/recognizing-security-breaches" element={<RecognizingSecurityBreaches />} />
-        <Route path="/phishing-awareness2" element={<PhishingAwareness2 />} />
-        <Route path="/password-security2" element={<PasswordSecurity2 />} />
-        <Route path="/data-protection2" element={<DataProtection2 />} />
-        <Route path="/fire-drills" element={<FireDrills />} />
-        <Route path="/lockdown-drills2" element={<LockdownDrills2 />} />
-        <Route path="/severe-weather-preparedness" element={<SevereWeatherPreparedness />} />
-        <Route path="/stranger-danger-awareness" element={<StangerDangerAwareness />} />
-        <Route path="/internet-safety" element={<InternetSafety />} />
-        <Route path="/verbal-bullying" element={<VerbalBullying />} />
-        <Route path="/physical-bullying" element={<PhysicalBullying />} />
-        <Route path="/cyber-bullying" element={<CyberBullying />} />
-        <Route path="/trusted-adults" element={<TrustedAdults />} />
-        <Route path="/anonymous-reporting-systems" element={<AnonymousReportingSystems />} />
-        <Route path="/peer-support-networks" element={<PeerSupportNetworks />} />
-        <Route path="/recognizing-security-incidents" element={<RecognizingSecurityIncidents />} />
-        <Route path="/incident-reporting-procedures" element={<IncidentReportingProcedures />} />
-        <Route path="/AUP-training" element={<AcceptableUsePolicyTraining />} />
-        <Route path="/data-handling-guidelines" element={<DataHandlingGuidelines />} />
-        <Route path="/access-restrictions" element={<AccessRestrictions />} />
+        <Route path="/AccessP" element={<AccessPoints />} />
+        <Route path="/BuildingS" element={<BuildingSecurity />} />
+        <Route path="/PerimeterS" element={<PerimeterSecurity />} />
+        <Route path="/CCTV" element={<CCTVCameras />} />
+        <Route path="/AlarmS" element={<AlarmSystems />} />
+        <Route path="/OnSite" element={<OnSiteSecurity />} />
+        <Route path="/MainE" element={<MainEntrance />} />
+        <Route path="/SecondaryEntrances" element={<SecondaryEntrances />} />
+        <Route path="/FencingandBarriers" element={<FencingandBarriers />} />
+        <Route path="/LockingMechanisms" element={<LockingMechanisms />} />
+        <Route path="/Lighting" element={<Lighting />} />
+        <Route path="/IndoorCameras" element={<IndoorCameras />} />
+        <Route path="/OutdoorCameras" element={<OutdoorCameras />} />
+        <Route path="/IntrusionAlarms" element={<IntrusionAlarms />} />
+        <Route path="/PerimeterAlarms" element={<PerimeterAlarms />} />
+        <Route path="/SecurityGuards" element={<SecurityGuards />} />
+        <Route path="/SecurityPersonnel" element={<SecurityPersonnel />} />
+        <Route path="/ReceptionStaff" element={<ReceptionStaff />} />
+        <Route path="/SecurityGates" element={<SecurityGates />} />
+        <Route path="/Turnstiles" element={<Turnstiles />} />
+        <Route path="/AccessControlSystems" element={<AccessControlSystems />} />
+        <Route path="/StationedGuards" element={<StationedGuards />} />
+        <Route path="/CardReaders" element={<CardReaders />} />
+        <Route path="/BiometricScanners" element={<BiometricScanners />} />
+        <Route path="/AccessControlSoftware" element={<AccessControlSoftware />} />
+        <Route path="/PerimeterFencing" element={<PerimeterFencing />} />
+        <Route path="/VehicleBarriers" element={<VehicleBarriers />} />
+        <Route path="/RazorWire" element={<RazorWire />} />
+        <Route path="/MotionActivatedLights" element={<MotionActivatedLights />} />
+        <Route path="/Floodlights" element={<Floodlights />} />
+        <Route path="/DoorLocks" element={<DoorLocks />} />
+        <Route path="/WindowLocks" element={<WindowLocks />} />
+        <Route path="/AccessControlKeypads" element={<AccessControlKeypads />} />
+        <Route path="/DomeCameras" element={<DomeCameras />} />
+        <Route path="/PTZCameras" element={<PTZCameras />} />
+        <Route path="/BulletCameras" element={<BulletCameras />} />
+        <Route path="/WeatherproofCameras" element={<WeatherproofCameras />} />
+        <Route path="/InfraredCameras" element={<InfraredCameras />} />
+        <Route path="/MotionSensors" element={<MotionSensors />} />
+        <Route path="/GlassBreakSensors" element={<GlassBreakSensors />} />
+        <Route path="/DoorAlarms" element={<DoorAlarms />} />
+        <Route path="/FenceSensors" element={<FenceSensors />} />
+        <Route path="/GateAlarms" element={<GateAlarms />} />
+        <Route path="/OnSiteGuards" element={<OnSiteGuards />} />
+        <Route path="/RovingPatrols" element={<RovingPatrols />} />
+        <Route path="/FrontDeskSecurity" element={<FrontDeskSecurity />} />
+        <Route path="/VisitorCheckin" element={<VisitorCheckin />} />
+        <Route path="/CreateanAccount" element={<CreateanAccount />} />
+        <Route path="/ForgotPassword" element={<ForgotPassword />} />
+        <Route path="/BuildingandAddress" element={<BuildingandAddress />} />
       </Routes>
     </Router>
+   </BuildingProvider>
+ </div>
   );
 }
 
