@@ -191,6 +191,9 @@ import AnonymousReportingSystems from './Screens/AnonymousReportingSystems';
 import PeerSupportNetworks from './Screens/PeerSupportNetworks';
 import RecognizingSecurityIncidents from './Screens/RecognizingSecurityIncidents';
 import IncidentReportingProcedures from './Screens/IncidentReportingProcedures';
+import AcceptableUsePolicyTraining from './Screens/AcceptableUsePolicyTraining';
+import DataHandlingGuidelines from './Screens/DataHandlingGuidelines';
+import AccessRestrictions from './Screens/AccessRestrictions';
 
 function App() {
   return (
@@ -389,6 +392,9 @@ function App() {
         <Route path="/peer-support-networks" element={<PeerSupportNetworks />} />
         <Route path="/recognizing-security-incidents" element={<RecognizingSecurityIncidents />} />
         <Route path="/incident-reporting-procedures" element={<IncidentReportingProcedures />} />
+        <Route path="/AUP-training" element={<AcceptableUsePolicyTraining />} />
+        <Route path="/data-handling-guidelines" element={<DataHandlingGuidelines />} />
+        <Route path="/access-restrictions" element={<AccessRestrictions />} />
       </Routes>
     </Router>
   );
