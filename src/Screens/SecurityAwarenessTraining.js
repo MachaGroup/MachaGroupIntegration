@@ -43,7 +43,6 @@ function SecurityAwarenessTrainingPage() {
         <form>
           {/* Security Awareness Training Buttons */}
           {['Threat Recognition', 'Cybersecurity Training', 'Security Policies and Procedures'].map((section, index) => (
-          {['Threat Recognition', 'Cybersecurity Training', 'Security Policies and Procedures'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>
