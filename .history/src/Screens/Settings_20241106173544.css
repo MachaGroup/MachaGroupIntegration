@@ -1,0 +1,102 @@
+/* General Page Styling */
+.settings-page {
+    background-color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  /* Header Styling */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    background-color: #b0d3e6;
+    box-sizing: border-box;
+  }
+  
+  .back-button {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #333;
+  }
+  
+  .title {
+    font-size: 1.8em;
+    color: #333;
+    margin: 0;
+  }
+  
+  /* Settings Container */
+  .settings-container {
+    width: 100%;
+    max-width: 600px; /* Adjust to control the container width */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Align items to the top */
+    margin-top: 20px;
+  }
+  
+  /* Profile Picture Container */
+  .profile-pic-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  /* Profile Picture */
+  .profile-pic {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    object-fit: cover;
+  }
+  
+  /* File Input Below the Image */
+  .file-input {
+    margin-top: 10px;
+  }
+  
+  /* Settings Buttons */
+  .settings-options {
+    width: 100%; /* Full width */
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Add space between buttons */
+  }
+  
+  .settings-button {
+    padding: 10px;
+    background-color: #74b9ff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: background-color 0.3s;
+  }
+  
+  .settings-button:hover {
+    background-color: #1b578c;
+  }
+  
+  /* Log out Link */
+  .logout-link {
+    margin-top: 30px;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 1.2em;
+  }
+  
+  .logout-link:hover {
+    text-decoration: underline;
+  }

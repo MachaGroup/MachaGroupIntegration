@@ -1,0 +1,194 @@
+/* General Page Styling */
+.editprofile-page {
+  background-color: white;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Header Styling */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #b0d3e6;
+  padding: 10px;
+  width: 100%;
+  max-width: 500px; /* Adjust max-width for mobile */
+  box-sizing: border-box;
+}
+
+/* Back Button Styling */
+.back-button {
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+  color: #333;
+}
+
+/* Title Styling */
+.title {
+  font-size: 1.5em;
+  color: #333;
+  margin: 0;
+  text-align: center;
+}
+
+/* Logo Styling */
+.logo {
+  width: 60px; /* Smaller size for mobile */
+  height: 60px;
+  border-radius: 50%;
+}
+
+/* Form Container */
+.form-container {
+  background-color: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px; /* Adjust max-width for mobile */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Form Styling */
+.profile-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Form Row Styling */
+.form-group {
+  width: 100%;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Input Fields */
+.form-group label {
+  font-size: 0.9em; /* Adjust font size for mobile */
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+/* Profile Picture Section */
+.profile-pic-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile-pic-container img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+/* File Upload Button */
+.file-upload {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.file-upload input[type="file"] {
+  display: none;
+}
+
+.file-upload label {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #74b9ff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  text-align: center;
+  transition: background-color 0.3s;
+}
+
+.file-upload label:hover {
+  background-color: #0984e3;
+}
+
+/* Save Button Styling */
+.save-profile-button {
+  background-color: #74b9ff;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  margin-top: 15px;
+  transition: background-color 0.3s;
+  width: 100%;
+  max-width: 500px; /* Ensure button width aligns with form */
+}
+
+.save-profile-button:hover {
+  background-color: #0984e3;
+}
+
+/* Cancel Link Styling */
+.cancel-link {
+  color: #74b9ff;
+  margin-top: 15px;
+  text-decoration: none;
+  font-size: 1em;
+  text-align: center;
+}
+
+.cancel-link:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .header, .form-container, .save-profile-button {
+      max-width: 100%; /* Full width on smaller screens */
+  }
+
+  .title {
+      font-size: 1.4em; /* Slightly smaller title on mobile */
+  }
+
+  .back-button {
+      font-size: 1.2em; /* Adjust back button size */
+  }
+
+  .logo {
+      width: 50px;
+      height: 50px;
+  }
+
+  .file-upload label {
+      padding: 8px 16px; /* Smaller padding for mobile */
+      font-size: 0.85em;
+  }
+}
+
+  

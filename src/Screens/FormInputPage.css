@@ -1,0 +1,123 @@
+/* General Layout */
+.form-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: #f0f0f0;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Header Styling */
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+h1 {
+  font-size: 2em;
+  color: #333;
+}
+
+.logo {
+  width: 50px;
+  height: 50px;
+  margin-top: 10px;
+}
+
+/* Back Button Styling */
+.back-button-container {
+  align-self: flex-start;
+  margin-bottom: 20px;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  font-size: 2em;
+  cursor: pointer;
+  color: #333;
+}
+
+/* Form Container Styling */
+.form-container {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 70%; /* Expanded to fit more screen width */
+  max-width: 900px; /* Cap the width on large screens */
+  box-sizing: border-box;
+}
+
+/* Form Sections */
+.form-section {
+  display: flex;
+  flex-direction: column; /* Stack label above button */
+  align-items: center; /* Center both the label and button */
+  margin-bottom: 15px;
+  width: 100%; /* Make sure the button takes the full container width */
+}
+
+.form-section label {
+  font-size: 1em;
+  color: #333;
+  margin-bottom: 10px; /* Add space between the label and button */
+  text-align: center; /* Center the label */
+  width: 100%; /* Make the label take the full width */
+}
+
+/* Form Button Styling - Same as Save/Submit Buttons */
+.form-button {
+  width: 100%; /* Full width to match Save/Submit buttons */
+  padding: 15px;
+  background-color: #74b9ff; /* Matches Save/Submit buttons */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+}
+
+.form-button:hover {
+  background-color: #0984e3; /* Hover color */
+}
+
+/* Save Button Styling */
+.save-button {
+  width: 100%;
+  padding: 15px;
+  background-color: #74b9ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  margin-top: 15px;
+}
+
+.save-button:hover {
+  background-color: #0984e3;
+}
+
+/* Submit Button Styling */
+.submit-button {
+  width: 100%;
+  padding: 15px;
+  background-color: #74b9ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  margin-top: 15px;
+}
+
+.submit-button:hover {
+  background-color: #0984e3;
+}
