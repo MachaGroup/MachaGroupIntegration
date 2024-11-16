@@ -18,7 +18,7 @@ function DrillExecutionPage() {
           navigate('/lockdown-drills');
           break;
       case 'Staff Roles and Responsibilities':
-          navigate('/staff-roles-and-responsibilites');
+          navigate('/staff-roles-and-responsibilities');
           break;
       case 'Debriefing and Feedback':
           navigate('/debriefing-and-feedback');

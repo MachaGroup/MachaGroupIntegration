@@ -1,11 +1,37 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
 import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 
 function EmergencyProceduresPage() {
+  const navigate = useNavigate();  // Initialize useNavigate hook
+
   const handleButtonClick = (section) => {
     console.log(`Button clicked for: ${section}`);
     // Add logic for handling button click, e.g., open a modal or navigate
+
+    switch (section) {
+      case 'Curriculum Integration':
+        navigate('/curriculum-integration');
+        break;
+      case 'Student Handbooks':
+        navigate('/student-handbooks');
+        break;
+      case 'Parent Involvement':
+        navigate('/parent-involvement2');
+        break;
+      case 'Fire Drills':
+        navigate('/fire-drills');
+        break;
+      case 'Lockdown Drills':
+        navigate('/lockdown-drills2');
+        break;
+      case 'Severe Weather Preparedness':
+        navigate('/severe-weather-preparedness');
+        break;
+      default:
+        console.log('Unknown section');
+    }
   };
 
   return (
