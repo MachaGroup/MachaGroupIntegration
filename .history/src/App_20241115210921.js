@@ -69,7 +69,7 @@ import PasswordManagement from './Screens/PasswordManagement';
 import IncidentIdentification from './Screens/IncidentIdentification';
 import IncidentResponsePlanning from './Screens/IncidentResponsePlanning';
 import FirewallConfiguratinon from './Screens/FirewallConfiguration';
-import IntrusionDetectionSystems from './Screens/IntrusionDetectionSystems';
+import IntrusionDetectionSystems from './Screens/IntrusionDectecitonSystems';
 import AntivirusAndMalwareProtection from './Screens/AntivirusAndMalwareProtection';
 import DeviceManagement from './Screens/DeviceManagement';
 import FileEncryption from './Screens/FileEncryption';
@@ -161,20 +161,6 @@ import ForgotPassword from "./Screens/ForgotPassword";
 import BuildingandAddress from "./Screens/BuildingandAddress";
 import AccessControlLists from "./Screens/AccessControlLists";
 import FirewallPolicies from "./Screens/FirewallPolicies";
-import SignatureBasedDetection from './Screens/SignatureBasedDetection';
-import NetworkAnomalyDetection from "./Screens/NetworkAnomalyDetection";
-import AntivirusSoftware from "./Screens/AntivirusSoftware";
-import MalwareRemovalTools from "./Screens/MalwareRemovalTools";
-import PatchManagement from "./Screens/PatchManagement";
-import DeviceEncryption from "./Screens/DeviceEncryption";
-import FullDiskEncryption from "./Screens/FullDiskEncryption";
-import FileLevelEncryption from "./Screens/FileLevelEncryption";
-import SecureEmailGateways from "./Screens/SecureEmailGateways";
-import EndToEndEncryption from "./Screens/EndToEndEncryption";
-import RegularBackupSchedules from "./Screens/Regular/BackupSchedules";
-import OffsiteBackupStorage from "./Screens/OffsiteBackupStorage";
-import BackupTesting from "./Screens/BackupTesting";
-import ContinuityOfOperations from "./Screens/ContinuityOfOperations";
 
 function App() {
   return (
@@ -251,7 +237,7 @@ function App() {
         <Route path="/incident-identification" element={<IncidentIdentification />} />
         <Route path="/incident-response-planning" element={<IncidentResponsePlanning />} />
         <Route path="/firewall-configuration" element={<FirewallConfiguratinon />} />
-        <Route path="/IntrusionDetectionSystems" element={<IntrusionDetectionSystems />} />
+        <Route path="/intrusion-detection-systems" element={<IntrusionDetectionSystems />} />
         <Route path="/antivirus-and-malware-protection" element={<AntivirusAndMalwareProtection />} />
         <Route path="/device-management" element={<DeviceManagement />} />
         <Route path="/file-encryption" element={<FileEncryption />} /> 
@@ -343,21 +329,6 @@ function App() {
         <Route path="/BuildingandAddress" element={<BuildingandAddress />} />
         <Route path="/AccessControlLists" element={<AccessControlLists />} />
         <Route path="/FirewallPolicies" element={<FirewallPolicies />} />
-        <Route path="/NetworkAnomalyDetection" element={<NetworkAnomalyDetection />} />
-        <Route path="/SignatureBasedDetection" element={<SignatureBasedDetection />} />
-        <Route path="/AntivirusSoftware" element={<AntivirusSoftware />} />
-        <Route path="/MalwareRemovalTools" element={<MalwareRemovalTools />} />
-        <Route path="/PatchManagement" element={<PatchManagement />} />
-        <Route path="/DeviceEncryption" element={<DeviceEncryption />} />
-        <Route path="/FullDiskEncryption" element={<FullDiskEncryption />} />
-        <Route path="/FileLevelEncryption" element={<FileLevelEncryption/>} />
-        <Route path="/SecureEmailGateways" element={<SecureEmailGateways/>} />
-        <Route path="/EndToEndEncryption" element={<EndToEndEncryption/>} />
-        <Route path="/RegularBackupSchedules" element={<RegularBackupSchedules/>} />
-        <Route path="/OffsiteBackupStorage" element={<OffsiteBackupStorage />} />
-        <Route path="/BackupTesting" element= {<BackupTesting/>} />
-        <Route path="/ContinuityOfOperations" element={<ContinuityOfOperations/>} />
-
       </Routes>
     </Router>
    </BuildingProvider>

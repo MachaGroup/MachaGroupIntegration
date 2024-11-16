@@ -10,28 +10,7 @@ function SecurityGatesPage() {
     const { setBuildingId, buildingId } = useBuilding(); // Access and update buildingId from context
     const db = getFirestore();
 
-    const [formData, setFormData] = useState({
-        gatesOperational: '',
-        gatesSmooth: '',
-        gatesDamage: '',
-        backupSystems: '',
-        accessControlMethods: '',
-        authMechanisms: '',
-        integratedSystems: '',
-        logEntries: '',
-        safetyFeatures: '',
-        trapHazards: '',
-        safetySignage: '',
-        complianceRegulations: '',
-        regulatoryRequirements: '',
-        inspectionsCertifications: '',
-        maintenanceSchedule: '',
-        maintenanceTasks: '',
-        maintenanceRecords: '',
-        userTraining: '',
-        instructionsGuidelines: '',
-        reportingProcess: '',
-    });
+    const [formData, setFormData] = useState();
 
     useEffect(() => {
         const fetchBuildingIdFromBuildings = async () => {

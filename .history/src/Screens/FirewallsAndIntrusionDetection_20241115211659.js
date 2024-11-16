@@ -36,7 +36,7 @@ function FirewallsAndIntrusionDetectionPage() {
         <h2>Firewalls and Intrusion Detection</h2>
         <form>
           {/* Firewalls and Intrusion Detection Buttons */}
-          {['Firewall Configuration','Intrusion Detection Systems' ].map((section, index) => (
+          {['Firewall Configuration','Intrustion Detection Systems' ].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>

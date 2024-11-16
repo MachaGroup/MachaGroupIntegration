@@ -1,25 +1,11 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
 import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 
-function FirewallsAndIntrusionDetectionPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook
-  
+function DeviceManagementPage() {
   const handleButtonClick = (section) => {
     console.log(`Button clicked for: ${section}`);
     // Add logic for handling button click, e.g., open a modal or navigate
-
-    switch (section) {
-      case 'Firewall Configuration':
-          navigate('/firewall-configuration');
-          break;
-      case 'Intrusion Detection Systems':
-          navigate('/IntrusionDetectionSystems');
-          break;
-      default:
-          console.log('Unknown section');
-  }
   };
 
   return (
@@ -31,12 +17,12 @@ function FirewallsAndIntrusionDetectionPage() {
         <img src={logo} alt="Logo" className="logo" />
       </header>
 
-      {/* Firewalls and Intrusion Detection Section */}
+      {/* Device Management Section */}
       <main className="form-container">
-        <h2>Firewalls and Intrusion Detection</h2>
+        <h2>Device Management</h2>
         <form>
-          {/* Firewalls and Intrusion Detection Buttons */}
-          {['Firewall Configuration','Intrusion Detection Systems' ].map((section, index) => (
+          {/* Device Management Buttons */}
+          {['Patch Management', 'Device Encryption'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>
@@ -50,4 +36,4 @@ function FirewallsAndIntrusionDetectionPage() {
   );
 }
 
-export default FirewallsAndIntrusionDetectionPage;
+export default DeviceManagementPage;

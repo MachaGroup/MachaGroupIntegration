@@ -1,21 +1,23 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
-import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
-import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
+import logo from '../assets/MachaLogo.png'; // Adjust the path relative to the current file location
 
-function FirewallConfigurationPage() { // Fixed typo in component name
+function IntrusionDetectionSystemsPage() {
     const navigate = useNavigate(); // Initialize useNavigate
 
     const handleButtonClick = (section) => {
+        console.log(`Button clicked for: ${section}`);
+        // Navigate to the respective section's page
         switch (section) {
-            case 'Access Control Lists':
-                navigate('/AccessControlLists');
+            case 'Network Anomaly Detection':
+                navigate('/NetworkAnomalyDetection');
                 break;
-            case 'Firewall Policies':
-                navigate('/FirewallPolicies');
+            case 'Signature-Based Detection':
+                navigate('/SignatureBasedDetection');
                 break;
             default:
-                console.error('Unknown section');
+                console.error('Unknown section:', section);
         }
     };
 
@@ -23,17 +25,17 @@ function FirewallConfigurationPage() { // Fixed typo in component name
         <div className="form-page">
             {/* Header Section */}
             <header className="header">
-                <button className="back-button" onClick={() => navigate(-1)}>←</button> {/* Updated to use navigate(-1) */}
+                <button className="back-button" onClick={() => navigate(-1)}>←</button> {/* Use navigate(-1) for back navigation */}
                 <h1>The MACHA Group</h1>
                 <img src={logo} alt="Logo" className="logo" />
             </header>
 
-            {/* Firewall Configuration Section */}
+            {/* Intrusion Detection Systems Section */}
             <main className="form-container">
-                <h2>Firewall Configuration</h2>
+                <h2>Intrusion Detection Systems</h2>
                 <form>
-                    {/* Firewall Configuration Buttons */}
-                    {['Access Control Lists', 'Firewall Policies'].map((section, index) => (
+                    {/* Intrusion Detection Systems Buttons */}
+                    {['Network Anomaly Detection', 'Signature-Based Detection'].map((section, index) => (
                         <div key={index} className="form-section">
                             <label>{section}</label>
                             <button
@@ -51,4 +53,4 @@ function FirewallConfigurationPage() { // Fixed typo in component name
     );
 }
 
-export default FirewallConfigurationPage;
+export default IntrusionDetectionSystemsPage;

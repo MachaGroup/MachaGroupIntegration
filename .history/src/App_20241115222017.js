@@ -167,14 +167,6 @@ import AntivirusSoftware from "./Screens/AntivirusSoftware";
 import MalwareRemovalTools from "./Screens/MalwareRemovalTools";
 import PatchManagement from "./Screens/PatchManagement";
 import DeviceEncryption from "./Screens/DeviceEncryption";
-import FullDiskEncryption from "./Screens/FullDiskEncryption";
-import FileLevelEncryption from "./Screens/FileLevelEncryption";
-import SecureEmailGateways from "./Screens/SecureEmailGateways";
-import EndToEndEncryption from "./Screens/EndToEndEncryption";
-import RegularBackupSchedules from "./Screens/Regular/BackupSchedules";
-import OffsiteBackupStorage from "./Screens/OffsiteBackupStorage";
-import BackupTesting from "./Screens/BackupTesting";
-import ContinuityOfOperations from "./Screens/ContinuityOfOperations";
 
 function App() {
   return (
@@ -349,15 +341,6 @@ function App() {
         <Route path="/MalwareRemovalTools" element={<MalwareRemovalTools />} />
         <Route path="/PatchManagement" element={<PatchManagement />} />
         <Route path="/DeviceEncryption" element={<DeviceEncryption />} />
-        <Route path="/FullDiskEncryption" element={<FullDiskEncryption />} />
-        <Route path="/FileLevelEncryption" element={<FileLevelEncryption/>} />
-        <Route path="/SecureEmailGateways" element={<SecureEmailGateways/>} />
-        <Route path="/EndToEndEncryption" element={<EndToEndEncryption/>} />
-        <Route path="/RegularBackupSchedules" element={<RegularBackupSchedules/>} />
-        <Route path="/OffsiteBackupStorage" element={<OffsiteBackupStorage />} />
-        <Route path="/BackupTesting" element= {<BackupTesting/>} />
-        <Route path="/ContinuityOfOperations" element={<ContinuityOfOperations/>} />
-
       </Routes>
     </Router>
    </BuildingProvider>
