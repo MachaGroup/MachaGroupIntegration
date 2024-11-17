@@ -281,7 +281,6 @@ import DataProtectionImpactAssessments from "./Screens/DataProtectionImpactAsses
 import ConsentManagement from "./Screens/ConsentManagement";
 import StudentDataPrivacyPolicies from "./Screens/StudentDataPrivacyPolicies";
 import DataBreachNotificationProcedures from "./Screens/DataBreachNotificationProcedures";
-import AnomalyDetection from "./Screens/AnomalyDetection";
 
 function App() {
   return (
@@ -371,7 +370,7 @@ function App() {
         <Route path="/multi-factor-authentication" element={<MultiFactorAuthentication />} />
         <Route path="/event-logging" element={<EventLoggingAndMonitoring />} />
         <Route path="/user-activity-monitoring" element={<UserActivityMonitoring />} />
-        <Route path="/ResponseTeamFormation" element={<ResponseTeamFormation />} />
+        <Route path="/response-team-formation" element={<ResponseTeamFormation />} />
         <Route path="/containment-and-mitigation" element={<ContainmentAndMitigation />} />
         <Route path="/password-security" element={<PasswordSecurity />} />
         <Route path="/security-policies-and-procedures" element={<SecurityPoliciesAndProcedures />} />
@@ -577,14 +576,13 @@ function App() {
         <Route path="IntrusionDetectionSystems2" element={<IntrusionDetectionSystems2 />} />
         <Route path="UserBehaviorAnalytics" element={<UserBehaviorAnalytics />} />
         <Route path="IncidentResponseTeamRolesAndResponsibilities" element={<IncidentResponseTeamRolesAndResponsibilities />} />
-        <Route path="CommunicationChannelsAndProtocols" element={<CommunicationChannelsAndProtocols />} />
+        <Route path="CommunicationChannelsAndProcedures" element={<CommunicationChannelsAndProtocols />} />
         <Route path="IsolationProcedures" element={<IsolationProcedures />} />
         <Route path="PatchManagement2" element={<PatchManagement2 />} />
         <Route path="DataProtectionImpactAssessments" element={<DataProtectionImpactAssessments />} />
         <Route path="ConsentManagement" element={<ConsentManagement />} />
         <Route path="StudentDataPrivacyPolicies" element={<StudentDataPrivacyPolicies />} />
         <Route path="DataBreachNotificationProcedures" element={<DataBreachNotificationProcedures />} />
-        <Route path="AnomalyDetection" element={<AnomalyDetection />} />
       </Routes>
     </Router>
    </BuildingProvider>

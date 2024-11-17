@@ -577,7 +577,7 @@ function App() {
         <Route path="IntrusionDetectionSystems2" element={<IntrusionDetectionSystems2 />} />
         <Route path="UserBehaviorAnalytics" element={<UserBehaviorAnalytics />} />
         <Route path="IncidentResponseTeamRolesAndResponsibilities" element={<IncidentResponseTeamRolesAndResponsibilities />} />
-        <Route path="CommunicationChannelsAndProtocols" element={<CommunicationChannelsAndProtocols />} />
+        <Route path="CommunicationChannelsAndProcedures" element={<CommunicationChannelsAndProtocols />} />
         <Route path="IsolationProcedures" element={<IsolationProcedures />} />
         <Route path="PatchManagement2" element={<PatchManagement2 />} />
         <Route path="DataProtectionImpactAssessments" element={<DataProtectionImpactAssessments />} />

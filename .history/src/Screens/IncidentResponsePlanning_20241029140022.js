@@ -12,7 +12,7 @@ function IncidentResponsePlanningPage() {
 
     switch (section) {
         case 'Response Team Formation':
-            navigate('/ResponseTeamFormation');
+            navigate('/response-team-formation');
             break;
         case 'Containment and Mitigation':
             navigate('/containment-and-mitigation');

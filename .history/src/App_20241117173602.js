@@ -82,7 +82,7 @@ import PasswordPolicies from './Screens/PasswordPolicies';
 import MultiFactorAuthentication from './Screens/MultiFactorAuthentication';
 import EventLoggingAndMonitoring from './Screens/EventLoggingAndMonitoring';
 import UserActivityMonitoring from './Screens/UserActivityMonitoring';
-import ResponseTeamFormation from './Screens/ResponseTeamFormation';
+import ResponseTeamFoundation from './Screens/ResponseTeamFoundation';
 import ContainmentAndMitigation from './Screens/ContainmentAndMitigation';
 import PasswordSecurity from './Screens/PasswordSecurity';
 import SecurityPoliciesAndProcedures from './Screens/SecurityPoliciesAndProcedures';
@@ -269,19 +269,7 @@ import PasswordComplexityRequirements from "./Screens/PasswordComplexityRequirem
 import PasswordExpirationPolicies from "./Screens/PasswordExpirationPolicies";
 import TwoFactorAuthentication from "./Screens/TwoFactorAuthentication";
 import BiometricAuthentication from "./Screens/BiometricAuthentication";
-import FireAlarmSystems from "./Screens/FireAlarmSystems";
-import SecurityInformationAndEventManagement from "./Screens/SecurityInformationAndEventManagement";
-import IntrusionDetectionSystems2 from "./Screens/IntrusionDetectionSystems2";
-import UserBehaviorAnalytics from "./Screens/UserBehaviorAnalytics";
-import IncidentResponseTeamRolesAndResponsibilities from "./Screens/IncidentResponseTeamRolesAndResponsibilities";
-import CommunicationChannelsAndProtocols from "./Screens/CommunicationChannelsAndProtocols";
-import IsolationProcedures from "./Screens/IsolationProcedures";
-import PatchManagement2 from "./Screens/PatchManagement2";
-import DataProtectionImpactAssessments from "./Screens/DataProtectionImpactAssessments";
-import ConsentManagement from "./Screens/ConsentManagement";
-import StudentDataPrivacyPolicies from "./Screens/StudentDataPrivacyPolicies";
-import DataBreachNotificationProcedures from "./Screens/DataBreachNotificationProcedures";
-import AnomalyDetection from "./Screens/AnomalyDetection";
+import FireAlarmSystmes from "./Screens/FireAlarmSystems";
 
 function App() {
   return (
@@ -371,7 +359,7 @@ function App() {
         <Route path="/multi-factor-authentication" element={<MultiFactorAuthentication />} />
         <Route path="/event-logging" element={<EventLoggingAndMonitoring />} />
         <Route path="/user-activity-monitoring" element={<UserActivityMonitoring />} />
-        <Route path="/ResponseTeamFormation" element={<ResponseTeamFormation />} />
+        <Route path="/response-team-foundation" element={<ResponseTeamFoundation />} />
         <Route path="/containment-and-mitigation" element={<ContainmentAndMitigation />} />
         <Route path="/password-security" element={<PasswordSecurity />} />
         <Route path="/security-policies-and-procedures" element={<SecurityPoliciesAndProcedures />} />
@@ -573,18 +561,8 @@ function App() {
         <Route path="DataHandlingGuidelines" element={<DataHandlingGuidelines />} />
         <Route path="AccessRestrictions" element={<AccessRestrictions />} />
         <Route path="FireAlarmSystems" element={<FireAlarmSystems />} />
-        <Route path="SecurityInformationAndEventManagement" element={<SecurityInformationAndEventManagement />} />
-        <Route path="IntrusionDetectionSystems2" element={<IntrusionDetectionSystems2 />} />
-        <Route path="UserBehaviorAnalytics" element={<UserBehaviorAnalytics />} />
-        <Route path="IncidentResponseTeamRolesAndResponsibilities" element={<IncidentResponseTeamRolesAndResponsibilities />} />
-        <Route path="CommunicationChannelsAndProtocols" element={<CommunicationChannelsAndProtocols />} />
-        <Route path="IsolationProcedures" element={<IsolationProcedures />} />
-        <Route path="PatchManagement2" element={<PatchManagement2 />} />
-        <Route path="DataProtectionImpactAssessments" element={<DataProtectionImpactAssessments />} />
-        <Route path="ConsentManagement" element={<ConsentManagement />} />
-        <Route path="StudentDataPrivacyPolicies" element={<StudentDataPrivacyPolicies />} />
-        <Route path="DataBreachNotificationProcedures" element={<DataBreachNotificationProcedures />} />
-        <Route path="AnomalyDetection" element={<AnomalyDetection />} />
+
+        
       </Routes>
     </Router>
    </BuildingProvider>

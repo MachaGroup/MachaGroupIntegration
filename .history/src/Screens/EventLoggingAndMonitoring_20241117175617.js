@@ -3,7 +3,7 @@ import './AccessControl.css'; // Reuse the same CSS file for consistency in styl
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 import { useNavigate } from 'react-router-dom'; // Ensure react-router-dom is installed and used for navigation
 
-function UserActivityMonitoringPage() {
+function EventLoggingAndMonitoringPage() {
   const navigate = useNavigate();
 
   const handleButtonClick = (section) => {
@@ -11,11 +11,11 @@ function UserActivityMonitoringPage() {
     
     // Example logic for navigation based on the button clicked
     switch (section) {
-      case 'User Behavior Analytics (UBA)':
-        navigate('/UserBehaviorAnalytics'); // Navigate to UBA page
+      case 'Security Information and Event Management (SIEM) Solutions':
+        navigate('/SecurityInformationAndEventManagement'); // Navigate to SIEM Solutions page
         break;
-      case 'Anomaly Detection':
-        navigate('/AnomalyDetection'); // Navigate to Anomaly Detection page
+      case 'Intrusion Detection Systems (IDS)':
+        navigate('/IntrusionDetectionSystems'); // Navigate to IDS Systems page
         break;
       default:
         console.log('Unknown section');
@@ -31,12 +31,12 @@ function UserActivityMonitoringPage() {
         <img src={logo} alt="Logo" className="logo" />
       </header>
 
-      {/* User Activity Monitoring Section */}
+      {/* Event Logging and Monitoring Section */}
       <main className="form-container">
-        <h2>User Activity Monitoring</h2>
+        <h2>Event Logging and Monitoring</h2>
         <form>
-          {/* User Activity Monitoring Buttons */}
-          {['User Behavior Analytics (UBA)', 'Anomaly Detection'].map((section, index) => (
+          {/* Event Logging and Monitoring Buttons */}
+          {['Security Information and Event Management (SIEM) Solutions', 'Intrusion Detection Systems (IDS)'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>
@@ -50,4 +50,4 @@ function UserActivityMonitoringPage() {
   );
 }
 
-export default UserActivityMonitoringPage;
+export default EventLoggingAndMonitoringPage;
