@@ -13,10 +13,10 @@ function LockdownDrillsPage() {
 
     switch (section) {
       case 'Drill Scenerios':
-        navigate('/drill-scenerios');
+        navigate('/DrillScenerios');
         break;
       case 'Lockdown Signal Recognition':
-        navigate('/lockdown-signal-recognition');
+        navigate('/LockdownSignalRecognition');
         break;
       default:
         console.log('Unknown section');

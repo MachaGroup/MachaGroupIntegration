@@ -12,13 +12,13 @@ function NaturalDisasterDrillsPage() {
 
     switch (section) {
       case 'Tornado Drills':
-        navigate('/tornado-drills');
+        navigate('/TornadoDrills');
         break;
       case 'Earthquake Drills':
-        navigate('/earthquake-drills');
+        navigate('/EarthquakeDrills');
         break;
       case 'Fire Drill':
-        navigate('/fire-drill');
+        navigate('/FireDrill');
         break;
       default:
         console.log('Unknown section');

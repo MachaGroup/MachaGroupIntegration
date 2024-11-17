@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, addDoc, doc, getDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
@@ -7,35 +7,17 @@ import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
 
 function FireAlarmSystemsPage() {
     const navigate = useNavigate();
-    const { setBuildingId, buildingId } = useBuilding(); // Access and update buildingId from context
+    const { buildingId } = useBuilding(); // Access and update buildingId from context
     const db = getFirestore();
 
     const [formData, setFormData] = useState();
 
     useEffect(() => {
-        const fetchBuildingIdFromBuildings = async () => {
-            if (!buildingId) {
-                try {
-                    // Replace 'BuildingDocumentID' with your actual document ID in the Buildings collection
-                    const buildingDocRef = doc(db, 'Buildings', 'BuildingDocumentID'); 
-                    const buildingSnapshot = await getDoc(buildingDocRef);
-
-                    if (buildingSnapshot.exists()) {
-                        const buildingData = buildingSnapshot.data();
-                        setBuildingId(buildingData.buildingId); // Set buildingId from the fetched document
-                    } else {
-                        alert('Building information not found. Redirecting...');
-                        navigate('/BuildingandAddress');
-                    }
-                } catch (error) {
-                    console.error('Error fetching building ID:', error);
-                    alert('Error fetching building information.');
-                }
-            }
-        };
-
-        fetchBuildingIdFromBuildings();
-    }, [buildingId, navigate, setBuildingId, db]);
+        if(!buildingId) {
+          alert('No builidng selected. Redirecting to Building Info...');
+          navigate('BuildingandAddress');
+        }
+      }, [buildingId, navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -45,8 +27,9 @@ function FireAlarmSystemsPage() {
         }));
     };
 
+    // Function to handle back button
     const handleBack = () => {
-        navigate(-1);
+        navigate(-1);  // Navigates to the previous page
     };
 
     const handleSubmit = async (e) => {

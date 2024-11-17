@@ -21,9 +21,9 @@ function ClassroomLockdownProtocolsFormPage() {
         <main className="form-container">
             <form>
                 {/* 2.2.1.2.1 Classroom Lockdown Procedures */}
-                <h2>Door Locks:</h2>
+                <h2>2.2.1.2.1 Door Locks:</h2>
                 <div className="form-section">
-                    <label>Are classroom doors equipped with locks that can be securely engaged from the inside?</label>
+                    <label>2.2.1.2.1.1 Are classroom doors equipped with locks that can be securely engaged from the inside?</label>
                     <div>
                         <input type="radio" name="gates-operational" value="yes" /> Yes
                         <input type="radio" name="gates-operational" value="no" /> No
@@ -31,7 +31,7 @@ function ClassroomLockdownProtocolsFormPage() {
                 </div>
 
                 <div className="form-section">
-                    <label>Do locks meet safety standards and regulations for lockdown procedures?</label>
+                    <label>2.2.1.2.1.2 Do locks meet safety standards and regulations for lockdown procedures?</label>
                     <div>
                         <input type="radio" name="gates-operational" value="yes" /> Yes
                         <input type="radio" name="gates-operational" value="no" /> No
@@ -39,14 +39,15 @@ function ClassroomLockdownProtocolsFormPage() {
                 </div>
 
                 <div className="form-section">
-                    <label>Are locks easy to operate and reliably secure, even under stress or pressure?</label>
+                    <label>2.2.1.2.1.3 Are locks easy to operate and reliably secure, even under stress or pressure?</label>
                     <div>
                         <input type="radio" name="gates-operational" value="yes" /> Yes
                         <input type="radio" name="gates-operational" value="no" /> No
                     </div>
                 </div>
 
-                <h2>Barricading Mechanisms:</h2>
+                { /* 2.2.1.2.2 Barricading Mechanisms*/ }
+                <h2>2.2.1.2.2 Barricading Mechanisms:</h2>
                 <div className="form-section">
                     <label>Are there barricading mechanisms available in classrooms to reinforce door security during lockdowns?</label>
                     <div>

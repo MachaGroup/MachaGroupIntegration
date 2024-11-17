@@ -117,7 +117,7 @@ import FirstAidResponse from './Screens/FirstAidResponse';
 import EvacuationProcedures from './Screens/EvacuationProcedures';
 import FireExtinguisherLocations from './Screens/FireExtinguisherLocations';
 import ClassroomLockdownProtocols from './Screens/ClassroomLockdownProtocols';
-import CommunicationProtocols2 from './Screens/CommunicationProtocols2';
+import LockdownCommunicationProtocols from './Screens/LockdownCommunicationProtocols';
 import LawEnforcementCoordination from './Screens/LawEnforcementCoordination';
 import DisasterDrills from './Screens/DisasterDrills';
 import TornadoShelterLocations from './Screens/TornadoShelterLocations';
@@ -314,8 +314,8 @@ function App() {
         <Route path="/natural-disaster-plans" element={<NaturalDisasterPlans />} />
         <Route path="/natural-disaster-drills" element={<NaturalDisasterDrills />} />
         <Route path="/lockdown-drills" element={<LockdownDrills />} />
-        <Route path="/public-address-system" element={<PublicAddressSystem />} />
-        <Route path="/text-email-alerts" element={<TextEmailAlerts />} />
+        <Route path="/publicAddressSystem" element={<PublicAddressSystem />} />
+        <Route path="/TextEmailAlerts" element={<TextEmailAlerts />} />
         <Route path="/staff-communication" element={<StaffCommunication />} />
         <Route path="/parent-communication" element={<ParentCommunication />} />
         <Route path="/community-engagement" element={<CommunityEngagement />} />
@@ -456,7 +456,7 @@ function App() {
         <Route path="CybersecurityTraining" element={<CybersecurityTraining />} />
         <Route path="EmergencyCommunication" element={<EmergencyCommunication />} />
         <Route path="ClassroomLockdownProtocols" element={<ClassroomLockdownProtocols />} />
-        <Route path="CommunicationProtocols2" element={<CommunicationProtocols2 />} />
+        <Route path="LockdownCommunicationProtocols" element={<LockdownCommunicationProtocols />} />
         <Route path="LawEnforcementCoordination" element={<LawEnforcementCoordination />} />
         <Route path="FireDepartmentCollaboration" element={<FireDepartmentCollaboration />} />
         <Route path="HealthcareProviderEngagement" element={<HealthcareProviderEngagement />} />
