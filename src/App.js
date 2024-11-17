@@ -253,14 +253,25 @@ import AntivirusSoftware from "./Screens/AntivirusSoftware";
 import MalwareRemovalTools from "./Screens/MalwareRemovalTools";
 import PatchManagement from "./Screens/PatchManagement";
 import DeviceEncryption from "./Screens/DeviceEncryption";
-import FullDiskEncryption from "./Screens/FullDiskEncryption";
-import FileLevelEncryption from "./Screens/FileLevelEncryption";
-import SecureEmailGateways from "./Screens/SecureEmailGateways";
-import EndToEndEncryption from "./Screens/EndToEndEncryption";
-import RegularBackupSchedules from "./Screens/Regular/BackupSchedules";
-import OffsiteBackupStorage from "./Screens/OffsiteBackupStorage";
-import BackupTesting from "./Screens/BackupTesting";
-import ContinuityOfOperations from "./Screens/ContinuityOfOperations";
+import FireAlarmSystems from './Screens/FireAlarmSystems';
+// import FullDiskEncryption from "./Screens/FullDiskEncryption";
+// import FileLevelEncryption from "./Screens/FileLevelEncryption";
+// import SecureEmailGateways from "./Screens/SecureEmailGateways"; // HERE
+// import EndToEndEncryption from "./Screens/EndToEndEncryption";
+// import RegularBackupSchedules from "./Screens/Regular/BackupSchedules";
+// import OffsiteBackupStorage from "./Screens/OffsiteBackupStorage";
+// import BackupTesting from "./Screens/BackupTesting";
+// import ContinuityOfOperations from "./Screens/ContinuityOfOperations";
+
+// The Routes for the imports above:
+/* <Route path="/FullDiskEncryption" element={<FullDiskEncryption />} />
+<Route path="/FileLevelEncryption" element={<FileLevelEncryption/>} />
+<Route path="/SecureEmailGateways" element={<SecureEmailGateways/>} />
+<Route path="/EndToEndEncryption" element={<EndToEndEncryption/>} />
+<Route path="/RegularBackupSchedules" element={<RegularBackupSchedules/>} />
+<Route path="/OffsiteBackupStorage" element={<OffsiteBackupStorage />} />
+<Route path="/BackupTesting" element= {<BackupTesting/>} />
+<Route path="/ContinuityOfOperations" element={<ContinuityOfOperations/>} /> */
 
 function App() {
   return (
@@ -435,15 +446,97 @@ function App() {
         <Route path="/MalwareRemovalTools" element={<MalwareRemovalTools />} />
         <Route path="/PatchManagement" element={<PatchManagement />} />
         <Route path="/DeviceEncryption" element={<DeviceEncryption />} />
-        <Route path="/FullDiskEncryption" element={<FullDiskEncryption />} />
-        <Route path="/FileLevelEncryption" element={<FileLevelEncryption/>} />
-        <Route path="/SecureEmailGateways" element={<SecureEmailGateways/>} />
-        <Route path="/EndToEndEncryption" element={<EndToEndEncryption/>} />
-        <Route path="/RegularBackupSchedules" element={<RegularBackupSchedules/>} />
-        <Route path="/OffsiteBackupStorage" element={<OffsiteBackupStorage />} />
-        <Route path="/BackupTesting" element= {<BackupTesting/>} />
-        <Route path="/ContinuityOfOperations" element={<ContinuityOfOperations/>} />
+        <Route path="ConflictResolution" element={<ConflictResolution />} />
+        <Route path="EmergencyCommunication" element={<ConflictResolution />} />
+        <Route path="FirstAidResponse" element={<FirstAidResponse />} />
+        <Route path="EvacuationProcedures" element={<EvacuationProcedures />}/>
+        <Route path="FireExtinguisherLocations" element={<FireExtinguisherLocations />} />
+        <Route path="FireAlarmSystems" element={<FireAlarmSystems />} />
+        <Route path="ThreatRecognition" element={<ThreatRecognition />} />
+        <Route path="CybersecurityTraining" element={<CybersecurityTraining />} />
+        <Route path="EmergencyCommunication" element={<EmergencyCommunication />} />
+        <Route path="ClassroomLockdownProtocols" element={<ClassroomLockdownProtocols />} />
+        <Route path="CommunicationProtocols2" element={<CommunicationProtocols2 />} />
+        <Route path="LawEnforcementCoordination" element={<LawEnforcementCoordination />} />
+        <Route path="FireDepartmentCollaboration" element={<FireDepartmentCollaboration />} />
+        <Route path="HealthcareProviderEngagement" element={<HealthcareProviderEngagement />} />
+        <Route path="EmergencyShelters" element={<EmergencyShelters />} />
+        <Route path="MedicalFacilities" element={<MedicalFacilities />} />
+        <Route path="MentalHealthServices" element={<MentalHealthServices />} />
+        <Route path="FirstAidCPRTraining2" element={<FirstAidCPRTraining2 />} />
+        <Route path="DisasterDrills" element={<DisasterDrills />} />
+        <Route path="TornadoShelterLocations" element={<TornadoShelterLocations />} />
+        <Route path="SevereWeatherMonitoring" element={<SevereWeatherMonitoring />} />
+        <Route path="TornadoDrills" element={<TornadoDrills />} />
+        <Route path="EarthquakeDrills" element={<EarthquakeDrills />} />
+        <Route path="FireDrill" element={<FireDrill />} />
+        <Route path="DrillScenerios" element={<DrillScenerios />} />
+        <Route path="LockdownSignalRecognition" element={<LockdownSignalRecognition />} />
+        <Route path="StaffRolesAndResponsibilities" element={<StaffRolesAndResponsibilities />} />
+        <Route path="DebriefingAndFeedback" element={<DebriefingAndFeedback />} />
+        <Route path="EvacuationRoutesReview" element={<EvacuationRoutesReview />} />
+        <Route path="DrillFrequency" element={<DrillFrequency />} />
+        <Route path="SpeakerLocations" element={<SpeakerLocations />} />
+        <Route path="EmergencyAnnouncementProtocols" element={<EmergencyAnnouncementProtocols />} />
+        <Route path="BackupPowerSystems" element={<BackupPowerSystems />} />
+        <Route path="ContactInformationDatabase" element={<ContactInformationDatabase />} />
+        <Route path="AlertActivationProcedures" element={<AlertActivationProcedures />} />
+        <Route path="IntegrationWithParentCommunication" element={<IntegrationWithParentCommunication />} />
+        <Route path="TwoWayRadios" element={<TwoWayRadios />} />
+        <Route path="EmergencyCommunicationTraining" element={<EmergencyCommunicationTraining />} />
+        <Route path="CommunicationPlatforms" element={<CommunicationPlatforms />} />
+        <Route path="ParentNotificationProcedures" element={<ParentNotificationProcedures />} />
+        <Route path="CommunicationLanguage" element={<CommunicationLanguage />} />
+        <Route path="TrainingProviders" element={<TrainingProviders />} />
+        <Route path="TrainingMaterials" element={<TrainingMaterials />} />
+        <Route path="RecertificationSchedule" element={<RecertificationSchedule />} />
+        <Route path="ScenarioBasedTraining" element={<ScenarioBasedTraining />} />
+        <Route path="ResponseProtocols" element={<ResponseProtocols />} />
+        <Route path="PostIncidentSupport" element={<PostIncidentSupport />} />
+        <Route path="CurriculumIntegration" element={<CurriculumIntegration />} />
+        <Route path="StudentHandbooks" element={<StudentHandbooks />} />
+        <Route path="ParentInvolvement2" element={<ParentInvolvement2 />} />
+        <Route path="SafetyDemonstrations" element={<SafetyDemonstrations />} />
+        <Route path="RolePlayingScenarios" element={<RolePlayingScenarios />} />
+        <Route path="StudentLeadership" element={<StudentLeadership />} />
+        <Route path="SafetyWorkshops" element={<SafetyWorkshops />} />
+        <Route path="ParentVolunteerPrograms" element={<ParentVolunteerPrograms />} />
+        <Route path="ParentAdvisoryCommittees" element={<ParentAdvisoryCommittees />} />
+        <Route path="ParentTeacherAssociations" element={<ParentTeacherAssociations />} />
+        <Route path="EmergencyContacts" element={<EmergencyContacts />} />
+        <Route path="ParentFeedbackMechanisms" element={<ParentFeedbackMechanisms />} />
+        <Route path="LawEnforcementPartnership" element={<LawEnforcementPartnership />} />
+        <Route path="HealthcareProviderEngagement" element={<HealthcareProviderEngagement />} />
+        <Route path="BasicFirstAidTechniques" element={<BasicFirstAidTechniques />} />
+        <Route path="CPRCertification" element={<CPRCertification />} />
+        <Route path="AEDTraining" element={<AEDTraining />} />
+        <Route path="ActiveShooterResponse" element={<ActiveShooterResponse />} />
+        <Route path="ResponseProtocols2" element={<ResponseProtocols2 />} />
+        <Route path="EvacuationProcedures2" element={<EvacuationProcedures2 />} />
+        <Route path="EmergencyCommunication2" element={<EmergencyCommunication2 />} />
+        <Route path="IdentifyingSuspiciousBehavior" element={<IdentifyingSuspiciousBehavior />} />
+        <Route path="RecognizingSecurityBreaches" element={<RecognizingSecurityBreaches />} />
+        <Route path="PhishingAwareness2" element={<PhishingAwareness2 />} />
+        <Route path="PasswordSecurity2" element={<PasswordSecurity2 />} />
+        <Route path="DataProtection2" element={<DataProtection2 />} />
+        <Route path="FireDrills" element={<FireDrills />} />
+        <Route path="LockdownDrills2" element={<LockdownDrills2 />} />
+        <Route path="SevereWeatherPreparedness" element={<SevereWeatherPreparedness />} />
+        <Route path="StrangerDangerAwareness" element={<StrangerDangerAwareness />} />
+        <Route path="InternetSafety" element={<InternetSafety />} />
+        <Route path="VerbalBullying" element={<VerbalBullying />} />
+        <Route path="PhysicalBullying" element={<PhysicalBullying />} />
+        <Route path="CyberBullying" element={<CyberBullying />} />
+        <Route path="TrustedAdults" element={<TrustedAdults />} />
+        <Route path="AnonymousReportingSystems" element={<AnonymousReportingSystems />} />
+        <Route path="PeerSupportNetworks" element={<PeerSupportNetworks />} />
+        <Route path="RecognizingSecurityIncidents" element={<RecognizingSecurityIncidents />} />
+        <Route path="IncidentReportingProcedures" element={<IncidentReportingProcedures />} />
+        <Route path="AcceptableUsePolicyTraining" element={<AcceptableUsePolicyTraining />} />
+        <Route path="DataHandlingGuidelines" element={<DataHandlingGuidelines />} />
+        <Route path="AccessRestrictions" element={<AccessRestrictions />} />
 
+        
       </Routes>
     </Router>
    </BuildingProvider>

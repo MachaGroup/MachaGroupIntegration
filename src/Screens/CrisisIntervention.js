@@ -12,13 +12,13 @@ function CrisisInterventionPage() {
 
     switch (section) {
       case 'Conflict Resolution':
-          navigate('/conflict-resolution');
+          navigate('/ConflictResolution');
           break;
       case 'Emergency Communication':
-          navigate('/emergency-communication');
+          navigate('/EmergencyCommunication');
           break;
       case 'First Aid Response':
-          navigate('/first-aid-response');
+          navigate('/FirstAidResponse');
           break;
       default:
           console.log('Unknown section');

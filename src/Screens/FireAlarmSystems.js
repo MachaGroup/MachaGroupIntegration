@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
 
-function SecurityGatesPage() {
+function FireAlarmSystemsPage() {
     const navigate = useNavigate();
     const { setBuildingId, buildingId } = useBuilding(); // Access and update buildingId from context
     const db = getFirestore();
@@ -59,19 +59,19 @@ function SecurityGatesPage() {
 
 
         try {
-          // Create a document reference to the building in the 'Buildings' collection
-          const buildingRef = doc(db, 'Buildings', buildingId); 
+            // Create a document reference to the building in the 'Buildings' collection
+            const buildingRef = doc(db, 'Buildings', buildingId); 
 
-          // Store the form data in the specified Firestore structure
-          const formsRef = collection(db, 'forms/Physical Security/Security Gates');
-          await addDoc(formsRef, {
-              building: buildingRef, // Reference to the building document
-              formData: formData, // Store the form data as a nested object
-          });
+            // Store the form data in the specified Firestore structure
+            const formsRef = collection(db, 'forms/Physical Security/Security Gates');
+            await addDoc(formsRef, {
+                building: buildingRef, // Reference to the building document
+                formData: formData, // Store the form data as a nested object
+            });
 
-          console.log('Form data submitted successfully!');
-          alert('Form submitted successfully!');
-          navigate('/Form');
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
         } catch (error) {
             console.error('Error submitting form:', error);
             alert('Failed to submit the form. Please try again.');
@@ -82,48 +82,40 @@ function SecurityGatesPage() {
         <div className="form-page">
             <header className="header">
                 <button className="back-button" onClick={handleBack}>←</button>
-                <h1>Security Gates Assessment</h1>
+                <h1>Fire Alarms Systems</h1>
                 <img src={logo} alt="Logo" className="logo" />
             </header>
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    <h2>1.1.1.1.1 Security Gates (e.g., automated sliding gates)</h2>
+                    <h2>2.2.1.1.3 Security Gates (e.g., automated sliding gates)</h2>
 
                     {/* Functionality and Operation */}
-                    <h3>1.1.1.1.1.1 Functionality and Operation:</h3>
+                    <h3>2.2.1.1.3.1 Functionality and Reliability:</h3>
                     <div className="form-section">
-                        <label>1.1.1.1.1.1.1. Are the security gates operational and functioning as intended?</label>
+                        <label>2.2.1.1.3.1.1. Are the fire alarm systems installed throughout the premises to provide comprehensive coverage?</label>
                         <div>
-                            <input type="radio" name="gatesOperational" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="gatesOperational" value="no" onChange={handleChange} /> No
+                            <input type="radio" name="alarmsInstalled" value="yes" onChange={handleChange} /> Yes
+                            <input type="radio" name="alarmsInstalled" value="no" onChange={handleChange} /> No
                         </div>
                     </div>
 
                     <div className="form-section">
-                        <label>1.1.1.1.1.1.2. Do the gates open and close smoothly without any mechanical issues?</label>
+                        <label>2.2.1.1.3.1.2. Are alarm systems regularly tested to ensure they are functioning correctly and capable of detecting fires prompty?</label>
                         <div>
-                            <input type="radio" name="gatesSmooth" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="gatesSmooth" value="no" onChange={handleChange} /> No
+                            <input type="radio" name="regularAlarmTesting" value="yes" onChange={handleChange} /> Yes
+                            <input type="radio" name="regularAlarmTesting" value="no" onChange={handleChange} /> No
                         </div>
                     </div>
 
                     <div className="form-section">
-                        <label>1.1.1.1.1.1.3. Are there any signs of wear or damage that could affect the gate's functionality?</label>
+                        <label>2.2.1.1.3.1.3. Is ther a process in place to address any malfunctions or deficiencies indentified during testing promptly?</label>
                         <input
                             type="text"
-                            name="gatesDamage"
+                            name="malfunctions"
                             placeholder="Describe any wear or damage"
                             onChange={handleChange}
                         />
-                    </div>
-
-                    <div className="form-section">
-                        <label>1.1.1.1.1.1.4. Are there backup systems in place in case of power outages or malfunctions?</label>
-                        <div>
-                            <input type="radio" name="backupSystems" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="backupSystems" value="no" onChange={handleChange} /> No
-                        </div>
                     </div>
 
                     {/* Access Control */}
@@ -275,4 +267,4 @@ function SecurityGatesPage() {
     );
 }
 
-export default SecurityGatesPage;
+export default FireAlarmSystemsPage;

@@ -12,13 +12,13 @@ function FireEmergencyPlansPage() {
 
     switch (section) {
       case 'Evacuation Procedures':
-        navigate('/evacuation-procedures');
+        navigate('/EvacuationProcedures');
         break;
       case 'Fire Extinguisher Locations':
-        navigate('/fire-extinguisher-locations');
+        navigate('/FireExtinguisherLocations');
         break;
-      case 'Alarm Systems':
-        navigate('/alarm-systems');
+      case 'Fire Alarm Systems':
+        navigate('/FireAlarmSystems');
         break;
       default:
         console.log('Unknown section');
