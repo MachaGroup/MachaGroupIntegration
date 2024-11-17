@@ -12,7 +12,7 @@ function BullyingPreventionPage() {
 
     switch (section) {
         case 'Recognizing Bullying Behavior':
-            navigate('/recognizing-bullying-behaivor');
+            navigate('/recognizing-bullying-behavior');
             break;
         case 'Reporting Procedures':
             navigate('/reporting-procedures');
