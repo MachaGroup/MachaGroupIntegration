@@ -18,16 +18,16 @@ function DrillExecutionPage() {
           navigate('/lockdown-drills');
           break;
       case 'Staff Roles and Responsibilities':
-          navigate('/staff-roles-and-responsibilities');
+          navigate('/StaffRolesAndResponsibilities');
           break;
       case 'Debriefing and Feedback':
-          navigate('/debriefing-and-feedback');
+          navigate('/DebriefingAndFeedback');
           break;
       case 'Evacuation Routes Review':
-          navigate('/evacuation-routes-review');
+          navigate('/EvacuationRoutesReview');
           break;
       case 'Drill Frequency':
-            navigate('/drill-frequency');
+            navigate('/DrillFrequency');
             break;
       default:
           console.log('Unknown section');

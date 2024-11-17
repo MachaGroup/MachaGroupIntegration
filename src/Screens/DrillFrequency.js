@@ -32,14 +32,10 @@ function DrillFrequencyFormPage() {
                 <div className="form-section">
                     <label>Is there a predefined schedule for conducting drills, such as monthly, quarterly, or semi-annually?</label>
                     <div>
-                        <input type="radio" name="gates-operational" value="yes" /> Yes
-                        <input type="radio" name="gates-operational" value="no" /> No
+                        <input type="radio" name="predifinedSchedule" value="monthly" /> Monthly
+                        <input type="radio" name="predifinedSchedule" value="qurterly" /> Quarterly
+                        <input type="radio" name="predifinedSchedule" value='semi-annually' /> Semi-Annually
                     </div>
-                    <select id="mySelect" multiple>
-                        <option value="option1">Monthly</option>
-                        <option value="option2">Quarterly</option>
-                        <option value="option3">Semi-annually</option>
-                    </select>
                 </div>
 
                 <div className="form-section">
