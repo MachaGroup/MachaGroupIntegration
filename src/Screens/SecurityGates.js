@@ -255,7 +255,3 @@ function SecurityGatesPage() {
 }
 
 export default SecurityGatesPage;
-
-
-
-
