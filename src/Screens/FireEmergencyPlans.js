@@ -39,7 +39,7 @@ function FireEmergencyPlansPage() {
         <h2>Fire Emergency Plans</h2>
         <form>
           {/* Fire Emergency Plans Buttons */}
-          {['Evacuation Procedures', 'Fire Extinguisher Locations', 'Alarm Systems'].map((section, index) => (
+          {['Evacuation Procedures', 'Fire Extinguisher Locations', 'Fire Alarm Systems'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>

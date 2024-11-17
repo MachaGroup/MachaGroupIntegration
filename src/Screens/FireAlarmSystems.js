@@ -63,7 +63,7 @@ function FireAlarmSystemsPage() {
             const buildingRef = doc(db, 'Buildings', buildingId); 
 
             // Store the form data in the specified Firestore structure
-            const formsRef = collection(db, 'forms/Physical Security/Security Gates');
+            const formsRef = collection(db, 'forms/Emergency Preparedness/Fire Alarm Systems');
             await addDoc(formsRef, {
                 building: buildingRef, // Reference to the building document
                 formData: formData, // Store the form data as a nested object
@@ -88,9 +88,9 @@ function FireAlarmSystemsPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    <h2>2.2.1.1.3 Security Gates (e.g., automated sliding gates)</h2>
+                    <h2>2.2.1.1.3 Fire Alarm Systems (e.g., automated sliding gates)</h2>
 
-                    {/* Functionality and Operation */}
+                    {/* Functionality and Reliability */}
                     <h3>2.2.1.1.3.1 Functionality and Reliability:</h3>
                     <div className="form-section">
                         <label>2.2.1.1.3.1.1. Are the fire alarm systems installed throughout the premises to provide comprehensive coverage?</label>
@@ -109,109 +109,161 @@ function FireAlarmSystemsPage() {
                     </div>
 
                     <div className="form-section">
-                        <label>2.2.1.1.3.1.3. Is ther a process in place to address any malfunctions or deficiencies indentified during testing promptly?</label>
+                        <label>2.2.1.1.3.1.3. Is there a process in place to address any malfunctions or deficiencies indentified during testing promptly?</label>
+                        <div>
+                            <input type="radio" name="malfunctions" value="yes" onChange={handleChange} /> Yes
+                            <input type="radio" name="malfunctions" value="No" onChange={handleChange} /> No
+                        </div>
+                    </div>
+
+                    {/* Testing Schedule */}
+                    <h3>2.2.1.1.3.2 Testing Schedule:</h3>
+                    <div className="form-section">
+                        <label>2.2.1.1.3.2.1. Is there a schdule for testing fire alarm systems, including frquency and procudres?</label>
                         <input
                             type="text"
-                            name="malfunctions"
-                            placeholder="Describe any wear or damage"
-                            onChange={handleChange}
-                        />
-                    </div>
-
-                    {/* Access Control */}
-                    <h3>1.1.1.1.1.2 Access Control:</h3>
-                    <div className="form-section">
-                        <label>1.1.1.1.1.2.1. How is access to the security gates controlled?</label>
-                        <input
-                            type="text"
-                            name="accessControlMethods"
-                            placeholder="Enter access control methods"
-                            onChange={handleChange}
-                        />
-                    </div>
-
-                    <div className="form-section">
-                        <label>1.1.1.1.1.2.2. Are there authentication mechanisms, such as keypads, card readers, or biometric scanners, to restrict entry?</label>
-                        <div>
-                            <input type="radio" name="authMechanisms" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="authMechanisms" value="no" onChange={handleChange} /> No
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>1.1.1.1.1.2.3. Are access control systems integrated with other security measures, such as surveillance cameras or intrusion detection systems?</label>
-                        <div>
-                            <input type="radio" name="integratedSystems" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="integratedSystems" value="no" onChange={handleChange} /> No
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>1.1.1.1.1.2.4. Is there a log of entries and exits through the security gates for monitoring and auditing purposes?</label>
-                        <div>
-                            <input type="radio" name="logEntries" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="logEntries" value="no" onChange={handleChange} /> No
-                        </div>
-                    </div>
-
-                    {/* Safety Features */}
-                    <h3>1.1.1.1.1.3 Safety Features:</h3>
-                    <div className="form-section">
-                        <label>1.1.1.1.1.3.1. Are there safety features in place to prevent accidents or injuries, such as sensors to detect obstructions or emergency stop buttons?</label>
-                        <div>
-                            <input type="radio" name="safetyFeatures" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="safetyFeatures" value="no" onChange={handleChange} /> No
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>1.1.1.1.1.3.2. Are the gates equipped with safety mechanisms to prevent trapping or crushing hazards?</label>
-                        <div>
-                            <input type="radio" name="trapHazards" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="trapHazards" value="no" onChange={handleChange} /> No
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>1.1.1.1.1.3.3. Are there clear instructions or signage to inform users about safety procedures and precautions when using the gates?</label>
-                        <div>
-                            <input type="radio" name="safetySignage" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="safetySignage" value="no" onChange={handleChange} /> No
-                        </div>
-                    </div>
-
-                    {/* Compliance with Regulations */}
-                    <h3>1.1.1.1.1.4 Compliance with Regulations:</h3>
-                    <div className="form-section">
-                        <label>1.1.1.1.1.4.1. Do the security gates comply with relevant safety and security regulations, codes, and standards?</label>
-                        <div>
-                            <input type="radio" name="complianceRegulations" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="complianceRegulations" value="no" onChange={handleChange} /> No
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>1.1.1.1.1.4.2. Are there any specific requirements or guidelines for security gates outlined by regulatory authorities or industry associations that need to be met?</label>
-                        <input
-                            type="text"
-                            name="regulatoryRequirements"
-                            placeholder="Enter regulatory requirements"
+                            name="testingSchedule"
+                            placeholder="Enter testing schedule"
                             onChange={handleChange}
                         />
                     </div>
 
                     <div className="form-section">
-                        <label>1.1.1.1.1.4.3. Have the gates undergone any inspections or certifications to verify compliance with applicable standards?</label>
+                        <label>2.2.1.1.3.2.2. Are testing intervals established based on relevant regulations, industry standards, and manufacturer recommendations?</label>
                         <div>
-                            <input type="radio" name="inspectionsCertifications" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="inspectionsCertifications" value="no" onChange={handleChange} /> No
+                            <input type="radio" name="testingIntervals" value="yes" onChange={handleChange} /> Yes
+                            <input type="radio" name="testingIntervals" value="no" onChange={handleChange} /> No
                         </div>
                     </div>
 
-                    {/* Maintenance and Upkeep */}
-                    <h3>1.1.1.1.1.5 Maintenance and Upkeep:</h3>
                     <div className="form-section">
-                        <label>1.1.1.1.1.5.1. Is there a regular maintenance schedule in place for the security gates?</label>
+                        <label>2.2.1.1.3.2.3. Are tests conducted during both regular business hours and after hours to ensure all components of the system are thoroughly evaluated?</label>
+                        <div>
+                            <input type="radio" name="comprehensiveTesting" value="yes" onChange={handleChange} /> Yes
+                            <input type="radio" name="comprehensiveTesting" value="no" onChange={handleChange} /> No
+                        </div>
+                    </div>
+
+                    {/* Testing Procedures */}
+                    <h3>2.2.1.1.3.3 Testing Procedures:</h3>
+                    <div className="form-section">
+                        <label>2.2.1.1.3.3.1. Are testing procedures standardized and followed consistently by trained personnel?</label>
+                        <div>
+                            <input type="radio" name="standardized" value="yes" onChange={handleChange} /> Yes
+                            <input type="radio" name="standardized" value="no" onChange={handleChange} /> No
+                        </div>
+                    </div>
+
+                    <div className="form-section">
+                        <label>2.2.1.1.3.3.2. Do tests include activation of alarm devices, testing of audible and visual alerts, and verification of signal transmission to monitoring stations?</label>
+                        <div>
+                            <input type="radio" name="fireAlarmTetsing" value="yes" onChange={handleChange} /> Yes
+                            <input type="radio" name="fireAlarmTetsing" value="no" onChange={handleChange} /> No
+                        </div>
+                    </div>
+
+                    <div className="form-section">
+                        <label>2.2.1.1.3.3.3. Are there protocols in place for coordinating testing with building occupants, security personnel, and emergency responders to minimize disruptions?</label>
+                        <div>
+                        <input
+                            type="text"
+                            name="testingProtocols"
+                            placeholder="Enter the protocols"
+                            onChange={handleChange}
+                        />
+                        </div>
+                    </div>
+
+                    {/* Documentation and Regulations */}
+                    <h3>2.2.1.1.3.4 Documentation and Records:</h3>
+                    <div className="form-section">
+                        <label>2.2.1.1.3.4.1. Are records maintained for all fire alarm test, including dates, times, personnel involved, and results?</label>
+                        <div>
+                            <input type="radio" name="alarmRecords" value="yes" onChange={handleChange} /> Yes
+                            <input type="radio" name="alarmRecords" value="no" onChange={handleChange} /> No
+                        </div>
+                    </div>
+
+                    <div className="form-section">
+                        <label>2.2.1.1.3.4.2. Are test records retained for the required duration and readily accessible for review by authorities or inspectors?</label>
+                        <div>
+                            <input type="radio" name="retainedRecords" value="yes" onChange={handleChange} /> Yes
+                            <input type="radio" name="retainedRecords" value="no" onChange={handleChange} /> No
+                        </div>
+                    </div>
+
+                    <div className="form-section">
+                        <label>2.2.1.1.3.4.3. Is there a system in place to track and follow up on any deficiencies or issues identified during testing?</label>
+                        <div>
+                        <input
+                            type="text"
+                            name="issueTracking"
+                            placeholder="Enter tracking system issue"
+                            onChange={handleChange}
+                        />
+                        </div>
+                    </div>
+
+                    {/* Notification and Communication */}
+                    <h3>2.2.1.1.3.5 Notification and Communication:</h3>
+                    <div className="form-section">
+                        <label>2.2.1.1.3.5.1. Is there a process for notifying building occupants in advance of scheduled fire alarm tests?</label>
+                        <div>
+                        <input
+                            type="text"
+                            name="notificationProcess"
+                            placeholder="Enter notification process"
+                            onChange={handleChange}
+                        />
+                        </div>
+                    </div>
+
+                    <div className="form-section">
+                        <label>2.2.1.1.3.5.2. Are notifications provided thorugh appropriate channels, such as email, signage, or verbal announcements?</label>
+                        <div>
+                            <input type="radio" name="notificationChannels" value="yes" onChange={handleChange} /> Yes
+                            <input type="radio" name="notificationChannels" value="no" onChange={handleChange} /> No
+                        </div>
+                    </div>
+
+                    <div className="form-section">
+                        <label>2.2.1.1.3.5.3. Is ther coordination with local fire departments or monitoring agencies to ensure they are aware of scheduled tests and can responds appropriately to any alarms?</label>
+                        <div>
+                            <input type="radio" name="fireDepartmentCoordination" value="yes" onChange={handleChange} /> Yes
+                            <input type="radio" name="fireDepartmentCoordination" value="no" onChange={handleChange} /> No
+                        </div>
+                    </div>
+
+                    {/* Emergency Response Integration */}
+                    <h3>2.2.1.1.3.6 Emergency Response Integration:</h3>
+                    <div className="form-section">
+                        <label>2.2.1.1.3.6.1. Are fire alarm systems integrated into the overall emergency response plan for the premises?</label>
+                        <div>
+                            <input type="radio" name="alarmIntegration" value="yes" onChange={handleChange} /> Yes
+                            <input type="radio" name="alarmIntegration" value="no" onChange={handleChange} /> No
+                        </div>
+                    </div>
+
+                    <div className="form-section">
+                        <label>2.2.1.1.3.6.2. Do alarm tests include coordination with evacuation drills and other repsonse actions to ensure a comprehensive evaluation of emergency preparedness?</label>
+                        <div>
+                            <input type="radio" name="evacuationCoordination" value="yes" onChange={handleChange} /> Yes
+                            <input type="radio" name="evacuationCoordination" value="no" onChange={handleChange} /> No
+                        </div>
+                    </div>
+
+                    <div className="form-section">
+                        <label>2.2.1.1.3.6.3. Are designated personnel trained to respond to alarm activations and follow established procedures for verifying alarms and initiating emergency response actions?</label>
+                        <div>
+                            <input type="radio" name="trainedPersonnelResponse" value="yes" onChange={handleChange} /> Yes
+                            <input type="radio" name="trainedPersonnelResponse" value="no" onChange={handleChange} /> No
+                        </div>
+                    </div>
+
+                    {/* System Maintenance and Upkeep */}
+                    <h3>2.2.1.1.3.7 System Maintenance and Upkeep:</h3>
+                    <div className="form-section">
+                        <label>2.2.1.1.3.7.1. Is there a maintenance schedule in place for inspecting, servicing, and maintaining fire alarm systems??</label>
                         <div>
                             <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange} /> No
@@ -219,44 +271,18 @@ function FireAlarmSystemsPage() {
                     </div>
 
                     <div className="form-section">
-                        <label>1.1.1.1.1.5.2. Are maintenance tasks, such as lubrication, inspection of components, and testing of safety features, performed according to schedule?</label>
+                        <label>2.2.1.1.3.7.2. Are maintenance activities conducted by qualified technicians in compliance with manufacturer recommendations and industry standards?</label>
                         <div>
-                            <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange} /> No
+                            <input type="radio" name="maintenanceActivities" value="yes" onChange={handleChange} /> Yes
+                            <input type="radio" name="maintenanceActivities" value="no" onChange={handleChange} /> No
                         </div>
                     </div>
 
                     <div className="form-section">
-                        <label>1.1.1.1.1.5.3. Are there records documenting maintenance activities, repairs, and any issues identified during inspections?</label>
+                        <label>2.2.1.1.3.7.3. Are deficiencies or issues identified during maintenance promptly addressed and documented, with corrective actions implemented as needed?</label>
                         <div>
-                            <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange} /> No
-                        </div>
-                    </div>
-
-                    {/* User Training and Awareness */}
-                    <h3>1.1.1.1.1.6 User Training and Awareness:</h3>
-                    <div className="form-section">
-                        <label>1.1.1.1.1.6.1. Have users, such as security personnel or authorized staff, received training on how to operate the security gates safely and effectively?</label>
-                        <div>
-                            <input type="radio" name="userTraining" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="userTraining" value="no" onChange={handleChange} /> No
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>1.1.1.1.1.6.2. Are there instructions or guidelines available to users regarding proper gate usage and emergency procedures?</label>
-                        <div>
-                            <input type="radio" name="instructionsGuidelines" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="instructionsGuidelines" value="no" onChange={handleChange} /> No
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>1.1.1.1.1.6.3. Is there a process for reporting malfunctions, damage, or security incidents related to the gates?</label>
-                        <div>
-                            <input type="radio" name="reportingProcess" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="reportingProcess" value="no" onChange={handleChange} /> No
+                            <input type="radio" name="maintenanceIssues" value="yes" onChange={handleChange} /> Yes
+                            <input type="radio" name="maintenanceIssues" value="no" onChange={handleChange} /> No
                         </div>
                     </div>
 
