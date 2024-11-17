@@ -18,7 +18,7 @@ function CrisisInterventionPage() {
           navigate('/EmergencyCommunication');
           break;
       case 'First Aid Response':
-          navigate('/first-aid-response');
+          navigate('/FirstAidResponse');
           break;
       default:
           console.log('Unknown section');
