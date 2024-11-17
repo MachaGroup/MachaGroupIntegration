@@ -253,25 +253,23 @@ import AntivirusSoftware from "./Screens/AntivirusSoftware";
 import MalwareRemovalTools from "./Screens/MalwareRemovalTools";
 import PatchManagement from "./Screens/PatchManagement";
 import DeviceEncryption from "./Screens/DeviceEncryption";
-import FireAlarmSystems from './Screens/FireAlarmSystems';
-// import FullDiskEncryption from "./Screens/FullDiskEncryption";
-// import FileLevelEncryption from "./Screens/FileLevelEncryption";
-// import SecureEmailGateways from "./Screens/SecureEmailGateways"; // HERE
-// import EndToEndEncryption from "./Screens/EndToEndEncryption";
-// import RegularBackupSchedules from "./Screens/Regular/BackupSchedules";
-// import OffsiteBackupStorage from "./Screens/OffsiteBackupStorage";
-// import BackupTesting from "./Screens/BackupTesting";
-// import ContinuityOfOperations from "./Screens/ContinuityOfOperations";
-
-// The Routes for the imports above:
-/* <Route path="/FullDiskEncryption" element={<FullDiskEncryption />} />
-<Route path="/FileLevelEncryption" element={<FileLevelEncryption/>} />
-<Route path="/SecureEmailGateways" element={<SecureEmailGateways/>} />
-<Route path="/EndToEndEncryption" element={<EndToEndEncryption/>} />
-<Route path="/RegularBackupSchedules" element={<RegularBackupSchedules/>} />
-<Route path="/OffsiteBackupStorage" element={<OffsiteBackupStorage />} />
-<Route path="/BackupTesting" element= {<BackupTesting/>} />
-<Route path="/ContinuityOfOperations" element={<ContinuityOfOperations/>} /> */
+import FullDiskEncryption from "./Screens/FullDiskEncryption";
+import FileLevelEncryption from "./Screens/FileLevelEncryption";
+import SecureEmailGateways from "./Screens/SecureEmailGateways";
+import EndToEndEncryption from "./Screens/EndToEndEncryption";
+import RegularBackupSchedules from "./Screens/RegularBackupSchedules";
+import OffSiteBackupStorage from "./Screens/OffSiteBackupStorage";
+import BackupTesting from "./Screens/BackupTesting";
+import ContinuityOfOperations from "./Screens/ContinuityOfOperations";
+import SimulatedPhishingCampaigns from "./Screens/SimulatedPhishingCampaigns";
+import PhishingAwarenessTraining from "./Screens/PhishingAwarenessTraining";
+import IncidentReporting from "./Screens/IncidentReporting";
+import ContactInformation from "./Screens/ContactInformation";
+import PasswordComplexityRequirements from "./Screens/PasswordComplexityRequirements";
+import PasswordExpirationPolicies from "./Screens/PasswordExpirationPolicies";
+import TwoFactorAuthentication from "./Screens/TwoFactorAuthentication";
+import BiometricAuthentication from "./Screens/BiometricAuthentication";
+import FireAlarmSystems from "./Screens/FireAlarmSystems";
 
 function App() {
   return (
@@ -341,8 +339,8 @@ function App() {
         <Route path="/user-awareness" element={<UserAwarenessAndTraining />} />
         <Route path="/firewalls" element={<FirewallsAndIntrusionDetection />} />
         <Route path="/endpoint-security" element={<EndpointSecurity />} />
-        <Route path="/data-encryption" element={<DataEncryption />} />
-        <Route path="/data-backup-and-recovery" element={<DataBackupAndRecovery />} />
+        <Route path="/DataEncryption" element={<DataEncryption />} />
+        <Route path="/DataBackupAndRecovery" element={<DataBackupAndRecovery />} />
         <Route path="/phishing-awareness" element={<PhishingAwareness />} />
         <Route path="/password-management" element={<PasswordManagement />} />
         <Route path="/incident-identification" element={<IncidentIdentification />} />
@@ -353,7 +351,7 @@ function App() {
         <Route path="/device-management" element={<DeviceManagement />} />
         <Route path="/file-encryption" element={<FileEncryption />} /> 
         <Route path="/email-encryption" element={<EmailEncryption />} />
-        <Route path="/backup-solutions" element={<BackupSolutions />} />
+        <Route path="/BackupSolutions" element={<BackupSolutions />} />
         <Route path="/disaster-recovery-planning" element={<DisasterRecoveryPlanning />} />
         <Route path="/phishing-simulation-training" element={<PhishingSimulationTraining />} />
         <Route path="/reporting-procedures2" element={<ReportingProcedures2 />} />
@@ -445,7 +443,34 @@ function App() {
         <Route path="/AntivirusSoftware" element={<AntivirusSoftware />} />
         <Route path="/MalwareRemovalTools" element={<MalwareRemovalTools />} />
         <Route path="/PatchManagement" element={<PatchManagement />} />
+        <Route path="/ConflictResolution" element={<ConflictResolution />} />
+        <Route path="/ScenarioBasedTraining" element={<ScenarioBasedTraining />} />
+        <Route path="/ResponseProtocols" element={<ResponseProtocols />} />
+        <Route path="/PostIncidentSupport" element={<PostIncidentSupport />} />
+        <Route path="/FirstAid/CPRTraining" element={<FirstAidCPRTraining />} />
+        <Route path="/BasicFirstAidTechniques" element={<BasicFirstAidTechniques />} />
+        <Route path="/CPRCertification" element={<CPRCertification />} />
+        <Route path="/AEDTraining" element={<AEDTraining />} />
+        <Route path="/ActiveShooterResponse" element={<ActiveShooterResponse />} />
+        <Route path="/ResponseProtocols" element={<ResponseProtocols2 />} />
+        <Route path="/EvacuationProcedures" element={<EvacuationProcedures2 />} />
         <Route path="/DeviceEncryption" element={<DeviceEncryption />} />
+        <Route path="/FullDiskEncryption" element={<FullDiskEncryption />} />
+        <Route path="/SecureEmailGateways" element={<SecureEmailGateways />} />
+        <Route path="FileLevelEncryption" element={<FileLevelEncryption />} />
+        <Route path="EndToEndEncryption" element={<EndToEndEncryption />} />
+        <Route path="/RegularBackupSchedules" element={<RegularBackupSchedules />} />
+        <Route path="/OffSiteBackupStorage" element={<OffSiteBackupStorage />} />
+        <Route path="/BackupTesting" element={<BackupTesting />} />
+        <Route path="/ContinuityOfOperations" element={<ContinuityOfOperations />} />
+        <Route path="/SimulatedPhishingCampaigns" element={<SimulatedPhishingCampaigns />} />
+        <Route path="/PhishingAwarenessTraining" element={<PhishingAwarenessTraining />} />
+        <Route path="/IncidentReporting" element={<IncidentReporting />} />
+        <Route path="/ContactInformation" element={<ContactInformation />} />
+        <Route path="/PasswordComplexityRequirements" element={<PasswordComplexityRequirements />} />
+        <Route path="/PasswordExpirationPolicies" element={<PasswordExpirationPolicies />} />
+        <Route path="/TwoFactorAuthentication" element={<TwoFactorAuthentication />} />
+        <Route path="/BiometricAuthentication" element={<BiometricAuthentication />} />
         <Route path="ConflictResolution" element={<ConflictResolution />} />
         <Route path="EmergencyCommunication" element={<ConflictResolution />} />
         <Route path="FirstAidResponse" element={<FirstAidResponse />} />
