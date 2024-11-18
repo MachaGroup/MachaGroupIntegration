@@ -7,7 +7,7 @@ import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
 
 function PasswordComplexityRequirementsPage() {
   const navigate = useNavigate();
-  const { setBuildingId, buildingId } = useBuilding();
+  const { buildingId } = useBuilding();
   const db = getFirestore();
 
   const [formData, setFormData] = useState({});

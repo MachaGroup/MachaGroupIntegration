@@ -12,13 +12,13 @@ function AccessToCommunityResourcesPage() {
 
     switch (section) {
       case 'Emergency Shelters':
-        navigate('/emergency-shelters');
+        navigate('/EmergencyShelters');
         break;
       case 'Medical Facilities':
-        navigate('/medical-facilities');
+        navigate('/MedicalFacilities');
         break;
       case 'Mental Health Services':
-        navigate('/mental-health-services');
+        navigate('/MentalHealthServices');
         break;
       default:
         console.log('Unknown section');

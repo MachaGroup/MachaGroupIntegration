@@ -3,6 +3,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';  // Import useNavigate
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';  // Ensure this is linked to your universal CSS
+import logo from '../assets/MachaLogo.png';
 
 function AccessControlSoftwarePage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -65,6 +66,7 @@ function AccessControlSoftwarePage() {
         {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
         <h1>1.1.1.2.3. Access Control Software Assessment</h1>
+        <img src={logo} alt="Logo" className="logo" />
       </header>
 
       <main className="form-container">

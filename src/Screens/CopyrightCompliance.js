@@ -1,11 +1,24 @@
 import React from 'react';
 import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
+import { useNavigate } from 'react-router-dom';
 
 function CopyrightCompliancePage() {
+  const navigate = useNavigate();
+
   const handleButtonClick = (section) => {
     console.log(`Button clicked for: ${section}`);
-    // Add logic for handling button click, e.g., open a modal or navigate
+    
+    switch (section) {
+      case 'Fair Use Guidelines':
+        navigate('/FairUseGuidelines');  
+        break;
+      case 'Digital Content Licensing':
+        navigate('/DigitalContentLicensing');
+        break;
+      default:
+        console.log('Unknown Section');
+    }
   };
 
   return (
