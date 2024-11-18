@@ -1,21 +1,20 @@
 import React from 'react';
 import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
-import { useNavigate } from 'react-router-dom'; // Ensure react-router-dom is installed and used for navigation
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for routing
 
-function UserActivityMonitoringPage() {
+function ResponseTeamFormationPage() {
   const navigate = useNavigate();
 
   const handleButtonClick = (section) => {
     console.log(`Button clicked for: ${section}`);
-    
-    // Example logic for navigation based on the button clicked
+    // Add routing logic based on the button label
     switch (section) {
-      case 'User Behavior Analytics (UBA)':
-        navigate('/UserBehaviorAnalytics'); // Navigate to UBA page
+      case 'Incident Response Team Roles and Responsibilities':
+        navigate('/IncidentResponseTeamRolesAndResponsibilities');
         break;
-      case 'Anomaly Detection':
-        navigate('/AnomalyDetection'); // Navigate to Anomaly Detection page
+      case 'Communication Channels and Protocols':
+        navigate('/CommunicationChannelsAndProtocols');
         break;
       default:
         console.log('Unknown section');
@@ -26,17 +25,17 @@ function UserActivityMonitoringPage() {
     <div className="form-page">
       {/* Header Section */}
       <header className="header">
-        <button className="back-button" onClick={() => navigate(-1)}>←</button> {/* Use useNavigate for back navigation */}
+        <button className="back-button" onClick={() => window.history.back()}>←</button> {/* Use window.history.back for navigation */}
         <h1>The MACHA Group</h1>
         <img src={logo} alt="Logo" className="logo" />
       </header>
 
-      {/* User Activity Monitoring Section */}
+      {/* Response Team Foundation Section */}
       <main className="form-container">
-        <h2>User Activity Monitoring</h2>
+        <h2>Response Team Foundation</h2>
         <form>
-          {/* User Activity Monitoring Buttons */}
-          {['User Behavior Analytics (UBA)', 'Anomaly Detection'].map((section, index) => (
+          {/* Response Team Foundation Buttons */}
+          {['Incident Response Team Roles and Responsibilities', 'Communication Channels and Protocols'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>
@@ -50,4 +49,4 @@ function UserActivityMonitoringPage() {
   );
 }
 
-export default UserActivityMonitoringPage;
+export default ResponseTeamFormationPage;

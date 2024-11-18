@@ -1,25 +1,11 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
 import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 
-function IncidentResponsePlanningPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook
-  
+function ResponseTeamFormationPage() {
   const handleButtonClick = (section) => {
     console.log(`Button clicked for: ${section}`);
     // Add logic for handling button click, e.g., open a modal or navigate
-
-    switch (section) {
-        case 'Response Team Formation':
-            navigate('/ResponseTeamFormation');
-            break;
-        case 'Containment and Mitigation':
-            navigate('/containment-and-mitigation');
-            break;
-      default:
-          console.log('Unknown section');
-  }
   };
 
   return (
@@ -31,12 +17,12 @@ function IncidentResponsePlanningPage() {
         <img src={logo} alt="Logo" className="logo" />
       </header>
 
-      {/* Incident Response Planning Section */}
+      {/* Response Team Foundation Section */}
       <main className="form-container">
-        <h2>Incident Response Planning</h2>
+        <h2>Response Team Foundaiton</h2>
         <form>
-          {/* Incident Response Planning Buttons */}
-          {['Response Team Formation', 'Containment and Mitigation'].map((section, index) => (
+          {/* Response Team Foundation Buttons */}
+          {['Incident Response Team Roles and Responsibilities', 'Communication Channels and Protocols'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>
@@ -50,4 +36,4 @@ function IncidentResponsePlanningPage() {
   );
 }
 
-export default IncidentResponsePlanningPage;
+export default ResponseTeamFormationPage;

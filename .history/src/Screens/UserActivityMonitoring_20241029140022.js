@@ -1,32 +1,18 @@
 import React from 'react';
 import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
-import { useNavigate } from 'react-router-dom'; // Ensure react-router-dom is installed and used for navigation
 
 function UserActivityMonitoringPage() {
-  const navigate = useNavigate();
-
   const handleButtonClick = (section) => {
     console.log(`Button clicked for: ${section}`);
-    
-    // Example logic for navigation based on the button clicked
-    switch (section) {
-      case 'User Behavior Analytics (UBA)':
-        navigate('/UserBehaviorAnalytics'); // Navigate to UBA page
-        break;
-      case 'Anomaly Detection':
-        navigate('/AnomalyDetection'); // Navigate to Anomaly Detection page
-        break;
-      default:
-        console.log('Unknown section');
-    }
+    // Add logic for handling button click, e.g., open a modal or navigate
   };
 
   return (
     <div className="form-page">
       {/* Header Section */}
       <header className="header">
-        <button className="back-button" onClick={() => navigate(-1)}>←</button> {/* Use useNavigate for back navigation */}
+        <button className="back-button" onClick={() => window.history.back()}>←</button> {/* Use window.history.back for navigation */}
         <h1>The MACHA Group</h1>
         <img src={logo} alt="Logo" className="logo" />
       </header>

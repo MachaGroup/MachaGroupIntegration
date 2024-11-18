@@ -337,7 +337,7 @@ function App() {
         <Route path="/personal-safety" element={<PersonalSafety />} />
         <Route path="/safety-education" element={<SafetyEducation />} />
         <Route path="/parent-involvement" element={<ParentInvolvement />} />
-        <Route path="/CommunityPartnerships" element={<CommunityPartnerships />} />
+        <Route path="/community-partnerships" element={<CommunityPartnerships />} />
         <Route path="/security-awareness-training" element={<SecurityAwarenessTraining />} />
         <Route path="/bullying-prevention" element={<BullyingPrevention />} />
         <Route path="/parent-education-events" element={<ParentEducationEvents />} />
