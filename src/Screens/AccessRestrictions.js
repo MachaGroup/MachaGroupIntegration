@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, addDoc, doc, getDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
@@ -7,88 +7,69 @@ import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
  
 function AccessRestrictionsPage() {
     const navigate = useNavigate();
-    const { setBuildingId, buildingId } = useBuilding(); // Access and update buildingId from context
+    const { buildingId } = useBuilding();
     const db = getFirestore();
- 
+  
     const [formData, setFormData] = useState();
- 
+  
     useEffect(() => {
-        const fetchBuildingIdFromBuildings = async () => {
-            if (!buildingId) {
-                try {
-                    // Replace 'BuildingDocumentID' with your actual document ID in the Buildings collection
-                    const buildingDocRef = doc(db, 'Buildings', 'BuildingDocumentID');
-                    const buildingSnapshot = await getDoc(buildingDocRef);
- 
-                    if (buildingSnapshot.exists()) {
-                        const buildingData = buildingSnapshot.data();
-                        setBuildingId(buildingData.buildingId); // Set buildingId from the fetched document
-                    } else {
-                        alert('Building information not found. Redirecting...');
-                        navigate('/BuildingandAddress');
-                    }
-                } catch (error) {
-                    console.error('Error fetching building ID:', error);
-                    alert('Error fetching building information.');
-                }
-            }
-        };
- 
-        fetchBuildingIdFromBuildings();
-    }, [buildingId, navigate, setBuildingId, db]);
- 
+      if(!buildingId) {
+        alert('No builidng selected. Redirecting to Building Info...');
+        navigate('BuildingandAddress');
+      }
+    }, [buildingId, navigate]);
+  
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+      const { name, value } = e.target;
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
     };
- 
+  
+    // Function to handle back button
     const handleBack = () => {
-        navigate(-1);
+      navigate(-1);  // Navigates to the previous page
     };
- 
+  
     const handleSubmit = async (e) => {
-        e.preventDefault();
- 
-        if (!buildingId) {
-            alert('Building ID is missing. Please start from the Building Information page.');
-            return;
-        }
- 
- 
-        try {
-          // Create a document reference to the building in the 'Buildings' collection
-          const buildingRef = doc(db, 'Buildings', buildingId);
- 
-          // Store the form data in the specified Firestore structure
-          const formsRef = collection(db, 'forms/Policy and Conpliance/Access Restrictions');
-          await addDoc(formsRef, {
-              building: buildingRef, // Reference to the building document
-              formData: formData, // Store the form data as a nested object
-          });
- 
-          console.log('Form data submitted successfully!');
-          alert('Form submitted successfully!');
-          navigate('/Form');
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Failed to submit the form. Please try again.');
-        }
+      e.preventDefault();
+      
+      if(!buildingId) {
+        alert('Building ID is missing. Please start the assessment from the correct page.');
+        return;
+      }
+  
+      try {
+        // Create a document reference to the building in the 'Buildings' collection
+        const buildingRef = doc(db, 'Buildings', buildingId);
+  
+        // Store the form data in the specified Firestore structure
+        const formsRef = collection(db, 'forms/Policy and Compliance/Access Restrictions');
+        await addDoc(formsRef, {
+          buildling: buildingRef,
+          formData: formData,
+        });
+        console.log('From Data submitted successfully!')
+        alert('Form Submitted successfully!');
+        navigate('/Form');
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('Failed to submit the form. Please try again.');
+      }
     };
  
   return (
     <div className="form-page">
-        <form onSubmit={handleSubmit}></form>
         <header className="header">
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>5.1.1.1.1 Access Restrictions Assessment</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
-            <form>
+            <form onSubmit={handleSubmit}>
                 {/* 5.1.1.1.1 Access Restrictions */}
                 <h2>Recertification Frequency:</h2>
                 <div className="form-section">
