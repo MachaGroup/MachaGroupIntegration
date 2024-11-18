@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, addDoc, doc, getDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
@@ -7,33 +7,17 @@ import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
 
 function IncidentResponseTeamRolesPage() {
     const navigate = useNavigate();
-    const { setBuildingId, buildingId } = useBuilding();
+    const { buildingId } = useBuilding();
     const db = getFirestore();
 
     const [formData, setFormData] = useState({});
 
     useEffect(() => {
-        const fetchBuildingId = async () => {
-            if (!buildingId) {
-                try {
-                    const buildingDocRef = doc(db, 'Buildings', 'BuildingDocumentID');
-                    const buildingSnapshot = await getDoc(buildingDocRef);
-
-                    if (buildingSnapshot.exists()) {
-                        setBuildingId(buildingSnapshot.data().buildingId);
-                    } else {
-                        alert('Building information not found. Redirecting...');
-                        navigate('/BuildingandAddress');
-                    }
-                } catch (error) {
-                    console.error('Error fetching building ID:', error);
-                    alert('Error fetching building information.');
-                }
-            }
-        };
-
-        fetchBuildingId();
-    }, [buildingId, navigate, setBuildingId, db]);
+        if(!buildingId) {
+          alert('No builidng selected. Redirecting to Building Info...');
+          navigate('BuildingandAddress');
+        }
+      }, [buildingId, navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
