@@ -3,20 +3,21 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
 
 function SecurityGatesPage() {
     const navigate = useNavigate();
-    const { buildingId } = useBuilding(); // Access buildingId from context
+    const { buildingId } = useBuilding(); // Access and update buildingId from context
     const db = getFirestore();
 
     const [formData, setFormData] = useState();
 
     useEffect(() => {
-        if (!buildingId) {
-            alert('No building selected. Redirecting to Building Info...');
-            navigate('/BuildingandAddress');
+        if(!buildingId) {
+          alert('No builidng selected. Redirecting to Building Info...');
+          navigate('BuildingandAddress');
         }
-    }, [buildingId, navigate]);
+      }, [buildingId, navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -34,9 +35,10 @@ function SecurityGatesPage() {
         e.preventDefault();
 
         if (!buildingId) {
-            alert('Building ID is missing. Please start the assessment from the correct page.');
+            alert('Building ID is missing. Please start from the Building Information page.');
             return;
         }
+
 
         try {
           // Create a document reference to the building in the 'Buildings' collection
@@ -63,6 +65,7 @@ function SecurityGatesPage() {
             <header className="header">
                 <button className="back-button" onClick={handleBack}>←</button>
                 <h1>Security Gates Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
             </header>
 
             <main className="form-container">
@@ -255,7 +258,3 @@ function SecurityGatesPage() {
 }
 
 export default SecurityGatesPage;
-
-
-
-

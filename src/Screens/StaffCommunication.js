@@ -12,13 +12,13 @@ function StaffCommunicationPage() {
 
     switch (section) {
       case 'Two-way Radios':
-        navigate('/two-way-radios');
+        navigate('/TwoWayRadios');
         break;
       case 'Communication Channels':
-        navigate('/communication-channels');
+        navigate('/CommunicationChannels');
         break;
       case 'Emergency Communication Training':
-        navigate('/emergency-communication-training');
+        navigate('/EmergencyCommunicationTraining');
         break;  
       default:
         console.log('Unknown section');

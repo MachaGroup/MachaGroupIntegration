@@ -12,13 +12,13 @@ function PublicAddressSystemPage() {
 
     switch (section) {
       case 'Speaker Locations':
-        navigate('/speaker-locations');
+        navigate('/SpeakerLocations');
         break;
       case 'Emergency Announcement Protocols':
-        navigate('/emergency-announcement-protocols');
+        navigate('/EmergencyAnnouncementProtocols');
         break;
       case 'Backup Power Systems':
-        navigate('/backup-power-systems');
+        navigate('/BackupPowerSystems');
         break;
       default:
         console.log('Unknown section');

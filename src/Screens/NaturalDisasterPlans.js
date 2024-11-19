@@ -12,13 +12,13 @@ function NaturalDisasterPlansPage() {
 
     switch (section) {
       case 'Disaster Drills':
-        navigate('/disaster-drills');
+        navigate('/DisasterDrills');
         break;
       case 'Tornado Shelter Locations':
-        navigate('/tornado-shelter-locations');
+        navigate('/TornadoShelterLocations');
         break;
       case 'Severe Weather Monitoring':
-        navigate('/severe-weather-monitoring');
+        navigate('/SevereWeatherMonitoring');
         break;
       default:
         console.log('Unknown section');

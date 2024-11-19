@@ -1,11 +1,30 @@
 import React from 'react';
 import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
+import { useNavigate } from 'react-router-dom';
 
 function FERPACompliancePage() {
+  const navigate = useNavigate();
+
   const handleButtonClick = (section) => {
     console.log(`Button clicked for: ${section}`);
-    // Add logic for handling button click, e.g., open a modal or navigate
+    
+    switch (section) {
+      case 'Student Privacy Rights':
+        navigate('/StudentPrivacyRights');
+        break;
+      case 'Data Security Requirements':
+        navigate('/DataSecurityRequirements')
+        break;
+      case 'Student Data Privacy Policies':
+        navigate('/StudentDataPrivacyPolicies');
+        break;
+      case 'Data Breach Notification Procedures':
+        navigate('/DataBreachNotificationProcedures');
+        break;
+      default:
+        console.log('Unknown section');
+    }
   };
 
   return (
