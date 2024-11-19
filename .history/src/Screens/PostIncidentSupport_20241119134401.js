@@ -75,33 +75,33 @@ function PostIncidentSupportFormPage() {
       <div className="form-section">
         <label>What post-incident support services are available to staff members following emergency situations, and are they easily accessible?</label>
         <div>
-          <input type="text" name="support-services-availability" placeholder="List/Describe the support services" />
+          <input type="text" name="post-incident-support-availability" placeholder="List/Describe the support services" />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are counseling services, peer support programs, or other mental health resources offered to staff members affected by traumatic events?</label>
         <div>
-          <input type="radio" name="mental-health-resources-availability" value="yes" /> Yes
-          <input type="radio" name="mental-health-resources-availability" value="no" /> No
+          <input type="radio" name="counseling-services-availability" value="yes" /> Yes
+          <input type="radio" name="counseling-services-availability" value="no" /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>How are support services promoted and communicated to staff members to ensure awareness of available resources?</label>
         <div>
-          <input type="text" name="support-services-communication" placeholder="Describe how support services are promoted/communicated" />
+          <input type="text" name="support-services-promotion" placeholder="Describe how support services are promoted/communicated" />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are external partnerships or collaborations established with mental health organizations or community agencies to supplement internal support services?</label>
         <div>
-          <input type="radio" name="external-support-collaborations" value="yes" /> Yes
-          <input type="radio" name="external-support-collaborations" value="no" /> No
+          <input type="radio" name="external-partnerships" value="yes" /> Yes
+          <input type="radio" name="external-partnerships" value="no" /> No
         </div>
         <div>
-          <input type="text" name="external-support-details" placeholder="Describe the partnerships/collaborations" />
+          <input type="text" name="external-partnerships-details" placeholder="Describe the partnerships/collaborations" />
         </div>
       </div>
 
@@ -109,33 +109,33 @@ function PostIncidentSupportFormPage() {
       <div className="form-section">
         <label>What counseling and psychological support options are available to staff members in the aftermath of critical incidents or emergencies?</label>
         <div>
-          <input type="text" name="counseling-support-options" placeholder="Describe the counseling/psychological support options" />
+          <input type="text" name="psychological-support-options" placeholder="Describe the counseling/psychological support options" />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are licensed counselors or mental health professionals trained in trauma response and crisis intervention available to provide support?</label>
         <div>
-          <input type="radio" name="licensed-mental-health-availability" value="yes" /> Yes
-          <input type="radio" name="licensed-mental-health-availability" value="no" /> No
+          <input type="radio" name="licensed-counselors-availability" value="yes" /> Yes
+          <input type="radio" name="licensed-counselors-availability" value="no" /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>How are confidentiality and privacy protected for staff members seeking counseling or psychological support services?</label>
         <div>
-          <input type="text" name="confidentiality-protection" placeholder="Describe how confidentiality and privacy are protected" />
+          <input type="text" name="confidentiality-measures" placeholder="Describe how confidentiality and privacy are protected" />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are there protocols in place for assessing the immediate and long-term mental health needs of staff members and providing appropriate interventions?</label>
         <div>
-          <input type="radio" name="mental-health-assessment-protocols" value="yes" /> Yes
-          <input type="radio" name="mental-health-assessment-protocols" value="no" /> No
+          <input type="radio" name="mental-health-protocols" value="yes" /> Yes
+          <input type="radio" name="mental-health-protocols" value="no" /> No
         </div>
         <div>
-          <input type="text" name="mental-health-assessment-details" placeholder="Describe the protocols" />
+          <input type="text" name="mental-health-protocols-details" placeholder="Describe the protocols" />
         </div>
       </div>
 
@@ -143,15 +143,15 @@ function PostIncidentSupportFormPage() {
       <div className="form-section">
         <label>Are peer support programs established to facilitate informal assistance and emotional support among staff members following traumatic events?</label>
         <div>
-          <input type="radio" name="peer-support-established" value="yes" /> Yes
-          <input type="radio" name="peer-support-established" value="no" /> No
+          <input type="radio" name="peer-support-programs" value="yes" /> Yes
+          <input type="radio" name="peer-support-programs" value="no" /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>How are peer supporters selected, trained, and supported in their roles as peer counselors or advocates?</label>
         <div>
-          <input type="text" name="peer-supporter-roles" placeholder="Describe the process" />
+          <input type="text" name="peer-supporter-training" placeholder="Describe the process" />
         </div>
       </div>
 
@@ -166,7 +166,7 @@ function PostIncidentSupportFormPage() {
       <div className="form-section">
         <label>What measures are in place to ensure the effectiveness and sustainability of peer support initiatives over time?</label>
         <div>
-          <input type="text" name="peer-support-effectiveness" placeholder="Describe the measures" />
+          <input type="text" name="peer-support-sustainability" placeholder="Describe the measures" />
         </div>
       </div>
 
@@ -174,7 +174,7 @@ function PostIncidentSupportFormPage() {
       <div className="form-section">
         <label>How are family members of staff members affected by emergencies supported and informed about available resources?</label>
         <div>
-          <input type="text" name="family-assistance-description" placeholder="Describe how family members of staff are affected" />
+          <input type="text" name="family-support" placeholder="Describe how family members of staff are affected" />
         </div>
       </div>
 
@@ -192,7 +192,7 @@ function PostIncidentSupportFormPage() {
       <div className="form-section">
         <label>What resources or referral networks are available to connect family members with appropriate support services, such as counseling or financial assistance?</label>
         <div>
-          <input type="text" name="family-resources-referrals" placeholder="List the resources" />
+          <input type="text" name="family-referral-resources" placeholder="List the resources" />
         </div>
       </div>
 
@@ -208,30 +208,30 @@ function PostIncidentSupportFormPage() {
       <div className="form-section">
         <label>Are staff members trained on the availability and utilization of post-incident support services as part of their emergency response training?</label>
         <div>
-          <input type="radio" name="post-incident-support-training" value="yes" /> Yes
-          <input type="radio" name="post-incident-support-training" value="no" /> No
+          <input type="radio" name="training-post-incident-support" value="yes" /> Yes
+          <input type="radio" name="training-post-incident-support" value="no" /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>How are staff members educated on recognizing signs of stress, trauma, or emotional distress in themselves and their colleagues?</label>
         <div>
-          <input type="text" name="stress-recognition-education" placeholder="Describe how they are educated" />
+          <input type="text" name="stress-recognition-training" placeholder="Describe how they are educated" />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are training sessions or workshops conducted to enhance staff members' resilience and coping skills in response to critical incidents?</label>
         <div>
-          <input type="radio" name="resilience-training-workshops" value="yes" /> Yes
-          <input type="radio" name="resilience-training-workshops" value="no" /> No
+          <input type="radio" name="resilience-training" value="yes" /> Yes
+          <input type="radio" name="resilience-training" value="no" /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>What measures are in place to ensure that staff members feel comfortable and supported in seeking assistance or support when needed?</label>
         <div>
-          <input type="text" name="support-seeking-comfort-measures" placeholder="Describe the measures" />
+          <input type="text" name="support-seeking-measures" placeholder="Describe the measures" />
         </div>
       </div>
 
@@ -239,39 +239,38 @@ function PostIncidentSupportFormPage() {
       <div className="form-section">
         <label>How are post-incident support services evaluated for their effectiveness and responsiveness to staff members' needs?</label>
         <div>
-          <input type="text" name="evaluation-effectiveness" placeholder="Describe how services are evaluated" />
+          <input type="text" name="support-services-evaluation" placeholder="Describe how services are evaluated" />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are feedback mechanisms in place to gather input from staff members about their experiences with post-incident support services?</label>
         <div>
-          <input type="radio" name="feedback-mechanisms-in-place" value="yes" /> Yes
-          <input type="radio" name="feedback-mechanisms-in-place" value="no" /> No
+          <input type="radio" name="feedback-mechanisms" value="yes" /> Yes
+          <input type="radio" name="feedback-mechanisms" value="no" /> No
         </div>
         <div>
-          <input type="text" name="feedback-details" placeholder="Describe the feedback mechanisms" />
+          <input type="text" name="feedback-mechanism-details" placeholder="Describe the feedback mechanisms" />
         </div>
       </div>
 
       <div className="form-section">
         <label>What measures or metrics are used to assess the impact of support interventions on staff members' well-being and recovery?</label>
         <div>
-          <input type="text" name="impact-assessment-metrics" placeholder="Describe the measures/metrics" />
+          <input type="text" name="impact-metrics" placeholder="Describe the measures/metrics" />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are lessons learned from post-incident support activities used to inform improvements to the organization's crisis management and employee assistance programs?</label>
         <div>
-          <input type="radio" name="lessons-learned-used" value="yes" /> Yes
-          <input type="radio" name="lessons-learned-used" value="no" /> No
+          <input type="radio" name="lessons-learned" value="yes" /> Yes
+          <input type="radio" name="lessons-learned" value="no" /> No
         </div>
       </div>
     </form>
   </main>
 </div>
-
   )
 }
 

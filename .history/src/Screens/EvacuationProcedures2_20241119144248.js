@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 
-function EvacuationProcedures2FormPage() {
+function ResponseProtocols2FormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding(); // Access buildingId from context
   const db = getFirestore();
@@ -45,7 +45,7 @@ function EvacuationProcedures2FormPage() {
       const buildingRef = doc(db, 'Buildings', buildingId); 
 
       // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Personnel Training and Awareness/Evacuation Procedures 2');
+      const formsRef = collection(db, 'forms/Personnel Training and Awareness/Response Protocols 2');
       await addDoc(formsRef, {
           building: buildingRef, // Reference to the building document
           formData: formData, // Store the form data as a nested object
