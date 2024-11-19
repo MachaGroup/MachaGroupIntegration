@@ -201,6 +201,10 @@ import PerimeterSecurity from './Screens/PerimeterSecurity';
 import CCTVCameras from './Screens/CCTVCameras';
 import AlarmSystems from './Screens/AlarmSystems';
 import OnSiteSecurity from './Screens/OnSiteSecurity';
+import PersonalDeviceUsage from './Screens/PersonalDeviceUsage';
+import DataClassification from './Screens/DataClassification';
+import DataSharingPolicies from './Screens/DataSharingPolicies';
+import DataMinimization from './Screens/DataMinimization';
 //Tier 4 PS
 import MainEntrance from './Screens/MainEntrance';
 import SecondaryEntrances from './Screens/SecondaryEntrances';
@@ -497,6 +501,10 @@ function App() {
         <Route path="/accpetable-use-policy-training" element={<AcceptableUsePolicyTraining />} />
         <Route path="/data-handling-guidelines" element={<DataHandlingGuidelines />} />
         <Route path="/access-restrictions" element={<AccessRestrictions />} />
+        <Route path="/personal-device-usage" element={<PersonalDeviceUsage />} />
+        <Route path="/data-classification" element={<DataClassification />} />
+        <Route path="/data-sharing-policies" element={<DataSharingPolicies />} />
+        <Route path="/data-minimization" element={<DataMinimization />} />
       </Routes>
     </Router>
    </BuildingProvider>
