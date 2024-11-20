@@ -12,13 +12,13 @@ function ReportingProceduresPage() {
 
     switch (section) {
       case 'Trusted Adults':
-        navigate('/trusted-adults');
+        navigate('/TrustedAdults');
         break;
       case 'Anonymous Reporting Systems':
-        navigate('/anonymous-reporting-systems');
+        navigate('/AnonymousReportingSystems');
         break;
       case 'Peer Support Networks':
-        navigate('/peer-support-networks');
+        navigate('/PeerSupportNetworks');
         break;
       default:
         console.log('Unknown section');

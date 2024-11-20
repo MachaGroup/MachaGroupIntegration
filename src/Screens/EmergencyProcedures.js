@@ -12,22 +12,22 @@ function EmergencyProceduresPage() {
 
     switch (section) {
       case 'Curriculum Integration':
-        navigate('/curriculum-integration');
+        navigate('/CurriculumIntegration');
         break;
       case 'Student Handbooks':
-        navigate('/student-handbooks');
+        navigate('/StudentHandbooks');
         break;
       case 'Parent Involvement':
-        navigate('/parent-involvement2');
+        navigate('/ParentInvolvement2');
         break;
       case 'Fire Drills':
-        navigate('/fire-drills');
+        navigate('/FireDrills');
         break;
       case 'Lockdown Drills':
-        navigate('/lockdown-drills2');
+        navigate('/LockdownDrills2');
         break;
       case 'Severe Weather Preparedness':
-        navigate('/severe-weather-preparedness');
+        navigate('/SevereWeatherPreparedness');
         break;
       default:
         console.log('Unknown section');
