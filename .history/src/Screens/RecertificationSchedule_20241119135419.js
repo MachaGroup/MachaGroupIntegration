@@ -1,5 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
@@ -59,6 +57,7 @@ function RecertificationScheduleFormPage() {
         alert('Failed to submit the form. Please try again.');
     }
 };
+
 
   return (
     <div className="form-page">

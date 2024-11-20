@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './FormQuestions.css';
 import { useNavigate } from 'react-router-dom';
 import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
@@ -7,17 +7,10 @@ import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
 
 function FullDiskEncryptionPage() {
   const navigate = useNavigate();
-  const { buildingId } = useBuilding(); 
+  const { setBuildingId, buildingId } = useBuilding(); 
   const db = getFirestore();
 
   const [formData, setFormData] = useState({});
-
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
-    }
-  }, [buildingId, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

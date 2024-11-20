@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 import './FormQuestions.css';
-import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
- 
+
 function AccessRestrictionsPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding();
@@ -71,7 +71,7 @@ function AccessRestrictionsPage() {
         <main className="form-container">
             <form onSubmit={handleSubmit}>
                 {/* 5.1.1.1.1 Access Restrictions */}
-                <h2>Recertification Frequency:</h2>
+                <h2>5.1.1.1.1.1 Recertification Frequency:</h2>
                 <div className="form-section">
                     <label>What types of websites or online content are explicitly prohibited by the Acceptable Use Policy (AUP) (e.g., adult content, gambling sites)?</label>
                     <div>
@@ -94,7 +94,7 @@ function AccessRestrictionsPage() {
                     </div>
                 </div>
 
-                <h2>Implementation and Enforcement:</h2>
+                <h2>5.1.1.1.1.2 Implementation and Enforcement:</h2>
                 <div className="form-section">
                     <label>How are access restrictions enforced on the network (e.g., through web filters, firewalls)?</label>
                     <div>
@@ -116,7 +116,7 @@ function AccessRestrictionsPage() {
                     </div>
                 </div>
 
-                <h2>User Notification and Awareness:</h2>
+                <h2>5.1.1.1.1.3 User Notification and Awareness:</h2>
                 <div className="form-section">
                     <label>How are users informed about the access restrictions and prohibited websites (e.g., through training, policy documents)?</label>
                     <div>
@@ -139,7 +139,7 @@ function AccessRestrictionsPage() {
                     </div>
                 </div>
 
-                <h2>Exceptions and Approvals:</h2>
+                <h2>5.1.1.1.1.4 Exceptions and Approvals:</h2>
                 <div className="form-section">
                     <label>What procedures are in place for requesting exceptions to the access restrictions (e.g., for educational or research purposes)?</label>
                     <div>
@@ -162,7 +162,7 @@ function AccessRestrictionsPage() {
                     </div>
                 </div>
 
-                <h2>Monitoring and Reporting:</h2>
+                <h2>5.1.1.1.1.5 Monitoring and Reporting:</h2>
                 <div className="form-section">
                     <label>How is user activity monitored to ensure compliance with access restrictions (e.g., logging, auditing)?</label>
                     <div>
@@ -184,7 +184,7 @@ function AccessRestrictionsPage() {
                     </div>
                 </div>
 
-                <h2>Policy Review and Updates:</h2>
+                <h2>5.1.1.1.1.6 Policy Review and Updates:</h2>
                 <div className="form-section">
                     <label>How frequently is the Acceptable Use Policy reviewed and updated to reflect changes in technology and threats?</label>
                     <div>
@@ -206,7 +206,7 @@ function AccessRestrictionsPage() {
                     </div>
                 </div>
 
-                <h2>Legal and Regulatory Compliance:</h2>
+                <h2>5.1.1.1.1.7Legal and Regulatory Compliance:</h2>
                 <div className="form-section">
                     <label>What legal or regulatory requirements impact the development and enforcement of access restrictions (e.g., data protection laws)?</label>
                     <div>
@@ -229,7 +229,7 @@ function AccessRestrictionsPage() {
                     </div>
                 </div>
 
-                <h2>User Education and Training:</h2>
+                <h2>5.1.1.1.1.8 User Education and Training:</h2>
                 <div className="form-section">
                     <label>What training programs are in place to educate users about the Acceptable Use Policy and access restrictions?</label>
                     <div>
@@ -252,7 +252,7 @@ function AccessRestrictionsPage() {
                     </div>
                 </div>
 
-                <h2>Incident Management:</h2>
+                <h2>5.1.1.1.1.9 Incident Management:</h2>
                 <div className="form-section">
                     <label>What steps are taken when a user repeatedly attempts to access prohibited websites or violates access restrictions?</label>
                     <div>
@@ -274,7 +274,7 @@ function AccessRestrictionsPage() {
                     </div>
                 </div>
 
-                <h2>Feedback and Improvement:</h2>
+                <h2>5.1.1.1.1.10 Feedback and Improvement:</h2>
                 <div className="form-section">
                     <label>How is feedback collected from users regarding the effectiveness and impact of access restrictions?</label>
                     <div>
