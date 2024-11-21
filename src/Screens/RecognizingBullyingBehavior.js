@@ -12,13 +12,13 @@ function RecognizingBullyingBehaviorPage() {
 
     switch (section) {
       case 'Verbal Bullying':
-        navigate('/verbal-bullying');
+        navigate('/VerbalBullying');
         break;
       case 'Physical Bullying':
-        navigate('/physical-bullying');
+        navigate('/PhysicalBullying');
         break;
       case 'Cyber Bullying':
-        navigate('/cyber-bullying');
+        navigate('/CyberBullying');
         break;
       default:
         console.log('Unknown section');

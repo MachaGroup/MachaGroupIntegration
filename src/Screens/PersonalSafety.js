@@ -12,10 +12,10 @@ function PersonalSafetyPage() {
 
     switch (section) {
       case 'Stranger Danger Awareness':
-        navigate('/stranger-danger-awareness');
+        navigate('/StrangerDangerAwareness');
         break;
       case 'Internet Safety':
-        navigate('/internet-safety');
+        navigate('/InternetSafety');
         break;
       default:
         console.log('Unknown section');
