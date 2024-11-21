@@ -19,7 +19,7 @@ function MainScreen() {
     });
 
     return () => unsubscribe(); // Clean up the listener
-  }, []);
+  });
 
   const navigateTo = (path) => {
     navigate(path);
