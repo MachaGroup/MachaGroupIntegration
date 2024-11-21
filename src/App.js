@@ -290,6 +290,30 @@ import ConsentManagement from "./Screens/ConsentManagement";
 import StudentDataPrivacyPolicies from "./Screens/StudentDataPrivacyPolicies";
 import DataBreachNotificationProcedures from "./Screens/DataBreachNotificationProcedures";
 import AnomalyDetection from "./Screens/AnomalyDetection";
+import ComplianceWithRegulations from './Screens/ComplianceWithRegulations'; 
+import EffectivenessInAddressingSecurityRisks from  './Screens/EffectivenessInAddressingSecurityRisks';
+import StaffInputOnPolicyImpact from './Screens/StaffInputOnPolicyImpact';
+import PolicyRevisionApprovalWorkflow from './Screens/PolicyRevisionApprovalWorkflow';
+import DocumentationOfPolicyChanges from './Screens/DocumentationOfPolicyChanges';
+import SafetyAndSecurityTraining from './Screens/SafetyAndSecurityTraining';
+import FireSafetyTraining from './Screens/FireSafetyTraining';
+import EvacuationProceduresTraining from './Screens/EvacuationProceduresTraining';
+import IdentifyingSuspiciousBehavior2 from './Screens/IdentifyingSuspiciousBehavior2';
+import ResponseToSecurityThreats from './Screens/ResponseToSecurityThreats';
+import StrangerDangerAwareness2 from './Screens/StrangerDangerAwareness2';
+import FireDrills2 from './Screens/FireDrills2';
+import LockdownDrills3 from './Screens/LockdownDrills3';
+import KeycardAccessSystems from './Screens/KeycardAccessSystems';
+import BiometricAccessControlSystems from './Screens/BiometricAccessControlSystems';
+import CCTVCameraInstallation from './Screens/CCTVCameraInstallation';
+import IntrusionDetectionSystems3 from './Screens/IntrusionDetectionSystems3';
+import PerimeterSecurityFencing from './Screens/PerimeterSecurityFencing';
+import FirewallImplementation from './Screens/FirewallImplementation';
+import IntrusionPreventionSystems from './Screens/IntrusionPreventionSystems';
+import DataEncryptionProtocols from './Screens/DataEncryptionProtocols';
+import RegularDataBackups from './Screens/RegularDataBackups';
+import EndpointSecuritySolutions from './Screens/EndpointSecuritySolutions';
+
 
 function App() {
   return (
@@ -686,6 +710,32 @@ function App() {
         <Route path="/EncyptionRequirements" element={<EncryptionRequirements />} />
         <Route path="/DataAccessControls" element={<DataAccessControls />} />
         <Route path="/StudentPrivacyRights" element={<StudentPrivacyRights />} />
+        <Route path='/ComplianceWithRegulations' element={<ComplianceWithRegulations />} />
+        <Route path='/EffectivenessInAddressingSecurityRisks' element={<EffectivenessInAddressingSecurityRisks />} />
+        <Route path='/StaffInputOnPolicyImpact' element={<StaffInputOnPolicyImpact />} />     
+        <Route path='/PolicyRevisionApprovalWorkflow' element={<PolicyRevisionApprovalWorkflow />} />
+        <Route path='/DocumentationOfPolicyChanges' element={<DocumentationOfPolicyChanges />} />
+        <Route path='/SafetyAndSecurityTraining' element={<SafetyAndSecurityTraining />} />
+        <Route path='/FireSafetyTraining' element={<FireSafetyTraining />} />
+        <Route path='/EvacuationProceduresTraining' element={<EvacuationProceduresTraining />} />
+        <Route path='/IdentifyingSuspiciousBehavior2' element={<IdentifyingSuspiciousBehavior2 />} />
+        <Route path='/ResponseToSecurityThreats' element={<ResponseToSecurityThreats />} />
+        <Route path='/StrangerDangerAwareness2' element={<StrangerDangerAwareness2 />} />
+        <Route path='/FireDrills2' element={<FireDrills2 />} />
+        <Route path='/LockdownDrills3' element={<LockdownDrills3 />} />
+        <Route path='/KeycardAccessSystems' element={<KeycardAccessSystems />} />
+        <Route path='/BiometricAccessControlSystems' element={<BiometricAccessControlSystems />} />
+        <Route path='/CCTVCameraInstallation' element={<CCTVCameraInstallation />} />
+        <Route path='/IntrusionDetectionSystems3' element={<IntrusionDetectionSystems3 />} />
+        <Route path='/PerimeterSecurityFencing' element={<PerimeterSecurityFencing />} />
+        <Route path='/FirewallImplementation' element={<FirewallImplementation />} />
+        <Route path='/IntrusionPreventionSystems' element={<IntrusionPreventionSystems />} />
+        <Route path='/DataEncryptionProtocols' element={<DataEncryptionProtocols />} />
+        <Route path='/RegularDataBackups' element={<RegularDataBackups />} />
+        <Route path='/EndpointSecuritySolutions' element={<EndpointSecuritySolutions />} />
+
+
+
       </Routes>
     </Router>
    </BuildingProvider>
