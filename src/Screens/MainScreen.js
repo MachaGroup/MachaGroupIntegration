@@ -11,14 +11,15 @@ function MainScreen() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      if(!user){
+      setUser(user); // Update the user state
+      if (!user) {
+        // User is not logged in, redirect to the login page
         navigate('/login');
       }
-    })
+    });
 
     return () => unsubscribe(); // Clean up the listener
-  });
+  }, []);
 
   const navigateTo = (path) => {
     navigate(path);

@@ -20,17 +20,6 @@ function SecurityPoliciesAndProceduresPage() {
       default:
         console.log('Unknown section');
 }
-
-    switch (section) {
-      case 'Acceptable Use Policy (AUP) Training':
-          navigate('/AUP-training');
-          break;
-      case 'Data Handling Guidelines':
-          navigate('/data-handling-guidelines');
-          break;
-      default:
-        console.log('Unknown section');
-}
   };
 
   return (

@@ -22,10 +22,6 @@ function StaffTrainingPage() {
           break;
         case 'Security Awareness Training':
           navigate('/security-awareness-training');
-          break;
-        case 'Security Awareness Training(2)':
-          navigate('/security-awareness-training(2)');
-          break;
         case 'Incident Response Training':
           navigate('/incident-response-training');
           break;

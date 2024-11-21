@@ -21,18 +21,6 @@ function IncidentResponseTrainingPage() {
         default:
           console.log('Unknown section');
       }
-    
-      // Navigate to specific routes based on section
-      switch (section) {
-        case 'Recognizing Security Incidents':
-          navigate('/recognizing-security-incidents');
-          break;
-        case 'Incident Reporting Procedures':
-          navigate('/incident-reporting-procedures');
-          break;
-        default:
-          console.log('Unknown section');
-      }
   };
 
   return (

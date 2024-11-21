@@ -23,20 +23,6 @@ function FirstAidCPRTrainingPage() {
       default:
         console.log('Unknown section');
     }
-
-    switch (section) {
-      case 'Training Providers':
-        navigate('/training-providers');
-        break;
-      case 'Training Materials':
-        navigate('/training-materials');
-        break;
-      case 'Recertification Schedule':
-        navigate('/recertification-schedule');
-        break;
-      default:
-        console.log('Unknown section');
-    }
   };
 
   return (
