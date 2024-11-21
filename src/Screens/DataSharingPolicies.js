@@ -61,7 +61,6 @@ function DataSharingPoliciesFormPage() {
 
   return (
     <div className="form-page">
-        <form onSubmit={handleSubmit}></form>
         <header className="header">
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
@@ -69,7 +68,7 @@ function DataSharingPoliciesFormPage() {
         </header>
 
         <main className="form-container">
-            <form>
+            <form onSubmit={handleSubmit}>
                 {/* 5.1.1.2.2 Data Sharing Policies */}
                 <h2>5.1.1.2.2.1 Approval and Authorization:</h2>
                 <div className="form-section">
@@ -298,6 +297,9 @@ function DataSharingPoliciesFormPage() {
                         <input type="text" name="communicatingUpdates" placeholder="Describe how it's communicated" onChange={handleChange} />  
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

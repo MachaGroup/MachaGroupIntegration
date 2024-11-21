@@ -60,7 +60,6 @@ function DataClassificationFormPage() {
  
   return (
     <div className="form-page">
-        <form onSubmit={handleSubmit}></form>
         <header className="header">
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
@@ -68,7 +67,7 @@ function DataClassificationFormPage() {
         </header>
 
         <main className="form-container">
-            <form>
+            <form onSubmit={handleSubmit}>
                 {/* 5.1.1.1.2 Personal Device Usage */}
                 <h2>5.1.1.2.1.1 Classification Criteria:</h2>
                 <div className="form-section">
@@ -296,6 +295,9 @@ function DataClassificationFormPage() {
                         <input type="text" name="dataBreaches" placeholder="Describe the steps" onChange={handleChange} />  
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

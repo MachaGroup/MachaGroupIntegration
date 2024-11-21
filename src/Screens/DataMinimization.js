@@ -61,7 +61,6 @@ function DataMinimizationFormPage() {
 
   return (
     <div className="form-page">
-        <form onSubmit={handleSubmit}></form>
         <header className="header">
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
@@ -69,7 +68,7 @@ function DataMinimizationFormPage() {
         </header>
 
         <main className="form-container">
-            <form>
+            <form onSubmit={handleSubmit}>
                 {/* 5.1.2.1.1 Data Minimization */}
                 <h2>5.1.2.1.1.1 Data Collection Practices:</h2>
                 <div className="form-section">
@@ -297,6 +296,9 @@ function DataMinimizationFormPage() {
                         <input type="text" name="communicatedUpdates" placeholder="Describe how it's communicated" onChange={handleChange} />  
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

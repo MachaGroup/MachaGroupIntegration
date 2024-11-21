@@ -61,7 +61,6 @@ function PersonalDeviceUsageFormPage() {
 
   return (
     <div className="form-page">
-        <form onSubmit={handleSubmit}></form>
         <header className="header">
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
@@ -69,7 +68,7 @@ function PersonalDeviceUsageFormPage() {
         </header>
 
         <main className="form-container">
-            <form>
+            <form onSubmit={handleSubmit}>
                 {/* 5.1.1.1.2 Personal Device Usage */}
                 <h2>5.1.1.1.2.1 Policy Scope and Guidelines:</h2>
                 <div className="form-section">
@@ -298,6 +297,9 @@ function PersonalDeviceUsageFormPage() {
                     </div>
                 </div>
 
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
+                
             </form>
         </main>
     </div>

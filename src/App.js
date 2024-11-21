@@ -205,6 +205,10 @@ import PersonalDeviceUsage from './Screens/PersonalDeviceUsage';
 import DataClassification from './Screens/DataClassification';
 import DataSharingPolicies from './Screens/DataSharingPolicies';
 import DataMinimization from './Screens/DataMinimization';
+import DataRetentionPeriods from './Screens/DataRetentionPeriods';
+import EncryptionRequirements from './Screens/EncryptionRequirements';
+import DataAccessControls from './Screens/DataAccessControls';
+import StudentPrivacyRights from './Screens/StudentPrivacyRights';
 //Tier 4 PS
 import MainEntrance from './Screens/MainEntrance';
 import SecondaryEntrances from './Screens/SecondaryEntrances';
@@ -597,7 +601,6 @@ function App() {
         <Route path="/evacuation-procedures" element={<EvacuationProcedures />} />
         <Route path="fire-extinguisher-locations" element={<FireExtinguisherLocations />} />
         <Route path="/classroom-lockdown-protocols" element={<ClassroomLockdownProtocols />} />
-        <Route path="/lockdown-communication-protocols" element={<LockdownCommunicationProtocols />} />
         <Route path="/law-enforcement-coordination" element={<LawEnforcementCoordination />} />
         <Route path="/disaster-drills" element={<DisasterDrills />} />
         <Route path="/tornado-shelter-locations" element={<TornadoShelterLocations />} />
@@ -675,10 +678,14 @@ function App() {
         <Route path="/accpetable-use-policy-training" element={<AcceptableUsePolicyTraining />} />
         <Route path="/data-handling-guidelines" element={<DataHandlingGuidelines />} />
         <Route path="/access-restrictions" element={<AccessRestrictions />} />
-        <Route path="/personal-device-usage" element={<PersonalDeviceUsage />} />
+        <Route path="/PersonalDeviceUsage" element={<PersonalDeviceUsage />} />
         <Route path="/data-classification" element={<DataClassification />} />
         <Route path="/data-sharing-policies" element={<DataSharingPolicies />} />
-        <Route path="/data-minimization" element={<DataMinimization />} />
+        <Route path="/DataMinimization" element={<DataMinimization />} />
+        <Route path="/DataRetentionPeriods" element={<DataRetentionPeriods />} />
+        <Route path="/EncyptionRequirements" element={<EncryptionRequirements />} />
+        <Route path="/DataAccessControls" element={<DataAccessControls />} />
+        <Route path="/StudentPrivacyRights" element={<StudentPrivacyRights />} />
       </Routes>
     </Router>
    </BuildingProvider>
