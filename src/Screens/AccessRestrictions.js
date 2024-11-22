@@ -1,95 +1,78 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, addDoc, doc, getDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
  
 function AccessRestrictionsPage() {
     const navigate = useNavigate();
-    const { setBuildingId, buildingId } = useBuilding(); // Access and update buildingId from context
+    const { buildingId } = useBuilding();
     const db = getFirestore();
- 
+  
     const [formData, setFormData] = useState();
- 
+  
     useEffect(() => {
-        const fetchBuildingIdFromBuildings = async () => {
-            if (!buildingId) {
-                try {
-                    // Replace 'BuildingDocumentID' with your actual document ID in the Buildings collection
-                    const buildingDocRef = doc(db, 'Buildings', 'BuildingDocumentID');
-                    const buildingSnapshot = await getDoc(buildingDocRef);
- 
-                    if (buildingSnapshot.exists()) {
-                        const buildingData = buildingSnapshot.data();
-                        setBuildingId(buildingData.buildingId); // Set buildingId from the fetched document
-                    } else {
-                        alert('Building information not found. Redirecting...');
-                        navigate('/BuildingandAddress');
-                    }
-                } catch (error) {
-                    console.error('Error fetching building ID:', error);
-                    alert('Error fetching building information.');
-                }
-            }
-        };
- 
-        fetchBuildingIdFromBuildings();
-    }, [buildingId, navigate, setBuildingId, db]);
- 
+      if(!buildingId) {
+        alert('No builidng selected. Redirecting to Building Info...');
+        navigate('BuildingandAddress');
+      }
+    }, [buildingId, navigate]);
+  
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+      const { name, value } = e.target;
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
     };
- 
+  
+    // Function to handle back button
     const handleBack = () => {
-        navigate(-1);
+      navigate(-1);  // Navigates to the previous page
     };
- 
+  
     const handleSubmit = async (e) => {
-        e.preventDefault();
- 
-        if (!buildingId) {
-            alert('Building ID is missing. Please start from the Building Information page.');
-            return;
-        }
- 
- 
-        try {
-          // Create a document reference to the building in the 'Buildings' collection
-          const buildingRef = doc(db, 'Buildings', buildingId);
- 
-          // Store the form data in the specified Firestore structure
-          const formsRef = collection(db, 'forms/Policy and Conpliance/Access Restrictions');
-          await addDoc(formsRef, {
-              building: buildingRef, // Reference to the building document
-              formData: formData, // Store the form data as a nested object
-          });
- 
-          console.log('Form data submitted successfully!');
-          alert('Form submitted successfully!');
-          navigate('/Form');
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Failed to submit the form. Please try again.');
-        }
+      e.preventDefault();
+      
+      if(!buildingId) {
+        alert('Building ID is missing. Please start the assessment from the correct page.');
+        return;
+      }
+  
+      try {
+        // Create a document reference to the building in the 'Buildings' collection
+        const buildingRef = doc(db, 'Buildings', buildingId);
+  
+        // Store the form data in the specified Firestore structure
+        const formsRef = collection(db, 'forms/Policy and Compliance/Access Restrictions');
+        await addDoc(formsRef, {
+          buildling: buildingRef,
+          formData: formData,
+        });
+        console.log('From Data submitted successfully!')
+        alert('Form Submitted successfully!');
+        navigate('/Form');
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('Failed to submit the form. Please try again.');
+      }
     };
  
   return (
     <div className="form-page">
-        <form onSubmit={handleSubmit}></form>
         <header className="header">
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>5.1.1.1.1 Access Restrictions Assessment</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
-            <form>
+            <form onSubmit={handleSubmit}>
                 {/* 5.1.1.1.1 Access Restrictions */}
-                <h2>Recertification Frequency:</h2>
+                <h2>5.1.1.1.1.1 Recertification Frequency:</h2>
                 <div className="form-section">
                     <label>What types of websites or online content are explicitly prohibited by the Acceptable Use Policy (AUP) (e.g., adult content, gambling sites)?</label>
                     <div>
@@ -112,7 +95,7 @@ function AccessRestrictionsPage() {
                     </div>
                 </div>
 
-                <h2>Implementation and Enforcement:</h2>
+                <h2>5.1.1.1.1.2 Implementation and Enforcement:</h2>
                 <div className="form-section">
                     <label>How are access restrictions enforced on the network (e.g., through web filters, firewalls)?</label>
                     <div>
@@ -134,7 +117,7 @@ function AccessRestrictionsPage() {
                     </div>
                 </div>
 
-                <h2>User Notification and Awareness:</h2>
+                <h2>5.1.1.1.1.3 User Notification and Awareness:</h2>
                 <div className="form-section">
                     <label>How are users informed about the access restrictions and prohibited websites (e.g., through training, policy documents)?</label>
                     <div>
@@ -157,7 +140,7 @@ function AccessRestrictionsPage() {
                     </div>
                 </div>
 
-                <h2>Exceptions and Approvals:</h2>
+                <h2>5.1.1.1.1.4 Exceptions and Approvals:</h2>
                 <div className="form-section">
                     <label>What procedures are in place for requesting exceptions to the access restrictions (e.g., for educational or research purposes)?</label>
                     <div>
@@ -180,7 +163,7 @@ function AccessRestrictionsPage() {
                     </div>
                 </div>
 
-                <h2>Monitoring and Reporting:</h2>
+                <h2>5.1.1.1.1.5 Monitoring and Reporting:</h2>
                 <div className="form-section">
                     <label>How is user activity monitored to ensure compliance with access restrictions (e.g., logging, auditing)?</label>
                     <div>
@@ -202,7 +185,7 @@ function AccessRestrictionsPage() {
                     </div>
                 </div>
 
-                <h2>Policy Review and Updates:</h2>
+                <h2>5.1.1.1.1.6 Policy Review and Updates:</h2>
                 <div className="form-section">
                     <label>How frequently is the Acceptable Use Policy reviewed and updated to reflect changes in technology and threats?</label>
                     <div>
@@ -224,7 +207,7 @@ function AccessRestrictionsPage() {
                     </div>
                 </div>
 
-                <h2>Legal and Regulatory Compliance:</h2>
+                <h2>5.1.1.1.1.7Legal and Regulatory Compliance:</h2>
                 <div className="form-section">
                     <label>What legal or regulatory requirements impact the development and enforcement of access restrictions (e.g., data protection laws)?</label>
                     <div>
@@ -247,7 +230,7 @@ function AccessRestrictionsPage() {
                     </div>
                 </div>
 
-                <h2>User Education and Training:</h2>
+                <h2>5.1.1.1.1.8 User Education and Training:</h2>
                 <div className="form-section">
                     <label>What training programs are in place to educate users about the Acceptable Use Policy and access restrictions?</label>
                     <div>
@@ -270,7 +253,7 @@ function AccessRestrictionsPage() {
                     </div>
                 </div>
 
-                <h2>Incident Management:</h2>
+                <h2>5.1.1.1.1.9 Incident Management:</h2>
                 <div className="form-section">
                     <label>What steps are taken when a user repeatedly attempts to access prohibited websites or violates access restrictions?</label>
                     <div>
@@ -292,7 +275,7 @@ function AccessRestrictionsPage() {
                     </div>
                 </div>
 
-                <h2>Feedback and Improvement:</h2>
+                <h2>5.1.1.1.1.10 Feedback and Improvement:</h2>
                 <div className="form-section">
                     <label>How is feedback collected from users regarding the effectiveness and impact of access restrictions?</label>
                     <div>

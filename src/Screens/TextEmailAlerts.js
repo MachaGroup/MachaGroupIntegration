@@ -12,13 +12,13 @@ function TextEmailAlertsPage() {
 
     switch (section) {
       case 'Contact Information Database':
-        navigate('/contact-information-database');
+        navigate('/ContactInformationDatabase');
         break;
       case 'Alert Activation Procedures':
-        navigate('/alert-activation-procedures');
+        navigate('/AlertActivationProcedures');
         break;
       case 'Integration with Parent Communication':
-        navigate('/integration-with-parent-communication');
+        navigate('/IntegrationWithParentCommunication');
         break;
       default:
         console.log('Unknown section');

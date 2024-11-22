@@ -14,13 +14,13 @@ function LockdownProceduresPage() {
 
     switch (section) {
       case 'Classroom Lockdown Protocols':
-        navigate('/classroom-lockdown-protocols');
+        navigate('/ClassroomLockdownProtocols');
         break;
-      case 'Communication Protocols':
-        navigate('/communication-protocols2');
+      case 'Lockdown Communication Protocols':
+        navigate('/LockdownCommunicationProtocols');
         break;
       case 'Law Enforcement Coordination':
-        navigate('/law-enforcement-coordination');
+        navigate('/LawEnforcementCoordination');
         break;
       default:
         console.log('Unknown section');
@@ -41,7 +41,7 @@ function LockdownProceduresPage() {
         <h2>Lockdown Procedures</h2>
         <form>
           {/* Lockdown Procedures Buttons */}
-          {['Classroom Lockdown Protocols', 'Communication Protocols', 'Law Enforcement Coordination'].map((section, index) => (
+          {['Classroom Lockdown Protocols', 'Lockdown Communication Protocols', 'Law Enforcement Coordination'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>

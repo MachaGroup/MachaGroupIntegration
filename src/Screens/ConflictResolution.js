@@ -3,59 +3,33 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 
 function ConflictResolutionFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
+  const { buildingId } = useBuilding(); // Access and update buildingId from context
   const db = getFirestore();
 
   const [formData, setFormData] = useState();
 
   useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
-    }
-  }, [buildingId, navigate]);
+      if(!buildingId) {
+        alert('No builidng selected. Redirecting to Building Info...');
+        navigate('BuildingandAddress');
+      }
+    }, [buildingId, navigate]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+      const { name, value } = e.target;
+      setFormData((prevData) => ({
+          ...prevData,
+          [name]: value,
+      }));
   };
 
   // Function to handle back button
   const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
-    }
-
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
-
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Emergency Preparedness/Confict Resolution');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
-    }
+      navigate(-1);  // Navigates to the previous page
   };
 
   return (
@@ -64,6 +38,7 @@ function ConflictResolutionFormPage() {
          {/* Back Button */}
       <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
         <h1>Conflict Resolution Assessment</h1>
+        <img src={logo} alt="Logo" className="logo" />
       </header>
       
       <main className="form-container">
@@ -73,24 +48,24 @@ function ConflictResolutionFormPage() {
           <div className="form-section">
             <label>Are security personnel trained in conflict resolution techniques, including de-escalation strategies?</label>
             <div>
-              <input type="radio" name="trainedResolutionTechniques" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="trainedResolutionTechniques" value="no" onChange={handleChange}/> No
+              <input type="radio" name="conflictResolution" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="conflictResolution" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Have they received specialized training to handle diverse conflict scenarios effectively?</label>
             <div>
-              <input type="radio" name="specialized training" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="specialized training" value="no" onChange={handleChange}/> No
+              <input type="radio" name="specializedTraining" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="specializedTraining" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Do security personnel possess the necessary communication and interpersonal skills to manage conflicts professionally and calmly?</label>
             <div>
-              <input type="radio" name="communication interpersonal skills" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="communication interpersonal skills" value="no" onChange={handleChange}/> No
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -98,26 +73,27 @@ function ConflictResolutionFormPage() {
           <div className="form-section">
             <label>Are security personnel trained to recognize early signs of potential conflicts or escalating situations?</label>
             <div>
-              <input type="radio" name="Recognition" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="Recognition" value="no" onChange={handleChange}/> No
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Do they assess the nature and severity of conflicts quickly and accurately?</label>
             <div>
-              <input type="radio" name="severity of conflicts" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="severity of conflicts" value="no" onChange={handleChange}/> No
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there protocols in place for security personnel to determine appropriate responses based on the level of conflict and potential risks involved?</label>
             <div>
-              <input type="radio" name="Response Protocols" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="Response Protocols" value="no" onChange={handleChange}/> No 
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No 
             </div>
             <div>
+              <input type="text" name="access-rights" placeholder="Describe the protocols" onChange={handleChange}/>  
               <input type="text" name="access-rights" placeholder="Describe the De-escalation protocols" onChange={handleChange}/>  
             </div>
           </div>
@@ -126,24 +102,24 @@ function ConflictResolutionFormPage() {
           <div className="form-section">
             <label>Do security personnel employ de-escalation techniques to defuse tensions and reduce the intensity of conflicts?</label>
             <div>
-              <input type="radio" name="de-escalation technique" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="de-escalation technique" value="no" onChange={handleChange}/> No
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are they trained to remain calm and composed while interacting with individuals involved in conflicts?</label>
             <div>
-              <input type="radio" name="de-escalation training" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="de-escalation training" value="no" onChange={handleChange}/> No
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Do security personnel use active listening, empathy, and effective communication to address underlying issues and resolve conflicts peacefully?</label>
             <div>
-              <input type="radio" name="de-escalation technique check" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="de-escalation technique check" value="no" onChange={handleChange}/> No
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -151,27 +127,27 @@ function ConflictResolutionFormPage() {
           <div className="form-section">
             <label>Are security personnel trained in safe and effective physical restraint techniques, if necessary?</label>
             <div>
-              <input type="radio" name="physical restraint techniques" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="physical restraint techniques" value="no" onChange={handleChange}/> No
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Do they use physical intervention as a last resort, only when other de-escalation strategies have been exhausted?</label>
             <div>
-              <input type="radio" name="physical intervention" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="physical intervention" value="no" onChange={handleChange}/> No
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there protocols in place to ensure that physical intervention is performed in a manner that minimizes the risk of injury to all parties involved?</label>
             <div>
-              <input type="radio" name="physical interventions protocols" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="physical interventions protocols" value="no" onChange={handleChange}/> No  
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No  
             </div>
             <div>
-              <input type="text" name="auth-mechanisms" placeholder="Describe the physical interventions protocols" onChange={handleChange}/>  
+              <input type="text" name="auth-mechanisms" placeholder="Describe the protocols" onChange={handleChange}/>  
             </div>
           </div>
 
@@ -179,24 +155,24 @@ function ConflictResolutionFormPage() {
           <div className="form-section">
             <label>Are security personnel trained to work collaboratively with colleagues, emergency responders, and other stakeholders during crisis situations?</label>
             <div>
-              <input type="radio" name="Collaboration Techniques" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="Collaboration Techniques" value="no" onChange={handleChange}/> No
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Do they coordinate their efforts effectively to manage conflicts and ensure the safety of individuals and property?</label>
             <div>
-              <input type="radio" name="collabortiveconflictResolution" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="collabortiveconflictResolution" value="no" onChange={handleChange}/> No
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Is there clear communication and coordination between security personnel and other teams involved in emergency response?</label>
             <div>
-              <input type="radio" name="communication and coordination" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="communication and coordination" value="no" onChange={handleChange}/> No
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -204,18 +180,19 @@ function ConflictResolutionFormPage() {
           <div className="form-section">
             <label>Are incidents involving conflict resolution documented accurately and promptly?</label>
             <div>
-              <input type="radio" name="conflict resolution documented" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="conflict resolution documented" value="no" onChange={handleChange}/> No
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Is there a standardized reporting process for documenting details of conflicts, interventions, and outcomes?</label>
             <div>
-              <input type="radio" name="standardized reporting process" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="standardized reporting process" value="no" onChange={handleChange}/> No
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No
             </div>
             <div>
+              <input type="text" name="auth-mechanisms" placeholder="Describe the reporting process" onChange={handleChange}/>  
               <input type="text" name="auth-mechanisms" placeholder="Describe the reporting process" onChange={handleChange}/>  
             </div>
           </div>
@@ -223,8 +200,8 @@ function ConflictResolutionFormPage() {
           <div className="form-section">
             <label>Are reports reviewed regularly to identify trends, areas for improvement, and opportunities for further training or intervention?</label>
             <div>
-              <input type="radio" name="reports reviewed" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="reports reviewed" value="no" onChange={handleChange}/> No
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -232,24 +209,24 @@ function ConflictResolutionFormPage() {
           <div className="form-section">
             <label>Is there ongoing training and development for security personnel to enhance their conflict resolution skills?</label>
             <div>
-              <input type="radio" name="security personneltraining" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="security personneltraining" value="no" onChange={handleChange}/> No
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are debriefings conducted after incidents to evaluate responses, identify lessons learned, and implement corrective actions?</label>
             <div>
-              <input type="radio" name="incidents debriefing" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="incidents debriefing" value="no" onChange={handleChange}/> No
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Is feedback from security personnel and stakeholders used to improve conflict resolution strategies and procedures over time?</label>
             <div>
-              <input type="radio" name="feedback" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="feedback" value="no" onChange={handleChange}/> No
+              <input type="radio" name="gates-smooth" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No
             </div>
           </div>
         </form>

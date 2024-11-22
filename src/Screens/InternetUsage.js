@@ -12,10 +12,10 @@ function InternetUsagePage() {
 
     switch (section) {
       case 'Access Restrictions':
-          navigate('/access-restrictions');
+          navigate('/AccessRestrictions');
           break;
       case 'Personal Device Usage':
-          navigate('/personal-device-usage');
+          navigate('/PersonalDeviceUsage');
           break;
     default:
         console.log('Unknown section');

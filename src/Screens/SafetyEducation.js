@@ -12,13 +12,13 @@ function SafetyEducationPage() {
 
     switch (section) {
       case 'Safety Demonstrations':
-        navigate('/safety-demonstrations');
+        navigate('/SafetyDemonstrations');
         break;
       case 'Role-playing Scenarios':
-        navigate('/role-playing-scenarios');
+        navigate('/RolePlayingScenarios');
         break;
       case 'Student Leadership':
-        navigate('/student-leadership');
+        navigate('/StudentLeadership');
         break;
       default:
         console.log('Unknown section');

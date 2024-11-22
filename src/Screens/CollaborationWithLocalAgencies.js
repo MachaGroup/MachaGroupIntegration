@@ -12,13 +12,13 @@ function CollaborationWithLocalAgenicesPage() {
 
     switch (section) {
       case 'Law Enforcement Partnership':
-        navigate('/law-enforcement-partnership');
+        navigate('/LawEnforcementPartnership');
         break;
       case 'Fire Department Collaboration':
-        navigate('/fire-department-collaboration');
+        navigate('/FireDepartmentCollaboration');
         break;
       case 'Healthcare Provider Engagement':
-        navigate('/healthcare-provider-engagement');
+        navigate('/HealthcareProviderEngagement');
         break;
       default:
         console.log('Unknown section');

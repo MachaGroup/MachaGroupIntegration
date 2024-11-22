@@ -12,13 +12,13 @@ function FireEmergencyPlansPage() {
 
     switch (section) {
       case 'Evacuation Procedures':
-        navigate('/evacuation-procedures');
+        navigate('/EvacuationProcedures');
         break;
       case 'Fire Extinguisher Locations':
-        navigate('/fire-extinguisher-locations');
+        navigate('/FireExtinguisherLocations');
         break;
-      case 'Alarm Systems':
-        navigate('/alarm-systems');
+      case 'Fire Alarm Systems':
+        navigate('/FireAlarmSystems');
         break;
       default:
         console.log('Unknown section');
@@ -39,7 +39,7 @@ function FireEmergencyPlansPage() {
         <h2>Fire Emergency Plans</h2>
         <form>
           {/* Fire Emergency Plans Buttons */}
-          {['Evacuation Procedures', 'Fire Extinguisher Locations', 'Alarm Systems'].map((section, index) => (
+          {['Evacuation Procedures', 'Fire Extinguisher Locations', 'Fire Alarm Systems'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>
