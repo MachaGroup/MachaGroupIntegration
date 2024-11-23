@@ -3,25 +3,22 @@ import { useNavigate } from 'react-router-dom';  // Import useNavigate for navig
 import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 
-function SecurityAwarenessTrainingPage() {
+function CommunityEngagementPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook
-
+  
   const handleButtonClick = (section) => {
     console.log(`Button clicked for: ${section}`);
     // Add logic for handling button click, e.g., open a modal or navigate
 
     switch (section) {
-        case 'Threat Recognition':
-            navigate('/threat-recognition');
+        case 'Parent Involvement':
+            navigate('/parent-involvement');
             break;
-        case 'Cybersecurity Training':
-            navigate('/cybersecurity-training');
-            break;
-        case 'Security Policies and Procedures':
-            navigate('/security-policies-and-procedures')
-            break;
+        case 'Community Partnerships':
+                navigate('/community-partnerships');
+                break;
         default:
-          console.log('Unknown section');
+            console.log('Unknown section');
   }
   };
 
@@ -34,12 +31,12 @@ function SecurityAwarenessTrainingPage() {
         <img src={logo} alt="Logo" className="logo" />
       </header>
 
-      {/* Security Awareness Training Section */}
+      {/* Community Engagement Section */}
       <main className="form-container">
-        <h2>Security Awareness Training</h2>
+        <h2>Community Engagement</h2>
         <form>
-          {/* Security Awareness Training Buttons */}
-          {['Threat Recognition', 'Cybersecurity Training', 'Security Policies and Procedures'].map((section, index) => (
+          {/* Community Engagement Buttons */}
+          {['Parent Involvement', 'Community Partnerships'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>
@@ -53,4 +50,4 @@ function SecurityAwarenessTrainingPage() {
   );
 }
 
-export default SecurityAwarenessTrainingPage;
+export default CommunityEngagementPage;
