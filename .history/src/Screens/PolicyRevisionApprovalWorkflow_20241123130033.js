@@ -64,7 +64,7 @@ function PolicyRevisionApprovalWorkflowPage() {
         <header className="header">
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>5.4.2.1 Policy Revision Approval Workflow</h1>
+            <h1>5.4.2.1 Change Management Process</h1>
         </header>
 
         <main className="form-container">
