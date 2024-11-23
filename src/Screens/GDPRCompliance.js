@@ -13,7 +13,7 @@ function GDPRCompliancePage() {
       case 'Data Protection Impact Assessments (DPIA)':
         navigate('/DataProtectionImpact');
         break;
-      case ' Consent Management':
+      case 'Consent Management':
         navigate('/ConsentManagement');
         break;
       default:
