@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 import './FormQuestions.css';
-import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
  
 function AccessRestrictionsPage() {
     const navigate = useNavigate();

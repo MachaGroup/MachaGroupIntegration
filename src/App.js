@@ -711,9 +711,7 @@ function App() {
         <Route path="/EncyptionRequirements" element={<EncryptionRequirements />} />
         <Route path="/DataAccessControls" element={<DataAccessControls />} />
         <Route path="/StudentPrivacyRights" element={<StudentPrivacyRights />} />
-<<<<<<< HEAD
         <Route path="/DataSecurityRequirements" element={<DataSecurityRequirements />} />
-=======
         <Route path='/ComplianceWithRegulations' element={<ComplianceWithRegulations />} />
         <Route path='/EffectivenessInAddressingSecurityRisks' element={<EffectivenessInAddressingSecurityRisks />} />
         <Route path='/StaffInputOnPolicyImpact' element={<StaffInputOnPolicyImpact />} />     
@@ -740,7 +738,6 @@ function App() {
 
 
 
->>>>>>> 4629068f7f7605410507d06026084d932a62b907
       </Routes>
     </Router>
    </BuildingProvider>
