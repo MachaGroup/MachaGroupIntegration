@@ -209,6 +209,7 @@ import DataRetentionPeriods from './Screens/DataRetentionPeriods';
 import EncryptionRequirements from './Screens/EncryptionRequirements';
 import DataAccessControls from './Screens/DataAccessControls';
 import StudentPrivacyRights from './Screens/StudentPrivacyRights';
+import DataSecurityRequirements from './Screens/DataSecurityRequirements';
 //Tier 4 PS
 import MainEntrance from './Screens/MainEntrance';
 import SecondaryEntrances from './Screens/SecondaryEntrances';
@@ -588,7 +589,7 @@ function App() {
         <Route path="CommunicationChannelsAndProtocols" element={<CommunicationChannelsAndProtocols />} />
         <Route path="IsolationProcedures" element={<IsolationProcedures />} />
         <Route path="PatchManagement2" element={<PatchManagement2 />} />
-        <Route path="DataProtectionImpactAssessments" element={<DataProtectionImpactAssessments />} />
+        <Route path="DataProtectionImpact" element={<DataProtectionImpactAssessments />} />
         <Route path="ConsentManagement" element={<ConsentManagement />} />
         <Route path="StudentDataPrivacyPolicies" element={<StudentDataPrivacyPolicies />} />
         <Route path="DataBreachNotificationProcedures" element={<DataBreachNotificationProcedures />} />
@@ -686,6 +687,7 @@ function App() {
         <Route path="/EncyptionRequirements" element={<EncryptionRequirements />} />
         <Route path="/DataAccessControls" element={<DataAccessControls />} />
         <Route path="/StudentPrivacyRights" element={<StudentPrivacyRights />} />
+        <Route path="/DataSecurityRequirements" element={<DataSecurityRequirements />} />
       </Routes>
     </Router>
    </BuildingProvider>
