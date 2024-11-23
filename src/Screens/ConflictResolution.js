@@ -32,35 +32,6 @@ function ConflictResolutionFormPage() {
       navigate(-1);  // Navigates to the previous page
   };
 
-  const handleSubmit = async (e) => {
-      e.preventDefault();
-
-      if (!buildingId) {
-          alert('Building ID is missing. Please start from the Building Information page.');
-          return;
-      }
-
-
-      try {
-          // Create a document reference to the building in the 'Buildings' collection
-          const buildingRef = doc(db, 'Buildings', buildingId); 
-
-          // Store the form data in the specified Firestore structure
-          const formsRef = collection(db, 'forms/Emergency Preparedness/Fire Alarm Systems');
-          await addDoc(formsRef, {
-              building: buildingRef, // Reference to the building document
-              formData: formData, // Store the form data as a nested object
-          });
-
-          console.log('Form data submitted successfully!');
-          alert('Form submitted successfully!');
-          navigate('/Form');
-      } catch (error) {
-          console.error('Error submitting form:', error);
-          alert('Failed to submit the form. Please try again.');
-      }
-  };
-
   return (
     <div className="form-page">
       <header className="header">
@@ -123,6 +94,7 @@ function ConflictResolutionFormPage() {
             </div>
             <div>
               <input type="text" name="access-rights" placeholder="Describe the protocols" onChange={handleChange}/>  
+              <input type="text" name="access-rights" placeholder="Describe the De-escalation protocols" onChange={handleChange}/>  
             </div>
           </div>
 
@@ -221,6 +193,7 @@ function ConflictResolutionFormPage() {
             </div>
             <div>
               <input type="text" name="auth-mechanisms" placeholder="Describe the reporting process" onChange={handleChange}/>  
+              <input type="text" name="auth-mechanisms" placeholder="Describe the reporting process" onChange={handleChange}/>  
             </div>
           </div>
 
@@ -256,7 +229,6 @@ function ConflictResolutionFormPage() {
               <input type="radio" name="gates-smooth" value="no" onChange={handleChange}/> No
             </div>
           </div>
-
         </form>
       </main>
     </div>

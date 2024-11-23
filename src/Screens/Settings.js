@@ -17,7 +17,7 @@ function Settings() {
     onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
-  }, []);
+  });
 
   const navigateTo = (path) => {
     navigate(path);

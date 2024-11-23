@@ -20,8 +20,8 @@ function SecurityAwarenessTrainingPage() {
         case 'Security Policies and Procedures':
             navigate('/security-policies-and-procedures')
             break;
-        case 'Security Policies and Procedures':
-            navigate('/security-policies-and-procedures')
+        case 'Security Policies and Procedures(2)':
+            navigate('/security-policies-and-procedures(2)')
             break;
         default:
           console.log('Unknown section');
