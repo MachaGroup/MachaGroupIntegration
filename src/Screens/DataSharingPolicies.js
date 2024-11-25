@@ -1,3 +1,4 @@
+import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
@@ -65,6 +66,7 @@ function DataSharingPoliciesFormPage() {
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>5.1.1.2.2 Data Sharing Policies Assessment</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
