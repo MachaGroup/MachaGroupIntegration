@@ -3,6 +3,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 
 function PolicyRevisionApprovalWorkflowPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -65,50 +66,50 @@ function PolicyRevisionApprovalWorkflowPage() {
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>5.4.2.1 Change Management Process</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
-                <div className="form-section">
+              <div className="form-section">
                 {/* Policy Revision Approval Workflow */}
                 <h3>5.4.2.1.1 Policy Revision Approval Workflow</h3>
                 <label>What are the steps involved in the policy revision approval process?</label>
-            <div>
-              <input type="text" name="revisionApprovalSteps" placeholder="Describe the steps involved in the approval process" />
-            </div>
-          </div>
+                <div>
+                  <input type="text" name="revisionApprovalSteps" placeholder="Describe the steps involved in the approval process" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>Who are the key stakeholders involved in approving policy revisions?</label>
-            <div>
-              <input type="text" name="approvalStakeholders" placeholder="Describe the key stakeholders involved in policy revisions" />
-            </div>
-          </div>
+              <div className="form-section">
+                <label>Who are the key stakeholders involved in approving policy revisions?</label>
+                <div>
+                  <input type="text" name="approvalStakeholders" placeholder="Describe the key stakeholders involved in policy revisions" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>How are revisions communicated to all affected parties once approved?</label>
-            <div>
-              <input type="text" name="revisionCommunication" placeholder="Describe how revisions are communicated to stakeholders" />
-            </div>
-          </div>
+              <div className="form-section">
+                <label>How are revisions communicated to all affected parties once approved?</label>
+                <div>
+                  <input type="text" name="revisionCommunication" placeholder="Describe how revisions are communicated to stakeholders" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>What timelines are established for reviewing and approving proposed policy changes?</label>
-            <div>
-              <input type="text" name="revisionTimelines" placeholder="Describe the timelines for reviewing and approving revisions" />
-            </div>
-          </div>
+              <div className="form-section">
+                <label>What timelines are established for reviewing and approving proposed policy changes?</label>
+                <div>
+                  <input type="text" name="revisionTimelines" placeholder="Describe the timelines for reviewing and approving revisions" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>How is the effectiveness of the policy revision process evaluated after implementation?</label>
-            <div>
-              <input type="text" name="revisionEffectivenessEvaluation" placeholder="Describe how effectiveness is evaluated" />
-            </div>
-          </div>
+              <div className="form-section">
+                <label>How is the effectiveness of the policy revision process evaluated after implementation?</label>
+                <div>
+                  <input type="text" name="revisionEffectivenessEvaluation" placeholder="Describe how effectiveness is evaluated" onChange={handleChange}/>
+                </div>
+              </div>
 
-                    {/* Submit Button */}
-                    <button type="submit">Submit</button>
-
+              {/* Submit Button */}
+              <button type="submit">Submit</button>
             </form>
         </main>
     </div>

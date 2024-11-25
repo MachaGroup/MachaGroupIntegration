@@ -3,6 +3,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 
 function IntrusionDetectionSystems3Page() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -65,6 +66,7 @@ function IntrusionDetectionSystems3Page() {
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>7.3.1.2 Surveillance Systems</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
@@ -74,35 +76,35 @@ function IntrusionDetectionSystems3Page() {
                 <h3> 7.3.1.2.2 Intrusion Detection Systems 3</h3>
                 <label>What types of intrusion detection systems are currently in place (e.g., motion sensors, glass break detectors)?</label>
             <div>
-              <input type="text" name="intrusionSystemTypes" placeholder="Describe types of intrusion detection systems" />
+              <input type="text" name="intrusionSystemTypes" placeholder="Describe types of intrusion detection systems" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How are alerts generated and communicated when a potential intrusion is detected?</label>
             <div>
-              <input type="text" name="intrusionAlertCommunication" placeholder="Describe alert generation and communication" />
+              <input type="text" name="intrusionAlertCommunication" placeholder="Describe alert generation and communication" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>What protocols are followed in response to alerts from the intrusion detection system?</label>
             <div>
-              <input type="text" name="intrusionResponseProtocol" placeholder="Describe response protocols for intrusion alerts" />
+              <input type="text" name="intrusionResponseProtocol" placeholder="Describe response protocols for intrusion alerts" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How often are the intrusion detection systems tested for functionality and reliability?</label>
             <div>
-              <input type="text" name="intrusionSystemTesting" placeholder="Describe testing frequency for intrusion detection systems" />
+              <input type="text" name="intrusionSystemTesting" placeholder="Describe testing frequency for intrusion detection systems" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there regular reviews of incidents detected by the system to assess security effectiveness and improve procedures?</label>
             <div>
-              <input type="text" name="incidentReview" placeholder="Describe incident reviews and improvements" />
+              <input type="text" name="incidentReview" placeholder="Describe incident reviews and improvements" onChange={handleChange}/>
             </div>
           </div>
 

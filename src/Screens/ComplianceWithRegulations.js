@@ -3,6 +3,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 
 function ComplianceWithRegulationsPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -65,6 +66,7 @@ function ComplianceWithRegulationsPage() {
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>5.4.1.1 Policy Evaluation Criteria</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
@@ -74,35 +76,35 @@ function ComplianceWithRegulationsPage() {
                 <h3>5.4.1.1.1 Compliance with Regulations</h3>
                 <label>How often are policies reviewed to ensure they align with changing regulations?</label>
                 <div>
-                    <input type="text" name="policyReviewFrequency" placeholder="Describe how often policies are reviewed for regulatory compliance" />
+                    <input type="text" name="policyReviewFrequency" placeholder="Describe how often policies are reviewed for regulatory compliance" onChange={handleChange}/>
                 </div>
                 </div>
 
                 <div className="form-section">
                 <label>What regulatory frameworks (e.g., GDPR, FERPA, HIPAA) are used as benchmarks for compliance?</label>
                 <div>
-                    <input type="text" name="regulatoryFrameworks" placeholder="List the regulatory frameworks used for policy compliance" />
+                    <input type="text" name="regulatoryFrameworks" placeholder="List the regulatory frameworks used for policy compliance" onChange={handleChange}/>
                 </div>
                 </div>
 
                 <div className="form-section">
                 <label>How are regulatory updates communicated to policy reviewers and stakeholders?</label>
                 <div>
-                    <input type="text" name="regulatoryUpdateCommunication" placeholder="Describe how regulatory updates are communicated" />
+                    <input type="text" name="regulatoryUpdateCommunication" placeholder="Describe how regulatory updates are communicated" onChange={handleChange}/>
                 </div>
                 </div>
 
                 <div className="form-section">
                 <label>What tools or methods are used to monitor and assess compliance gaps in policies?</label>
                 <div>
-                    <input type="text" name="complianceAssessmentTools" placeholder="Describe tools or methods for assessing compliance gaps" />
+                    <input type="text" name="complianceAssessmentTools" placeholder="Describe tools or methods for assessing compliance gaps" onChange={handleChange}/>
                 </div>
                 </div>
 
                 <div className="form-section">
                 <label>How does the organization handle non-compliance identified during policy evaluations?</label>
                 <div>
-                    <input type="text" name="nonComplianceHandling" placeholder="Describe how non-compliance is handled during policy evaluations" />
+                    <input type="text" name="nonComplianceHandling" placeholder="Describe how non-compliance is handled during policy evaluations" onChange={handleChange}/>
                 </div>
                 </div>
 

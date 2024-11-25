@@ -3,6 +3,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 
 function EndpointSecuritySolutionsPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -65,6 +66,7 @@ function EndpointSecuritySolutionsPage() {
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>7.3.2.2 Data Protection Measures</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
@@ -74,35 +76,35 @@ function EndpointSecuritySolutionsPage() {
                 <h3> 7.3.2.2.3 Endpoint Security Solutions</h3>
                 <label>What types of endpoint security solutions are currently implemented (e.g., antivirus, anti-malware, encryption)?</label>
             <div>
-              <input type="text" name="endpointSecurityTypes" placeholder="Describe types of endpoint security solutions" />
+              <input type="text" name="endpointSecurityTypes" placeholder="Describe types of endpoint security solutions" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How are endpoint security solutions configured to ensure they are effective against evolving threats?</label>
             <div>
-              <input type="text" name="endpointSecurityConfiguration" placeholder="Describe configuration process for endpoint security" />
+              <input type="text" name="endpointSecurityConfiguration" placeholder="Describe configuration process for endpoint security" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>What processes are in place for monitoring and managing endpoint security alerts and incidents?</label>
             <div>
-              <input type="text" name="endpointSecurityMonitoring" placeholder="Describe monitoring and management processes for alerts" />
+              <input type="text" name="endpointSecurityMonitoring" placeholder="Describe monitoring and management processes for alerts" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How often are endpoint security solutions updated or patched to protect against new vulnerabilities?</label>
             <div>
-              <input type="text" name="endpointSecurityUpdates" placeholder="Describe frequency of updates or patches for endpoint security" />
+              <input type="text" name="endpointSecurityUpdates" placeholder="Describe frequency of updates or patches for endpoint security" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>What training or resources are provided to staff regarding the importance of endpoint security and safe practices?</label>
             <div>
-              <input type="text" name="endpointSecurityTraining" placeholder="Describe training for endpoint security awareness" />
+              <input type="text" name="endpointSecurityTraining" placeholder="Describe training for endpoint security awareness" onChange={handleChange}/>
             </div>
           </div>
           

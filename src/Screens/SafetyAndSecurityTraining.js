@@ -3,6 +3,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 
 function SafetyAndSecurityTrainingPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -65,50 +66,50 @@ function SafetyAndSecurityTrainingPage() {
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>7.2.2.2 Continuity of Operations Plan (COOP)</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
-                <div className="form-section">
+              <div className="form-section">
                 {/* Safety And Security Training */}
                 <h3> 7.2.2.3 Safety And Security Training</h3>
                 <label>What training programs are available for staff to understand safety and security protocols during emergencies?</label>
-            <div>
-              <input type="text" name="trainingPrograms" placeholder="Describe the safety and security training programs" />
-            </div>
-          </div>
+                <div>
+                  <input type="text" name="trainingPrograms" placeholder="Describe the safety and security training programs" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>How frequently are safety and security training sessions conducted for employees and stakeholders?</label>
-            <div>
-              <input type="text" name="trainingFrequency" placeholder="Describe the frequency of training sessions" />
-            </div>
-          </div>
+              <div className="form-section">
+                <label>How frequently are safety and security training sessions conducted for employees and stakeholders?</label>
+                <div>
+                  <input type="text" name="trainingFrequency" placeholder="Describe the frequency of training sessions" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>What methods are used to assess the effectiveness of safety and security training programs?</label>
-            <div>
-              <input type="text" name="trainingAssessmentMethods" placeholder="Describe the methods for assessing training effectiveness" />
-            </div>
-          </div>
+              <div className="form-section">
+                <label>What methods are used to assess the effectiveness of safety and security training programs?</label>
+                <div>
+                  <input type="text" name="trainingAssessmentMethods" placeholder="Describe the methods for assessing training effectiveness" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>How is training tailored to meet the specific needs of different roles within the organization?</label>
-            <div>
-              <input type="text" name="trainingCustomization" placeholder="Describe how training is customized for different roles" />
-            </div>
-          </div>
+              <div className="form-section">
+                <label>How is training tailored to meet the specific needs of different roles within the organization?</label>
+                <div>
+                  <input type="text" name="trainingCustomization" placeholder="Describe how training is customized for different roles" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>What resources are provided to staff for ongoing education about safety and security best practices?</label>
-            <div>
-              <input type="text" name="ongoingEducationResources" placeholder="Describe resources for ongoing education on safety and security" />
-            </div>
-          </div>
+              <div className="form-section">
+                <label>What resources are provided to staff for ongoing education about safety and security best practices?</label>
+                <div>
+                  <input type="text" name="ongoingEducationResources" placeholder="Describe resources for ongoing education on safety and security" onChange={handleChange}/>
+                </div>
+              </div>
           
-                    {/* Submit Button */}
-                    <button type="submit">Submit</button>
-
+              {/* Submit Button */}
+              <button type="submit">Submit</button>
             </form>
         </main>
     </div>

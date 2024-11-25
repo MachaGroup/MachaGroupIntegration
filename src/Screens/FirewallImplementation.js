@@ -3,6 +3,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 
 function FirewallImplementationPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -65,6 +66,7 @@ function FirewallImplementationPage() {
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>7.3.2.1 Network Security Measures</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
@@ -74,35 +76,35 @@ function FirewallImplementationPage() {
                 <h3> 7.3.2.1.1 Firewall Implementation</h3>
                 <label>What criteria are used to select and implement firewall solutions within the network?</label>
             <div>
-              <input type="text" name="firewallSelectionCriteria" placeholder="Describe selection and implementation criteria" />
+              <input type="text" name="firewallSelectionCriteria" placeholder="Describe selection and implementation criteria" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How frequently is the firewall configuration reviewed and updated to address emerging threats?</label>
             <div>
-              <input type="text" name="firewallReviewFrequency" placeholder="Describe review frequency for firewall configurations" />
+              <input type="text" name="firewallReviewFrequency" placeholder="Describe review frequency for firewall configurations" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>What specific access control lists (ACLs) have been established to restrict unauthorized access through the firewall?</label>
             <div>
-              <input type="text" name="firewallACLs" placeholder="Describe ACLs for firewall" />
+              <input type="text" name="firewallACLs" placeholder="Describe ACLs for firewall" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How are firewall logs monitored for suspicious activity or potential breaches?</label>
             <div>
-              <input type="text" name="firewallLogMonitoring" placeholder="Describe monitoring process for firewall logs" />
+              <input type="text" name="firewallLogMonitoring" placeholder="Describe monitoring process for firewall logs" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>What training or resources are provided to staff responsible for managing and maintaining the firewall?</label>
             <div>
-              <input type="text" name="firewallTraining" placeholder="Describe training for firewall management" />
+              <input type="text" name="firewallTraining" placeholder="Describe training for firewall management" onChange={handleChange}/>
             </div>
           </div>
           

@@ -3,6 +3,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 
 function BiometricAccessControlSystemsPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -65,6 +66,7 @@ function BiometricAccessControlSystemsPage() {
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>7.3.1.1 Access Control Systems</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
@@ -74,35 +76,35 @@ function BiometricAccessControlSystemsPage() {
                 <h3> 7.3.1.1.2 Biometric Access Control Systems</h3>
                 <label>What types of biometric data are collected (e.g., fingerprints, facial recognition) for access control?</label>
             <div>
-              <input type="text" name="biometricDataTypes" placeholder="Describe types of biometric data" />
+              <input type="text" name="biometricDataTypes" placeholder="Describe types of biometric data" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How is biometric data stored and protected to ensure privacy and compliance with regulations?</label>
             <div>
-              <input type="text" name="biometricDataProtection" placeholder="Describe storage and protection measures" />
+              <input type="text" name="biometricDataProtection" placeholder="Describe storage and protection measures" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>What procedures are in place for handling false rejections or errors in biometric access?</label>
             <div>
-              <input type="text" name="biometricErrors" placeholder="Describe procedures for handling errors" />
+              <input type="text" name="biometricErrors" placeholder="Describe procedures for handling errors" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How frequently is the biometric access control system evaluated for accuracy and reliability?</label>
             <div>
-              <input type="text" name="biometricEvaluation" placeholder="Describe evaluation frequency" />
+              <input type="text" name="biometricEvaluation" placeholder="Describe evaluation frequency" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there alternative access methods available for individuals who cannot use the biometric system?</label>
             <div>
-              <input type="text" name="alternativeAccess" placeholder="Describe alternative access methods" />
+              <input type="text" name="alternativeAccess" placeholder="Describe alternative access methods" onChange={handleChange}/>
             </div>
           </div>
 
