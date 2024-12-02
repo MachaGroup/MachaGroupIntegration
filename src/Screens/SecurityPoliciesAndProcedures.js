@@ -12,10 +12,10 @@ function SecurityPoliciesAndProceduresPage() {
 
     switch (section) {
       case 'Acceptable Use Policy (AUP) Training':
-          navigate('/AUP-training');
+          navigate('/AcceptableUsePolicyTraining');
           break;
       case 'Data Handling Guidelines':
-          navigate('/data-handling-guidelines');
+          navigate('/DataHandlingGuidelines');
           break;
       default:
         console.log('Unknown section');

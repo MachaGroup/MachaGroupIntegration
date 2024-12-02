@@ -3,6 +3,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 
 function FireDrills2Page() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -65,6 +66,7 @@ function FireDrills2Page() {
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>7.2.4.2 Emergency Response Drills for Students</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
@@ -74,35 +76,35 @@ function FireDrills2Page() {
                 <h3> 7.2.4.2.1 Fire Drills 2</h3>
                 <label>How often are fire drills conducted throughout the school year?</label>
             <div>
-              <input type="text" name="fireDrillFrequency" placeholder="Describe frequency of fire drills" />
+              <input type="text" name="fireDrillFrequency" placeholder="Describe frequency of fire drills" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>What procedures are in place to ensure that all students and staff can evacuate the building quickly and safely during a fire drill?</label>
             <div>
-              <input type="text" name="evacuationProcedures" placeholder="Describe procedures for safe evacuation" />
+              <input type="text" name="evacuationProcedures" placeholder="Describe procedures for safe evacuation" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How is student participation in fire drills tracked and assessed for compliance?</label>
             <div>
-              <input type="text" name="fireDrillTracking" placeholder="Describe tracking and assessment of participation" />
+              <input type="text" name="fireDrillTracking" placeholder="Describe tracking and assessment of participation" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there accommodations for students with disabilities during fire drills, and how are those addressed?</label>
             <div>
-              <input type="text" name="disabilityAccommodations" placeholder="Describe accommodations for students with disabilities" />
+              <input type="text" name="disabilityAccommodations" placeholder="Describe accommodations for students with disabilities" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How is feedback collected after fire drills to improve future drill procedures?</label>
             <div>
-              <input type="text" name="fireDrillFeedback" placeholder="Describe methods for collecting feedback post-drills" />
+              <input type="text" name="fireDrillFeedback" placeholder="Describe methods for collecting feedback post-drills" onChange={handleChange}/>
             </div>
           </div>
           

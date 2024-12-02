@@ -3,6 +3,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 
 function LockdownDrills3Page() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -65,6 +66,7 @@ function LockdownDrills3Page() {
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>7.2.4.2 Emergency Response Drills for Students</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
@@ -74,35 +76,35 @@ function LockdownDrills3Page() {
                 <h3> 7.2.4.2.2 Lockdown Drills 3</h3>
                 <label>How frequently are lockdown drills conducted in the school?</label>
             <div>
-              <input type="text" name="lockdownDrillFrequency" placeholder="Describe frequency of lockdown drills" />
+              <input type="text" name="lockdownDrillFrequency" placeholder="Describe frequency of lockdown drills" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>What are the specific procedures students and staff must follow during a lockdown drill?</label>
             <div>
-              <input type="text" name="lockdownProcedures" placeholder="Describe specific procedures for lockdown drills" />
+              <input type="text" name="lockdownProcedures" placeholder="Describe specific procedures for lockdown drills" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How are the outcomes of lockdown drills evaluated, and what changes are made based on that evaluation?</label>
             <div>
-              <input type="text" name="lockdownDrillEvaluation" placeholder="Describe evaluation of lockdown drill outcomes" />
+              <input type="text" name="lockdownDrillEvaluation" placeholder="Describe evaluation of lockdown drill outcomes" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How does the school communicate the lockdown procedures to students, especially new students or those with special needs?</label>
             <div>
-              <input type="text" name="lockdownCommunication" placeholder="Describe how lockdown procedures are communicated" />
+              <input type="text" name="lockdownCommunication" placeholder="Describe how lockdown procedures are communicated" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there mechanisms in place for students and parents to provide feedback on the effectiveness of the lockdown drills?</label>
             <div>
-              <input type="text" name="lockdownDrillFeedback" placeholder="Describe feedback mechanisms for lockdown drills" />
+              <input type="text" name="lockdownDrillFeedback" placeholder="Describe feedback mechanisms for lockdown drills" onChange={handleChange}/>
             </div>
           </div>
           

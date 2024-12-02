@@ -3,6 +3,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 
 function EffectivenessInAddressingSecurityRisksPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -65,6 +66,7 @@ function EffectivenessInAddressingSecurityRisksPage() {
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>5.4.1.1 Policy Evaluation Criteria</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
@@ -74,35 +76,35 @@ function EffectivenessInAddressingSecurityRisksPage() {
                 <h3>5.4.1.1.2 Effectiveness In Addressing Security Risks</h3>
                 <label>How is the effectiveness of current policies in mitigating security risks measured?</label>
             <div>
-              <input type="text" name="effectivenessMeasurement" placeholder="Describe how policy effectiveness is measured" />
+              <input type="text" name="effectivenessMeasurement" placeholder="Describe how policy effectiveness is measured" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>What metrics or indicators are used to evaluate the success of security policies?</label>
             <div>
-              <input type="text" name="successMetrics" placeholder="Describe metrics or indicators used to evaluate success" />
+              <input type="text" name="successMetrics" placeholder="Describe metrics or indicators used to evaluate success" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How often are security incidents reviewed to inform policy updates and improvements?</label>
             <div>
-              <input type="text" name="incidentReviewFrequency" placeholder="Describe the frequency of security incident reviews" />
+              <input type="text" name="incidentReviewFrequency" placeholder="Describe the frequency of security incident reviews" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>What processes are in place for stakeholders to provide feedback on the effectiveness of policies?</label>
             <div>
-              <input type="text" name="feedbackProcesses" placeholder="Describe processes for stakeholder feedback on policies" />
+              <input type="text" name="feedbackProcesses" placeholder="Describe processes for stakeholder feedback on policies" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How are lessons learned from security incidents integrated into policy revisions?</label>
             <div>
-              <input type="text" name="lessonsLearnedIntegration" placeholder="Describe how lessons from incidents are integrated into policy revisions" />
+              <input type="text" name="lessonsLearnedIntegration" placeholder="Describe how lessons from incidents are integrated into policy revisions" onChange={handleChange}/>
             </div>
           </div>
 

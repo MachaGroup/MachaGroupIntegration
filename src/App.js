@@ -146,7 +146,6 @@ import TrainingProviders from './Screens/TrainingProviders';
 import TrainingMaterials from './Screens/TrainingMaterials';
 import RecertificationSchedule from './Screens/RecertificationSchedule';
 import ScenarioBasedTraining from './Screens/ScenerioBasedTraining';
-import ResponseProtocols from './Screens/ResponseProtocols';
 import PostIncidentSupport from './Screens/PostIncidentSupport';
 import CurriculumIntegration from './Screens/CurriculumIntegration';
 import StudentHandbooks from './Screens/StudentHandbooks';
@@ -171,8 +170,8 @@ import BasicFirstAidTechniques from './Screens/BasicFirstAidTechniques';
 import CPRCertification from './Screens/CPRCertification';
 import AEDTraining from './Screens/AEDTraining';
 import ActiveShooterResponse from './Screens/ActiveShooterResponse';
-import ResponseProtocols2 from './Screens/ResponseProtocols2';
-import EvacuationProcedures2 from './Screens/EvacuationProcedures2';
+import EmergencyResponseProtocols from './Screens/EmergencyResponseProtocols';
+import EmergencyEvacuationProcedures from './Screens/EmergencyEvacuationProcedures';
 import EmergencyCommunication2 from './Screens/EmergencyCommunication2';
 import IdentifyingSuspiciousBehavior from './Screens/IdentifyingSuspiciousBehavior';
 import RecognizingSecurityBreaches from './Screens/RecognizingSecurityBreaches';
@@ -489,15 +488,15 @@ function App() {
         <Route path="/PatchManagement" element={<PatchManagement />} />
         <Route path="/ConflictResolution" element={<ConflictResolution />} />
         <Route path="/ScenarioBasedTraining" element={<ScenarioBasedTraining />} />
-        <Route path="/ResponseProtocols" element={<ResponseProtocols />} />
+        <Route path="/EmergencyResponseProtocols" element={<EmergencyResponseProtocols />} />
         <Route path="/PostIncidentSupport" element={<PostIncidentSupport />} />
         <Route path="/FirstAid/CPRTraining" element={<FirstAidCPRTraining />} />
         <Route path="/BasicFirstAidTechniques" element={<BasicFirstAidTechniques />} />
         <Route path="/CPRCertification" element={<CPRCertification />} />
         <Route path="/AEDTraining" element={<AEDTraining />} />
         <Route path="/ActiveShooterResponse" element={<ActiveShooterResponse />} />
-        <Route path="/ResponseProtocols" element={<ResponseProtocols2 />} />
-        <Route path="/EvacuationProcedures" element={<EvacuationProcedures2 />} />
+        <Route path="/EmergencyResponseProtocols" element={<EmergencyResponseProtocols />} />
+        <Route path="/EmergencyEvacuationProcedures" element={<EmergencyEvacuationProcedures />} />
         <Route path="/DeviceEncryption" element={<DeviceEncryption />} />
         <Route path="/FullDiskEncryption" element={<FullDiskEncryption />} />
         <Route path="/SecureEmailGateways" element={<SecureEmailGateways />} />
@@ -560,7 +559,6 @@ function App() {
         <Route path="TrainingMaterials" element={<TrainingMaterials />} />
         <Route path="RecertificationSchedule" element={<RecertificationSchedule />} />
         <Route path="ScenarioBasedTraining" element={<ScenarioBasedTraining />} />
-        <Route path="ResponseProtocols" element={<ResponseProtocols />} />
         <Route path="PostIncidentSupport" element={<PostIncidentSupport />} />
         <Route path="CurriculumIntegration" element={<CurriculumIntegration />} />
         <Route path="StudentHandbooks" element={<StudentHandbooks />} />
@@ -580,8 +578,8 @@ function App() {
         <Route path="CPRCertification" element={<CPRCertification />} />
         <Route path="AEDTraining" element={<AEDTraining />} />
         <Route path="ActiveShooterResponse" element={<ActiveShooterResponse />} />
-        <Route path="ResponseProtocols2" element={<ResponseProtocols2 />} />
-        <Route path="EvacuationProcedures2" element={<EvacuationProcedures2 />} />
+        <Route path="EmergencyResponseProtocols" element={<EmergencyResponseProtocols />} />
+        <Route path="EmergencyEvacuationProcedures" element={<EmergencyEvacuationProcedures />} />
         <Route path="EmergencyCommunication2" element={<EmergencyCommunication2 />} />
         <Route path="IdentifyingSuspiciousBehavior" element={<IdentifyingSuspiciousBehavior />} />
         <Route path="RecognizingSecurityBreaches" element={<RecognizingSecurityBreaches />} />
@@ -652,7 +650,7 @@ function App() {
         <Route path="/training-materials" element={<TrainingMaterials />} />
         <Route path="/recertification-schedule" element={<RecertificationSchedule />} />
         <Route path="/scenario-based-training" element={<ScenarioBasedTraining />} />
-        <Route path="/response-protocols" element={<ResponseProtocols />} />
+        <Route path="/emergency-response-protocols" element={<EmergencyResponseProtocols />} />
         <Route path="/post-incident-support" element={<PostIncidentSupport />} />
         <Route path="/curriculum-integration" element={<CurriculumIntegration />} />
         <Route path="/student-handbooks" element={<StudentHandbooks />} />
@@ -677,8 +675,8 @@ function App() {
         <Route path="/CPR-certification" element={<CPRCertification />} />
         <Route path="/AED-training" element={<AEDTraining />} />
         <Route path="/active-shooter-reponse" element={<ActiveShooterResponse />} />
-        <Route path="/response-protocols2" element={<ResponseProtocols2 />} />
-        <Route path="/evacuation-procedures2" element={<EvacuationProcedures2 />} />
+        <Route path="/response-protocols2" element={<EmergencyResponseProtocols />} />
+        <Route path="/evacuation-procedures2" element={<EmergencyEvacuationProcedures />} />
         <Route path="/emergency-communication2" element={<EmergencyCommunication2 />} />
         <Route path="/identifying-suspicious-behavior" element={<IdentifyingSuspiciousBehavior />} />
         <Route path="/recognizing-security-breaches" element={<RecognizingSecurityBreaches />} />

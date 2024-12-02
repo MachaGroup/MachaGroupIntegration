@@ -3,6 +3,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 
 function StrangerDangerAwareness2Page() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -65,6 +66,7 @@ function StrangerDangerAwareness2Page() {
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>7.2.4.1 Personal Safety Education</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
@@ -74,35 +76,35 @@ function StrangerDangerAwareness2Page() {
                 <h3> 7.2.4.1.2 Stranger Danger Awareness 2</h3>
                 <label>What programs or materials are used to teach students about stranger danger?</label>
             <div>
-              <input type="text" name="strangerDangerPrograms" placeholder="Describe programs or materials used" />
+              <input type="text" name="strangerDangerPrograms" placeholder="Describe programs or materials used" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How often are stranger danger awareness lessons incorporated into the curriculum?</label>
             <div>
-              <input type="text" name="strangerDangerFrequency" placeholder="Describe how often lessons are given" />
+              <input type="text" name="strangerDangerFrequency" placeholder="Describe how often lessons are given" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there any role-playing exercises or simulations included in the training for real-life scenarios?</label>
             <div>
-              <input type="text" name="rolePlayingExercises" placeholder="Describe role-playing or simulations used" />
+              <input type="text" name="rolePlayingExercises" placeholder="Describe role-playing or simulations used" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How do teachers assess student understanding of stranger danger concepts after the training?</label>
             <div>
-              <input type="text" name="strangerDangerAssessment" placeholder="Describe assessment methods for understanding" />
+              <input type="text" name="strangerDangerAssessment" placeholder="Describe assessment methods for understanding" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>What resources are provided to parents to reinforce stranger danger awareness at home?</label>
             <div>
-              <input type="text" name="parentResources" placeholder="Describe resources provided to parents" />
+              <input type="text" name="parentResources" placeholder="Describe resources provided to parents" onChange={handleChange}/>
             </div>
           </div>
           

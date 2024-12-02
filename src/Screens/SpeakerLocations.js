@@ -1,3 +1,4 @@
+import logo from '../assets/MachaLogo.png';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';  // Import useNavigate
 import './FormQuestions.css';  // Ensure this is linked to your universal CSS
@@ -16,6 +17,7 @@ function SpeakerLocationsFormPage() {
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>Speaker Locations Assessment</h1>
+            <img src={logo} alt="Logo" className="logo" />
       </header>
 
       <main className="form-container">

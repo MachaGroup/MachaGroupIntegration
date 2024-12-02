@@ -3,6 +3,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 
 function DocumentationOfPolicyChangesPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -62,53 +63,54 @@ function DocumentationOfPolicyChangesPage() {
   return (
     <div className="form-page">
         <header className="header">
-            {/* Back Button */}
+          {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>5.4.2.1 Change Management Process</h1>
+            <h1>5.4.2.1 Documentation of Policy Change Assessment</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                <div className="form-section">
+          <form onSubmit={handleSubmit}>
+            <div className="form-section">
                 {/* Documentation Of Policy Changes */}
                 <h3>5.4.2.1.2 Documentation Of Policy Changes</h3>
                 <label>What format is used for documenting changes made to policies?</label>
-            <div>
-              <input type="text" name="documentFormat" placeholder="Describe the format used for documenting changes" />
+              <div>
+                <input type="text" name="documentFormat" placeholder="Describe the format used for documenting changes" onChange={handleChange}/>
+              </div>
             </div>
-          </div>
 
-          <div className="form-section">
-            <label>How are the reasons for each policy change recorded?</label>
-            <div>
-              <input type="text" name="reasonDocumentation" placeholder="Describe how reasons for changes are documented" />
+            <div className="form-section">
+              <label>How are the reasons for each policy change recorded?</label>
+              <div>
+                <input type="text" name="reasonDocumentation" placeholder="Describe how reasons for changes are documented" onChange={handleChange}/>
+              </div>
             </div>
-          </div>
 
-          <div className="form-section">
-            <label>Who is responsible for maintaining the documentation of policy changes?</label>
-            <div>
-              <input type="text" name="documentationResponsibility" placeholder="Describe the person or team responsible for maintaining documentation" />
+            <div className="form-section">
+              <label>Who is responsible for maintaining the documentation of policy changes?</label>
+              <div>
+                <input type="text" name="documentationResponsibility" placeholder="Describe the person or team responsible for maintaining documentation" onChange={handleChange}/>
+              </div>
             </div>
-          </div>
 
-          <div className="form-section">
-            <label>How is the historical record of policy changes accessible to stakeholders?</label>
-            <div>
-              <input type="text" name="historicalRecordAccess" placeholder="Describe how the historical record of policy changes is accessed" />
+            <div className="form-section">
+              <label>How is the historical record of policy changes accessible to stakeholders?</label>
+              <div>
+                <input type="text" name="historicalRecordAccess" placeholder="Describe how the historical record of policy changes is accessed" onChange={handleChange}/>
+              </div>
             </div>
-          </div>
 
-          <div className="form-section">
-            <label>What procedures are in place to ensure that documentation is up-to-date and accurate?</label>
-            <div>
-              <input type="text" name="documentationUpdateProcedure" placeholder="Describe procedures for keeping documentation up-to-date" />
+            <div className="form-section">
+              <label>What procedures are in place to ensure that documentation is up-to-date and accurate?</label>
+              <div>
+                <input type="text" name="documentationUpdateProcedure" placeholder="Describe procedures for keeping documentation up-to-date" onChange={handleChange}/>
+              </div>
             </div>
-          </div>
-                    {/* Submit Button */}
-                    <button type="submit">Submit</button>
 
-            </form>
+            {/* Submit Button */}
+            <button type="submit">Submit</button>
+          </form>
         </main>
     </div>
   )
