@@ -59,6 +59,7 @@ function SecurityGatesPage() {
             console.error('Error submitting form:', error);
             alert('Failed to submit the form. Please try again.');
         }
+      }
     };
 
     return (
@@ -259,6 +260,5 @@ function SecurityGatesPage() {
             </div>
         </div>
         );
-    }
 
     export default SecurityGatesPage;

@@ -1,7 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
+import "./Navbar.css";
 
 const Navbar = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState(null);
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+
+  const toggleSection = (sectionName) => {
+    setActiveSection(activeSection === sectionName ? null : sectionName);
+  };
+
   const sections = [
     {
       name: "Home",
@@ -131,23 +143,107 @@ const Navbar = () => {
           { name: "Mental Health Services", path: "/PersonnelTrainingAndAwareness/MentalHealthServices" },
         ],
       },
+
+    {
+      title: "Cybersecurity",
+      path: "/Cybersecurity",
+      subNav: [
+        { title: "Access Control Lists", path: "/Cybersecurity/AccessControlLists" },
+        { title: "Firewall Policies", path: "/Cybersecurity/FirewallPolicies" },
+        { title: "Network Anamoloy Detection", path: "/Cybersecurity/NetworkAnamoloyDetection" },
+        { title: "Signature Based Detection", path: "/Cybersecurity/SignatureBasedDetection" },
+        { title: "Antivirus Software", path: "/Cybersecurity/AntivirusSoftware" },
+        { title: "Malware Removal Tools", path: "/Cybersecurity/MalwareRemovalTools" },
+        { title: "Patch Management", path: "/Cybersecurity/PatchManagement" },
+        { title: "Device Encryption", path: "/Cybersecurity/DeviceEncryption" },
+        { title: "Full Disk Encryption", path: "/Cybersecurity/FullDiskEncryption" },
+        { title: "File Level Encryption", path: "/Cybersecurity/FileLevelEncryption" },
+        { title: "Secure Email Gateways", path: "/Cybersecurity/SecureEmailGateways" },
+        { title: "End To End Encryption", path: "/Cybersecurity/EndToEndEncryption" },
+        { title: "Regular Backup Schedules", path: "/Cybersecurity/RegularBackupSchedules" },
+        { title: "Off Site Backup Storage", path: "/Cybersecurity/OffSiteBackupStorage" },
+        { title: "Backup Testing", path: "/Cybersecurity/BackupTesting" },
+        { title: "Continuinty Of Operations", path: "/Cybersecurity/ContinuintyOfOperations" },
+        { title: "Simulated Phishing Campaigns", path: "/Cybersecurity/SimulatedPhishingCampaigns" },
+        { title: "Phishing Awareness Training", path: "/Cybersecurity/PhishingAwarenessTraining" },
+        { title: "Incident Reporting", path: "/Cybersecurity/IncidentReporting" },
+        { title: "Contact Information", path: "/Cybersecurity/ContactInformation" },
+        { title: "Password Complexity Requirements", path: "/Cybersecurity/PasswordComplexityRequirements" },
+        { title: "Password Expiration Policies", path: "/Cybersecurity/PasswordExpirationPolicies" },
+        { title: "Two Factor Authentication", path: "/Cybersecurity/TwoFactorAuthentication" },
+        { title: "Biometric Authentication", path: "/Cybersecurity/BiometricAuthentication" },
+        { title: "Security Information And Event Management", path: "/Cybersecurity/SecurityInformationAndEventManagement" },
+        { title: "Intrusion Detection Systems", path: "/Cybersecurity/IntrusionDetectionSystems" },
+        { title: "User Behavior Analytics", path: "/Cybersecurity/UserBehaviorAnalytics" },
+        { title: "Incident Response Team Roles And Responsibilities", path: "/Cybersecurity/IncidentResponseTeamRolesAndResponsibilities" },
+        { title: "Communication Channels And Protocols", path: "/Cybersecurity/CommunicationChannelsAndProtocols" },
+        { title: "Isolation Procedures", path: "/Cybersecurity/IsolationProcedures" },
+        { title: "Incident Response Patch Management", path: "/Cybersecurity/IncidentResponsePatchManagement" },
+      ],
+    },
+
+    {
+      title: "Policy and Compliance",
+      path: "/PolicyAndCompliance",
+      subNav: [
+        { title: "Access Restrictions", path: "/PolicyAndCompliance/AccessRestrictions" },
+        { title: "Personal Device Usage", path: "/PolicyAndCompliance/PersonalDeviceUsage" },
+        { title: "Data Classification", path: "/PolicyAndCompliance/DataClassification" },
+        { title: "Data Sharing Policies", path: "/PolicyAndCompliance/DataSharingPolicies" },
+        { title: "Data Minimization", path: "/PolicyAndCompliance/DataMinimization" },
+        { title: "Data Retention Periods", path: "/PolicyAndCompliance/DataRetentionPeriods" },
+        { title: "Encryption Requirements", path: "/PolicyAndCompliance/EncryptionRequirements" },
+        { title: "Data Access Controls", path: "/PolicyAndCompliance/DataAccessControls" },
+        { title: "Student Privacy Rights", path: "/PolicyAndCompliance/StudentPrivacyRights" },
+        { title: "Data Security Requirements", path: "/PolicyAndCompliance/DataSecurityRequirements" },
+        { title: "Student Data Privacy Policies", path: "/PolicyAndCompliance/StudentDataPrivacyPolicies" },
+        { title: "Data Breach Notification Procedures", path: "/PolicyAndCompliance/DataBreachNotificationProcedures" },
+        { title: "Protected Health Information Handling", path: "/PolicyAndCompliance/ProtectedHealthInformationHandling" },
+        { title: "Medical Records Security", path: "/PolicyAndCompliance/MedicalRecordsSecurity" },
+        { title: "Data Protection Impact", path: "/PolicyAndCompliance/DataProtectionImpact" },
+        { title: "Consent Management", path: "/PolicyAndCompliance/ConsentManagement" },
+        { title: "Compliance With Regulations", path: "/PolicyAndCompliance/ComplianceWithRegulations" },
+        { title: "Effectiveness In Addressing Security Risks", path: "/PolicyAndCompliance/EffectivenessInAddressingSecurityRisks" },
+        { title: "Staff Input On Policy Impact", path: "/PolicyAndCompliance/StaffInputOnPolicyImpact" },
+        { title: "Policy Revision Approval Workflow", path: "/PolicyAndCompliance/PolicyRevisionApprovalWorkflow" },
+        { title: "Documentation Of Policy Changes", path: "/PolicyAndCompliance/DocumentationOfPolicyChanges" },
+      ],
+    },
+    {
+      title: "Community Partnership",
+      path: "/CommunityPartnership",
+      subNav: [
+        { title: "Law Enforcement Partnership", path: "/CommunityPartnership/LawEnforcementPartnership" },
+        { title: "Fire Department Collaboration", path: "/CommunityPartnership/FireDepartmentCollaboration" },
+        { title: "Healthcare Provider Engagement", path: "/CommunityPartnership/HealthcareProviderEngagement" },
+        { title: "Emergency Shelters", path: "/CommunityPartnership/EmergencyShelters" },
+        { title: "Medical Facilities", path: "/CommunityPartnership/MedicalFacilities" },
+        { title: "Mental Health Services", path: "/CommunityPartnership/MentalHealthServices" },
+      ],
+    },
   ];
 
   return (
     <nav className="navbar">
-      <ul>
+      {/* Menu Button */}
+      <button className="menu-button" onClick={toggleMenu}>
+        <div></div>
+        <div></div>
+        <div></div>
+      </button>
+
+      {/* Main Navigation */}
+      <ul className={`menu ${menuOpen ? "open" : ""}`}>
         {sections.map((section) => (
           <li key={section.name}>
-            <NavLink to={section.path} className="main-link">
-              {section.name}
-            </NavLink>
+            <div className="section-title" onClick={() => toggleSection(section.name)}>
+              <NavLink to={section.path}>{section.name}</NavLink>
+            </div>
             {section.subsections && (
-              <ul className="nested">
+              <ul className={`sub-menu ${activeSection === section.name ? "open" : ""}`}>
                 {section.subsections.map((sub) => (
                   <li key={sub.name}>
-                    <NavLink to={sub.path} className="sub-link">
-                      {sub.name}
-                    </NavLink>
+                    <NavLink to={sub.path}>{sub.name}</NavLink>
                   </li>
                 ))}
               </ul>

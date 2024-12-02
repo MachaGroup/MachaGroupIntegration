@@ -82,7 +82,7 @@ function ActiveShooterResponseFormPage() {
       <div className="form-section">
         <label>Are training materials and resources based on recognized active shooter response protocols, guidelines, and recommendations from law enforcement agencies, security experts, or government agencies?</label>
         <div>
-          <input type="radio" name="ASRMaterialsAlignment" value="yes" /> Yes
+          <input type="radio" name="ASRmMterialsAlignment" value="yes" /> Yes
           <input type="radio" name="ASRMaterialsAlignment" value="no" /> No
         </div>
       </div>
