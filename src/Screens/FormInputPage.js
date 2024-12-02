@@ -1,10 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
+import { useBuilding } from '../Context/BuildingContext'; // Import the custom hook for BuildingContext
 import './FormInputPage.css'; // CSS file for styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 
 function FormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook
+  const { buildingId } = useBuilding(); // Access the buildingId from context
 
   const handleBack = () => {
     navigate(-1);  // Navigate back to the previous page
@@ -12,33 +14,39 @@ function FormPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form Submitted');
-    // Add logic for handling form submission
+    console.log('Form Submitted for Building ID:', buildingId);
+    // Add logic for handling form submission associated with the current buildingId
   };
 
-  // Modify handleButtonClick to navigate to different routes
   const handleButtonClick = (section) => {
-    switch(section) {
+    if (!buildingId) {
+      alert('No building selected. Please start from the Building Info page.');
+      navigate('/BuildingandAddress'); // Redirect if no buildingId is set
+      return;
+    }
+
+    // Navigate to the selected section while maintaining building context
+    switch (section) {
       case 'Physical Security':
-        navigate('/Physical');
+        navigate('/Physical', { state: { buildingId } });
         break;
       case 'Emergency Preparedness':
-        navigate('/emergency-preparedness');
+        navigate('/emergency-preparedness', { state: { buildingId } });
         break;
       case 'Personnel Training and Awareness':
-        navigate('/personnel-training');
+        navigate('/personnel-training', { state: { buildingId } });
         break;
       case 'Cybersecurity':
-        navigate('/cybersecurity');
+        navigate('/cybersecurity', { state: { buildingId } });
         break;
       case 'Policy and Compliance':
-        navigate('/policy-compliance');
+        navigate('/policy-compliance', { state: { buildingId } });
         break;
       case 'Community Partnership':
-        navigate('/community-partnership');
+        navigate('/CommunityPartnerships', { state: { buildingId } });
         break;
       case 'Continuous Improvement - Safety and Security':
-        navigate('/continuous-improvement');
+        navigate('/continuous-improvement', { state: { buildingId } });
         break;
       default:
         console.log('Unknown section');
@@ -57,6 +65,8 @@ function FormPage() {
       {/* Form Section */}
       <main className="form-container">
         <h2>Create a Form</h2>
+        <p>Building ID: {buildingId}</p> {/* Display the current building ID */}
+
         <form onSubmit={handleSubmit}>
           {/* Form Buttons */}
           {[

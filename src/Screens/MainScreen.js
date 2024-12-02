@@ -19,7 +19,7 @@ function MainScreen() {
     });
 
     return () => unsubscribe(); // Clean up the listener
-  }, []);
+  });
 
   const navigateTo = (path) => {
     navigate(path);
@@ -29,7 +29,7 @@ function MainScreen() {
     try {
       await signOut(auth); // Sign out the user
       setUser(null); // Clear the user state
-      navigate('/login'); // Redirect to the login page
+      navigate('/Login'); // Redirect to the login page
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -52,7 +52,7 @@ function MainScreen() {
       </div>
 
       <div className="buttons-container">
-        <button onClick={() => navigateTo('/form')}>Create a Form</button>
+        <button onClick={() => navigateTo('/BuildingandAddress')}>Create a Form</button>
         <button onClick={() => navigateTo('/pricing')}>Pricing</button>
         <button onClick={() => navigateTo('/about')}>About Us</button>
         <button onClick={() => navigateTo('/faq')}>FAQ</button>

@@ -1,11 +1,49 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
 import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 
 function EmergencyResponseTrainingPage() {
+  const navigate = useNavigate();  // Initialize useNavigate hook
+
   const handleButtonClick = (section) => {
     console.log(`Button clicked for: ${section}`);
     // Add logic for handling button click, e.g., open a modal or navigate
+
+    switch (section) {
+      case 'Scenario-based Training':
+        navigate('/ScenarioBasedTraining');
+        break;
+      case 'Emergency Response Protocols':
+        navigate('/EmergencyResponseProtocols');
+        break;
+      case 'Post-Incident Support':
+        navigate('/PostIncidentSupport');
+        break;
+      case 'First Aid/CPR Training':
+        navigate('/FirstAidCPRTraining2');
+        break;
+      case 'Basic First Aid Techniques':
+        navigate('/BasicFirstAidTechniques');
+        break;
+      case 'CPR Certification':
+        navigate('/CPRCertification');
+        break;
+      case 'AED Training':
+        navigate('/AEDTraining');
+        break;
+      case 'Active Shooter Response':
+        navigate('/ActiveShooterResponse');
+        break;
+      case 'Response Protocols':
+        navigate('/ResponseProtocols2');
+        break;
+      case 'Emergency Evacuation Procedures':
+        navigate('/EmergencyEvacuationProcedures');
+        break;
+      default:
+        console.log('Unknown section');
+    }
   };
 
   return (
@@ -22,7 +60,7 @@ function EmergencyResponseTrainingPage() {
         <h2>Emergency Response Training</h2>
         <form>
           {/* Emergency Response Training Buttons */}
-          {['Scenerio-based Training', 'Response Protocols', 'Post-Incident Support', 'First Aid/CPR Training', 'Basic First Aid Techniques', 'CPR Certification', 'AED Training', 'Active Shooter Response', 'Response Protocols', 'Evacuation Procedures'].map((section, index) => (
+          {['Scenario-based Training', 'Emergency Response Protocols', 'Post-Incident Support', 'First Aid/CPR Training', 'Basic First Aid Techniques', 'CPR Certification', 'AED Training', 'Active Shooter Response', 'Response Protocols', 'Emergency Evacuation Procedures'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>

@@ -13,10 +13,10 @@ function AlertSystemPage() {
 
     switch (section) {
       case 'Public Address System':
-          navigate('/public-address-system');
+          navigate('/PublicAddressSystem');
           break;
       case 'Text/Email Alerts':
-          navigate('/text-email-alerts');
+          navigate('/TextEmailAlerts');
           break;
       default:
           console.log('Unknown section');

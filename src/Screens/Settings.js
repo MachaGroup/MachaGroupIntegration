@@ -17,7 +17,7 @@ function Settings() {
     onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
-  }, []);
+  });
 
   const navigateTo = (path) => {
     navigate(path);
@@ -31,7 +31,7 @@ function Settings() {
     try {
       await signOut(auth); // Sign out the user
       setUser(null); // Clear the user state
-      navigate('/login'); // Redirect to the login page
+      navigate('/Login'); // Redirect to the login page
     } catch (error) {
       console.error('Error signing out:', error);
     }

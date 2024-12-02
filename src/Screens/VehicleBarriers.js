@@ -1,13 +1,62 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate
-import './FormQuestions.css';  // Ensure this is linked to your universal CSS
+import React, { useState, useEffect } from 'react';
+import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
+import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 
 function VehicleBarriersPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
+  const { buildingId } = useBuilding();
+  const db = getFirestore();
+
+  const [formData, setFormData] = useState();
+
+  useEffect(() => {
+    if(!buildingId) {
+      alert('No building selected. Redirecting to Building Info...');
+      navigate('/BuildingandAddress');
+    }
+  }, [buildingId, navigate]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
   // Function to handle back button
   const handleBack = () => {
     navigate(-1);  // Navigates to the previous page
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if(!buildingId) {
+      alert('Building ID is missing. Please start the assessment from the correct page.');
+      return;
+    }
+    try {
+      // Create a document reference to the building in the 'Buildings' collection
+      const buildingRef = doc(db, 'Buildings', buildingId);
+
+      // Store the form data in the specified Firestore structure
+      const formsRef = collection(db, 'forms/Physical Security/Vehicle Barrier');
+      await addDoc(formsRef, {
+        building: buildingRef, // Reference to the building document
+        formData: formData, // Store the form data as a nested object
+      });
+
+      console.log('Form data submitted successfully!');
+      alert('Form submitted successfully!');
+      navigate('/Form');
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to submit the form. Please try again.')
+    }
   };
 
   return (
@@ -16,40 +65,41 @@ function VehicleBarriersPage() {
         {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
         <h1>1.1.2.1.2. Vehicle Barriers Assessment</h1>
+        <img src={logo} alt="Logo" className="logo" />
       </header>
 
       <main className="form-container">
-        <form>
+        <form onSubmit={handleSubmit}>
           {/* Functionality and Operation */}
           <h2>Functionality and Operation:</h2>
           <div className="form-section">
             <label>Are the vehicle barriers operational and functioning as intended?</label>
             <div>
-              <input type="radio" name="barriers-operational" value="yes" /> Yes
-              <input type="radio" name="barriers-operational" value="no" /> No
+              <input type="radio" name="barriersOperational" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersOperational" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Do the barriers effectively block vehicle access to restricted areas?</label>
             <div>
-              <input type="radio" name="barriers-block-access" value="yes" /> Yes
-              <input type="radio" name="barriers-block-access" value="no" /> No
+              <input type="radio" name="barriersBlockAccess" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersBlockAccess" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there any signs of damage, wear, or malfunction in the barrier mechanisms?</label>
             <div>
-              <input type="text" name="barriers-damage" placeholder="Describe any damage or wear" />
+              <input type="text" name="barriersDamage" placeholder="Describe any damage or wear" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there backup systems in place in case of power outages or mechanical failures?</label>
             <div>
-              <input type="radio" name="barriers-backup" value="yes" /> Yes
-              <input type="radio" name="barriers-backup" value="no" /> No
+              <input type="radio" name="barriersBackup" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersBackup" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -58,24 +108,24 @@ function VehicleBarriersPage() {
           <div className="form-section">
             <label>Are the vehicle barriers designed and constructed to withstand vehicle impact?</label>
             <div>
-              <input type="radio" name="barriers-withstand-impact" value="yes" /> Yes
-              <input type="radio" name="barriers-withstand-impact" value="no" /> No
+              <input type="radio" name="barriersWithstandImpact" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersWithstandImpact" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Do they meet relevant crash-rated standards or certifications for vehicle mitigation?</label>
             <div>
-              <input type="radio" name="barriers-crash-rated" value="yes" /> Yes
-              <input type="radio" name="barriers-crash-rated" value="no" /> No
+              <input type="radio" name="barriersCrashRated" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersCrashRated" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there any design features to minimize the risk of vehicle bypass or circumvention?</label>
             <div>
-              <input type="radio" name="barriers-design-features" value="yes" /> Yes
-              <input type="radio" name="barriers-design-features" value="no" /> No
+              <input type="radio" name="barriersDesignFeatures" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersDesignFeatures" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -84,23 +134,23 @@ function VehicleBarriersPage() {
           <div className="form-section">
             <label>How are the vehicle barriers integrated with access control systems?</label>
             <div>
-              <input type="text" name="barriers-integration" placeholder="Describe access control integration" />
+              <input type="text" name="barriersIntegration" placeholder="Describe access control integration" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there mechanisms to activate the barriers remotely or automatically based on access permissions?</label>
             <div>
-              <input type="radio" name="barriers-remote-activation" value="yes" /> Yes
-              <input type="radio" name="barriers-remote-activation" value="no" /> No
+              <input type="radio" name="barriersRemoteActivation" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersRemoteActivation" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Is access to the barrier controls restricted to authorized personnel only?</label>
             <div>
-              <input type="radio" name="barriers-restricted-access" value="yes" /> Yes
-              <input type="radio" name="barriers-restricted-access" value="no" /> No
+              <input type="radio" name="barriersRestrictedAccess" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersRestrictedAccess" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -109,24 +159,24 @@ function VehicleBarriersPage() {
           <div className="form-section">
             <label>Are there safety features in place to prevent accidents or injuries caused by the barriers?</label>
             <div>
-              <input type="radio" name="barriers-safety" value="yes" /> Yes
-              <input type="radio" name="barriers-safety" value="no" /> No
+              <input type="radio" name="barriersSafety" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersSafety" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are barriers equipped with warning lights, sirens, or other visual and audible signals to alert approaching vehicles?</label>
             <div>
-              <input type="radio" name="barriers-warning-signals" value="yes" /> Yes
-              <input type="radio" name="barriers-warning-signals" value="no" /> No
+              <input type="radio" name="barriersWarningSignals" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersWarningSignals" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there physical barriers or signage to prevent pedestrians from approaching the barrier zone?</label>
             <div>
-              <input type="radio" name="barriers-physical-signage" value="yes" /> Yes
-              <input type="radio" name="barriers-physical-signage" value="no" /> No
+              <input type="radio" name="barriersPhysicalSignage" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersPhysicalSignage" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -135,24 +185,24 @@ function VehicleBarriersPage() {
           <div className="form-section">
             <label>Is there a regular maintenance schedule in place for the vehicle barriers?</label>
             <div>
-              <input type="radio" name="barriers-maintenance-schedule" value="yes" /> Yes
-              <input type="radio" name="barriers-maintenance-schedule" value="no" /> No
+              <input type="radio" name="barriersMaintenanceSchedule" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersMaintenanceSchedule" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are maintenance tasks, such as lubrication, inspection of mechanisms, and testing of safety features, performed according to schedule?</label>
             <div>
-              <input type="radio" name="barriers-maintenance-tasks" value="yes" /> Yes
-              <input type="radio" name="barriers-maintenance-tasks" value="no" /> No
+              <input type="radio" name="barriersMaintenanceTasks" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersMaintenanceTasks" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there records documenting maintenance activities, repairs, and any issues identified during inspections?</label>
             <div>
-              <input type="radio" name="barriers-maintenance-records" value="yes" /> Yes
-              <input type="radio" name="barriers-maintenance-records" value="no" /> No
+              <input type="radio" name="barriersMaintenanceRecords" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersMaintenanceRecords" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -161,21 +211,21 @@ function VehicleBarriersPage() {
           <div className="form-section">
             <label>Do the vehicle barriers comply with relevant regulations, standards, and industry best practices?</label>
             <div>
-              <input type="radio" name="barriers-compliance" value="yes" /> Yes
-              <input type="radio" name="barriers-compliance" value="no" /> No
+              <input type="radio" name="barriersCompliance" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersCompliance" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there any specific requirements or guidelines for vehicle barriers outlined by regulatory authorities or industry associations?</label>
-            <input type="text" name="barriers-regulatory-requirements" placeholder="Enter any regulatory requirements" />
+            <input type="text" name="barriersRegulatoryRequirements" placeholder="Enter any regulatory requirements" onChange={handleChange}/>
           </div>
 
           <div className="form-section">
             <label>Have the barriers undergone testing or certification to verify compliance with applicable standards?</label>
             <div>
-              <input type="radio" name="barriers-testing" value="yes" /> Yes
-              <input type="radio" name="barriers-testing" value="no" /> No
+              <input type="radio" name="barriersTesting" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersTesting" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
@@ -184,24 +234,24 @@ function VehicleBarriersPage() {
           <div className="form-section">
             <label>Is there a contingency plan in place for emergency situations, such as vehicle attacks or security breaches?</label>
             <div>
-              <input type="radio" name="barriers-emergency-plan" value="yes" /> Yes
-              <input type="radio" name="barriers-emergency-plan" value="no" /> No
+              <input type="radio" name="barriersEmergencyPlan" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersEmergencyPlan" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Are security personnel trained on emergency procedures for activating and deactivating the barriers?</label>
             <div>
-              <input type="radio" name="barriers-emergency-training" value="yes" /> Yes
-              <input type="radio" name="barriers-emergency-training" value="no" /> No
+              <input type="radio" name="barriersEmergencyTraining" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersEmergencyTraining" value="no" onChange={handleChange}/> No
             </div>
           </div>
 
           <div className="form-section">
             <label>Is there coordination with law enforcement or emergency responders for rapid response to security incidents involving the barriers?</label>
             <div>
-              <input type="radio" name="barriers-emergency-response" value="yes" /> Yes
-              <input type="radio" name="barriers-emergency-response" value="no" /> No
+              <input type="radio" name="barriersEmergencyResponse" value="yes" onChange={handleChange}/> Yes
+              <input type="radio" name="barriersEmergencyResponse" value="no" onChange={handleChange}/> No
             </div>
           </div>
 

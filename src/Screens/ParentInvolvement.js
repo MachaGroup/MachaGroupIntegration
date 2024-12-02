@@ -11,8 +11,8 @@ function ParentInvolvementPage() {
     // Add logic for handling button click, e.g., open a modal or navigate
 
     switch (section) {
-        case 'Parent Education Events Plans':
-            navigate('/parent-education-events-plans');
+        case 'Parent Education Events':
+            navigate('/parent-education-events');
             break;
         case 'Parent Communication':
             navigate('/parent-comm');
@@ -36,7 +36,7 @@ function ParentInvolvementPage() {
         <h2>Parent Involvement</h2>
         <form>
           {/* Parent Involvement Buttons */}
-          {['Parent Education Events Plans', 'Parent Communication'].map((section, index) => (
+          {['Parent Education Events', 'Parent Communication'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>
