@@ -289,7 +289,6 @@ import DataProtectionImpactAssessments from "./Screens/DataProtectionImpactAsses
 import ConsentManagement from "./Screens/ConsentManagement";
 import StudentDataPrivacyPolicies from "./Screens/StudentDataPrivacyPolicies";
 import DataBreachNotificationProcedures from "./Screens/DataBreachNotificationProcedures";
-import AnomalyDetection from "./Screens/AnomalyDetection";
 import ComplianceWithRegulations from './Screens/ComplianceWithRegulations'; 
 import EffectivenessInAddressingSecurityRisks from  './Screens/EffectivenessInAddressingSecurityRisks';
 import StaffInputOnPolicyImpact from './Screens/StaffInputOnPolicyImpact';
@@ -615,7 +614,6 @@ function App() {
         <Route path="ConsentManagement" element={<ConsentManagement />} />
         <Route path="StudentDataPrivacyPolicies" element={<StudentDataPrivacyPolicies />} />
         <Route path="DataBreachNotificationProcedures" element={<DataBreachNotificationProcedures />} />
-        <Route path="AnomalyDetection" element={<AnomalyDetection />} />
         <Route path="/conflict-resolution" element={<ConflictResolution />} />
         <Route path="/threat-recognition" element={<ThreatRecognition />} />
         <Route path="/cybersecurity-training" element={<CybersecurityTraining />} />

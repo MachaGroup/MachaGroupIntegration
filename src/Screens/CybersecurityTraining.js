@@ -36,7 +36,7 @@ function CybersecurityTrainingPage() {
 
       {/* Security Awareness Training Section */}
       <main className="form-container">
-        <h2>Security Awareness Training</h2>
+        <h2>Cybersecurity Training</h2>
         <form>
           {/* Security Awareness Training Buttons */}
           {['Phishing Awareness', 'Password Security', 'Data Protection'].map((section, index) => (

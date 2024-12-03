@@ -33,7 +33,7 @@ function ThreatRecognitionPage() {
 
       {/* Security Awareness Training Section */}
       <main className="form-container">
-        <h2>Security Awareness Training</h2>
+        <h2>Threat Recognition</h2>
         <form>
           {/* Security Awareness Training Buttons */}
           {['Identifying Suspicious Behavior', 'Recognizing Security Breaches'].map((section, index) => (
