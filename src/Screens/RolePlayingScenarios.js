@@ -62,6 +62,7 @@ function RolePlayingScenariosFormPage() {
   return (
     <div className="form-page">
         <header className="header">
+    
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>Role-Playing Scenarios Assessment</h1>
