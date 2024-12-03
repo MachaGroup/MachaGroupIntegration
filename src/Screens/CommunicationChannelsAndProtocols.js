@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png'; 
+import Navbar from "./Navbar";
 
 function CommunicationChannelsPage() {
     const navigate = useNavigate();
@@ -55,6 +56,7 @@ function CommunicationChannelsPage() {
     return (
         <div className="form-page">
             <header className="header">
+            <Navbar />
                 <button className="back-button" onClick={() => navigate(-1)}>←</button>
                 <h1>Communication Channels and Protocols</h1>
                 <img src={logo} alt="Logo" className="logo" />

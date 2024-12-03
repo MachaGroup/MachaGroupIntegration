@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
+import Navbar from "./Navbar";
 
 function RegularBackupSchedulesPage() {
   const navigate = useNavigate();
@@ -47,6 +48,7 @@ function RegularBackupSchedulesPage() {
   return (
     <div className="form-page">
       <header className="header">
+            <Navbar />
         <button className="back-button" onClick={() => navigate(-1)}>←</button>
         <h1>Regular Backup Schedules Assessment</h1>
         <img src={logo} alt="Logo" className="logo" />

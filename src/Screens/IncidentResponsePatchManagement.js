@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
+import Navbar from "./Navbar";
 
 function PatchManagementPage() {
     const navigate = useNavigate();
@@ -54,6 +55,7 @@ function PatchManagementPage() {
     return (
         <div className="form-page">
             <header className="header">
+            <Navbar />
                 <button className="back-button" onClick={() => navigate(-1)}>←</button>
                 <h1>Incident Response Patch Management</h1>
                 <img src={logo} alt="Logo" className="logo" />

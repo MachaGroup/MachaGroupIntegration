@@ -4,6 +4,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import Navbar from "./Navbar";
 
 
 function CommunicationLanguageFormPage() {
@@ -63,6 +64,7 @@ function CommunicationLanguageFormPage() {
   return (
     <div className="form-page">
         <header className="header">
+            <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>Communication Language Assessment</h1>

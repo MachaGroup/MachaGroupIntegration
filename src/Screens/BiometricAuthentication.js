@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
+import Navbar from "./Navbar";
 
 function BiometricAuthenticationPage() {
   const navigate = useNavigate();
@@ -59,6 +60,7 @@ function BiometricAuthenticationPage() {
   return (
     <div className="form-page">
       <header className="header">
+            <Navbar />
         <button className="back-button" onClick={handleBack}>←</button>
         <h1>Biometric Authentication Assessment</h1>
         <img src={logo} alt="Logo" className="logo" />

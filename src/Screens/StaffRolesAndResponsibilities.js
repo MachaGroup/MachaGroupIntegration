@@ -4,6 +4,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import Navbar from "./Navbar";
 
 function StaffRolesAndResponsibilitiesFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -62,6 +63,7 @@ function StaffRolesAndResponsibilitiesFormPage() {
   return (
     <div className="form-page">
         <header className="header">
+            <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>Staff Roles and Responsibilities Assessment</h1>

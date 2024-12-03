@@ -2,6 +2,7 @@ import logo from '../assets/MachaLogo.png';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';  // Import useNavigate
 import './FormQuestions.css';  // Ensure this is linked to your universal CSS
+import Navbar from "./Navbar";
 
 function AlertActivationProceduresFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -14,6 +15,7 @@ function AlertActivationProceduresFormPage() {
   return (
     <div className="form-page">
         <header className="header">
+            <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>Alert Activation Procedures Assessment</h1>

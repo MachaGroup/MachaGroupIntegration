@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
+import Navbar from "./Navbar";
 
 function ScenarioBasedTrainingFormPage() {
     const navigate = useNavigate();
@@ -63,6 +64,7 @@ function ScenarioBasedTrainingFormPage() {
   return (
     <div className="form-page">
   <header className="header">
+            <Navbar />
     {/* Back Button */}
     <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
     <h1>3.1.1.2.1 Scenario-Based Training Assessment</h1>

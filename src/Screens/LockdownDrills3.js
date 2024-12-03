@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
+import Navbar from "./Navbar";
 
 function LockdownDrills3Page() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -63,6 +64,7 @@ function LockdownDrills3Page() {
   return (
     <div className="form-page">
         <header className="header">
+            <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>7.2.4.2 Emergency Response Drills for Students</h1>

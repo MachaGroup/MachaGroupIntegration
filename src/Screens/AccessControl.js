@@ -2,7 +2,6 @@ import React from 'react';
 import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
 import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
-import Navbar from "./Navbar"; // Import the Navbar
 
 function AccessControlPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook
@@ -28,7 +27,6 @@ function AccessControlPage() {
     <div className="form-page">
       {/* Header Section */}
       <header className="header">
-        <Navbar />
         <button className="back-button" onClick={() => window.history.back()}>←</button> {/* Use window.history.back for navigation */}
         <h1>The MACHA Group</h1>
         <img src={logo} alt="Logo" className="logo" />

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
+import Navbar from "./Navbar";
 
 function CyberBullyingFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -62,6 +63,7 @@ function CyberBullyingFormPage() {
   return (
     <div className="form-page">
         <header className="header">
+            <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>Cyber Bullying Assessment</h1>

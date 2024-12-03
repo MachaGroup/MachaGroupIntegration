@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 import './FormQuestions.css';
+import Navbar from "./Navbar";
  
 function AccessRestrictionsPage() {
     const navigate = useNavigate();
@@ -62,6 +63,7 @@ function AccessRestrictionsPage() {
   return (
     <div className="form-page">
         <header className="header">
+            <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>5.1.1.1.1 Access Restrictions Assessment</h1>

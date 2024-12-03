@@ -3,6 +3,7 @@ import './FormQuestions.css'; // Adjust as necessary
 import { useNavigate } from 'react-router-dom';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import logo from '../assets/MachaLogo.png'; // Adjust the path
+import Navbar from "./Navbar";
 
 function SecureEmailGatewaysPage() {
   const navigate = useNavigate();
@@ -34,6 +35,7 @@ function SecureEmailGatewaysPage() {
   return (
     <div className="form-page">
       <header className="header">
+            <Navbar />
         <button className="back-button" onClick={() => navigate(-1)}>←</button>
         <h1>Secure Email Gateways Assessment</h1>
         <img src={logo} alt="Logo" className="logo" />
