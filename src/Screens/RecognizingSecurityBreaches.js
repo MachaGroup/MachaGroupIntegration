@@ -1,143 +1,197 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate
-import './FormQuestions.css';  // Ensure this is linked to your universal CSS
+import React, { useState, useEffect } from 'react';
+import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
+import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 
 function RecognizingSecurityBreachesFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
+  const { buildingId } = useBuilding(); // Access buildingId from context
+  const db = getFirestore();
+
+  const [formData, setFormData] = useState();
+
+  useEffect(() => {
+      if (!buildingId) {
+          alert('No building selected. Redirecting to Building Info...');
+          navigate('/BuildingandAddress');
+      }
+  }, [buildingId, navigate]);
+
+  const handleChange = (e) => {
+      const { name, value } = e.target;
+      setFormData((prevData) => ({
+          ...prevData,
+          [name]: value,
+      }));
+  };
 
   // Function to handle back button
   const handleBack = () => {
     navigate(-1);  // Navigates to the previous page
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!buildingId) {
+        alert('Building ID is missing. Please start the assessment from the correct page.');
+        return;
+    }
+
+    try {
+      // Create a document reference to the building in the 'Buildings' collection
+      const buildingRef = doc(db, 'Buildings', buildingId); 
+
+      // Store the form data in the specified Firestore structure
+      const formsRef = collection(db, 'forms/Personnel Training and Awareness/Recognizing Security Breaches');
+      await addDoc(formsRef, {
+          building: buildingRef, // Reference to the building document
+          formData: formData, // Store the form data as a nested object
+      });
+
+      console.log('Form data submitted successfully!');
+      alert('Form submitted successfully!');
+      navigate('/Form');
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('Failed to submit the form. Please try again.');
+    }
+};
+
   return (
     <div className="form-page">
         <header className="header">
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Recognizing Security Breaches Assessment</h1>
+            <h1>3.4.2.1.2 Recognizing Security Breaches Assessment</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
-            <form>
+            <form onSubmit={handleSubmit}>
                 {/* 3.4.2.1.2 Recognizing Security Breaches */}
-                <h2>Understanding Security Vulnerabilities:</h2>
+                <h2>3.4.2.1.2.1 Understanding Security Vulnerabilities:</h2>
                 <div className="form-section">
                     <label>Are staff members trained to identify and recognize common security vulnerabilities, weaknesses, or gaps in physical security measures, access controls, or surveillance systems that could be exploited by intruders or unauthorized individuals?</label>
                     <div>
-                        <input type="radio" name="gates-operational" value="yes" /> Yes
-                        <input type="radio" name="gates-operational" value="no" /> No
+                        <input type="radio" name="identifying-security-vulnerabilities" value="yes" onChange={handleChange} /> Yes
+                        <input type="radio" name="identifying-security-vulnerabilities" value="no" onChange={handleChange} /> No
                     </div>
                 </div>
                 
                 <div className="form-section">
                     <label>What specific indicators or warning signs are emphasized during training as potential evidence of security breaches, such as unauthorized access points, tampered locks, broken windows, or unexplained disruptions to normal operations?</label>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the indicators/warning signs" />  
+                        <input type="text" name="warning-signs" placeholder="Describe the indicators/warning signs" onChange={handleChange} />  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>How are staff members educated on the importance of maintaining a proactive and vigilant stance towards security, actively monitoring their surroundings, and promptly reporting any deviations from established security protocols or procedures?</label>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe how they're educated" />  
+                        <input type="text" name="maintaining-proactive-stance" placeholder="Describe how they're educated" onChange={handleChange} />  
                     </div>
                 </div>
 
-                <h2>Response Protocols and Procedures:</h2>
+                <h2>3.4.2.1.2.2 Response Protocols and Procedures:</h2>
                 <div className="form-section">
                     <label>Are clear response protocols and procedures established for staff members to follow in the event of a suspected security breach, unauthorized access attempt, or breach of perimeter security?</label>
                     <div>
-                        <input type="radio" name="gates-operational" value="yes" /> Yes
-                        <input type="radio" name="gates-operational" value="no" /> No
+                        <input type="radio" name="suspected-security-breach" value="yes" onChange={handleChange} /> Yes
+                        <input type="radio" name="suspected-security-breach" value="no" onChange={handleChange} /> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the protocols/procedures" />  
+                        <input type="text" name="response-protocols" placeholder="Describe the protocols/procedures" onChange={handleChange} />  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>How are staff members trained to respond effectively and decisively to security breaches, including actions such as initiating lockdown procedures, activating alarm systems, alerting security personnel or law enforcement authorities, and directing occupants to safe locations?</label>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe how they're trained" />  
+                        <input type="text" name="response-training" placeholder="Describe how they're trained" onChange={handleChange} />  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>What measures are in place to ensure that staff members understand their roles and responsibilities during security incidents, coordinate their actions with other team members, and communicate critical information to facilitate a prompt and coordinated response?</label>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the measures" />  
+                        <input type="text" name="understanding-roles" placeholder="Describe the measures" onChange={handleChange} />  
                     </div>
                 </div>
 
-                <h2>Security Device Familiarization:</h2>
+                <h2>3.4.2.1.2.3 Security Device Familiarization:</h2>
                 <div className="form-section">
                     <label>Are staff members provided with training on the proper use, operation, and troubleshooting of security devices, such as access control systems, surveillance cameras, intrusion detection sensors, or alarm systems?</label>
                     <div>
-                        <input type="radio" name="gates-operational" value="yes" /> Yes
-                        <input type="radio" name="gates-operational" value="no" /> No
+                        <input type="radio" name="proper-use-training" value="yes" onChange={handleChange} /> Yes
+                        <input type="radio" name="proper-use-training" value="no" onChange={handleChange} /> No
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>How are staff members instructed to recognize abnormal behavior or indications of malfunction in security devices that could signal a potential security breach or technical issue requiring immediate attention?</label>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe how they're instructed" />  
+                        <input type="text" name="recognizing-abnormal-behavior" placeholder="Describe how they're instructed" onChange={handleChange} />  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>What resources or reference materials are available to staff members to assist them in troubleshooting common security device issues, interpreting system alerts or error messages, and taking appropriate corrective actions to restore functionality?</label>
                     <div>
-                        <input type="text" name="access-rights" placeholder="List the resources/reference materials" />  
+                        <input type="text" name="troubleshooting-resources" placeholder="List the resources/reference materials" onChange={handleChange} />  
                     </div>
                 </div>
 
-                <h2>Incident Documentation and Reporting:</h2>
+                <h2>3.4.2.1.2.4 Incident Documentation and Reporting:</h2>
                 <div className="form-section">
                     <label>Are staff members trained on the importance of documenting and reporting security breaches or unauthorized access incidents in a timely and accurate manner to support investigation, analysis, and corrective action?</label>
                     <div>
-                        <input type="radio" name="gates-operational" value="yes" /> Yes
-                        <input type="radio" name="gates-operational" value="no" /> No
+                        <input type="radio" name="documenting-importance" value="yes" onChange={handleChange} /> Yes
+                        <input type="radio" name="documenting-importance" value="no" onChange={handleChange} /> No
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>How are staff members instructed to document relevant details and observations regarding security breaches, including the location, time, nature of the incident, individuals involved, and any additional contextual information that may aid in understanding the situation?</label>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe how they're instructed" />  
+                        <input type="text" name="instructed-documenting-details" placeholder="Describe how they're instructed" onChange={handleChange} />  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>What protocols are in place for reporting security breaches to designated authorities, security personnel, or administrative staff members, and how are staff members informed of their obligations and responsibilities in this regard?</label>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the protocols" />  
+                        <input type="text" name="reporting-breaches" placeholder="Describe the protocols" onChange={handleChange} />  
                     </div>
                 </div>
 
-                <h2>Continuous Improvement and Feedback:</h2>
+                <h2>3.4.2.1.2.5 Continuous Improvement and Feedback:</h2>
                 <div className="form-section">
                     <label>How does the organization promote a culture of continuous improvement in security awareness and breach recognition capabilities among staff members through ongoing training, reinforcement activities, and feedback mechanisms?</label>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe how they promote" />  
+                        <input type="text" name="promoting-culture" placeholder="Describe how they promote" onChange={handleChange} />  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>Are staff members encouraged to provide feedback on security protocols, procedures, or training materials based on their real-world experiences, insights, or suggestions for enhancing security awareness and breach recognition effectiveness?</label>
                     <div>
-                        <input type="radio" name="gates-operational" value="yes" /> Yes
-                        <input type="radio" name="gates-operational" value="no" /> No
+                        <input type="radio" name="security-protocols-feedback" value="yes" onChange={handleChange} /> Yes
+                        <input type="radio" name="security-protocols-feedback" value="no" onChange={handleChange} /> No
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>What mechanisms are in place to review and analyze reported security breaches, identify root causes or contributing factors, and implement corrective actions or procedural enhancements to prevent recurrence and strengthen overall security posture?</label>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the mechanisms" />  
+                        <input type="text" name="reviewing-breaches" placeholder="Describe the mechanisms" onChange={handleChange} />  
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

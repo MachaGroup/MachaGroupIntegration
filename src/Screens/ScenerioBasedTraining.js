@@ -65,285 +65,290 @@ function ScenarioBasedTrainingFormPage() {
   <header className="header">
     {/* Back Button */}
     <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-    <h1>Scenario-Based Training Assessment</h1>
+    <h1>3.1.1.2.1 Scenario-Based Training Assessment</h1>
+    <img src={logo} alt="Logo" className="logo" />
   </header>
 
   <main className="form-container">
-    <form>
-      {/* 3.1.1.1.4 Scenario-Based Training */}
-      <h2>Training Scenario Development:</h2>
+    <form onSubmit={handleSubmit}>
+      {/* 3.1.1.2.1 Scenario-Based Training */}
+      <h2>3.1.1.2.1.1 Training Scenario Development:</h2>
       <div className="form-section">
         <label>How are scenarios for scenario-based training developed, and are they based on realistic and relevant emergency situations?</label>
         <div>
-          <input type="radio" name="scenario-development-realism" value="yes" /> Yes
-          <input type="radio" name="scenario-development-realism" value="no" /> No
+          <input type="radio" name="scenario-development-realism" value="yes" onChange={handleChange} /> Yes
+          <input type="radio" name="scenario-development-realism" value="no" onChange={handleChange} /> No
         </div>
         <div>
-          <input type="text" name="scenario-development-description" placeholder="Describe the development of the scenarios" />
+          <input type="text" name="scenario-development-description" placeholder="Describe the development of the scenarios" onChange={handleChange} />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are scenarios tailored to address specific threats or hazards that staff members may encounter in their roles or environments?</label>
         <div>
-          <input type="radio" name="scenario-specificity" value="yes" /> Yes
-          <input type="radio" name="scenario-specificity" value="no" /> No
+          <input type="radio" name="scenario-specificity" value="yes" onChange={handleChange} /> Yes
+          <input type="radio" name="scenario-specificity" value="no" onChange={handleChange} /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>What considerations are taken into account when designing scenarios, such as the organization's risk profile, industry standards, or regulatory requirements?</label>
         <div>
-          <input type="text" name="scenario-design-considerations" placeholder="List/Describe the considerations" />
+          <input type="text" name="scenario-design-considerations" placeholder="List/Describe the considerations" onChange={handleChange} />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are scenarios categorized based on severity levels or types of emergencies to ensure comprehensive training coverage?</label>
         <div>
-          <input type="radio" name="scenario-categorization" value="yes" /> Yes
-          <input type="radio" name="scenario-categorization" value="no" /> No
+          <input type="radio" name="scenario-categorization" value="yes" onChange={handleChange} /> Yes
+          <input type="radio" name="scenario-categorization" value="no" onChange={handleChange} /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>How are scenario development processes documented and reviewed to maintain consistency and quality?</label>
         <div>
-          <input type="text" name="scenario-documentation-process" placeholder="Describe the processes" />
+          <input type="text" name="scenario-documentation-process" placeholder="Describe the processes" onChange={handleChange} />
         </div>
       </div>
 
-      <h2>Scenario Implementation:</h2>
+      <h2>3.1.1.2.1.2 Scenario Implementation:</h2>
       <div className="form-section">
         <label>How are scenario-based training sessions conducted, and what methods or tools are used to simulate emergency situations?</label>
         <div>
-          <input type="text" name="scenario-session-conduct" placeholder="Describe the sessions and methods" />
+          <input type="text" name="scenario-session-conduct" placeholder="Describe the sessions and methods" onChange={handleChange} />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are scenarios integrated into tabletop exercises, simulations, or full-scale drills to provide a range of training experiences?</label>
         <div>
-          <input type="radio" name="scenario-integration" value="yes" /> Yes
-          <input type="radio" name="scenario-integration" value="no" /> No
+          <input type="radio" name="scenario-integration" value="yes" onChange={handleChange} /> Yes
+          <input type="radio" name="scenario-integration" value="no" onChange={handleChange} /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>What resources or support are provided to ensure the safe and effective execution of scenario-based training sessions?</label>
         <div>
-          <input type="text" name="scenario-resources" placeholder="List the resources" />
+          <input type="text" name="scenario-resources" placeholder="List the resources" onChange={handleChange} />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are contingency plans in place to address unexpected issues or challenges that may arise during scenario implementation?</label>
         <div>
-          <input type="radio" name="scenario-contingency-plans" value="yes" /> Yes
-          <input type="radio" name="scenario-contingency-plans" value="no" /> No
+          <input type="radio" name="scenario-contingency-plans" value="yes" onChange={handleChange} /> Yes
+          <input type="radio" name="scenario-contingency-plans" value="no" onChange={handleChange} /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>How are scenarios modified or updated over time to reflect changes in organizational needs or emerging threats?</label>
         <div>
-          <input type="text" name="scenario-updates" placeholder="Describe how scenarios are modified/updated" />
+          <input type="text" name="scenario-updates" placeholder="Describe how scenarios are modified/updated" onChange={handleChange} />
         </div>
       </div>
 
-      <h2>Participant Engagement:</h2>
+      <h2>3.1.1.2.1.3 Participant Engagement:</h2>
       <div className="form-section">
         <label>How are staff members engaged and involved in scenario-based training exercises to maximize learning outcomes?</label>
         <div>
-          <input type="text" name="participant-engagement" placeholder="Describe how staff members are involved" />
+          <input type="text" name="participant-engagement" placeholder="Describe how staff members are involved" onChange={handleChange} />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are participants encouraged to actively participate in scenarios by making decisions, taking actions, and communicating effectively with team members?</label>
         <div>
-          <input type="radio" name="active-participation" value="yes" /> Yes
-          <input type="radio" name="active-participation" value="no" /> No
+          <input type="radio" name="active-participation" value="yes" onChange={handleChange} /> Yes
+          <input type="radio" name="active-participation" value="no" onChange={handleChange} /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>What measures are in place to address any concerns or anxieties that staff members may have about participating in scenario-based training?</label>
         <div>
-          <input type="text" name="participant-concerns-measures" placeholder="Describe the measures" />
+          <input type="text" name="participant-concerns-measures" placeholder="Describe the measures" onChange={handleChange} />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are scenarios designed to promote teamwork, collaboration, and effective communication among participants?</label>
         <div>
-          <input type="radio" name="scenario-teamwork" value="yes" /> Yes
-          <input type="radio" name="scenario-teamwork" value="no" /> No
+          <input type="radio" name="scenario-teamwork" value="yes" onChange={handleChange} /> Yes
+          <input type="radio" name="scenario-teamwork" value="no" onChange={handleChange} /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>How are participant feedback and suggestions incorporated into the design and delivery of scenario-based training activities?</label>
         <div>
-          <input type="text" name="feedback-integration" placeholder="Describe how the feedback is included" />
+          <input type="text" name="feedback-integration" placeholder="Describe how the feedback is included" onChange={handleChange} />
         </div>
       </div>
 
-      <h2>Learning Objectives:</h2>
+      <h2>3.1.1.2.1.4 Learning Objectives:</h2>
       <div className="form-section">
         <label>What specific learning objectives are targeted through scenario-based training, and how are these objectives communicated to participants?</label>
         <div>
-          <input type="text" name="learning-objectives" placeholder="Describe the learning objectives" />
+          <input type="text" name="learning-objectives" placeholder="Describe the learning objectives" onChange={handleChange} />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are scenarios designed to reinforce key concepts, procedures, or protocols related to emergency response and crisis management?</label>
         <div>
-          <input type="radio" name="reinforce-key-concepts" value="yes" /> Yes
-          <input type="radio" name="reinforce-key-concepts" value="no" /> No
+          <input type="radio" name="reinforce-key-concepts" value="yes" onChange={handleChange} /> Yes
+          <input type="radio" name="reinforce-key-concepts" value="no" onChange={handleChange} /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>How are learning outcomes assessed and evaluated to ensure that participants have achieved the desired competencies and skills?</label>
         <div>
-          <input type="text" name="outcomes-evaluation" placeholder="Describe how learning outcomes are assessed" />
+          <input type="text" name="outcomes-evaluation" placeholder="Describe how learning outcomes are assessed" onChange={handleChange} />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are performance metrics used to measure the effectiveness of scenario-based training in meeting established learning objectives?</label>
         <div>
-          <input type="radio" name="performance-metrics" value="yes" /> Yes
-          <input type="radio" name="performance-metrics" value="no" /> No
+          <input type="radio" name="performance-metrics" value="yes" onChange={handleChange} /> Yes
+          <input type="radio" name="performance-metrics" value="no" onChange={handleChange} /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>How are participant knowledge and skills assessed before and after scenario-based training to measure improvement and identify areas for further development?</label>
         <div>
-          <input type="text" name="knowledge-assessment" placeholder="Describe how knowledge and skills are assessed" />
+          <input type="text" name="knowledge-assessment" placeholder="Describe how knowledge and skills are assessed" onChange={handleChange} />
         </div>
       </div>
 
-      <h2>Debriefing and Feedback:</h2>
+      <h2>3.1.1.2.1.5 Debriefing and Feedback:</h2>
       <div className="form-section">
         <label>Is there a structured process for debriefing participants following scenario-based training exercises, and how are debriefing sessions facilitated?</label>
         <div>
-          <input type="radio" name="debriefing-process" value="yes" /> Yes
-          <input type="radio" name="debriefing-process" value="no" /> No
+          <input type="radio" name="debriefing-process" value="yes" onChange={handleChange} /> Yes
+          <input type="radio" name="debriefing-process" value="no" onChange={handleChange} /> No
         </div>
         <div>
-          <input type="text" name="debriefing-sessions" placeholder="Describe the process and how sessions are facilitated" />
+          <input type="text" name="debriefing-sessions" placeholder="Describe the process and how sessions are facilitated" onChange={handleChange} />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are participants provided with constructive feedback and opportunities for reflection on their performance during scenarios?</label>
         <div>
-          <input type="radio" name="constructive-feedback" value="yes" /> Yes
-          <input type="radio" name="constructive-feedback" value="no" /> No
+          <input type="radio" name="constructive-feedback" value="yes" onChange={handleChange} /> Yes
+          <input type="radio" name="constructive-feedback" value="no" onChange={handleChange} /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>How are lessons learned from scenario-based training exercises documented and incorporated into future training plans or improvements?</label>
         <div>
-          <input type="text" name="lessons-learned-documentation" placeholder="Describe how lessons are documented" />
+          <input type="text" name="lessons-learned-documentation" placeholder="Describe how lessons are documented" onChange={handleChange} />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are debriefing sessions used to identify strengths, weaknesses, and areas for improvement in individual and team performance?</label>
         <div>
-          <input type="radio" name="debriefing-improvement" value="yes" /> Yes
-          <input type="radio" name="debriefing-improvement" value="no" /> No
+          <input type="radio" name="debriefing-improvement" value="yes" onChange={handleChange} /> Yes
+          <input type="radio" name="debriefing-improvement" value="no" onChange={handleChange} /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>What mechanisms are in place to ensure that feedback from participants is used to enhance the effectiveness and relevance of scenario-based training activities?</label>
         <div>
-          <input type="text" name="feedback-enhancement-mechanisms" placeholder="Describe the mechanisms" />
+          <input type="text" name="feedback-enhancement-mechanisms" placeholder="Describe the mechanisms" onChange={handleChange} />
         </div>
       </div>
 
-      <h2>Scenario Variation and Complexity:</h2>
+      <h2>3.1.1.2.1.6 Scenario Variation and Complexity:</h2>
       <div className="form-section">
         <label>How are scenarios varied in terms of complexity, duration, and intensity to provide a diverse training experience?</label>
         <div>
-          <input type="text" name="scenario-variation" placeholder="Describe how scenarios vary" />
+          <input type="text" name="scenario-variation" placeholder="Describe how scenarios vary" onChange={handleChange} />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are scenarios adjusted based on the skill levels, roles, and responsibilities of participants to ensure appropriate challenge and engagement?</label>
         <div>
-          <input type="radio" name="scenario-adjustment" value="yes" /> Yes
-          <input type="radio" name="scenario-adjustment" value="no" /> No
+          <input type="radio" name="scenario-adjustment" value="yes" onChange={handleChange} /> Yes
+          <input type="radio" name="scenario-adjustment" value="no" onChange={handleChange} /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>What strategies are used to gradually increase the complexity of scenarios as participants progress through training programs?</label>
         <div>
-          <input type="text" name="complexity-strategies" placeholder="Describe the strategies" />
+          <input type="text" name="complexity-strategies" placeholder="Describe the strategies" onChange={handleChange} />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are scenarios designed to simulate realistic stressors and environmental factors that participants may encounter during actual emergencies?</label>
         <div>
-          <input type="radio" name="realistic-simulations" value="yes" /> Yes
-          <input type="radio" name="realistic-simulations" value="no" /> No
+          <input type="radio" name="realistic-simulations" value="yes" onChange={handleChange} /> Yes
+          <input type="radio" name="realistic-simulations" value="no" onChange={handleChange} /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>How are potential ethical, legal, or psychological considerations addressed when developing and implementing complex scenarios?</label>
         <div>
-          <input type="text" name="consideration-measures" placeholder="Describe how considerations are addressed" />
+          <input type="text" name="consideration-measures" placeholder="Describe how considerations are addressed" onChange={handleChange} />
         </div>
       </div>
 
-      <h2>Integration with Emergency Plans:</h2>
+      <h2>3.1.1.2.1.7 Integration with Emergency Plans:</h2>
       <div className="form-section">
         <label>How are scenario-based training activities aligned with the organization's emergency response plans, procedures, and protocols?</label>
         <div>
-          <input type="text" name="integration-emergency-plans" placeholder="Describe how activities align" />
+          <input type="text" name="integration-emergency-plans" placeholder="Describe how activities align" onChange={handleChange} />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are scenarios designed to test specific components of emergency plans, such as evacuation procedures, communication protocols, or incident command structures?</label>
         <div>
-          <input type="radio" name="test-emergency-components" value="yes" /> Yes
-          <input type="radio" name="test-emergency-components" value="no" /> No
+          <input type="radio" name="test-emergency-components" value="yes" onChange={handleChange} /> Yes
+          <input type="radio" name="test-emergency-components" value="no" onChange={handleChange} /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>What measures are in place to ensure that lessons learned from scenario-based training exercises are incorporated into emergency planning and preparedness efforts?</label>
         <div>
-          <input type="text" name="training-lessons-measures" placeholder="Describe the measures" />
+          <input type="text" name="training-lessons-measures" placeholder="Describe the measures" onChange={handleChange} />
         </div>
       </div>
 
       <div className="form-section">
         <label>Are emergency response teams or personnel involved in scenario development and implementation to ensure alignment with operational needs and priorities?</label>
         <div>
-          <input type="radio" name="emergency-team-involvement" value="yes" /> Yes
-          <input type="radio" name="emergency-team-involvement" value="no" /> No
+          <input type="radio" name="emergency-team-involvement" value="yes" onChange={handleChange} /> Yes
+          <input type="radio" name="emergency-team-involvement" value="no" onChange={handleChange} /> No
         </div>
       </div>
 
       <div className="form-section">
         <label>How are scenario-based training outcomes used to validate and enhance the effectiveness of emergency plans and procedures?</label>
         <div>
-          <input type="text" name="outcomes-validation" placeholder="Describe how the outcomes are used to validate" />
+          <input type="text" name="outcomes-validation" placeholder="Describe how the outcomes are used to validate" onChange={handleChange} />
         </div>
       </div>
+
+      {/* Submit Button */}
+      <button type="submit">Submit</button>
+
     </form>
   </main>
 </div>
