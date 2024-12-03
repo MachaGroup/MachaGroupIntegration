@@ -20,7 +20,7 @@ const Navbar = () => {
     {
       name: "Home",
       path: "/Home",
-      subsections: [{ name: "Main", path: "/Home" }],
+      subsections: [{ name: "Main", path: "/Main" }],
     },
     {
       name: "Physical Security",
