@@ -1,0 +1,140 @@
+/* General Layout */
+.form-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: #f7f7f7;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Header Styling */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Align content left and right */
+    width: 100%;
+    background-color: #74b9ff; /* Blue background color */
+    color: white;
+    padding: 10px 20px; /* Add padding for spacing */
+    box-sizing: border-box;
+    position: relative; /* Ensure positioning for the navbar menu */
+}
+
+h1 {
+    font-size: 1.8em;
+    color: white;
+    margin: 0; /* Remove default margin */
+    text-align: center;
+    flex-grow: 1; /* Allow title to take up space */
+}
+
+.logo {
+    width: 50px;
+    height: 50px;
+}
+
+/* Navbar Styling */
+.navbar {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 50%; /* Align to the center vertically */
+    right: 20px; /* Align to the right within the header */
+    transform: translateY(-50%); /* Center vertically */
+}
+
+.menu-button {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 25px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+.menu-button div {
+    height: 4px;
+    background-color: white; /* White bars for contrast */
+    border-radius: 2px;
+    transition: transform 0.3s;
+}
+
+.menu {
+    display: none;
+    position: absolute;
+    top: 40px; /* Below the button */
+    right: 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    width: 200px;
+    z-index: 1000;
+}
+
+.menu.open {
+    display: block;
+}
+
+.menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu li {
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.menu li:last-child {
+    border-bottom: none;
+}
+
+.menu li a {
+    color: black; /* Black font for dropdown items */
+    text-decoration: none;
+    display: block;
+}
+
+.menu li a:hover {
+    background-color: #f4f4f4;
+}
+
+/* Back Button Styling */
+.back-button {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: white;
+    margin-right: 10px; /* Add spacing */
+}
+
+.back-button:hover {
+    color: #dfe6e9;
+}
+
+.back-button-container {
+    display: inline-flex; /* Ensures container does not take the full width */
+    align-items: center;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .header {
+        flex-wrap: wrap;
+    }
+
+    h1 {
+        font-size: 1.2em;
+    }
+}

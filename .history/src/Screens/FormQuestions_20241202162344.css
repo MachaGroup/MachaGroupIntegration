@@ -1,0 +1,143 @@
+/* General Layout */
+.form-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: #f7f7f7;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Header Styling */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Space between back button and menu button */
+    width: 100%;
+    background-color: #74b9ff; /* Blue background color */
+    color: white;
+    padding: 10px 20px; /* Padding for spacing */
+    box-sizing: border-box;
+    position: relative; /* Ensure positioning for menu button */
+}
+
+h1 {
+    font-size: 1.8em;
+    color: white;
+    margin: 0; /* Remove default margin */
+    text-align: center;
+    flex-grow: 1; /* Allow title to take space between buttons */
+}
+
+.logo {
+    width: 50px;
+    height: 50px;
+    position: absolute; /* Ensures the logo is centered */
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Navbar Styling */
+.navbar {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 50%; /* Vertically center */
+    right: 20px; /* Position at the top-right corner */
+    transform: translateY(-50%);
+}
+
+.menu-button {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 25px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+.menu-button div {
+    height: 4px;
+    background-color: white; /* White bars for contrast */
+    border-radius: 2px;
+    transition: transform 0.3s;
+}
+
+.menu {
+    display: none;
+    position: absolute;
+    top: 50px; /* Below the menu button */
+    right: 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    width: 200px;
+    z-index: 1000;
+}
+
+.menu.open {
+    display: block;
+}
+
+.menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu li {
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.menu li:last-child {
+    border-bottom: none;
+}
+
+.menu li a {
+    color: black; /* Black font for dropdown items */
+    text-decoration: none;
+    display: block;
+}
+
+.menu li a:hover {
+    background-color: #f4f4f4;
+}
+
+/* Back Button Styling */
+.back-button {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: white;
+    margin-right: 10px;
+}
+
+.back-button-container {
+    display: inline-flex; /* Ensures container does not take the full width */
+    align-items: center;
+}
+
+.back-button:hover {
+    color: #dfe6e9;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .header {
+        flex-wrap: wrap;
+    }
+
+    h1 {
+        font-size: 1.2em;
+    }
+}

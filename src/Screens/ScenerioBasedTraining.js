@@ -65,14 +65,14 @@ function ScenarioBasedTrainingFormPage() {
   <header className="header">
     {/* Back Button */}
     <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-    <h1>Scenario-Based Training Assessment</h1>
+    <h1>3.1.1.2.1 Scenario-Based Training Assessment</h1>
     <img src={logo} alt="Logo" className="logo" />
   </header>
 
   <main className="form-container">
     <form onSubmit={handleSubmit}>
-      {/* 3.1.1.1.4 Scenario-Based Training */}
-      <h2>Training Scenario Development:</h2>
+      {/* 3.1.1.2.1 Scenario-Based Training */}
+      <h2>3.1.1.2.1.1 Training Scenario Development:</h2>
       <div className="form-section">
         <label>How are scenarios for scenario-based training developed, and are they based on realistic and relevant emergency situations?</label>
         <div>
@@ -110,7 +110,7 @@ function ScenarioBasedTrainingFormPage() {
         </div>
       </div>
 
-      <h2>Scenario Implementation:</h2>
+      <h2>3.1.1.2.1.2 Scenario Implementation:</h2>
       <div className="form-section">
         <label>How are scenario-based training sessions conducted, and what methods or tools are used to simulate emergency situations?</label>
         <div>
@@ -148,7 +148,7 @@ function ScenarioBasedTrainingFormPage() {
         </div>
       </div>
 
-      <h2>Participant Engagement:</h2>
+      <h2>3.1.1.2.1.3 Participant Engagement:</h2>
       <div className="form-section">
         <label>How are staff members engaged and involved in scenario-based training exercises to maximize learning outcomes?</label>
         <div>
@@ -186,7 +186,7 @@ function ScenarioBasedTrainingFormPage() {
         </div>
       </div>
 
-      <h2>Learning Objectives:</h2>
+      <h2>3.1.1.2.1.4 Learning Objectives:</h2>
       <div className="form-section">
         <label>What specific learning objectives are targeted through scenario-based training, and how are these objectives communicated to participants?</label>
         <div>
@@ -224,7 +224,7 @@ function ScenarioBasedTrainingFormPage() {
         </div>
       </div>
 
-      <h2>Debriefing and Feedback:</h2>
+      <h2>3.1.1.2.1.5 Debriefing and Feedback:</h2>
       <div className="form-section">
         <label>Is there a structured process for debriefing participants following scenario-based training exercises, and how are debriefing sessions facilitated?</label>
         <div>
@@ -262,7 +262,7 @@ function ScenarioBasedTrainingFormPage() {
         </div>
       </div>
 
-      <h2>Scenario Variation and Complexity:</h2>
+      <h2>3.1.1.2.1.6 Scenario Variation and Complexity:</h2>
       <div className="form-section">
         <label>How are scenarios varied in terms of complexity, duration, and intensity to provide a diverse training experience?</label>
         <div>
@@ -300,7 +300,7 @@ function ScenarioBasedTrainingFormPage() {
         </div>
       </div>
 
-      <h2>Integration with Emergency Plans:</h2>
+      <h2>3.1.1.2.1.7 Integration with Emergency Plans:</h2>
       <div className="form-section">
         <label>How are scenario-based training activities aligned with the organization's emergency response plans, procedures, and protocols?</label>
         <div>

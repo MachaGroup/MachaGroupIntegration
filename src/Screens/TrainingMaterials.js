@@ -72,7 +72,7 @@ function TrainingMaterialsFormPage() {
   <main className="form-container">
     <form onSubmit={handleSubmit}>
       {/* 3.1.1.1.2 Training Materials */}
-      <h2>Availability and Accessibility:</h2>
+      <h2>3.1.1.1.2.1 Availability and Accessibility:</h2>
       <div className="form-section">
         <label>Are appropriate training materials, such as first aid kits, AEDs (Automated External Defibrillators), and CPR manikins, readily available during training sessions?</label>
         <div>
@@ -110,7 +110,7 @@ function TrainingMaterialsFormPage() {
         </div>
       </div>
 
-      <h2>Maintenance and Inspection:</h2>
+      <h2>3.1.1.1.2.2 Maintenance and Inspection:</h2>
       <div className="form-section">
         <label>How often are training materials inspected to ensure they are in working condition and compliant with safety standards?</label>
         <div>
@@ -148,7 +148,7 @@ function TrainingMaterialsFormPage() {
         </div>
       </div>
 
-      <h2>Stocking and Replenishment:</h2>
+      <h2>3.1.1.1.2.3 Stocking and Replenishment:</h2>
       <div className="form-section">
         <label>Are training materials regularly stocked with necessary supplies, such as bandages, gloves, and medication?</label>
         <div>
@@ -186,7 +186,7 @@ function TrainingMaterialsFormPage() {
         </div>
       </div>
 
-      <h2>Quality and Suitability:</h2>
+      <h2>3.1.1.1.2.4 Quality and Suitability:</h2>
       <div className="form-section">
         <label>Are training materials selected based on their quality, durability, and suitability for the intended training purposes?</label>
         <div>
@@ -224,7 +224,7 @@ function TrainingMaterialsFormPage() {
         </div>
       </div>
 
-      <h2>Training Material Usage:</h2>
+      <h2>3.1.1.1.2.5 Training Material Usage:</h2>
       <div className="form-section">
         <label>Are participants trained on how to use and apply various items in the training materials effectively during practical exercises and simulations?</label>
         <div>
@@ -262,7 +262,7 @@ function TrainingMaterialsFormPage() {
         </div>
       </div>
 
-      <h2>Training Material Documentation:</h2>
+      <h2>3.1.1.1.2.6 Training Material Documentation:</h2>
       <div className="form-section">
         <label>Are records maintained for each training material, including purchase receipts, maintenance logs, and usage reports?</label>
         <div>
@@ -299,7 +299,7 @@ function TrainingMaterialsFormPage() {
         </div>
       </div>
 
-      <h2>Training Material Security:</h2>
+      <h2>3.1.1.1.2.7 Training Material Security:</h2>
       <div className="form-section">
         <label>Are measures in place to secure training materials against theft, loss, or unauthorized access?</label>
         <div>

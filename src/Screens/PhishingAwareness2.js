@@ -65,14 +65,14 @@ function PhishingAwareness2FormPage() {
         <header className="header">
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Phishing Awareness Assessment</h1>
+            <h1>3.1.1.4.2.1 Phishing Awareness Assessment</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
-                {/* 3.4.2.2.1 Phishing Awareness */}
-                <h2>Recognizing Phishing Attempts:</h2>
+                {/* 3.1.1.4.2.1 Phishing Awareness */}
+                <h2>3.1.1.4.2.1.1 Recognizing Phishing Attempts:</h2>
                 <div className="form-section">
                     <label>Are staff members trained to recognize common indicators of phishing attempts, such as unsolicited emails requesting sensitive information, urgent requests for account credentials, or messages containing suspicious links or attachments?</label>
                     <div>
@@ -95,7 +95,7 @@ function PhishingAwareness2FormPage() {
                     </div>
                 </div>
                 
-                <h2>Response Protocols and Procedures:</h2>
+                <h2>3.1.1.4.2.1.2 Response Protocols and Procedures:</h2>
                 <div className="form-section">
                     <label>Are clear response protocols and procedures established for staff members to follow in the event of encountering a suspected phishing email or cyber threat, including steps to report the incident, mitigate risks, and safeguard sensitive information?</label>
                     <div>
@@ -117,7 +117,7 @@ function PhishingAwareness2FormPage() {
                     </div>
                 </div>
 
-                <h2>Phishing Simulation Exercises:</h2>
+                <h2>3.1.1.4.2.1.3 Phishing Simulation Exercises:</h2>
                 <div className="form-section">
                     <label>Are staff members provided with opportunities to participate in simulated phishing exercises or awareness campaigns designed to mimic real-world phishing scenarios and test their ability to recognize and respond to phishing threats?</label>
                     <div>
@@ -140,7 +140,7 @@ function PhishingAwareness2FormPage() {
                     </div>
                 </div>
 
-                <h2>Educational Resources and Awareness Materials:</h2>
+                <h2>3.1.1.4.2.1.4 Educational Resources and Awareness Materials:</h2>
                 <div className="form-section">
                     <label>Are educational resources, awareness materials, or interactive modules available to staff members to enhance their understanding of phishing threats, cybersecurity best practices, and proactive measures for safeguarding sensitive information?</label>
                     <div>
@@ -163,7 +163,7 @@ function PhishingAwareness2FormPage() {
                     </div>
                 </div>
 
-                <h2>Reporting and Incident Management:</h2>
+                <h2>3.1.1.4.2.1.5 Reporting and Incident Management:</h2>
                 <div className="form-section">
                     <label>Are staff members informed of the procedures for reporting suspected phishing emails or cyber incidents to designated IT or security personnel for investigation and response?</label>
                     <div>
