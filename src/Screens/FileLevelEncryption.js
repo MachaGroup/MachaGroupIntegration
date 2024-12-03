@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
+import Navbar from "./Navbar";
 
 function FileLevelEncryptionPage() {
   const navigate = useNavigate();
@@ -59,6 +60,7 @@ function FileLevelEncryptionPage() {
   return (
     <div className="form-page">
       <header className="header">
+            <Navbar />
         <button className="back-button" onClick={handleBack}>←</button>
         <h1>File-Level Encryption Assessment</h1>
         <img src={logo} alt="Logo" className="logo" />

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
+import Navbar from "./Navbar";
 
 function RecognizingSecurityBreachesFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -63,16 +64,17 @@ function RecognizingSecurityBreachesFormPage() {
   return (
     <div className="form-page">
         <header className="header">
+            <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Recognizing Security Breaches Assessment</h1>
+            <h1>3.4.2.1.2 Recognizing Security Breaches Assessment</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
                 {/* 3.4.2.1.2 Recognizing Security Breaches */}
-                <h2>Understanding Security Vulnerabilities:</h2>
+                <h2>3.4.2.1.2.1 Understanding Security Vulnerabilities:</h2>
                 <div className="form-section">
                     <label>Are staff members trained to identify and recognize common security vulnerabilities, weaknesses, or gaps in physical security measures, access controls, or surveillance systems that could be exploited by intruders or unauthorized individuals?</label>
                     <div>
@@ -95,7 +97,7 @@ function RecognizingSecurityBreachesFormPage() {
                     </div>
                 </div>
 
-                <h2>Response Protocols and Procedures:</h2>
+                <h2>3.4.2.1.2.2 Response Protocols and Procedures:</h2>
                 <div className="form-section">
                     <label>Are clear response protocols and procedures established for staff members to follow in the event of a suspected security breach, unauthorized access attempt, or breach of perimeter security?</label>
                     <div>
@@ -117,7 +119,7 @@ function RecognizingSecurityBreachesFormPage() {
                     </div>
                 </div>
 
-                <h2>Security Device Familiarization:</h2>
+                <h2>3.4.2.1.2.3 Security Device Familiarization:</h2>
                 <div className="form-section">
                     <label>Are staff members provided with training on the proper use, operation, and troubleshooting of security devices, such as access control systems, surveillance cameras, intrusion detection sensors, or alarm systems?</label>
                     <div>
@@ -140,7 +142,7 @@ function RecognizingSecurityBreachesFormPage() {
                     </div>
                 </div>
 
-                <h2>Incident Documentation and Reporting:</h2>
+                <h2>3.4.2.1.2.4 Incident Documentation and Reporting:</h2>
                 <div className="form-section">
                     <label>Are staff members trained on the importance of documenting and reporting security breaches or unauthorized access incidents in a timely and accurate manner to support investigation, analysis, and corrective action?</label>
                     <div>
@@ -163,7 +165,7 @@ function RecognizingSecurityBreachesFormPage() {
                     </div>
                 </div>
 
-                <h2>Continuous Improvement and Feedback:</h2>
+                <h2>3.4.2.1.2.5 Continuous Improvement and Feedback:</h2>
                 <div className="form-section">
                     <label>How does the organization promote a culture of continuous improvement in security awareness and breach recognition capabilities among staff members through ongoing training, reinforcement activities, and feedback mechanisms?</label>
                     <div>

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
+import Navbar from "./Navbar";
 
 function RecertificationScheduleFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -63,6 +64,7 @@ function RecertificationScheduleFormPage() {
   return (
     <div className="form-page">
   <header className="header">
+            <Navbar />
     {/* Back Button */}
     <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
     <h1>Recertification Schedule Assessment</h1>
@@ -72,7 +74,7 @@ function RecertificationScheduleFormPage() {
   <main className="form-container">
     <form onSubmit={handleSubmit}>
       {/* 3.1.1.1.3 Recertification Schedule */}
-      <h2>Recertification Frequency:</h2>
+      <h2>3.1.1.1.3.1 Recertification Frequency:</h2>
       <div className="form-section">
         <label>What is the established frequency for recertifying staff members in First Aid/CPR training (e.g., every two years, annually)?</label>
         <div>
@@ -95,7 +97,7 @@ function RecertificationScheduleFormPage() {
         </div>
       </div>
 
-      <h2>Notification and Reminder System:</h2>
+      <h2>3.1.1.1.3.2 Notification and Reminder System:</h2>
       <div className="form-section">
         <label>How are staff members notified of upcoming recertification deadlines for First Aid/CPR training?</label>
         <div>
@@ -118,7 +120,7 @@ function RecertificationScheduleFormPage() {
         </div>
       </div>
 
-      <h2>Recertification Process:</h2>
+      <h2>3.1.1.1.3.3 Recertification Process:</h2>
       <div className="form-section">
         <label>What is the process for staff members to recertify in First Aid/CPR training, and are there specific steps or procedures they need to follow?</label>
         <div>
@@ -141,7 +143,7 @@ function RecertificationScheduleFormPage() {
         </div>
       </div>
 
-      <h2>Documentation and Records:</h2>
+      <h2>3.1.1.1.3.4 Documentation and Records:</h2>
       <div className="form-section">
         <label>How are records of staff members' recertification status and completion maintained, and are these records kept up to date?</label>
         <div>
@@ -163,7 +165,7 @@ function RecertificationScheduleFormPage() {
         </div>
       </div>
 
-      <h2>Evaluation and Feedback:</h2>
+      <h2>3.1.1.1.3.5 Evaluation and Feedback:</h2>
       <div className="form-section">
         <label>How is the effectiveness of the recertification process evaluated, and are there mechanisms for gathering feedback from staff members?</label>
         <div>

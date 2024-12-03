@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
 import './PhysicalSecurity.css'; // Reuse the same CSS file for consistency in styling
-import Navbar from "./Navbar"; // Import the Navbar
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 
 function PhysicalSecurityPage() {
@@ -28,7 +27,6 @@ function PhysicalSecurityPage() {
     <div className="form-page">
       {/* Header Section */}
       <header className="header">
-        <Navbar />
         <button className="back-button" onClick={() => window.history.back()}>←</button> {/* Use window.history.back for navigation */}
         <h1>The MACHA Group</h1>
         <img src={logo} alt="Logo" className="logo" />

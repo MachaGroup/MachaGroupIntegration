@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
+import Navbar from "./Navbar";
 
 function PasswordSecurity2FormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -63,16 +64,17 @@ function PasswordSecurity2FormPage() {
   return (
     <div className="form-page">
         <header className="header">
+            <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Password Security Assessment</h1>
+            <h1>3.1.1.4.2.2 Password Security Assessment</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
-                {/* 3.4.2.2.2 Password Security */}
-                <h2>Password Creation Best Practices:</h2>
+                {/* 3.1.1.4.2.2 Password Security */}
+                <h2>3.1.1.4.2.2.1 Password Creation Best Practices:</h2>
                 <div className="form-section">
                     <label>Are staff members trained on best practices for creating strong, complex passwords that are resistant to dictionary attacks, brute-force attempts, and other common password cracking techniques?</label>
                     <div>
@@ -95,7 +97,7 @@ function PasswordSecurity2FormPage() {
                     </div>
                 </div>
 
-                <h2>Password Management Tools and Techniques:</h2>
+                <h2>3.1.1.4.2.2.2 Password Management Tools and Techniques:</h2>
                 <div className="form-section">
                     <label>Are staff members introduced to password management tools or utilities designed to facilitate the generation, storage, and retrieval of strong, complex passwords across multiple accounts or devices securely?</label>
                     <div>
@@ -118,7 +120,7 @@ function PasswordSecurity2FormPage() {
                     </div>
                 </div>
 
-                <h2>Password Hygiene and Maintenance:</h2>
+                <h2>3.1.1.4.2.2.3 Password Hygiene and Maintenance:</h2>
                 <div className="form-section">
                     <label>Are staff members educated on the importance of practicing good password hygiene, including avoiding common pitfalls such as sharing passwords with others, writing down passwords on physical or digital notes, or storing passwords in easily accessible locations?</label>
                     <div>
@@ -141,7 +143,7 @@ function PasswordSecurity2FormPage() {
                     </div>
                 </div>
 
-                <h2>Social Engineering Awareness:</h2>
+                <h2>3.1.1.4.2.2.4 Social Engineering Awareness:</h2>
                 <div className="form-section">
                     <label>Are staff members trained to recognize social engineering tactics commonly employed by attackers to trick individuals into divulging their passwords or sensitive information through manipulation, deception, or coercion?</label>
                     <div>
@@ -164,7 +166,7 @@ function PasswordSecurity2FormPage() {
                     </div>
                 </div>
 
-                <h2>Password Policy Compliance:</h2>
+                <h2>3.1.1.4.2.2.5 Password Policy Compliance:</h2>
                 <div className="form-section">
                     <label>Are staff members informed of the organization's password policy requirements, including expectations for password complexity, expiration, history retention, and enforcement mechanisms for non-compliance?</label>
                     <div>

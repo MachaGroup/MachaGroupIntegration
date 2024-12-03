@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
+import Navbar from "./Navbar";
 
 function PostIncidentSupportFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -63,16 +64,17 @@ function PostIncidentSupportFormPage() {
   return (
     <div className="form-page">
   <header className="header">
+            <Navbar />
     {/* Back Button */}
     <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-    <h1>Post-Incident Support Assessment</h1>
+    <h1>3.1.1.2.3 Post-Incident Support Assessment</h1>
     <img src={logo} alt="Logo" className="logo" />
   </header>
 
   <main className="form-container">
     <form onSubmit={handleSubmit}>
-      {/* 3.1.1.1.6 Post-Incident Support */}
-      <h2>Availability of Support Services:</h2>
+      {/* 3.1.1.2.3 Post-Incident Support */}
+      <h2>3.1.1.2.3.1 Availability of Support Services:</h2>
       <div className="form-section">
         <label>What post-incident support services are available to staff members following emergency situations, and are they easily accessible?</label>
         <div>
@@ -102,7 +104,7 @@ function PostIncidentSupportFormPage() {
         </div>
       </div>
 
-      <h2>Counseling and Psychological Support:</h2>
+      <h2>3.1.1.2.3.2 Counseling and Psychological Support:</h2>
       <div className="form-section">
         <label>What counseling and psychological support options are available to staff members in the aftermath of critical incidents or emergencies?</label>
         <div>
@@ -132,7 +134,7 @@ function PostIncidentSupportFormPage() {
         </div>
       </div>
 
-      <h2>Peer Support Programs:</h2>
+      <h2>3.1.1.2.3.3 Peer Support Programs:</h2>
       <div className="form-section">
         <label>Are peer support programs established to facilitate informal assistance and emotional support among staff members following traumatic events?</label>
         <div>
@@ -163,7 +165,7 @@ function PostIncidentSupportFormPage() {
         </div>
       </div>
 
-      <h2>Family Assistance and Resources:</h2>
+      <h2>3.1.1.2.3.4 Family Assistance and Resources:</h2>
       <div className="form-section">
         <label>How are family members of staff members affected by emergencies supported and informed about available resources?</label>
         <div>
@@ -193,7 +195,7 @@ function PostIncidentSupportFormPage() {
         </div>
       </div>
 
-      <h2>Training and Preparedness:</h2>
+      <h2>3.1.1.2.3.5 Training and Preparedness:</h2>
       <div className="form-section">
         <label>Are staff members trained on the availability and utilization of post-incident support services as part of their emergency response training?</label>
         <div>
@@ -224,7 +226,7 @@ function PostIncidentSupportFormPage() {
         </div>
       </div>
 
-      <h2>Evaluation and Continuous Improvement:</h2>
+      <h2>3.1.1.2.3.6 Evaluation and Continuous Improvement:</h2>
       <div className="form-section">
         <label>How are post-incident support services evaluated for their effectiveness and responsiveness to staff members' needs?</label>
         <div>

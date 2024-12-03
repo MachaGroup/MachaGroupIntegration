@@ -4,7 +4,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';  // Ensure this is linked to your universal CSS
 import logo from '../assets/MachaLogo.png';
-import Navbar from "./Navbar"; // Import the Navbar
+import Navbar from "./Navbar";
 
 function TurnstilesPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -61,7 +61,7 @@ function TurnstilesPage() {
   return (
     <div className="form-page">
       <header className="header">
-        <Navbar />
+            <Navbar />
         {/* Back Button */}
       <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
         <h1>Turnstiles Assessment</h1>

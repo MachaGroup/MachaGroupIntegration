@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
+import Navbar from "./Navbar";
 
 function EmergencyCommunication2FormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -63,6 +64,7 @@ function EmergencyCommunication2FormPage() {
   return (
     <div className="form-page">
         <header className="header">
+            <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>Emergency Communication Assessment</h1>
@@ -72,7 +74,7 @@ function EmergencyCommunication2FormPage() {
         <main className="form-container">
             <form onSubmit={handleSubmit}>
                 {/* 3.1.1.3.1 Emergency Communication */}
-                <h2>Communication Equipment and Tools:</h2>
+                <h2>3.1.1.3.1.1 Communication Equipment and Tools:</h2>
                 <div className="form-section">
                     <label>What communication devices and tools are provided to staff members for emergency communication purposes, such as two-way radios, mobile phones, intercom systems, or panic alarms?</label>
                     <div>
@@ -95,7 +97,7 @@ function EmergencyCommunication2FormPage() {
                     </div>
                 </div>
 
-                <h2>Communication Protocols and Procedures:</h2>
+                <h2>3.1.1.3.1.2 Communication Protocols and Procedures:</h2>
                 <div className="form-section">
                     <label>Are standardized communication protocols and procedures established to facilitate clear, concise, and efficient communication among staff members, emergency responders, and relevant stakeholders during emergencies?</label>
                     <div>
@@ -118,7 +120,7 @@ function EmergencyCommunication2FormPage() {
                     </div>
                 </div>
 
-                <h2>Training and Proficiency:</h2>
+                <h2>3.1.1.3.1.3 Training and Proficiency:</h2>
                 <div className="form-section">
                     <label>Are staff members provided with training on the proper use, operation, and protocols for emergency communication devices and systems?</label>
                     <div>
@@ -142,7 +144,7 @@ function EmergencyCommunication2FormPage() {
                     </div>
                 </div>
 
-                <h2>Coordination and Collaboration:</h2>
+                <h2>3.1.1.3.1.4 Coordination and Collaboration:</h2>
                 <div className="form-section">
                     <label>How are communication systems integrated with broader emergency response plans, incident command structures, and coordination efforts within the school environment?</label>
                     <div>
@@ -165,7 +167,7 @@ function EmergencyCommunication2FormPage() {
                     </div>
                 </div>
 
-                <h2>Redundancy and Backup Systems:</h2>
+                <h2>3.1.1.3.1.5 Redundancy and Backup Systems:</h2>
                 <div className="form-section">
                     <label>Are redundancy measures and backup communication systems implemented to mitigate the risk of communication failures, network disruptions, or equipment malfunctions during emergencies?</label>
                     <div>

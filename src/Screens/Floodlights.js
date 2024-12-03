@@ -4,7 +4,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
-import Navbar from "./Navbar"; // Import the Navbar
+import Navbar from "./Navbar";
 
 function FloodlightsPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -63,7 +63,7 @@ function FloodlightsPage() {
   return (
     <div className="form-page">
       <header className="header">
-        <Navbar />
+            <Navbar />
         {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
         <h1>Floodlights Assessment</h1>

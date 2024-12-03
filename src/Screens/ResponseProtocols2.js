@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
+import Navbar from "./Navbar";
 
 function ResponseProtocols2FormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -62,16 +63,17 @@ function ResponseProtocols2FormPage() {
   return (
     <div className="form-page">
   <header className="header">
+            <Navbar />
     {/* Back Button */}
     <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-    <h1>Response Protocols Assessment</h1>
+    <h1>3.1.1.2.9 Response Protocols Assessment</h1>
     <img src={logo} alt="Logo" className="logo" />
   </header>
 
   <main className="form-container">
     <form onSubmit={handleSubmit}>
       {/* 3.1.1.2.9 Response Protocols */}
-      <h2>Immediate Action Procedures:</h2>
+      <h2>3.1.1.2.9.1 Immediate Action Procedures:</h2>
       <div className="form-section">
         <label>What immediate actions are staff members trained to take in response to different types of emergencies, such as medical emergencies, fire incidents, hazardous material spills, or security threats?</label>
         <div>
@@ -93,7 +95,7 @@ function ResponseProtocols2FormPage() {
         </div>
       </div>
 
-      <h2>Decision-making and Command Structure:</h2>
+      <h2>3.1.1.2.9.2 Decision-making and Command Structure:</h2>
       <div className="form-section">
         <label>How are decision-making responsibilities, authority levels, and incident command structures defined and communicated within the school organization during emergency situations?</label>
         <div>
@@ -116,7 +118,7 @@ function ResponseProtocols2FormPage() {
         </div>
       </div>
 
-      <h2>Emergency Notification and Activation:</h2>
+      <h2>3.1.1.2.9.3 Emergency Notification and Activation:</h2>
       <div className="form-section">
         <label>How are emergency response procedures initiated and communicated to staff members, students, and visitors within the school environment?</label>
         <div>
@@ -139,7 +141,7 @@ function ResponseProtocols2FormPage() {
         </div>
       </div>
 
-      <h2>Resource Allocation and Utilization:</h2>
+      <h2>3.1.1.2.9.4 Resource Allocation and Utilization:</h2>
       <div className="form-section">
         <label>How are resources, equipment, and facilities allocated and utilized during emergency response operations to support incident management, victim care, and logistical needs?</label>
         <div>
@@ -162,7 +164,7 @@ function ResponseProtocols2FormPage() {
         </div>
       </div>
 
-      <h2>Situational Assessment and Information Gathering:</h2>
+      <h2>3.1.1.2.9.5 Situational Assessment and Information Gathering:</h2>
       <div className="form-section">
         <label>How do response protocols facilitate the collection, verification, and dissemination of critical information, situational updates, and incident intelligence to inform decision-making and response actions?</label>
         <div>
