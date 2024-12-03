@@ -45,7 +45,7 @@ function EmergencyCommunication2FormPage() {
       const buildingRef = doc(db, 'Buildings', buildingId); 
 
       // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Personnel Training and Awareness/Emergency Communication 2');
+      const formsRef = collection(db, 'forms/Personnel Training and Awareness/Emergency Communication');
       await addDoc(formsRef, {
           building: buildingRef, // Reference to the building document
           formData: formData, // Store the form data as a nested object
@@ -65,7 +65,7 @@ function EmergencyCommunication2FormPage() {
         <header className="header">
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>3.1.1.3.1 Emergency Communication Assessment</h1>
+            <h1>Emergency Communication Assessment</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
@@ -76,22 +76,22 @@ function EmergencyCommunication2FormPage() {
                 <div className="form-section">
                     <label>What communication devices and tools are provided to staff members for emergency communication purposes, such as two-way radios, mobile phones, intercom systems, or panic alarms?</label>
                     <div>
-                        <input type="text" name="communication-device-tools" placeholder="List the devices/tools" onChange={handleChange} />  
+                        <input type="text" name="communicationDevices" placeholder="List the devices/tools" onChange={handleChange}/>  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>Are communication devices selected based on their reliability, range, durability, and compatibility with existing infrastructure to ensure effective communication capabilities during emergencies?</label>
                     <div>
-                        <input type="radio" name="reliability-devices" value="yes" onChange={handleChange} /> Yes
-                        <input type="radio" name="reliability-devices" value="no" onChange={handleChange} /> No
+                        <input type="radio" name="deviceSelectionCriteria" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="deviceSelectionCriteria" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>How are communication devices maintained, tested, and periodically inspected to verify functionality, battery life, signal strength, and readiness for use in emergency situations?</label>
                     <div>
-                        <input type="text" name="maintained-devices" placeholder="Describe how they're maintained" onChange={handleChange} />  
+                        <input type="text" name="deviceMaintenance" placeholder="Describe how they're maintained" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -99,22 +99,22 @@ function EmergencyCommunication2FormPage() {
                 <div className="form-section">
                     <label>Are standardized communication protocols and procedures established to facilitate clear, concise, and efficient communication among staff members, emergency responders, and relevant stakeholders during emergencies?</label>
                     <div>
-                        <input type="radio" name="standardized-protocols" value="yes" onChange={handleChange} /> Yes
-                        <input type="radio" name="standardized-protocols" value="no" onChange={handleChange} /> No
+                        <input type="radio" name="communicationProtocols" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="communicationProtocols" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>How are communication channels designated, prioritized, and utilized for different types of emergency communications, such as distress calls, status updates, incident reports, or coordination messages?</label>
                     <div>
-                        <input type="text" name="designated-channels" placeholder="Describe how they're designated" onChange={handleChange} />  
+                        <input type="text" name="communicationChannels" placeholder="Describe how they're designated" onChange={handleChange}/>  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>What measures are in place to ensure adherence to communication protocols, minimize radio interference, avoid channel congestion, and prioritize emergency traffic during critical incidents?</label>
                     <div>
-                        <input type="text" name="ensuring-adherence-measures" placeholder="Describe the measures" onChange={handleChange} />  
+                        <input type="text" name="protocolAdherence" placeholder="Describe the measures" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -122,23 +122,23 @@ function EmergencyCommunication2FormPage() {
                 <div className="form-section">
                     <label>Are staff members provided with training on the proper use, operation, and protocols for emergency communication devices and systems?</label>
                     <div>
-                        <input type="radio" name="proper-use-training" value="yes" onChange={handleChange} /> Yes
-                        <input type="radio" name="proper-use-training" value="no" onChange={handleChange} /> No
+                        <input type="radio" name="staffTraining" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="staffTraining" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>Do training programs include practical exercises, simulations, or role-playing scenarios to familiarize staff members with communication procedures, protocols, and equipment operation under simulated emergency conditions?</label>
                     <div>
-                        <input type="radio" name="training-programs" value="yes" onChange={handleChange} /> Yes
-                        <input type="radio" name="training-programs" value="no" onChange={handleChange} /> No
+                        <input type="radio" name="trainingPrograms" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="trainingPrograms" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>How are staff members assessed for proficiency in emergency communication skills, such as effective radio etiquette, message clarity, active listening, and situational awareness during training exercises and drills?</label>
                     <div>
-                        <input type="text" name="assessed-proficiency" placeholder="Describe how they're accessed" onChange={handleChange} />  
+                        <input type="text" name="communicationProficiency" placeholder="Describe how they're accessed" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -146,22 +146,22 @@ function EmergencyCommunication2FormPage() {
                 <div className="form-section">
                     <label>How are communication systems integrated with broader emergency response plans, incident command structures, and coordination efforts within the school environment?</label>
                     <div>
-                        <input type="text" name="integrated-systems" placeholder="Describe how they're integrated" onChange={handleChange} />  
+                        <input type="text" name="systemIntegration" placeholder="Describe how they're integrated" onChange={handleChange}/>  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>Are communication protocols aligned with incident management protocols, resource allocation procedures, and decision-making frameworks to support effective coordination, information sharing, and situational awareness during emergencies?</label>
                     <div>
-                        <input type="radio" name="aligned-protocols" value="yes" onChange={handleChange} /> Yes
-                        <input type="radio" name="aligned-protocols" value="no" onChange={handleChange} /> No
+                        <input type="radio" name="protocolAlignment" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="protocolAlignment" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>What mechanisms are in place to facilitate communication and collaboration with external agencies, such as emergency dispatch centers, law enforcement agencies, fire departments, or medical response teams, during emergency incidents?</label>
                     <div>
-                        <input type="text" name="facilitating-communication" placeholder="Describe the measures" onChange={handleChange} />  
+                        <input type="text" name="externalCollaboration" placeholder="Describe the measures" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -169,31 +169,25 @@ function EmergencyCommunication2FormPage() {
                 <div className="form-section">
                     <label>Are redundancy measures and backup communication systems implemented to mitigate the risk of communication failures, network disruptions, or equipment malfunctions during emergencies?</label>
                     <div>
-                        <input type="radio" name="redundancy-measures" value="yes" onChange={handleChange} /> Yes
-                        <input type="radio" name="redundancy-measures" value="no" onChange={handleChange} /> No
-                    </div>
-                    <div>
-                        <input type="text" name="redundancy-measures" placeholder="Describe the measures" onChange={handleChange} />  
+                        <input type="text" name="redundancyMeasures" placeholder="Describe the measures" onChange={handleChange}/>  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>How are redundant communication channels, alternative communication methods, or backup power sources utilized to ensure continuity of communication and information flow in the event of primary system failures or infrastructure damage?</label>
                     <div>
-                        <input type="text" name="redundant-channels" placeholder="Describe the redundancy" onChange={handleChange} />  
+                        <input type="text" name="backupCommunication" placeholder="Describe the redundancy" onChange={handleChange}/>  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>What provisions are in place to maintain communication resilience, restore functionality, and adapt communication strategies to changing conditions or evolving threats during prolonged emergency incidents?</label>
                     <div>
-                        <input type="text" name="maintaining-resilience" placeholder="Describe the provisions" onChange={handleChange} />  
+                        <input type="text" name="communicationResilience" placeholder="Describe the provisions" onChange={handleChange}/>  
                     </div>
                 </div>
 
-                {/* Submit Button */}
-                <button type="submit">Submit</button>
-
+            <button type='submit'>Submit</button>
             </form>
         </main>
     </div>

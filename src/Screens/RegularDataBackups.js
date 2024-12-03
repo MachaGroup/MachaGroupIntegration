@@ -3,6 +3,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 
 function RegularDataBackupsPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -65,50 +66,50 @@ function RegularDataBackupsPage() {
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>7.3.2.2 Data Protection Measures</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
-                <div className="form-section">
+              <div className="form-section">
                 {/* Data Encryption Protocols */}
                 <h3> 7.3.2.2.2 Regular Data Backups</h3>
                 <label>What is the frequency of data backups (e.g., daily, weekly, monthly), and how is this schedule determined?</label>
-            <div>
-              <input type="text" name="backupFrequency" placeholder="Describe data backup frequency and rationale" />
-            </div>
-          </div>
+                <div>
+                  <input type="text" name="backupFrequency" placeholder="Describe data backup frequency and rationale" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>What types of data are included in the backup process, and are there any exclusions?</label>
-            <div>
-              <input type="text" name="backupDataTypes" placeholder="Describe types of data included in backups" />
-            </div>
-          </div>
+              <div className="form-section">
+                <label>What types of data are included in the backup process, and are there any exclusions?</label>
+                <div>
+                  <input type="text" name="backupDataTypes" placeholder="Describe types of data included in backups" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>How are backup data stored, and what measures are in place to ensure the security of these backups?</label>
-            <div>
-              <input type="text" name="backupStorageSecurity" placeholder="Describe backup data storage and security" />
-            </div>
-          </div>
+              <div className="form-section">
+                <label>How are backup data stored, and what measures are in place to ensure the security of these backups?</label>
+                <div>
+                  <input type="text" name="backupStorageSecurity" placeholder="Describe backup data storage and security" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>What testing procedures are conducted to verify the integrity and recoverability of backup data?</label>
-            <div>
-              <input type="text" name="backupTesting" placeholder="Describe testing procedures for backup integrity" />
-            </div>
-          </div>
+              <div className="form-section">
+                <label>What testing procedures are conducted to verify the integrity and recoverability of backup data?</label>
+                <div>
+                  <input type="text" name="backupTesting" placeholder="Describe testing procedures for backup integrity" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>How is the backup process documented, and who is responsible for overseeing it?</label>
-            <div>
-              <input type="text" name="backupDocumentation" placeholder="Describe documentation and oversight for backups" />
-            </div>
-          </div>
+              <div className="form-section">
+                <label>How is the backup process documented, and who is responsible for overseeing it?</label>
+                <div>
+                  <input type="text" name="backupDocumentation" placeholder="Describe documentation and oversight for backups" onChange={handleChange}/>
+                </div>
+              </div>
           
-                    {/* Submit Button */}
-                    <button type="submit">Submit</button>
-
+              {/* Submit Button */}
+              <button type="submit">Submit</button>
             </form>
         </main>
     </div>

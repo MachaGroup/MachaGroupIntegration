@@ -76,22 +76,22 @@ function RecognizingSecurityBreachesFormPage() {
                 <div className="form-section">
                     <label>Are staff members trained to identify and recognize common security vulnerabilities, weaknesses, or gaps in physical security measures, access controls, or surveillance systems that could be exploited by intruders or unauthorized individuals?</label>
                     <div>
-                        <input type="radio" name="identifying-security-vulnerabilities" value="yes" onChange={handleChange} /> Yes
-                        <input type="radio" name="identifying-security-vulnerabilities" value="no" onChange={handleChange} /> No
+                        <input type="radio" name="securityVulnerabilityTraining" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="securityVulnerabilityTraining" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
                 
                 <div className="form-section">
                     <label>What specific indicators or warning signs are emphasized during training as potential evidence of security breaches, such as unauthorized access points, tampered locks, broken windows, or unexplained disruptions to normal operations?</label>
                     <div>
-                        <input type="text" name="warning-signs" placeholder="Describe the indicators/warning signs" onChange={handleChange} />  
+                        <input type="text" name="securityIndicators" placeholder="Describe the indicators/warning signs" onChange={handleChange}/>  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>How are staff members educated on the importance of maintaining a proactive and vigilant stance towards security, actively monitoring their surroundings, and promptly reporting any deviations from established security protocols or procedures?</label>
                     <div>
-                        <input type="text" name="maintaining-proactive-stance" placeholder="Describe how they're educated" onChange={handleChange} />  
+                        <input type="text" name="proactiveEducation" placeholder="Describe how they're educated" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -99,25 +99,21 @@ function RecognizingSecurityBreachesFormPage() {
                 <div className="form-section">
                     <label>Are clear response protocols and procedures established for staff members to follow in the event of a suspected security breach, unauthorized access attempt, or breach of perimeter security?</label>
                     <div>
-                        <input type="radio" name="suspected-security-breach" value="yes" onChange={handleChange} /> Yes
-                        <input type="radio" name="suspected-security-breach" value="no" onChange={handleChange} /> No
-                    </div>
-                    <div>
-                        <input type="text" name="response-protocols" placeholder="Describe the protocols/procedures" onChange={handleChange} />  
+                        <input type="text" name="responseProtocols" placeholder="Describe the protocols/procedures" onChange={handleChange}/>  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>How are staff members trained to respond effectively and decisively to security breaches, including actions such as initiating lockdown procedures, activating alarm systems, alerting security personnel or law enforcement authorities, and directing occupants to safe locations?</label>
                     <div>
-                        <input type="text" name="response-training" placeholder="Describe how they're trained" onChange={handleChange} />  
+                        <input type="text" name="responseTraining" placeholder="Describe how they're trained" onChange={handleChange}/>  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>What measures are in place to ensure that staff members understand their roles and responsibilities during security incidents, coordinate their actions with other team members, and communicate critical information to facilitate a prompt and coordinated response?</label>
                     <div>
-                        <input type="text" name="understanding-roles" placeholder="Describe the measures" onChange={handleChange} />  
+                        <input type="text" name="roleCoordination" placeholder="Describe the measures" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -125,22 +121,22 @@ function RecognizingSecurityBreachesFormPage() {
                 <div className="form-section">
                     <label>Are staff members provided with training on the proper use, operation, and troubleshooting of security devices, such as access control systems, surveillance cameras, intrusion detection sensors, or alarm systems?</label>
                     <div>
-                        <input type="radio" name="proper-use-training" value="yes" onChange={handleChange} /> Yes
-                        <input type="radio" name="proper-use-training" value="no" onChange={handleChange} /> No
+                        <input type="radio" name="deviceFamiliarization" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="deviceFamiliarization" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>How are staff members instructed to recognize abnormal behavior or indications of malfunction in security devices that could signal a potential security breach or technical issue requiring immediate attention?</label>
                     <div>
-                        <input type="text" name="recognizing-abnormal-behavior" placeholder="Describe how they're instructed" onChange={handleChange} />  
+                        <input type="text" name="deviceMalfunctionRecognition" placeholder="Describe how they're instructed" onChange={handleChange}/>  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>What resources or reference materials are available to staff members to assist them in troubleshooting common security device issues, interpreting system alerts or error messages, and taking appropriate corrective actions to restore functionality?</label>
                     <div>
-                        <input type="text" name="troubleshooting-resources" placeholder="List the resources/reference materials" onChange={handleChange} />  
+                        <input type="text" name="troubleshootingResources" placeholder="List the resources/reference materials" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -148,22 +144,22 @@ function RecognizingSecurityBreachesFormPage() {
                 <div className="form-section">
                     <label>Are staff members trained on the importance of documenting and reporting security breaches or unauthorized access incidents in a timely and accurate manner to support investigation, analysis, and corrective action?</label>
                     <div>
-                        <input type="radio" name="documenting-importance" value="yes" onChange={handleChange} /> Yes
-                        <input type="radio" name="documenting-importance" value="no" onChange={handleChange} /> No
+                        <input type="radio" name="incidentReportingTraining" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="incidentReportingTraining" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>How are staff members instructed to document relevant details and observations regarding security breaches, including the location, time, nature of the incident, individuals involved, and any additional contextual information that may aid in understanding the situation?</label>
                     <div>
-                        <input type="text" name="instructed-documenting-details" placeholder="Describe how they're instructed" onChange={handleChange} />  
+                        <input type="text" name="incidentDocumentation" placeholder="Describe how they're instructed" onChange={handleChange}/>  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>What protocols are in place for reporting security breaches to designated authorities, security personnel, or administrative staff members, and how are staff members informed of their obligations and responsibilities in this regard?</label>
                     <div>
-                        <input type="text" name="reporting-breaches" placeholder="Describe the protocols" onChange={handleChange} />  
+                        <input type="text" name="reportingProtocols" placeholder="Describe the protocols" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -171,28 +167,26 @@ function RecognizingSecurityBreachesFormPage() {
                 <div className="form-section">
                     <label>How does the organization promote a culture of continuous improvement in security awareness and breach recognition capabilities among staff members through ongoing training, reinforcement activities, and feedback mechanisms?</label>
                     <div>
-                        <input type="text" name="promoting-culture" placeholder="Describe how they promote" onChange={handleChange} />  
+                        <input type="text" name="continuousImprovement" placeholder="Describe how they promote" onChange={handleChange}/>  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>Are staff members encouraged to provide feedback on security protocols, procedures, or training materials based on their real-world experiences, insights, or suggestions for enhancing security awareness and breach recognition effectiveness?</label>
                     <div>
-                        <input type="radio" name="security-protocols-feedback" value="yes" onChange={handleChange} /> Yes
-                        <input type="radio" name="security-protocols-feedback" value="no" onChange={handleChange} /> No
+                        <input type="radio" name="feedbackEncouragement" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="feedbackEncouragement" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>What mechanisms are in place to review and analyze reported security breaches, identify root causes or contributing factors, and implement corrective actions or procedural enhancements to prevent recurrence and strengthen overall security posture?</label>
                     <div>
-                        <input type="text" name="reviewing-breaches" placeholder="Describe the mechanisms" onChange={handleChange} />  
+                        <input type="text" name="breachAnalysisMechanisms" placeholder="Describe the mechanisms" onChange={handleChange}/>  
                     </div>
                 </div>
 
-                {/* Submit Button */}
-                <button type="submit">Submit</button>
-
+                <button type='submit'>Submit</button>
             </form>
         </main>
     </div>

@@ -3,6 +3,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 
 function DataEncryptionProtocolsPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -65,6 +66,7 @@ function DataEncryptionProtocolsPage() {
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>7.3.2.2 Data Protection Measures</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
@@ -74,35 +76,35 @@ function DataEncryptionProtocolsPage() {
                 <h3> 7.3.2.2.1 Data Encryption Protocols</h3>
                 <label>What types of data are prioritized for encryption, and what criteria determine this prioritization?</label>
             <div>
-              <input type="text" name="encryptionPrioritization" placeholder="Describe criteria for data encryption prioritization" />
+              <input type="text" name="encryptionPrioritization" placeholder="Describe criteria for data encryption prioritization" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How are encryption keys managed and protected to prevent unauthorized access?</label>
             <div>
-              <input type="text" name="encryptionKeyManagement" placeholder="Describe encryption key management processes" />
+              <input type="text" name="encryptionKeyManagement" placeholder="Describe encryption key management processes" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>What encryption standards or protocols (e.g., AES, RSA) are implemented to secure data both in transit and at rest?</label>
             <div>
-              <input type="text" name="encryptionStandards" placeholder="Describe encryption standards or protocols" />
+              <input type="text" name="encryptionStandards" placeholder="Describe encryption standards or protocols" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How frequently are encryption methods reviewed and updated to address emerging threats or vulnerabilities?</label>
             <div>
-              <input type="text" name="encryptionReviewFrequency" placeholder="Describe frequency of encryption method review" />
+              <input type="text" name="encryptionReviewFrequency" placeholder="Describe frequency of encryption method review" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>What processes are in place to ensure compliance with relevant regulations regarding data encryption?</label>
             <div>
-              <input type="text" name="encryptionCompliance" placeholder="Describe compliance processes for data encryption" />
+              <input type="text" name="encryptionCompliance" placeholder="Describe compliance processes for data encryption" onChange={handleChange}/>
             </div>
           </div>
           

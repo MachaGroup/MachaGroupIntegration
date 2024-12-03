@@ -3,6 +3,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 
 function IdentifyingSuspiciousBehavior2Page() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -65,6 +66,7 @@ function IdentifyingSuspiciousBehavior2Page() {
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
             <h1>7.2.3.2 Security Awareness Training</h1>
+            <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
@@ -74,35 +76,35 @@ function IdentifyingSuspiciousBehavior2Page() {
                 <h3> 7.2.3.2.1 Identifying Suspicious Behavior 2</h3>
                 <label>What specific behaviors are staff trained to recognize as suspicious in the school environment?</label>
             <div>
-              <input type="text" name="suspiciousBehavior" placeholder="Describe behaviors considered suspicious in the school" />
+              <input type="text" name="suspiciousBehavior" placeholder="Describe behaviors considered suspicious in the school" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How is the training for identifying suspicious behavior conducted (e.g., workshops, online modules)?</label>
             <div>
-              <input type="text" name="suspiciousBehaviorTrainingMethod" placeholder="Describe methods for training to identify suspicious behavior" />
+              <input type="text" name="suspiciousBehaviorTrainingMethod" placeholder="Describe methods for training to identify suspicious behavior" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>What resources or tools are provided to staff for reporting suspicious behavior?</label>
             <div>
-              <input type="text" name="reportingResources" placeholder="Describe resources for reporting suspicious behavior" />
+              <input type="text" name="reportingResources" placeholder="Describe resources for reporting suspicious behavior" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>How often is the training on identifying suspicious behavior reviewed or updated to reflect current security concerns?</label>
             <div>
-              <input type="text" name="suspiciousBehaviorTrainingReview" placeholder="Describe review/update frequency for suspicious behavior training" />
+              <input type="text" name="suspiciousBehaviorTrainingReview" placeholder="Describe review/update frequency for suspicious behavior training" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
             <label>Are there real-life scenarios or examples included in the training to help staff better understand suspicious behavior?</label>
             <div>
-              <input type="text" name="realLifeScenarios" placeholder="Describe inclusion of real-life scenarios in training" />
+              <input type="text" name="realLifeScenarios" placeholder="Describe inclusion of real-life scenarios in training" onChange={handleChange}/>
             </div>
           </div>
           

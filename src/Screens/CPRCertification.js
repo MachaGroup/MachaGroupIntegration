@@ -68,6 +68,7 @@ function CPRCertificationFormPage() {
     <h1>3.1.1.2.6 CPR Certification Assessment</h1>
     <img src={logo} alt="Logo" className="logo" />
   </header>
+
   <main className="form-container">
     <form onSubmit={handleSubmit}>
       {/* 3.1.1.2.6 CPR Certification */}
@@ -136,9 +137,9 @@ function CPRCertificationFormPage() {
         </div>
         <div>
           <select id="delivery-methods" multiple>
-            <option value="in-person" onChange={handleChange} >In-person</option>
-            <option value="online" onChange={handleChange} >Online</option>
-            <option value="blended" onChange={handleChange} >Blended learning approaches</option>
+          <input type="radio" name="trainingDeliveryModes" value="in-person" onChange={handleChange}/> In-person
+          <input type="radio" name="trainingDeliveryModes" value="online" onChange={handleChange}/> Online
+          <input type="radio" name='trainingDeliveryModes' value='blended' onChange={handleChange}/> Blended Learning Approaches
           </select>
         </div>
       </div>

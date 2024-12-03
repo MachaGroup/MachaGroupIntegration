@@ -65,7 +65,7 @@ function RecertificationScheduleFormPage() {
   <header className="header">
     {/* Back Button */}
     <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-    <h1>3.1.1.1.3 Recertification Schedule Assessment</h1>
+    <h1>Recertification Schedule Assessment</h1>
     <img src={logo} alt="Logo" className="logo" />
   </header>
 
@@ -76,22 +76,22 @@ function RecertificationScheduleFormPage() {
       <div className="form-section">
         <label>What is the established frequency for recertifying staff members in First Aid/CPR training (e.g., every two years, annually)?</label>
         <div>
-          <input type="text" name="recertification-frequency" placeholder="Describe the method for recertifying" onChange={handleChange} />
+          <input type="text" name="recertificationFrequency" placeholder="Describe the method for recertifying" onChange={handleChange}/>
         </div>
       </div>
 
       <div className="form-section">
         <label>How is the recertification schedule determined, and are there specific factors or regulations guiding this decision?</label>
         <div>
-          <input type="text" name="recertification-schedule-determination" placeholder="Describe how the schedule is determined" onChange={handleChange} />
+          <input type="text" name="recertificationScheduleDetermination" placeholder="Describe how the schedule is determined" onChange={handleChange}/>
         </div>
       </div>
 
       <div className="form-section">
         <label>Are there variations in recertification requirements based on job roles, departmental needs, or regulatory standards?</label>
         <div>
-          <input type="radio" name="recertification-variations" value="yes" onChange={handleChange} /> Yes
-          <input type="radio" name="recertification-variations" value="no" onChange={handleChange} /> No
+          <input type="radio" name="recertificationVariations" value="yes" onChange={handleChange}/> Yes
+          <input type="radio" name="recertificationVariations" value="no" onChange={handleChange}/> No
         </div>
       </div>
 
@@ -99,22 +99,22 @@ function RecertificationScheduleFormPage() {
       <div className="form-section">
         <label>How are staff members notified of upcoming recertification deadlines for First Aid/CPR training?</label>
         <div>
-          <input type="text" name="notification-methods" placeholder="Describe how the staff is notified" onChange={handleChange} />
+          <input type="text" name="notificationMethods" placeholder="Describe how the staff is notified" onChange={handleChange}/>
         </div>
       </div>
 
       <div className="form-section">
         <label>Is there a reminder system in place to alert staff members well in advance of their recertification expiration dates?</label>
         <div>
-          <input type="radio" name="reminder-system" value="yes" onChange={handleChange} /> Yes
-          <input type="radio" name="reminder-system" value="no" onChange={handleChange} /> No
+          <input type="radio" name="reminderSystem" value="yes" onChange={handleChange}/> Yes
+          <input type="radio" name="reminderSystem" value="no" onChange={handleChange}/> No
         </div>
       </div>
 
       <div className="form-section">
         <label>What communication channels are utilized to ensure that staff members receive timely reminders about recertification requirements?</label>
         <div>
-          <input type="text" name="communication-channels" placeholder="List the communication channels" onChange={handleChange} />
+          <input type="text" name="communicationChannels" placeholder="List the communication channels" onChange={handleChange}/>
         </div>
       </div>
 
@@ -122,22 +122,22 @@ function RecertificationScheduleFormPage() {
       <div className="form-section">
         <label>What is the process for staff members to recertify in First Aid/CPR training, and are there specific steps or procedures they need to follow?</label>
         <div>
-          <input type="text" name="recertification-process" placeholder="Describe the process" onChange={handleChange} />
+          <input type="text" name="recertificationProcess" placeholder="Describe the process" onChange={handleChange}/>
         </div>
       </div>
 
       <div className="form-section">
         <label>Are recertification courses offered on-site, online, or through external training providers, and how are these options determined?</label>
         <div>
-          <input type="radio" name="recertification-options" value="yes" onChange={handleChange} /> Yes
-          <input type="radio" name="recertification-options" value="no" onChange={handleChange} /> No
+          <input type="radio" name="recertificationOptions" value="yes" onChange={handleChange}/> Yes
+          <input type="radio" name="recertificationOptions" value="no" onChange={handleChange}/> No
         </div>
       </div>
 
       <div className="form-section">
         <label>How are staff members supported in completing recertification requirements, such as scheduling flexibility or financial assistance?</label>
         <div>
-          <input type="text" name="recertification-support" placeholder="Describe how the staff is supported to complete requirements" onChange={handleChange} />
+          <input type="text" name="recertificationSupport" placeholder="Describe how the staff is supported to complete requirements" onChange={handleChange}/>
         </div>
       </div>
 
@@ -145,25 +145,21 @@ function RecertificationScheduleFormPage() {
       <div className="form-section">
         <label>How are records of staff members' recertification status and completion maintained, and are these records kept up to date?</label>
         <div>
-          <input type="text" name="recertification-records" placeholder="Describe how the records are maintained" onChange={handleChange} />
+          <input type="text" name="recertificationRecords" placeholder="Describe how the records are maintained" onChange={handleChange}/>
         </div>
       </div>
 
       <div className="form-section">
         <label>Are recertification certificates or credentials issued to staff members upon successful completion, and how are these documents distributed or stored?</label>
         <div>
-          <input type="radio" name="certificates-issuance" value="yes" onChange={handleChange} /> Yes
-          <input type="radio" name="certificates-issuance" value="no" onChange={handleChange} /> No
-        </div>
-        <div>
-          <input type="text" name="certificate-distribution" placeholder="Describe how they are distributed or stored" onChange={handleChange} />
+          <input type="text" name="certificateDistribution" placeholder="Describe how they are distributed or stored" onChange={handleChange}/>
         </div>
       </div>
 
       <div className="form-section">
         <label>What measures are in place to ensure the accuracy and integrity of recertification records, including verification of course completion and instructor credentials?</label>
         <div>
-          <input type="text" name="records-integrity" placeholder="Describe the measures" onChange={handleChange} />
+          <input type="text" name="recordsIntegrity" placeholder="Describe the measures" onChange={handleChange}/>
         </div>
       </div>
 
@@ -171,32 +167,27 @@ function RecertificationScheduleFormPage() {
       <div className="form-section">
         <label>How is the effectiveness of the recertification process evaluated, and are there mechanisms for gathering feedback from staff members?</label>
         <div>
-          <input type="radio" name="recertification-evaluation" value="yes" onChange={handleChange} /> Yes
-          <input type="radio" name="recertification-evaluation" value="no" onChange={handleChange} /> No
-        </div>
-        <div>
-          <input type="text" name="evaluation-feedback" placeholder="Describe the mechanisms" onChange={handleChange} />
+          <input type="text" name="evaluationFeedback" placeholder="Describe the mechanisms" onChange={handleChange}/>
         </div>
       </div>
 
       <div className="form-section">
         <label>Are staff members given the opportunity to provide input on the recertification courses, instructors, or content to identify areas for improvement?</label>
         <div>
-          <input type="radio" name="staff-feedback" value="yes" onChange={handleChange} /> Yes
-          <input type="radio" name="staff-feedback" value="no" onChange={handleChange} /> No
+          <input type="radio" name="staffFeedback" value="yes" onChange={handleChange}/> Yes
+          <input type="radio" name="staffFeedback" value="no" onChange={handleChange}/> No
         </div>
       </div>
 
       <div className="form-section">
         <label>How are lessons learned from previous recertification cycles used to refine and enhance the recertification process for future iterations?</label>
         <div>
-          <input type="text" name="lessons-learned" placeholder="Describe how lessons are learned" onChange={handleChange} />
+          <input type="text" name="lessonsLearned" placeholder="Describe how lessons are learned" onChange={handleChange}/>
         </div>
       </div>
 
       {/* Submit Button */}
-      <button type="submit">Submit</button>
-
+      <button type='submit'>Submit</button>
     </form>
   </main>
 </div>

@@ -14,8 +14,8 @@ function EmergencyResponseTrainingPage() {
       case 'Scenario-based Training':
         navigate('/ScenarioBasedTraining');
         break;
-      case 'Response Protocols':
-        navigate('/ResponseProtocols');
+      case 'Emergency Response Protocols':
+        navigate('/EmergencyResponseProtocols');
         break;
       case 'Post-Incident Support':
         navigate('/PostIncidentSupport');
@@ -38,8 +38,8 @@ function EmergencyResponseTrainingPage() {
       case 'Response Protocols':
         navigate('/ResponseProtocols2');
         break;
-      case 'Evacuation Procedures':
-        navigate('/EvacuationProcedures2');
+      case 'Emergency Evacuation Procedures':
+        navigate('/EmergencyEvacuationProcedures');
         break;
       default:
         console.log('Unknown section');
@@ -60,7 +60,7 @@ function EmergencyResponseTrainingPage() {
         <h2>Emergency Response Training</h2>
         <form>
           {/* Emergency Response Training Buttons */}
-          {['Scenario-based Training', 'Response Protocols', 'Post-Incident Support', 'First Aid/CPR Training', 'Basic First Aid Techniques', 'CPR Certification', 'AED Training', 'Active Shooter Response', 'Response Protocols', 'Evacuation Procedures'].map((section, index) => (
+          {['Scenario-based Training', 'Emergency Response Protocols', 'Post-Incident Support', 'First Aid/CPR Training', 'Basic First Aid Techniques', 'CPR Certification', 'AED Training', 'Active Shooter Response', 'Response Protocols', 'Emergency Evacuation Procedures'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>

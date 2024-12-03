@@ -45,7 +45,7 @@ function PhishingAwareness2FormPage() {
       const buildingRef = doc(db, 'Buildings', buildingId); 
 
       // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Personnel Training and Awareness/Phishing Awareness 2');
+      const formsRef = collection(db, 'forms/Personnel Training and Awareness/Phishing Awareness');
       await addDoc(formsRef, {
           building: buildingRef, // Reference to the building document
           formData: formData, // Store the form data as a nested object
@@ -76,22 +76,22 @@ function PhishingAwareness2FormPage() {
                 <div className="form-section">
                     <label>Are staff members trained to recognize common indicators of phishing attempts, such as unsolicited emails requesting sensitive information, urgent requests for account credentials, or messages containing suspicious links or attachments?</label>
                     <div>
-                        <input type="radio" name="common-indicators" value="yes" onChange={handleChange} /> Yes
-                        <input type="radio" name="common-indicators" value="no" onChange={handleChange} /> No
+                        <input type="radio" name="phishingTrainingRecognition" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="phishingTrainingRecognition" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
                 
                 <div className="form-section">
                     <label>What specific characteristics or red flags are emphasized during training as potential signs of phishing, such as misspelled or unfamiliar sender addresses, generic greetings, grammatical errors, or requests for confidential data?</label>
                     <div>
-                        <input type="text" name="red-flags" placeholder="Describe the characteristics/red flags" onChange={handleChange} />  
+                        <input type="text" name="phishingRedFlags" placeholder="Describe the characteristics/red flags" onChange={handleChange}/>  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>How are staff members educated on the importance of exercising caution and skepticism when interacting with email messages, especially those prompting them to disclose personal information or take immediate action without verification?</label>
                     <div>
-                        <input type="text" name="exercising-caution" placeholder="Describe how they're educated" onChange={handleChange} />  
+                        <input type="text" name="phishingCautionEducation" placeholder="Describe how they're educated" onChange={handleChange}/>  
                     </div>
                 </div>
                 
@@ -99,25 +99,21 @@ function PhishingAwareness2FormPage() {
                 <div className="form-section">
                     <label>Are clear response protocols and procedures established for staff members to follow in the event of encountering a suspected phishing email or cyber threat, including steps to report the incident, mitigate risks, and safeguard sensitive information?</label>
                     <div>
-                        <input type="radio" name="encountering-phishing-email" value="yes" onChange={handleChange} /> Yes
-                        <input type="radio" name="encountering-phishing-email" value="no" onChange={handleChange} /> No
-                    </div>
-                    <div>
-                        <input type="text" name="response-protocols" placeholder="Describe the protocols/procedures" onChange={handleChange} />  
+                        <input type="text" name="phishingResponseProtocols" placeholder="Describe the protocols/procedures" onChange={handleChange}/>  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>How are staff members trained to respond effectively to phishing attempts, such as refraining from clicking on suspicious links or attachments, verifying the authenticity of sender identities, and forwarding suspicious emails to designated IT or security personnel for analysis?</label>
                     <div>
-                        <input type="text" name="responding-to-phishing-attempts" placeholder="Describe how they're trained" onChange={handleChange} />  
+                        <input type="text" name="phishingResponseTraining" placeholder="Describe how they're trained" onChange={handleChange}/>  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>What measures are in place to ensure that staff members understand their roles and responsibilities in preventing, detecting, and responding to phishing attacks, including the escalation of incidents to appropriate authorities for further investigation and remediation?</label>
                     <div>
-                        <input type="text" name="understanding-roles" placeholder="Describe the measures" onChange={handleChange} />  
+                        <input type="text" name="phishingRolesAndResponsibilities" placeholder="Describe the measures" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -125,22 +121,22 @@ function PhishingAwareness2FormPage() {
                 <div className="form-section">
                     <label>Are staff members provided with opportunities to participate in simulated phishing exercises or awareness campaigns designed to mimic real-world phishing scenarios and test their ability to recognize and respond to phishing threats?</label>
                     <div>
-                        <input type="radio" name="simulated-phishing-exercises" value="yes" onChange={handleChange} /> Yes
-                        <input type="radio" name="simulated-phishing-exercises" value="no" onChange={handleChange} /> No
+                        <input type="radio" name="phishingSimulationOpportunities" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="phishingSimulationOpportunities" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>How do phishing simulation exercises simulate various phishing techniques and tactics, challenge staff members' ability to differentiate between legitimate and fraudulent emails, and reinforce best practices for mitigating phishing risks?</label>
                     <div>
-                        <input type="text" name="phishing-techniques" placeholder="Describe how they simulate" onChange={handleChange} />  
+                        <input type="text" name="phishingSimulationDescription" placeholder="Describe how they simulate" onChange={handleChange}/>  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>What feedback mechanisms are utilized to evaluate staff members' performance during phishing simulation exercises, track their progress in identifying phishing attempts, and provide targeted guidance or training to address areas for improvement?</label>
                     <div>
-                        <input type="text" name="evaluating-performance" placeholder="Describe the mechanisms" onChange={handleChange} />  
+                        <input type="text" name="phishingSimulationFeedback" placeholder="Describe the mechanisms" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -148,22 +144,22 @@ function PhishingAwareness2FormPage() {
                 <div className="form-section">
                     <label>Are educational resources, awareness materials, or interactive modules available to staff members to enhance their understanding of phishing threats, cybersecurity best practices, and proactive measures for safeguarding sensitive information?</label>
                     <div>
-                        <input type="radio" name="enhance-understanding" value="yes" onChange={handleChange} /> Yes
-                        <input type="radio" name="enhance-understanding" value="no" onChange={handleChange} /> No
+                        <input type="radio" name="phishingEducationalResources" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="phishingEducationalResources" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>How are staff members provided with access to informational resources, instructional videos, or online tutorials covering topics such as email security, password hygiene, two-factor authentication, and safe browsing habits to reinforce phishing awareness and prevention strategies?</label>
                     <div>
-                        <input type="text" name="informational-resources" placeholder="Describe how they're provided" onChange={handleChange} />  
+                        <input type="text" name="phishingResourceAccess" placeholder="Describe how they're provided" onChange={handleChange}/>  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>What strategies are employed to promote ongoing engagement and awareness among staff members regarding emerging phishing trends, evolving cyber threats, and recommended countermeasures to protect against phishing attacks in a dynamic threat landscape?</label>
                     <div>
-                        <input type="text" name="promoting-engagement" placeholder="Describe the strategies" onChange={handleChange} />  
+                        <input type="text" name="phishingEngagementStrategies" placeholder="Describe the strategies" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -171,28 +167,26 @@ function PhishingAwareness2FormPage() {
                 <div className="form-section">
                     <label>Are staff members informed of the procedures for reporting suspected phishing emails or cyber incidents to designated IT or security personnel for investigation and response?</label>
                     <div>
-                        <input type="radio" name="informed-procedures" value="yes" onChange={handleChange} /> Yes
-                        <input type="radio" name="informed-procedures" value="no" onChange={handleChange} /> No
+                        <input type="radio" name="phishingReportingProcedures" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="phishingReportingProcedures" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>How are staff members encouraged to promptly report phishing attempts, security breaches, or suspicious activities through established reporting channels, incident response mechanisms, or incident management systems?</label>
                     <div>
-                        <input type="text" name="reporting-phishing-attempts" placeholder="Describe how they're encouraged" onChange={handleChange} />  
+                        <input type="text" name="phishingReportingEncouragement" placeholder="Describe how they're encouraged" onChange={handleChange}/>  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>What mechanisms are in place to facilitate timely analysis, triage, and resolution of reported phishing incidents, including communication with affected individuals, containment of threats, and implementation of corrective actions to prevent recurrence?</label>
                     <div>
-                        <input type="text" name="facilitating-timely-analysis" placeholder="Describe the mechanisms" onChange={handleChange} />  
+                        <input type="text" name="phishingIncidentManagement" placeholder="Describe the mechanisms" onChange={handleChange}/>  
                     </div>
                 </div>
 
-                {/* Submit Button */}
-                <button type="submit">Submit</button>
-
+                <button type='submit'>Submit</button>
             </form>
         </main>
     </div>
