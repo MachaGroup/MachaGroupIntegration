@@ -82,7 +82,7 @@ function Login() {
 
        {/* Forgot Password link */}
        <p className="forgot-password-text">
-        <a href="#" onClick={(e) => {
+        <a href="/ForgotPassword" onClick={(e) => {
           e.preventDefault();
           handleForgotPassword();
         }}>
@@ -94,5 +94,3 @@ function Login() {
 }
 
 export default Login;
-
-
