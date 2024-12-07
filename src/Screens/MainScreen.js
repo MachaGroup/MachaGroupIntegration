@@ -35,16 +35,11 @@ function MainScreen() {
     }
   };
 
-  const handleBack = () => {
-    navigate(-1);
-  };
-
   return (
     <div className="main-container">
       <header className="header">
-        <button className="back-button" onClick={handleBack}>←</button>
-        <h1>The MACHA Group</h1>
         <img src={logo} alt="Logo" className="logo" />
+        <h1>The MACHA Group</h1>
       </header>
 
       <div className="welcome-message">
