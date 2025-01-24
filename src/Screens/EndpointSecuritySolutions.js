@@ -67,48 +67,48 @@ function EndpointSecuritySolutionsPage() {
             <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>7.3.2.2 Data Protection Measures</h1>
+            <h1>7.3.2.2.3. Endpoint Security Solutions</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
-                <div className="form-section">
-                {/* Data Encryption Protocols */}
-                <h3> 7.3.2.2.3 Endpoint Security Solutions</h3>
+              {/* Data Encryption Protocols */}
+              <h2>7.3.2.2.3. Endpoint Security Solutions</h2>
+              <div className="form-section">
                 <label>What types of endpoint security solutions are currently implemented (e.g., antivirus, anti-malware, encryption)?</label>
-            <div>
-              <input type="text" name="endpointSecurityTypes" placeholder="Describe types of endpoint security solutions" onChange={handleChange}/>
-            </div>
-          </div>
+                <div>
+                  <input type="text" name="endpointSecurityTypes" placeholder="Describe types of endpoint security solutions" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>How are endpoint security solutions configured to ensure they are effective against evolving threats?</label>
-            <div>
-              <input type="text" name="endpointSecurityConfiguration" placeholder="Describe configuration process for endpoint security" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>How are endpoint security solutions configured to ensure they are effective against evolving threats?</label>
+                <div>
+                  <input type="text" name="endpointSecurityConfiguration" placeholder="Describe configuration process for endpoint security" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>What processes are in place for monitoring and managing endpoint security alerts and incidents?</label>
-            <div>
-              <input type="text" name="endpointSecurityMonitoring" placeholder="Describe monitoring and management processes for alerts" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>What processes are in place for monitoring and managing endpoint security alerts and incidents?</label>
+                <div>
+                  <input type="text" name="endpointSecurityMonitoring" placeholder="Describe monitoring and management processes for alerts" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>How often are endpoint security solutions updated or patched to protect against new vulnerabilities?</label>
-            <div>
-              <input type="text" name="endpointSecurityUpdates" placeholder="Describe frequency of updates or patches for endpoint security" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>How often are endpoint security solutions updated or patched to protect against new vulnerabilities?</label>
+                <div>
+                  <input type="text" name="endpointSecurityUpdates" placeholder="Describe frequency of updates or patches for endpoint security" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>What training or resources are provided to staff regarding the importance of endpoint security and safe practices?</label>
-            <div>
-              <input type="text" name="endpointSecurityTraining" placeholder="Describe training for endpoint security awareness" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>What training or resources are provided to staff regarding the importance of endpoint security and safe practices?</label>
+                <div>
+                  <input type="text" name="endpointSecurityTraining" placeholder="Describe training for endpoint security awareness" onChange={handleChange}/>
+                </div>
+              </div>
           
                     {/* Submit Button */}
                     <button type="submit">Submit</button>

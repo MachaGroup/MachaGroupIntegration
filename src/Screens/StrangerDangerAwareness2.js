@@ -67,48 +67,49 @@ function StrangerDangerAwareness2Page() {
             <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>7.2.4.1 Personal Safety Education</h1>
+            <h1>7.2.4.1.2 Stranger Danger Awareness</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
-                <div className="form-section">
+                
                 {/* Response To Security Threats */}
-                <h3> 7.2.4.1.2 Stranger Danger Awareness 2</h3>
+                <h2> 7.2.4.1.2 Stranger Danger Awareness: </h2>
+                <div className="form-section">
                 <label>What programs or materials are used to teach students about stranger danger?</label>
-            <div>
-              <input type="text" name="strangerDangerPrograms" placeholder="Describe programs or materials used" onChange={handleChange}/>
-            </div>
-          </div>
+                  <div>
+                    <input type="text" name="strangerDangerPrograms" placeholder="Describe programs or materials used" onChange={handleChange}/>
+                  </div>
+                </div>
 
-          <div className="form-section">
-            <label>How often are stranger danger awareness lessons incorporated into the curriculum?</label>
-            <div>
-              <input type="text" name="strangerDangerFrequency" placeholder="Describe how often lessons are given" onChange={handleChange}/>
-            </div>
-          </div>
+                <div className="form-section">
+                  <label>How often are stranger danger awareness lessons incorporated into the curriculum?</label>
+                  <div>
+                    <input type="text" name="strangerDangerFrequency" placeholder="Describe how often lessons are given" onChange={handleChange}/>
+                  </div>
+                </div>
 
-          <div className="form-section">
-            <label>Are there any role-playing exercises or simulations included in the training for real-life scenarios?</label>
-            <div>
-              <input type="text" name="rolePlayingExercises" placeholder="Describe role-playing or simulations used" onChange={handleChange}/>
-            </div>
-          </div>
+                <div className="form-section">
+                  <label>Are there any role-playing exercises or simulations included in the training for real-life scenarios?</label>
+                  <div>
+                    <input type="text" name="rolePlayingExercises" placeholder="Describe role-playing or simulations used" onChange={handleChange}/>
+                  </div>
+                </div>
 
-          <div className="form-section">
-            <label>How do teachers assess student understanding of stranger danger concepts after the training?</label>
-            <div>
-              <input type="text" name="strangerDangerAssessment" placeholder="Describe assessment methods for understanding" onChange={handleChange}/>
-            </div>
-          </div>
+                <div className="form-section">
+                  <label>How do teachers assess student understanding of stranger danger concepts after the training?</label>
+                  <div>
+                    <input type="text" name="strangerDangerAssessment" placeholder="Describe assessment methods for understanding" onChange={handleChange}/>
+                  </div>
+                </div>
 
-          <div className="form-section">
-            <label>What resources are provided to parents to reinforce stranger danger awareness at home?</label>
-            <div>
-              <input type="text" name="parentResources" placeholder="Describe resources provided to parents" onChange={handleChange}/>
-            </div>
-          </div>
+                <div className="form-section">
+                  <label>What resources are provided to parents to reinforce stranger danger awareness at home?</label>
+                  <div>
+                    <input type="text" name="parentResources" placeholder="Describe resources provided to parents" onChange={handleChange}/>
+                  </div>
+                </div>
           
                     {/* Submit Button */}
                     <button type="submit">Submit</button>

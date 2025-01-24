@@ -67,7 +67,7 @@ function SafetyAndSecurityTrainingPage() {
             <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>7.2.2.2 Continuity of Operations Plan (COOP)</h1>
+            <h1>7.2.2.2.3. Safety and Security Training</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
@@ -75,7 +75,7 @@ function SafetyAndSecurityTrainingPage() {
             <form onSubmit={handleSubmit}>
               <div className="form-section">
                 {/* Safety And Security Training */}
-                <h3> 7.2.2.3 Safety And Security Training</h3>
+                <h2>7.2.2.2.3. Safety and Security Training</h2>
                 <label>What training programs are available for staff to understand safety and security protocols during emergencies?</label>
                 <div>
                   <input type="text" name="trainingPrograms" placeholder="Describe the safety and security training programs" onChange={handleChange}/>

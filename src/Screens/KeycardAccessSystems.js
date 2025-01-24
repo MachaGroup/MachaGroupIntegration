@@ -67,48 +67,48 @@ function KeycardAccessSystemsPage() {
             <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>7.3.1.1 Access Control Systems</h1>
+            <h1>7.3.1.1.1. Keycard Access Systems</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
-                <div className="form-section">
-                {/* Keycard Access Systems */}
-                <h3> 7.3.1.1.1 Keycard Access Systems</h3>
+              {/* Keycard Access Systems */}
+              <h2>7.3.1.1.1. Keycard Access Systems</h2>
+              <div className="form-section">
                 <label>What criteria are used to determine who is issued keycards for access to school facilities?</label>
-            <div>
-              <input type="text" name="keycardCriteria" placeholder="Describe criteria for keycard issuance" onChange={handleChange}/>
-            </div>
-          </div>
+                <div>
+                  <input type="text" name="keycardCriteria" placeholder="Describe criteria for keycard issuance" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>How is the keycard access system monitored for unauthorized access attempts?</label>
-            <div>
-              <input type="text" name="keycardMonitoring" placeholder="Describe monitoring processes" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>How is the keycard access system monitored for unauthorized access attempts?</label>
+                <div>
+                  <input type="text" name="keycardMonitoring" placeholder="Describe monitoring processes" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>What procedures are in place for deactivating keycards when an employee leaves the school or changes roles?</label>
-            <div>
-              <input type="text" name="keycardDeactivation" placeholder="Describe deactivation procedures" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>What procedures are in place for deactivating keycards when an employee leaves the school or changes roles?</label>
+                <div>
+                  <input type="text" name="keycardDeactivation" placeholder="Describe deactivation procedures" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>How frequently is the keycard access system reviewed for effectiveness and potential vulnerabilities?</label>
-            <div>
-              <input type="text" name="keycardReview" placeholder="Describe frequency of reviews" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>How frequently is the keycard access system reviewed for effectiveness and potential vulnerabilities?</label>
+                <div>
+                  <input type="text" name="keycardReview" placeholder="Describe frequency of reviews" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>Are there contingency plans for situations where keycards fail or are lost, and how are these communicated to staff?</label>
-            <div>
-              <input type="text" name="keycardContingency" placeholder="Describe contingency plans" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>Are there contingency plans for situations where keycards fail or are lost, and how are these communicated to staff?</label>
+                <div>
+                  <input type="text" name="keycardContingency" placeholder="Describe contingency plans" onChange={handleChange}/>
+                </div>
+              </div>
           
                     {/* Submit Button */}
                     <button type="submit">Submit</button>

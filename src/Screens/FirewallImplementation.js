@@ -67,48 +67,48 @@ function FirewallImplementationPage() {
             <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>7.3.2.1 Network Security Measures</h1>
+            <h1>7.3.2.1.1. Firewall Implementation and Configuration</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
-                <div className="form-section">
-                {/* Firewall Implementation */}
-                <h3> 7.3.2.1.1 Firewall Implementation</h3>
+              {/* Firewall Implementation */}
+              <h2>7.3.2.1.1. Firewall Implementation and Configuration</h2>
+              <div className="form-section">
                 <label>What criteria are used to select and implement firewall solutions within the network?</label>
-            <div>
-              <input type="text" name="firewallSelectionCriteria" placeholder="Describe selection and implementation criteria" onChange={handleChange}/>
-            </div>
-          </div>
+                <div>
+                  <input type="text" name="firewallSelectionCriteria" placeholder="Describe selection and implementation criteria" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>How frequently is the firewall configuration reviewed and updated to address emerging threats?</label>
-            <div>
-              <input type="text" name="firewallReviewFrequency" placeholder="Describe review frequency for firewall configurations" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>How frequently is the firewall configuration reviewed and updated to address emerging threats?</label>
+                <div>
+                  <input type="text" name="firewallReviewFrequency" placeholder="Describe review frequency for firewall configurations" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>What specific access control lists (ACLs) have been established to restrict unauthorized access through the firewall?</label>
-            <div>
-              <input type="text" name="firewallACLs" placeholder="Describe ACLs for firewall" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>What specific access control lists (ACLs) have been established to restrict unauthorized access through the firewall?</label>
+                <div>
+                  <input type="text" name="firewallACLs" placeholder="Describe ACLs for firewall" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>How are firewall logs monitored for suspicious activity or potential breaches?</label>
-            <div>
-              <input type="text" name="firewallLogMonitoring" placeholder="Describe monitoring process for firewall logs" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>How are firewall logs monitored for suspicious activity or potential breaches?</label>
+                <div>
+                  <input type="text" name="firewallLogMonitoring" placeholder="Describe monitoring process for firewall logs" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>What training or resources are provided to staff responsible for managing and maintaining the firewall?</label>
-            <div>
-              <input type="text" name="firewallTraining" placeholder="Describe training for firewall management" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>What training or resources are provided to staff responsible for managing and maintaining the firewall?</label>
+                <div>
+                  <input type="text" name="firewallTraining" placeholder="Describe training for firewall management" onChange={handleChange}/>
+                </div>
+              </div>
           
                     {/* Submit Button */}
                     <button type="submit">Submit</button>

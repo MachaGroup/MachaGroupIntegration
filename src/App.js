@@ -312,7 +312,86 @@ import IntrusionPreventionSystems from './Screens/IntrusionPreventionSystems';
 import DataEncryptionProtocols from './Screens/DataEncryptionProtocols';
 import RegularDataBackups from './Screens/RegularDataBackups';
 import EndpointSecuritySolutions from './Screens/EndpointSecuritySolutions';
-
+import ContinuousImprovement from './Screens/ContinuousImprovement';
+import RiskAssessmentAndMitigation from './Screens/RiskAssessmentAndMitigation';
+import SafetyRiskAssessment from './Screens/SafetyRiskAssessment';
+import HazardIdentification from './Screens/HazardIdentification';
+import RiskAnalysis from './Screens/RiskAnalysis';
+import SecurityThreatAssessment from './Screens/SecurityThreatAssessment';
+import ThreatIdentification from './Screens/ThreatIdentification';
+import SecurityVulnerabilityAssessment from './Screens/SecurityVulnerabilityAssessment';
+import EmergencyPreparednessPlanning from './Screens/EmergencyPreparednessPlanning';
+import EmergencyResponsePlanDevelopment from './Screens/EmergencyResponsePlanDevelopment';
+import IncidentCommandStrucutre from './Screens/IncidentCommandStructure';
+import ScenarioBasedPlanning from './Screens/ScenarioBasedPlanning';
+import CrisisManagementProcedures from './Screens/CrisisManagementProcedures';
+import CrisisCommunicationPlan from './Screens/CrisisCommunicationPlan';
+import ContinuityOfOperationsPlan from './Screens/ContinuityOfOperationsPlan';
+import StaffTrainingPrograms from './Screens/StaffTrainingPrograms';
+import SafetyProceduresTraining from './Screens/SafetyProceduresTraining';
+import SecurityAwarenessTraining2 from './Screens/SecurityAwarenessTraining2';
+import StudentSafetyEducation from './Screens/StudentSafetyEducation';
+import PersonalSafetyEducation from './Screens/PersonalSafetyEducation';
+import EmergencyResponseDrillsForStudents from './Screens/EmergencyResponseDrillsForStudents';
+import SecurityInfrastructureEnhancement from './Screens/SecurityInfrastructureEnhancement';
+import PhysicalSecurityMeasures from './Screens/PhysicalSecurityMeasures';
+import AccessControlSystems2 from './Screens/AccessControlSystems2';
+import SurveillanceSystems2 from './Screens/SurveillanceSystems2';
+import CybersecurityInfrastructure from './Screens/CybersecurityInfrastructure';
+import NetworkSecurityMeasures from './Screens/NetworkSecurityMeasures';
+import DataProtectionMeasures2 from './Screens/DataProtectionMeasures2';
+import PhysicalHazardsAssessment from './Screens/PhysicalHazardsAssessment';
+import EnvironmentalHazardsAssessment from './Screens/EnvironmentalHazardsAssessment';
+import LikelihoodAndImpactAssessment from './Screens/LikelihoodAndImpactAssessment';
+import VulnerabilityAssessment from './Screens/VulnerabilityAssessment';
+import ExternalThreats from './Screens/ExternalThreats';
+import InternalThreats from './Screens/InternalThreats';
+import PerimeterSecurityEvaluation from './Screens/PerimeterSecurityEvaluation';
+import AccessControlSystemsAssessment from './Screens/AccessControlSystemsAssessment';
+import CybersecurityVulnerabilityAssessment from './Screens/CybersecurityVulnerabilityAssessment';
+import RolesAndResponsibilitiesOfEmergencyResponseTeam from './Screens/RolesAndResponsibilitiesOfEmergencyResponseTeam';
+import CommunicationProtocols2 from './Screens/CommunicationProtocols2';
+import TabletopExercises from './Screens/TabletopExercises';
+import SimulatedEmergencyDrills from './Screens/SimulatedEmergencyDrills';
+import InternalCommunicationProtocols from './Screens/InternalCommunicationProtocols';
+import ExternalCommunicationProtocols from './Screens/ExternalCommunicationProtocols';
+import CriticalFunctionIdentification from './Screens/CriticalFunctionIdentification';
+import BackupSystemsAndRedundancies from './Screens/BackupSystemsAndRedundancies';
+import StrongPasswordGuidelines from './Screens/StrongPasswordGuidelines';
+import MultiFactorAuthenticationAwareness from './Screens/MultiFactorAuthenticationAwareness';
+import LawEnforcementPartnerships from './Screens/LawEnforcementPartnerships';
+import SchoolResourceOfficers from './Screens/SchoolResourceOfficers';
+import SRORolesAndResponsibilities from './Screens/SRORolesAndResponsibilities';
+import SROTrainingAndCertification from './Screens/SROTrainingAndCertification';
+import FireDepartmentCollaborations from './Screens/FireDepartmentCollaborations';
+import FirePreventionPrograms from './Screens/FirePreventionPrograms';
+import EmergencyResponseCoordination from './Screens/EmergencyResponseCoordination';
+import JointCommunityEvents from './Screens/JointCommunityEvents';
+import JointTrainingExercises from './Screens/JointTrainingExercises';
+import ActiveShooterDrillsWithPolice from './Screens/ActiveShooterDrillsWithPolice';
+import EmergencyResponseTraining2 from './Screens/EmergencyResponseTraining2';
+import CrisisInterventionWorkshops from './Screens/CrisisInterventionWorkshops';
+import FireSafetyEducationForStudents from './Screens/FireSafetyEducationForStudents';
+import FireDrillsAndEvacuationPlanning from './Screens/FireDrillsAndEvacuationPlanning';
+import FireDepartmentAccessToSchoolFacilities from './Screens/FireDepartmentAccessToSchoolFacilities';
+import MutualAidAgreements from './Screens/MutualAidAgreements';
+import FirefighterTrainingSessions from './Screens/FirefighterTrainingSessions';
+import CollaborationWithLocalAgenices2 from './Screens/CollaborationWithLocalAgencies2';
+import CommunityPartnership from './Screens/CommunityPartnership';
+import ParentAndCommunityInvolvement from './Screens/ParentAndCommunityInvolvement';
+import ParentTeacherAssociations2 from './Screens/ParentTeacherAssociations2';
+import FamilyEngagementEvents from './Screens/FamilyEngagementEvents';
+import VolunteerPrograms from './Screens/VolunteerPrograms';
+import CommunityOutreachPrograms from './Screens/CommunityOutreachPrograms';
+import CommunityServiceProjects from './Screens/CommunityServiceProjects';
+import BusinessPartnerships from './Screens/BusinessPartnerships';
+import CommunityEngagementSurveys from './Screens/CommunityEngagementSurveys';
+import BackToSchoolNights from './Screens/BackToSchoolNights';
+import ParentWorkshopsOnStudentSafety from './Screens/ParentWorkshopsOnStudentSafety';
+import ParentTeacherConferences from './Screens/ParentTeacherConferences';
+import ClassroomHelpers from './Screens/ClassroomHelpers';
+import ParentChaperonesForFieldTrips from './Screens/ParentChaperonesForFieldTrips';
+import FundraisingEvents from './Screens/FundraisingEvents';
 
 function App() {
   return (
@@ -573,7 +652,6 @@ function App() {
         <Route path="EmergencyContacts" element={<EmergencyContacts />} />
         <Route path="ParentFeedbackMechanisms" element={<ParentFeedbackMechanisms />} />
         <Route path="LawEnforcementPartnership" element={<LawEnforcementPartnership />} />
-        <Route path="HealthcareProviderEngagement" element={<HealthcareProviderEngagement />} />
         <Route path="BasicFirstAidTechniques" element={<BasicFirstAidTechniques />} />
         <Route path="CPRCertification" element={<CPRCertification />} />
         <Route path="AEDTraining" element={<AEDTraining />} />
@@ -664,9 +742,7 @@ function App() {
         <Route path="/parent-teacher-associations" element={<ParentTeacherAssociations />} />
         <Route path="/emergency-contacts" element={<EmergencyContacts />} />
         <Route path="/parent-feedback-mechanisms" element={<ParentFeedbackMechanisms />} />
-        <Route path="/law-enforcement-partnership" element={<LawEnforcementPartnership />} />
         <Route path="/fire-department-collaboration" element={<FireDepartmentCollaboration />} />
-        <Route path="/healthcare-provider-engagement" element={<HealthcareProviderEngagement />} />
         <Route path="/emergency-shelters" element={<EmergencyShelters />} />
         <Route path="/medical-facilities" element={<MedicalFacilities />} />
         <Route path="/mental-health-services" element={<MentalHealthServices />} />
@@ -731,7 +807,86 @@ function App() {
         <Route path='/DataEncryptionProtocols' element={<DataEncryptionProtocols />} />
         <Route path='/RegularDataBackups' element={<RegularDataBackups />} />
         <Route path='/EndpointSecuritySolutions' element={<EndpointSecuritySolutions />} />
-
+        <Route path='/continuous-improvement' element={<ContinuousImprovement />} />
+        <Route path='/risk-assessment-and-mitigation' element={<RiskAssessmentAndMitigation />} />
+        <Route path='/safety-risk-assessment' element={<SafetyRiskAssessment />} />
+        <Route path='/hazard-identification' element={<HazardIdentification />} />
+        <Route path='/risk-analysis' element={<RiskAnalysis />} />
+        <Route path='/security-threat-assessment' element={<SecurityThreatAssessment />} />
+        <Route path='/threat-identification' element={<ThreatIdentification />} />
+        <Route path='/security-vulnerability-assessment' element={<SecurityVulnerabilityAssessment />} />
+        <Route path='/emergency-preparedness-planning' element={<EmergencyPreparednessPlanning />} />
+        <Route path='/emergency-response-plan-development' element={<EmergencyResponsePlanDevelopment />} />
+        <Route path='/incident-command-structure' element={<IncidentCommandStrucutre />} />
+        <Route path='/scenario-based-planning' element={<ScenarioBasedPlanning />} />
+        <Route path='/crisis-management-procedures' element={<CrisisManagementProcedures />} />
+        <Route path='/crisis-communication-plan' element={<CrisisCommunicationPlan />} />
+        <Route path='/continuity-of-operations-plan' element={<ContinuityOfOperationsPlan />} />
+        <Route path='/staff-training-programs' element={<StaffTrainingPrograms />} />
+        <Route path='/safety-procedures-training' element={<SafetyProceduresTraining />} />
+        <Route path='/security-awareness-training2' element={<SecurityAwarenessTraining2 />} />
+        <Route path='/student-safety-education' element={<StudentSafetyEducation />} />
+        <Route path='/personal-safety-education' element={<PersonalSafetyEducation />} />
+        <Route path='/emergency-response-drills-for-students' element={<EmergencyResponseDrillsForStudents />} />
+        <Route path='/security-infrastructure-enhancement' element={<SecurityInfrastructureEnhancement />} />
+        <Route path='/physical-security-measures' element={<PhysicalSecurityMeasures />} />
+        <Route path='/access-control-systems2' element={<AccessControlSystems2 />} />
+        <Route path='/surveillance-systems2' element={<SurveillanceSystems2 />} />
+        <Route path='/cybersecurity-infrastructure' element={<CybersecurityInfrastructure />} />
+        <Route path='/network-security-measures' element={<NetworkSecurityMeasures />} />
+        <Route path='/data-protection-measures2' element={<DataProtectionMeasures2 />} />
+        <Route path='/physical-hazards-assessment' element={<PhysicalHazardsAssessment />} />
+        <Route path='/enviromental-hazards-assessment' element={<EnvironmentalHazardsAssessment />} />
+        <Route path='/likelihood-and-impact-assessment' element={<LikelihoodAndImpactAssessment />} />
+        <Route path='/vulnerability-assessment' element={<VulnerabilityAssessment />} />
+        <Route path='/external-threats' element={<ExternalThreats />} />
+        <Route path='/internal-threats' element={<InternalThreats />} />
+        <Route path='/perimeter-security-evaluation' element={<PerimeterSecurityEvaluation />} />
+        <Route path='/access-control-systems-assessment' element={<AccessControlSystemsAssessment />} />
+        <Route path='/cybersecurity-vulnerability-assessment' element={<CybersecurityVulnerabilityAssessment />} />
+        <Route path='/roles-and-responsibilities-of-emergency-response-team' element={<RolesAndResponsibilitiesOfEmergencyResponseTeam />} />
+        <Route path='/communication-protocols2' element={<CommunicationProtocols2 />} />
+        <Route path='/tabletop-exercises' element={<TabletopExercises />} />
+        <Route path='/simulated-emergency-drills' element={<SimulatedEmergencyDrills />} />
+        <Route path='/internal-communication-protocols' element={<InternalCommunicationProtocols />} />
+        <Route path='/external-communication-protocols' element={<ExternalCommunicationProtocols />} />
+        <Route path='/critical-function-identification' element={<CriticalFunctionIdentification />} />
+        <Route path='/backup-systems-and-redundancies' element={<BackupSystemsAndRedundancies />} />
+        <Route path='/strong-password-guidelines' element={<StrongPasswordGuidelines />} />
+        <Route path='/multi-factor-authentication-awareness' element={<MultiFactorAuthenticationAwareness />} />
+        <Route path='/law-enforcement-partnerships' element={<LawEnforcementPartnerships />} />
+        <Route path='/school-resource-officers' element={<SchoolResourceOfficers />} />
+        <Route path='/sro-roles-and-responsibilities' element={<SRORolesAndResponsibilities />} />
+        <Route path='/sro-training-and-certification' element={<SROTrainingAndCertification />} />
+        <Route path='/fire-department-collaborations' element={<FireDepartmentCollaborations />} />
+        <Route path='/fire-prevention-programs' element={<FirePreventionPrograms />} />
+        <Route path='/emergency-response-coordination' element={<EmergencyResponseCoordination />} />
+        <Route path='/joint-community-events' element={<JointCommunityEvents />} />
+        <Route path='/joint-training-exercises' element={<JointTrainingExercises />} />
+        <Route path='/active-shooter-drills-with-police' element={<ActiveShooterDrillsWithPolice />} />
+        <Route path='/emergency-response-training2' element={<EmergencyResponseTraining2 />} />
+        <Route path='/crisis-intervention-workshops' element={<CrisisInterventionWorkshops />} />
+        <Route path='/fire-safety-education-for-students' element={<FireSafetyEducationForStudents />} />
+        <Route path='/fire-drills-and-evacuation-planning' element={<FireDrillsAndEvacuationPlanning />} />
+        <Route path='/fire-department-access-to-school-facilities' element={<FireDepartmentAccessToSchoolFacilities />} />
+        <Route path='/mutual-aid-agreements' element={<MutualAidAgreements />} />
+        <Route path='/firefighter-training-sessions' element={<FirefighterTrainingSessions />} />
+        <Route path='/collaboration-with-local-agencies2' element={<CollaborationWithLocalAgenices2 />} />
+        <Route path='/community-partnership' element={<CommunityPartnership />} />
+        <Route path='/parent-and-community-involvement' element={<ParentAndCommunityInvolvement />} />
+        <Route path='/parent-teacher-associations2' element={<ParentTeacherAssociations2 />} />
+        <Route path='/family-engagement-events' element={<FamilyEngagementEvents />} />
+        <Route path='/volunteer-programs' element={<VolunteerPrograms />} />
+        <Route path='/community-outreach-programs' element={<CommunityOutreachPrograms />} />
+        <Route path='/community-service-projects' element={<CommunityServiceProjects />} />
+        <Route path='/business-partnerships' element={<BusinessPartnerships />} />
+        <Route path='/community-engagement-surveys' element={<CommunityEngagementSurveys />} />
+        <Route path='/back-to-school-nights' element={<BackToSchoolNights />} />
+        <Route path='/parent-workshops-on-student-safety' element={<ParentWorkshopsOnStudentSafety />} />
+        <Route path='/parent-teacher-conferences' element={<ParentTeacherConferences />} />
+        <Route path='/classroom-helpers' element={<ClassroomHelpers />} />
+        <Route path='/parent-chaperones-for-field-trips' element={<ParentChaperonesForFieldTrips />} />
+        <Route path='/fundraising-events' element={<FundraisingEvents />} />
 
 
       </Routes>

@@ -67,15 +67,15 @@ function RegularDataBackupsPage() {
             <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>7.3.2.2 Data Protection Measures</h1>
+            <h1>7.3.2.2.2. Regular Data Backups</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
+              {/* Data Encryption Protocols */}
+              <h2>7.3.2.2.2. Regular Data Backups</h2>
               <div className="form-section">
-                {/* Data Encryption Protocols */}
-                <h3> 7.3.2.2.2 Regular Data Backups</h3>
                 <label>What is the frequency of data backups (e.g., daily, weekly, monthly), and how is this schedule determined?</label>
                 <div>
                   <input type="text" name="backupFrequency" placeholder="Describe data backup frequency and rationale" onChange={handleChange}/>

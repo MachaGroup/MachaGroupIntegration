@@ -67,48 +67,48 @@ function CCTVCameraInstallationPage() {
             <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>7.3.1.2 Surveillance Systems</h1>
+            <h1>7.3.1.2.1. CCTV Camera Installation and Monitoring</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
-                <div className="form-section">
-                {/* CCTV Camera Installation and Monitoring */}
-                <h3> 7.3.1.2.1 CCTV Camera Installation and Monitoring</h3>
+              {/* CCTV Camera Installation and Monitoring */}
+              <h2>7.3.1.2.1. CCTV Camera Installation and Monitoring</h2>
+              <div className="form-section">
                 <label>What criteria are used to determine the placement of CCTV cameras throughout the facility?</label>
-            <div>
-              <input type="text" name="cctvPlacementCriteria" placeholder="Describe placement criteria for CCTV cameras" onChange={handleChange}/>
-            </div>
-          </div>
+                <div>
+                  <input type="text" name="cctvPlacementCriteria" placeholder="Describe placement criteria for CCTV cameras" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>How is the footage from CCTV cameras monitored, and who is responsible for monitoring?</label>
-            <div>
-              <input type="text" name="cctvMonitoring" placeholder="Describe monitoring processes" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>How is the footage from CCTV cameras monitored, and who is responsible for monitoring?</label>
+                <div>
+                  <input type="text" name="cctvMonitoring" placeholder="Describe monitoring processes" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>What is the retention period for recorded footage, and how is it securely stored?</label>
-            <div>
-              <input type="text" name="cctvRetention" placeholder="Describe retention period and storage practices" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>What is the retention period for recorded footage, and how is it securely stored?</label>
+                <div>
+                  <input type="text" name="cctvRetention" placeholder="Describe retention period and storage practices" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>Are there policies in place regarding the access and review of recorded footage by authorized personnel?</label>
-            <div>
-              <input type="text" name="cctvAccessPolicy" placeholder="Describe policies for accessing CCTV footage" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>Are there policies in place regarding the access and review of recorded footage by authorized personnel?</label>
+                <div>
+                  <input type="text" name="cctvAccessPolicy" placeholder="Describe policies for accessing CCTV footage" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>How often is the CCTV system evaluated for effectiveness and updated as needed?</label>
-            <div>
-              <input type="text" name="cctvSystemEvaluation" placeholder="Describe evaluation and update frequency" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>How often is the CCTV system evaluated for effectiveness and updated as needed?</label>
+                <div>
+                  <input type="text" name="cctvSystemEvaluation" placeholder="Describe evaluation and update frequency" onChange={handleChange}/>
+                </div>
+              </div>
 
           
                     {/* Submit Button */}

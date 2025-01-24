@@ -67,48 +67,48 @@ function EvacuationProceduresTrainingPage() {
             <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>7.2.3.1 Safety Procedures Training (COOP)</h1>
+            <h1>Evacuation Procedures Training</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
-                <div className="form-section">
-                {/* Evacuation Procedures Training */}
-                <h3> 7.2.3.1.2 Evacuation Procedures Training</h3>
+              {/* Evacuation Procedures Training */}
+              <h2>7.2.3.1.2. Evacuation Procedures Training</h2>
+              <div className="form-section">
                 <label>What are the key components included in the evacuation procedures training for staff?</label>
-            <div>
-              <input type="text" name="evacuationComponents" placeholder="Describe key components of evacuation training" onChange={handleChange}/>
-            </div>
-          </div>
+                <div>
+                  <input type="text" name="evacuationComponents" placeholder="Describe key components of evacuation training" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>How is the effectiveness of the evacuation procedures assessed after training sessions?</label>
-            <div>
-              <input type="text" name="evacuationEffectiveness" placeholder="Describe how effectiveness is assessed post-training" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>How is the effectiveness of the evacuation procedures assessed after training sessions?</label>
+                <div>
+                  <input type="text" name="evacuationEffectiveness" placeholder="Describe how effectiveness is assessed post-training" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>Are there specific evacuation routes and assembly points that staff are trained to use, and how are these communicated?</label>
-            <div>
-              <input type="text" name="evacuationRoutes" placeholder="Describe evacuation routes and communication" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>Are there specific evacuation routes and assembly points that staff are trained to use, and how are these communicated?</label>
+                <div>
+                  <input type="text" name="evacuationRoutes" placeholder="Describe evacuation routes and communication" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>How often is the evacuation procedures training updated or reviewed for relevance and compliance?</label>
-            <div>
-              <input type="text" name="evacuationTrainingReview" placeholder="Describe frequency of review and updates to evacuation training" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>How often is the evacuation procedures training updated or reviewed for relevance and compliance?</label>
+                <div>
+                  <input type="text" name="evacuationTrainingReview" placeholder="Describe frequency of review and updates to evacuation training" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>What measures are in place to accommodate individuals with disabilities during evacuation procedures?</label>
-            <div>
-              <input type="text" name="disabilityAccommodations" placeholder="Describe measures for individuals with disabilities during evacuation" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>What measures are in place to accommodate individuals with disabilities during evacuation procedures?</label>
+                <div>
+                  <input type="text" name="disabilityAccommodations" placeholder="Describe measures for individuals with disabilities during evacuation" onChange={handleChange}/>
+                </div>
+              </div>
           
                     {/* Submit Button */}
                     <button type="submit">Submit</button>

@@ -67,48 +67,48 @@ function DataEncryptionProtocolsPage() {
             <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>7.3.2.2 Data Protection Measures</h1>
+            <h1>7.3.2.2.1. Data Encryption Protocols</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
-                <div className="form-section">
-                {/* Data Encryption Protocols */}
-                <h3> 7.3.2.2.1 Data Encryption Protocols</h3>
+              {/* Data Encryption Protocols */}
+              <h2>7.3.2.2.1. Data Encryption Protocols</h2>
+              <div className="form-section">
                 <label>What types of data are prioritized for encryption, and what criteria determine this prioritization?</label>
-            <div>
-              <input type="text" name="encryptionPrioritization" placeholder="Describe criteria for data encryption prioritization" onChange={handleChange}/>
-            </div>
-          </div>
+                <div>
+                  <input type="text" name="encryptionPrioritization" placeholder="Describe criteria for data encryption prioritization" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>How are encryption keys managed and protected to prevent unauthorized access?</label>
-            <div>
-              <input type="text" name="encryptionKeyManagement" placeholder="Describe encryption key management processes" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>How are encryption keys managed and protected to prevent unauthorized access?</label>
+                <div>
+                  <input type="text" name="encryptionKeyManagement" placeholder="Describe encryption key management processes" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>What encryption standards or protocols (e.g., AES, RSA) are implemented to secure data both in transit and at rest?</label>
-            <div>
-              <input type="text" name="encryptionStandards" placeholder="Describe encryption standards or protocols" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>What encryption standards or protocols (e.g., AES, RSA) are implemented to secure data both in transit and at rest?</label>
+                <div>
+                  <input type="text" name="encryptionStandards" placeholder="Describe encryption standards or protocols" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>How frequently are encryption methods reviewed and updated to address emerging threats or vulnerabilities?</label>
-            <div>
-              <input type="text" name="encryptionReviewFrequency" placeholder="Describe frequency of encryption method review" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>How frequently are encryption methods reviewed and updated to address emerging threats or vulnerabilities?</label>
+                <div>
+                  <input type="text" name="encryptionReviewFrequency" placeholder="Describe frequency of encryption method review" onChange={handleChange}/>
+                </div>
+              </div>
 
-          <div className="form-section">
-            <label>What processes are in place to ensure compliance with relevant regulations regarding data encryption?</label>
-            <div>
-              <input type="text" name="encryptionCompliance" placeholder="Describe compliance processes for data encryption" onChange={handleChange}/>
-            </div>
-          </div>
+              <div className="form-section">
+                <label>What processes are in place to ensure compliance with relevant regulations regarding data encryption?</label>
+                <div>
+                  <input type="text" name="encryptionCompliance" placeholder="Describe compliance processes for data encryption" onChange={handleChange}/>
+                </div>
+              </div>
           
                     {/* Submit Button */}
                     <button type="submit">Submit</button>

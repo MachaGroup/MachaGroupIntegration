@@ -67,15 +67,15 @@ function PerimeterSecurityFencingPage() {
             <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>7.3.1.2 Surveillance Systems</h1>
+            <h1>7.3.1.2.3. Perimeter Security Fencing</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
+              {/* Perimeter Security Fencing */}
+              <h2>7.3.1.2.3. Perimeter Security Fencing</h2>
               <div className="form-section">
-                {/* Perimeter Security Fencing */}
-                <h3> 7.3.1.2.3 Perimeter Security Fencing</h3>
                 <label>What type of fencing is used to secure the perimeter of the property (e.g., chain link, barbed wire)?</label>
                 <div>
                   <input type="text" name="fencingType" placeholder="Describe type of perimeter fencing used" onChange={handleChange}/>

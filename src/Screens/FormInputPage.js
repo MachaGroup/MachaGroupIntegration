@@ -44,7 +44,7 @@ function FormPage() {
         navigate('/policy-compliance', { state: { buildingId } });
         break;
       case 'Community Partnership':
-        navigate('/CommunityPartnerships', { state: { buildingId } });
+        navigate('/community-partnership', { state: { buildingId } });
         break;
       case 'Continuous Improvement - Safety and Security':
         navigate('/continuous-improvement', { state: { buildingId } });
