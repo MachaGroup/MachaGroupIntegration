@@ -1,18 +1,16 @@
 {
   "files": {
-    "main.css": "/MachaGroupIntegration/static/css/main.1ebe25ce.chunk.css",
-    "main.js": "/MachaGroupIntegration/static/js/main.fa7cfa19.chunk.js",
-    "main.js.map": "/MachaGroupIntegration/static/js/main.fa7cfa19.chunk.js.map",
-    "runtime~main.js": "/MachaGroupIntegration/static/js/runtime~main.c7ef00b2.js",
-    "runtime~main.js.map": "/MachaGroupIntegration/static/js/runtime~main.c7ef00b2.js.map",
-    "static/js/2.9328999b.chunk.js": "/MachaGroupIntegration/static/js/2.9328999b.chunk.js",
-    "static/js/2.9328999b.chunk.js.map": "/MachaGroupIntegration/static/js/2.9328999b.chunk.js.map",
-    "static/js/3.cf3acbb1.chunk.js": "/MachaGroupIntegration/static/js/3.cf3acbb1.chunk.js",
-    "static/js/3.cf3acbb1.chunk.js.map": "/MachaGroupIntegration/static/js/3.cf3acbb1.chunk.js.map",
+    "main.css": "/MachaGroupIntegration/static/css/main.b1c8b413.css",
+    "main.js": "/MachaGroupIntegration/static/js/main.4a229983.js",
+    "static/js/453.3388112d.chunk.js": "/MachaGroupIntegration/static/js/453.3388112d.chunk.js",
+    "static/media/MachaLogo.png": "/MachaGroupIntegration/static/media/MachaLogo.e5bb6344e46bc3b5c774.png",
     "index.html": "/MachaGroupIntegration/index.html",
-    "precache-manifest.fa6c317a128e9773ec98beeebd965709.js": "/MachaGroupIntegration/precache-manifest.fa6c317a128e9773ec98beeebd965709.js",
-    "service-worker.js": "/MachaGroupIntegration/service-worker.js",
-    "static/css/main.1ebe25ce.chunk.css.map": "/MachaGroupIntegration/static/css/main.1ebe25ce.chunk.css.map",
-    "static/media/MachaLogo.png": "/MachaGroupIntegration/static/media/MachaLogo.d5703089.png"
-  }
+    "main.b1c8b413.css.map": "/MachaGroupIntegration/static/css/main.b1c8b413.css.map",
+    "main.4a229983.js.map": "/MachaGroupIntegration/static/js/main.4a229983.js.map",
+    "453.3388112d.chunk.js.map": "/MachaGroupIntegration/static/js/453.3388112d.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b1c8b413.css",
+    "static/js/main.4a229983.js"
+  ]
 }
