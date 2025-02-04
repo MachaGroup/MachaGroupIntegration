@@ -77,7 +77,7 @@ function FireDrillFormPage() {
                 <div className="form-section">
                     <label>How often are fire drills conducted within the facility?</label>
                     <div>
-                        <input type="text" name="access-rights" placeholder="How often" onChange={handleChange}/>  
+                        <input type="text" name="conductedFireDrills" placeholder="How often" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -105,7 +105,7 @@ function FireDrillFormPage() {
                         <input type="radio" name="DrillInitiationProtocol" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the protocol" onChange={handleChange}/>  
+                        <input type="text" name="initiatingProtocol" placeholder="Describe the protocol" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -124,7 +124,7 @@ function FireDrillFormPage() {
                         <input type="radio" name="AbsentIndividualSystem" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the system" onChange={handleChange}/>  
+                        <input type="text" name="absentSystem" placeholder="Describe the system" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -161,7 +161,7 @@ function FireDrillFormPage() {
                         <input type="radio" name="MarkedEvacRoutes" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the routes" onChange={handleChange}/>  
+                        <input type="text" name="evacuationRoutes" placeholder="Describe the routes" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -180,7 +180,7 @@ function FireDrillFormPage() {
                         <input type="radio" name="AltEvacRoutes" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the alternatives" onChange={handleChange}/>  
+                        <input type="text" name="alternativeEvacuationRoutes" placeholder="Describe the alternatives" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -192,7 +192,7 @@ function FireDrillFormPage() {
                         <input type="radio" name="OccupantAccountProcess" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the process" onChange={handleChange}/>  
+                        <input type="text" name="accountingProcess" placeholder="Describe the process" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -203,7 +203,7 @@ function FireDrillFormPage() {
                         <input type="radio" name="StaffDrillResponsibilities" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="List the assigned roles and responsibilities" onChange={handleChange}/>  
+                        <input type="text" name="staffResponsibilities" placeholder="List the assigned roles and responsibilities" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -223,7 +223,7 @@ function FireDrillFormPage() {
                         <input type="radio" name="EffectivenessEvaluation" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the mechanism" onChange={handleChange}/>  
+                        <input type="text" name="evaluatingEffectivenessMechanism" placeholder="Describe the mechanism" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -267,6 +267,9 @@ function FireDrillFormPage() {
                         <input type="radio" name="CorrectiveActionDocumentation" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

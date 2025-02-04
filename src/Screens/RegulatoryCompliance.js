@@ -14,9 +14,6 @@ function RegulatoryComlpiancePage() {
         case 'FERPA Compliance':
             navigate('/FERPA-compliance');
             break;
-        case 'HIPAA Compliance':
-            navigate('/HIPAA-compliance');
-            break;
         case 'GDPR Compliance':
             navigate('/GDPR-compliance');
             break;
@@ -39,7 +36,7 @@ function RegulatoryComlpiancePage() {
         <h2>Regulatory Compliance</h2>
         <form>
           {/* Regulatory Compliance Buttons */}
-          {['FERPA Compliance','HIPAA Compliance', 'GDPR Compliance'].map((section, index) => (
+          {['FERPA Compliance', 'GDPR Compliance'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>

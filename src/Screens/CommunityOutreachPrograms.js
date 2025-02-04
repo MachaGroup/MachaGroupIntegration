@@ -11,12 +11,6 @@ function CommunityOutreachProgramsPage() {
     // Add logic for handling button click, e.g., open a modal or navigate
 
     switch (section) {
-        case 'Community Service Projects':
-            navigate('/community-service-projects');
-            break;
-        case 'Business Partnerships':
-            navigate('/business-partnerships');
-            break;
         case 'Community Engagement Surveys':
             navigate('/community-engagement-surveys');
             break;
@@ -39,7 +33,7 @@ function CommunityOutreachProgramsPage() {
         <h2>Community Outreach Programs</h2>
         <form>
           {/* Community Outreach Programs Buttons */}
-          {['Community Service Projects', 'Business Partnerships', 'Community Engagement Surveys'].map((section, index) => (
+          {['Community Engagement Surveys'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>

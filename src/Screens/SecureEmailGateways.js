@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
-import './FormQuestions.css'; // Adjust as necessary
+import React, { useState, useEffect } from 'react';
+import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
-import logo from '../assets/MachaLogo.png'; // Adjust the path
+import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
 
 function SecureEmailGatewaysPage() {
-  const navigate = useNavigate();
+  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
+  const { buildingId } = useBuilding();
   const db = getFirestore();
-  const [formData, setFormData] = useState({});
+
+  const [formData, setFormData] = useState();
+
+  useEffect(() => {
+    if(!buildingId) {
+      alert('No builidng selected. Redirecting to Building Info...');
+      navigate('BuildingandAddress');
+    }
+  }, [buildingId, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,13 +28,31 @@ function SecureEmailGatewaysPage() {
     }));
   };
 
+  // Function to handle back button
+  const handleBack = () => {
+    navigate(-1);  // Navigates to the previous page
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if(!buildingId) {
+      alert('Building ID is missing. Please start the assessment from the correct page.');
+      return;
+    }
 
     try {
-      const formsRef = collection(db, 'forms/Cybersecurity/SecureEmailGateways');
-      await addDoc(formsRef, { formData });
-      alert('Form submitted successfully!');
+      // Create a document reference to the building in the 'Buildings' collection
+      const buildingRef = doc(db, 'Buildings', buildingId);
+
+      // Store the form data in the specified Firestore structure
+      const formsRef = collection(db, 'forms/Cybersecurity/Secure Email Gateways');
+      await addDoc(formsRef, {
+        buildling: buildingRef,
+        formData: formData,
+      });
+      console.log('From Data submitted successfully!')
+      alert('Form Submitted successfully!');
       navigate('/Form');
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -36,7 +64,7 @@ function SecureEmailGatewaysPage() {
     <div className="form-page">
       <header className="header">
             <Navbar />
-        <button className="back-button" onClick={() => navigate(-1)}>←</button>
+        <button className="back-button" onClick={handleBack}>←</button>
         <h1>Secure Email Gateways Assessment</h1>
         <img src={logo} alt="Logo" className="logo" />
       </header>

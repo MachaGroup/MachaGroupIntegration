@@ -81,7 +81,7 @@ function DebriefingAndFeedbackFormPage() {
                         <input type="radio" name="Structured Debriefing" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the process" onChange={handleChange}/>  
+                        <input type="text" name="structuredDebriefingProcess" placeholder="Describe the process" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -109,7 +109,7 @@ function DebriefingAndFeedbackFormPage() {
                         <input type="radio" name="Objective Establishment" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the sessions" onChange={handleChange}/>  
+                        <input type="text" name="objectiveEstablishment" placeholder="Describe the sessions" onChange={handleChange}/>  
                     </div>
                 </div>
                 
@@ -204,7 +204,7 @@ function DebriefingAndFeedbackFormPage() {
                         <input type="radio" name="Tracking Process" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the process" onChange={handleChange}/>  
+                        <input type="text" name="trackingProcess" placeholder="Describe the process" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -248,6 +248,9 @@ function DebriefingAndFeedbackFormPage() {
                         <input type="radio" name="Insight Sharing" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

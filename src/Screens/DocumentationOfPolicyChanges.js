@@ -67,15 +67,15 @@ function DocumentationOfPolicyChangesPage() {
             <Navbar />
           {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>5.4.2.1 Documentation of Policy Change Assessment</h1>
+            <h1>Documentation of Policy Changes Assessment</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
           <form onSubmit={handleSubmit}>
+            {/* Documentation Of Policy Changes */}
+            <h2>5.4.2.1.2 Documentation Of Policy Changes</h2>
             <div className="form-section">
-                {/* Documentation Of Policy Changes */}
-                <h3>5.4.2.1.2 Documentation Of Policy Changes</h3>
                 <label>What format is used for documenting changes made to policies?</label>
               <div>
                 <input type="text" name="documentFormat" placeholder="Describe the format used for documenting changes" onChange={handleChange}/>

@@ -14,9 +14,6 @@ function CommunityPartnershipPage() {
         case 'Collaboration with Local Agencies':
             navigate('/collaboration-with-local-agencies2');
             break;
-        case 'Healthcare Provider Engagement':
-            navigate('/healthcare-provider-engagement');
-            break;
         case 'Parent and Community Involvement**':
             navigate('/parent-and-community-involvement');
             break;
@@ -39,7 +36,7 @@ function CommunityPartnershipPage() {
         <h2>Community Partnership</h2>
         <form>
           {/* Community Partnerships Buttons */}
-          {['Collaboration with Local Agencies', 'Healthcare Provider Engagement', 'Parent and Community Involvement**'].map((section, index) => (
+          {['Collaboration with Local Agencies', 'Parent and Community Involvement**'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>

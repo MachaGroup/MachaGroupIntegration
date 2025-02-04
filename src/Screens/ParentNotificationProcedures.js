@@ -82,7 +82,7 @@ function ParentNotificationProceduresFormPage() {
                         <input type="radio" name="Notification Procedures Existence" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the procedures" onChange={handleChange}/>  
+                        <input type="text" name="notificationProceduresExistence" placeholder="Describe the procedures" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -102,7 +102,7 @@ function ParentNotificationProceduresFormPage() {
                         <input type="radio" name="Automated Messaging Implementation" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the automated messaging system" onChange={handleChange}/>  
+                        <input type="text" name="automatedMessagingImplementation" placeholder="Describe the automated messaging system" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -164,7 +164,7 @@ function ParentNotificationProceduresFormPage() {
                         <input type="radio" name="Channel Prioritization Scheme" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the scheme" onChange={handleChange}/>  
+                        <input type="text" name="channelPrioritizationScheme" placeholder="Describe the scheme" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -218,6 +218,9 @@ function ParentNotificationProceduresFormPage() {
                         <input type="radio" name="Procedure Refinement Feedback" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

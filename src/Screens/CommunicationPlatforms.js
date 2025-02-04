@@ -82,7 +82,7 @@ function CommunicationPlatformsFormPage() {
                         <input type="radio" name="CommPlatformEstablish" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the designated communication platforms" onChange={handleChange}/>  
+                        <input type="text" name="communicationPlatformEstablish" placeholder="Describe the designated communication platforms" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -119,7 +119,7 @@ function CommunicationPlatformsFormPage() {
                         <input type="radio" name="BackupOptionsDesc" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the redundant communication options" />  
+                        <input type="text" name="backupOptionsDesc" placeholder="Describe the redundant communication options" />  
                     </div>
                 </div>
 
@@ -206,7 +206,7 @@ function CommunicationPlatformsFormPage() {
                         <input type="radio" name="ParentFeedback" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the feedback mechanisms" onChange={handleChange}/>  
+                        <input type="text" name="parentFeedback" placeholder="Describe the feedback mechanisms" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -217,6 +217,9 @@ function CommunicationPlatformsFormPage() {
                         <input type="radio" name="ProtocolEnhancements" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

@@ -148,7 +148,7 @@ function TornadoShelterLocationsFormPage() {
                         <input type="radio" name="Overcrowding Measures" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the measures" onChange={handleChange}/>  
+                        <input type="text" name="overcrowdingMeasures" placeholder="Describe the measures" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -193,7 +193,7 @@ function TornadoShelterLocationsFormPage() {
                         <input type="radio" name="Accommodations Made" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the accommodations" onChange={handleChange}/>  
+                        <input type="text" name="accommodationsMade" placeholder="Describe the accommodations" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -204,7 +204,7 @@ function TornadoShelterLocationsFormPage() {
                         <input type="radio" name="Assistance Procedures" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the procedures" onChange={handleChange}/>  
+                        <input type="text" name="assistanceProcedures" placeholder="Describe the procedures" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -216,7 +216,7 @@ function TornadoShelterLocationsFormPage() {
                         <input type="radio" name="Warning Protocol" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the protocol" onChange={handleChange}/>  
+                        <input type="text" name="warningProtocol" placeholder="Describe the protocol" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -227,7 +227,7 @@ function TornadoShelterLocationsFormPage() {
                         <input type="radio" name="Communication Systems" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the communication systems" onChange={handleChange}/>  
+                        <input type="text" name="communicationSystems" placeholder="Describe the communication systems" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -263,6 +263,9 @@ function TornadoShelterLocationsFormPage() {
                         <input type="radio" name="Drill Testing" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

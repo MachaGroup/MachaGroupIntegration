@@ -66,7 +66,7 @@ function EarthquakeDrillsPage() {
             <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Conflict Resolution Assessment</h1>
+            <h1>Earthquake Drills Assessment</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
@@ -77,7 +77,7 @@ function EarthquakeDrillsPage() {
                 <div className="form-section">
                     <label>How often are earthquake drills conducted within the facility?</label>
                     <div>
-                        <input type="text" name="access-rights" placeholder="How often" onChange={handleChange}/>  
+                        <input type="text" name="conductedEarthquakeDrills" placeholder="How often" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -105,7 +105,7 @@ function EarthquakeDrillsPage() {
                         <input type="radio" name="NotificationProtocol" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the protocol" onChange={handleChange}/>  
+                        <input type="text" name="initiatingProtocol" placeholder="Describe the protocol" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -124,7 +124,7 @@ function EarthquakeDrillsPage() {
                         <input type="radio" name="AbsentOccupantSystem" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the system" onChange={handleChange}/>  
+                        <input type="text" name="absentSystem" placeholder="Describe the system" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -177,7 +177,7 @@ function EarthquakeDrillsPage() {
                         <input type="radio" name="AlternateRoutes" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the alternatives" onChange={handleChange}/>  
+                        <input type="text" name="alternativeRoutes" placeholder="Describe the alternatives" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -189,7 +189,7 @@ function EarthquakeDrillsPage() {
                         <input type="radio" name="OccupantAccounting" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the process" onChange={handleChange}/>  
+                        <input type="text" name="occupantAccountingProcess" placeholder="Describe the process" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -217,7 +217,7 @@ function EarthquakeDrillsPage() {
                         <input type="radio" name="earthquakeDrillEvaluation" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the mechanism" onChange={handleChange}/>  
+                        <input type="text" name="evaluatingMechanism" placeholder="Describe the mechanism" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -261,6 +261,9 @@ function EarthquakeDrillsPage() {
                         <input type="radio" name="DeficiencyDocumentation" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

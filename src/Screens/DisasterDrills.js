@@ -77,7 +77,7 @@ function DisasterDrillsFormPage() {
                 <div className="form-section">
                     <label>How often are disaster drills conducted within the facility?</label>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="How often are they constructed" onChange={handleChange}/>  
+                        <input type="text" name="conductedDisasterDrills" placeholder="How often are they constructed" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -146,7 +146,7 @@ function DisasterDrillsFormPage() {
                         <input type="radio" name="Role Assignment" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="List individuals and assigned roles" onChange={handleChange}/>  
+                        <input type="text" name="roleAssignment" placeholder="List individuals and assigned roles" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -183,7 +183,7 @@ function DisasterDrillsFormPage() {
                         <input type="radio" name="Sheltering Setup" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the procedures" onChange={handleChange}/>  
+                        <input type="text" name="shelteringSetup" placeholder="Describe the procedures" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -194,7 +194,7 @@ function DisasterDrillsFormPage() {
                         <input type="radio" name="Shelter Details" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the shelter areas" onChange={handleChange}/>  
+                        <input type="text" name="shelterDetails" placeholder="Describe the shelter areas" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -214,7 +214,7 @@ function DisasterDrillsFormPage() {
                         <input type="radio" name="Drill Notification" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the protocol" onChange={handleChange}/>  
+                        <input type="text" name="drillNotification" placeholder="Describe the protocol" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -242,7 +242,7 @@ function DisasterDrillsFormPage() {
                         <input type="radio" name="Drill Evaluation" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the process" onChange={handleChange}/>  
+                        <input type="text" name="drillEvaluation" placeholder="Describe the process" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -253,7 +253,7 @@ function DisasterDrillsFormPage() {
                         <input type="radio" name="Feedback Collection" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the feedback mechanisms" onChange={handleChange}/>  
+                        <input type="text" name="feedbackCollection" placeholder="Describe the feedback mechanisms" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -264,6 +264,9 @@ function DisasterDrillsFormPage() {
                         <input type="radio" name="Outcome Updates" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

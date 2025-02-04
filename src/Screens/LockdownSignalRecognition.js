@@ -97,7 +97,7 @@ function LockdownSignalRecognitionFormPage() {
                         <input type="radio" name="Standardized Start-End" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the method" onChange={handleChange}/>  
+                        <input type="text" name="standardizedMethod" placeholder="Describe the method" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -125,7 +125,7 @@ function LockdownSignalRecognitionFormPage() {
                         <input type="radio" name="Multi-Channel" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the system" onChange={handleChange}/>  
+                        <input type="text" name="multiChannelSystem" placeholder="Describe the system" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -178,7 +178,7 @@ function LockdownSignalRecognitionFormPage() {
                         <input type="radio" name="Lockdown Feedback Mechanisms" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the feedback mechanisms" onChange={handleChange}/>  
+                        <input type="text" name="lockdownFeedbackMechanisms" placeholder="Describe the feedback mechanisms" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -256,6 +256,9 @@ function LockdownSignalRecognitionFormPage() {
                         <input type="radio" name="Corrective Actions" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

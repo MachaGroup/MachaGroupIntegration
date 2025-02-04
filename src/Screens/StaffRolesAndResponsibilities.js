@@ -123,7 +123,7 @@ function StaffRolesAndResponsibilitiesFormPage() {
                         <input type="radio" name="Coordination System" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the system" onChange={handleChange}/>  
+                        <input type="text" name="coordinationSystem" placeholder="Describe the system" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -151,7 +151,7 @@ function StaffRolesAndResponsibilitiesFormPage() {
                         <input type="radio" name="Performance Monitoring" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the process" onChange={handleChange}/>  
+                        <input type="text" name="performanceMonitoring" placeholder="Describe the process" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -245,6 +245,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                         <input type="radio" name="Evaluation Recommendations" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

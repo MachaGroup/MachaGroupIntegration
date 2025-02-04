@@ -6,7 +6,7 @@ import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
 
-function FireDepartmentAccessToSchoolFacilitiesPage() {
+function PlanningCommunityOutreachStrategiesPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
   const db = getFirestore();
@@ -46,7 +46,7 @@ function FireDepartmentAccessToSchoolFacilitiesPage() {
       const buildingRef = doc(db, 'Buildings', buildingId);
 
       // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Community Partnership/Fire Department Access to School Facilities');
+      const formsRef = collection(db, 'forms/Community Partnership/Planning Community Outreach Strategies');
       await addDoc(formsRef, {
         buildling: buildingRef,
         formData: formData,
@@ -64,55 +64,55 @@ function FireDepartmentAccessToSchoolFacilitiesPage() {
   return (
     <div className="form-page">
         <header className="header">
-            <Navbar />
-            {/* Back Button */}
+          <Navbar />
+          {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Fire Department Access to School Facilities</h1>
+            <h1>Planning Community Outreach Strategies</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
-                {/* Fire Department Access to School Facilities */}
-                <h2>6.1.2.2.1. Fire Department Access to School Facilities</h2>
+                {/* Planning Community Outreach Strategies */}
+                <h2>6.3.2.3.3. Planning Community Outreach Strategies</h2>
                 <div className="form-section">
-                    <label>What protocols are in place for fire department personnel to access school grounds during emergencies?</label>
+                    <label>What specific outreach methods will be used to engage with community members regarding school safety?</label>
                     <div>
-                        <input type="text" name="fireDepartmentPersonnelProtocols" placeholder="Describe the protocols" onChange={handleChange}/>
-                    </div>
-                </div>
-                
-                <div className="form-section">
-                    <label>How is access to the school's blueprints and layout provided to the fire department for effective emergency response?</label>
-                    <div>
-                        <input type="text" name="blueprintsForEffectiveness" placeholder="Describe how it's provided for effectiveness" onChange={handleChange}/>
+                        <input type="text" name="outreachMethods" placeholder="Describe the methods" onChange={handleChange}/>
                     </div>
                 </div>
 
                 <div className="form-section">
-                    <label>Are there designated entry points for emergency services, and how are they communicated to staff and students?</label>
+                    <label>How will the effectiveness of outreach strategies be measured and evaluated?</label>
                     <div>
-                        <input type="text" name="entryPoints" placeholder="Describe the entry points and they're communicated" onChange={handleChange}/>
+                        <input type="text" name="effectiveOutreachStrategies" placeholder="Describe how it'll be measured and evaluated" onChange={handleChange}/>
                     </div>
                 </div>
 
                 <div className="form-section">
-                    <label>What training do school staff receive regarding cooperating with fire department personnel during an emergency?</label>
+                    <label>What role will community feedback play in shaping future outreach initiatives?</label>
                     <div>
-                        <input type="text" name="staffTraining" placeholder="Describe the training" onChange={handleChange}/>
+                        <input type="text" name="communityFeedbackRole" placeholder="Describe the role" onChange={handleChange}/>
                     </div>
                 </div>
 
                 <div className="form-section">
-                    <label>How frequently are joint inspections conducted with the fire department to ensure accessibility and readiness of emergency routes?</label>
+                    <label>How will the school ensure inclusivity in its outreach efforts to reach diverse community groups?</label>
                     <div>
-                        <input type="text" name="frequentJointInspections" placeholder="Describe how frequent" onChange={handleChange}/>
+                        <input type="text" name="diverseCommunityGroups" placeholder="Describe how it'll ensure inclusitivity" onChange={handleChange}/>
+                    </div>
+                </div>
+
+                <div className="form-section">
+                    <label>What resources or partnerships will be leveraged to enhance community outreach efforts?</label>
+                    <div>
+                        <input type="text" name="leveregedResources" placeholder="Describe the resources" onChange={handleChange}/>
                     </div>
                 </div>
 
                 {/* Submit Button */}
                 <button type="submit">Submit</button>
-
+            
             </form>
         </main>
     </div>
@@ -120,4 +120,4 @@ function FireDepartmentAccessToSchoolFacilitiesPage() {
   )
 }
 
-export default FireDepartmentAccessToSchoolFacilitiesPage;
+export default PlanningCommunityOutreachStrategiesPage;

@@ -107,7 +107,7 @@ function ClassroomLockdownProtocolsFormPage() {
                         <input type="radio" name="barricading mechanism" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="List the mechanisms" />
+                        <input type="text" name="barricadingMechanisms" placeholder="List the mechanisms" />
                     </div>
                 </div>
 
@@ -160,7 +160,7 @@ function ClassroomLockdownProtocolsFormPage() {
                         <input type="radio" name="lockdown communication system" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the communication system" />
+                        <input type="text" name="lockdownCommunicationSystem" placeholder="Describe the communication system" />
                     </div>
                 </div>
 
@@ -171,7 +171,7 @@ function ClassroomLockdownProtocolsFormPage() {
                         <input type="radio" name="emergency communication devices" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="List the devices" onChange={handleChange}/>
+                        <input type="text" name="emergencyCommunicationDevices" placeholder="List the devices" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -182,7 +182,7 @@ function ClassroomLockdownProtocolsFormPage() {
                         <input type="radio" name="designated protocol" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the protocol" onChange={handleChange}/>
+                        <input type="text" name="designatedProtocol" placeholder="Describe the protocol" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -194,7 +194,7 @@ function ClassroomLockdownProtocolsFormPage() {
                         <input type="radio" name="designated safe zones" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the safe zones" onChange={handleChange}/>
+                        <input type="text" name="designatedSafeZones" placeholder="Describe the safe zones" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -255,7 +255,7 @@ function ClassroomLockdownProtocolsFormPage() {
                         <input type="radio" name="guardians communication" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the plan" onChange={handleChange}/>
+                        <input type="text" name="guardiansCommunication" placeholder="Describe the plan" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -266,6 +266,9 @@ function ClassroomLockdownProtocolsFormPage() {
                         <input type="radio" name="available support services" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

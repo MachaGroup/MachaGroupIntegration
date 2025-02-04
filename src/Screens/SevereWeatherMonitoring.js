@@ -123,7 +123,7 @@ function SevereWeatherMonitoringFormPage() {
                         <input type="radio" name="Alert System Redundancy" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the redundancy" onChange={handleChange}/>  
+                        <input type="text" name="alertSystemRedundancy" placeholder="Describe the redundancy" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -135,7 +135,7 @@ function SevereWeatherMonitoringFormPage() {
                         <input type="radio" name="Activation Protocols Set" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the protocols" onChange={handleChange}/>  
+                        <input type="text" name="activationProtocolsSet" placeholder="Describe the protocols" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -146,7 +146,7 @@ function SevereWeatherMonitoringFormPage() {
                         <input type="radio" name="Designated Personnel Authority" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="List the designated personnel" onChange={handleChange}/>  
+                        <input type="text" name="designatedPersonnelAuthority" placeholder="List the designated personnel" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -157,7 +157,7 @@ function SevereWeatherMonitoringFormPage() {
                         <input type="radio" name="Alert Verification Process" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the process" onChange={handleChange}/>  
+                        <input type="text" name="alertVerificationProcess" placeholder="Describe the process" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -185,7 +185,7 @@ function SevereWeatherMonitoringFormPage() {
                         <input type="radio" name="Authenticity Verification" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the protocol" onChange={handleChange}/>  
+                        <input type="text" name="authenticityVerification" placeholder="Describe the protocol" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -197,7 +197,7 @@ function SevereWeatherMonitoringFormPage() {
                         <input type="radio" name="Response Procedures Set" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the procedures" onChange={handleChange}/>  
+                        <input type="text" name="responseProceduresSet" placeholder="Describe the procedures" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -250,7 +250,7 @@ function SevereWeatherMonitoringFormPage() {
                         <input type="radio" name="System Evaluation Process" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the process" onChange={handleChange}/>  
+                        <input type="text" name="systemEvaluationProcess" placeholder="Describe the process" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -261,7 +261,7 @@ function SevereWeatherMonitoringFormPage() {
                         <input type="radio" name="Feedback Mechanisms Active" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the feedback mechanisms" onChange={handleChange}/>  
+                        <input type="text" name="feedbackMechanismsActive" placeholder="Describe the feedback mechanisms" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -272,6 +272,9 @@ function SevereWeatherMonitoringFormPage() {
                         <input type="radio" name="Improvement Recommendations Used" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

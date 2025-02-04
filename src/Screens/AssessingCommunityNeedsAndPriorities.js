@@ -6,7 +6,7 @@ import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
 
-function FireDepartmentAccessToSchoolFacilitiesPage() {
+function AssessingCommunityNeedsAndPrioritiesPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
   const db = getFirestore();
@@ -46,7 +46,7 @@ function FireDepartmentAccessToSchoolFacilitiesPage() {
       const buildingRef = doc(db, 'Buildings', buildingId);
 
       // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Community Partnership/Fire Department Access to School Facilities');
+      const formsRef = collection(db, 'forms/Community Partnership/Assessing Community Needs and Priorities');
       await addDoc(formsRef, {
         buildling: buildingRef,
         formData: formData,
@@ -64,49 +64,49 @@ function FireDepartmentAccessToSchoolFacilitiesPage() {
   return (
     <div className="form-page">
         <header className="header">
-            <Navbar />
-            {/* Back Button */}
+          <Navbar />
+          {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Fire Department Access to School Facilities</h1>
+            <h1>Assessing Community Needs and Priorities</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
-                {/* Fire Department Access to School Facilities */}
-                <h2>6.1.2.2.1. Fire Department Access to School Facilities</h2>
+                {/* Assessing Community Needs and Priorities */}
+                <h2>6.3.2.3.2. Assessing Community Needs and Priorities</h2>
                 <div className="form-section">
-                    <label>What protocols are in place for fire department personnel to access school grounds during emergencies?</label>
+                    <label>How are community needs and priorities related to school safety identified and prioritized?</label>
                     <div>
-                        <input type="text" name="fireDepartmentPersonnelProtocols" placeholder="Describe the protocols" onChange={handleChange}/>
-                    </div>
-                </div>
-                
-                <div className="form-section">
-                    <label>How is access to the school's blueprints and layout provided to the fire department for effective emergency response?</label>
-                    <div>
-                        <input type="text" name="blueprintsForEffectiveness" placeholder="Describe how it's provided for effectiveness" onChange={handleChange}/>
+                        <input type="text" name="identifyingCommunityNeeds" placeholder="Describe how they're identified and prioritized" onChange={handleChange}/>
                     </div>
                 </div>
 
                 <div className="form-section">
-                    <label>Are there designated entry points for emergency services, and how are they communicated to staff and students?</label>
+                    <label>What tools or methods are used to assess the specific safety concerns of community members?</label>
                     <div>
-                        <input type="text" name="entryPoints" placeholder="Describe the entry points and they're communicated" onChange={handleChange}/>
+                        <input type="text" name="toolsAssessingSafetyConcerns" placeholder="Describe the tools" onChange={handleChange}/>
                     </div>
                 </div>
 
                 <div className="form-section">
-                    <label>What training do school staff receive regarding cooperating with fire department personnel during an emergency?</label>
+                    <label>How often is the assessment of community needs conducted to ensure it reflects current conditions?</label>
                     <div>
-                        <input type="text" name="staffTraining" placeholder="Describe the training" onChange={handleChange}/>
+                        <input type="text" name="conductedAssessmentOfCommunityNeeds" placeholder="Describe how often" onChange={handleChange}/>
                     </div>
                 </div>
 
                 <div className="form-section">
-                    <label>How frequently are joint inspections conducted with the fire department to ensure accessibility and readiness of emergency routes?</label>
+                    <label>In what ways are community members involved in the process of identifying their safety needs and priorities?</label>
                     <div>
-                        <input type="text" name="frequentJointInspections" placeholder="Describe how frequent" onChange={handleChange}/>
+                        <input type="text" name="involvedCommunityMemebers" placeholder="Describe the ways they're involved" onChange={handleChange}/>
+                    </div>
+                </div>
+
+                <div className="form-section">
+                    <label>How do the assessed needs influence the development of school safety programs and initiatives?</label>
+                    <div>
+                        <input type="text" name="assessedNeeds" placeholder="Describe the influence" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -120,4 +120,4 @@ function FireDepartmentAccessToSchoolFacilitiesPage() {
   )
 }
 
-export default FireDepartmentAccessToSchoolFacilitiesPage;
+export default AssessingCommunityNeedsAndPrioritiesPage;

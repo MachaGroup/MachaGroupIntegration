@@ -16,7 +16,7 @@ function StaffCommunicationPage() {
         navigate('/TwoWayRadios');
         break;
       case 'Communication Channels':
-        navigate('/CommunicationChannelsAndProtocols');
+        navigate('/CommunicationChannels');
         break;
       case 'Emergency Communication Training':
         navigate('/EmergencyCommunicationTraining');

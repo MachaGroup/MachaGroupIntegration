@@ -72,8 +72,8 @@ function EmergencyCommunicationFormPage() {
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
-            {/* 2.1.1.2 Communication Systems */}
-            <h2>Communication Systems:</h2>
+            {/* 2.1.1.2 Emergency Communication */}
+            <h2>Emergency Communication:</h2>
             <div className="form-section">
                 <label>Are there dedicated communication systems in place for alerting authorities during emergencies?</label>
                 <div>
@@ -242,7 +242,8 @@ function EmergencyCommunicationFormPage() {
                 </div>
             </div>
 
-            <button type='submit'>Submit</button>
+            {/* Submit Button */}
+            <button type="submit">Submit</button>
             </form>
         </main>
     </div>

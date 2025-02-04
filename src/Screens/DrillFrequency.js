@@ -77,16 +77,16 @@ function DrillFrequencyFormPage() {
                 <div className="form-section">
                     <label>What is the planned frequency of emergency drills within the facility?</label>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the plan" onChange={handleChange}/>  
+                        <input type="text" name="plannedEmergencyDrills" placeholder="Describe the plan" onChange={handleChange}/>  
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>Is there a predefined schedule for conducting drills, such as monthly, quarterly, or semi-annually?</label>
                     <div>
-                        <input type="radio" name="predifinedSchedule" value="monthly" /> Monthly
-                        <input type="radio" name="predifinedSchedule" value="qurterly" /> Quarterly
-                        <input type="radio" name="predifinedSchedule" value='semi-annually' /> Semi-Annually
+                        <input type="radio" name="predifinedSchedule" value="monthly" onChange={handleChange} /> Monthly
+                        <input type="radio" name="predifinedSchedule" value="qurterly" onChange={handleChange} /> Quarterly
+                        <input type="radio" name="predifinedSchedule" value='semi-annually' onChange={handleChange} /> Semi-Annually
                     </div>
                 </div>
 
@@ -122,7 +122,7 @@ function DrillFrequencyFormPage() {
                         <input type="radio" name="Compliance Process" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the process" onChange={handleChange}/>  
+                        <input type="text" name="complianceProcess" placeholder="Describe the process" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -192,7 +192,7 @@ function DrillFrequencyFormPage() {
                         <input type="radio" name="Feedback Mechanisms" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the feedback mechanisms" onChange={handleChange}/>  
+                        <input type="text" name="feedbackMechanisms" placeholder="Describe the feedback mechanisms" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -228,7 +228,7 @@ function DrillFrequencyFormPage() {
                         <input type="radio" name="Feedback Integration" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the process" onChange={handleChange}/>  
+                        <input type="text" name="feedbackIntegration" placeholder="Describe the process" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -256,6 +256,9 @@ function DrillFrequencyFormPage() {
                         <input type="radio" name="Retention Policy" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

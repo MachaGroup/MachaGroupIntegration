@@ -132,7 +132,7 @@ function FirstAidResponseFormPage() {
                         <input type="radio" name="established procedures" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe Emergency procedures " onChange={handleChange}/>
+                        <input type="text" name="establishedProcedures" placeholder="Describe Emergency procedures " onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -160,7 +160,7 @@ function FirstAidResponseFormPage() {
                         <input type="radio" name="Medical responsible individual" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="List the contact or responsible individual" onChange={handleChange}/>
+                        <input type="text" name="medicalResponsibleIndividual" placeholder="List the contact or responsible individual" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -196,7 +196,7 @@ function FirstAidResponseFormPage() {
                         <input type="radio" name="standardized reporting process" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the reporting process" onChange={handleChange}/>
+                        <input type="text" name="standardizedReportingProcess" placeholder="Describe the reporting process" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -257,6 +257,9 @@ function FirstAidResponseFormPage() {
                         <input type="radio" name="past incidents feedback" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

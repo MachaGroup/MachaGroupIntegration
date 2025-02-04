@@ -67,15 +67,15 @@ function PolicyRevisionApprovalWorkflowPage() {
             <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>5.4.2.1 Change Management Process</h1>
+            <h1>Policy Revision Approval Workflow Assessment</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
+              {/* Policy Revision Approval Workflow */}
+              <h2>5.4.2.1.1 Policy Revision Approval Workflow</h2>
               <div className="form-section">
-                {/* Policy Revision Approval Workflow */}
-                <h3>5.4.2.1.1 Policy Revision Approval Workflow</h3>
                 <label>What are the steps involved in the policy revision approval process?</label>
                 <div>
                   <input type="text" name="revisionApprovalSteps" placeholder="Describe the steps involved in the approval process" onChange={handleChange}/>

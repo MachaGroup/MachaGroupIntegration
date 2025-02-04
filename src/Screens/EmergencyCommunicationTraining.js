@@ -82,7 +82,7 @@ function EmergencyCommunicationTrainingFormPage() {
                         <input type="radio" name="Training Programs Exist" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the training programs" onChange={handleChange}/>  
+                        <input type="text" name="trainingProgramsExist" placeholder="Describe the training programs" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -98,7 +98,7 @@ function EmergencyCommunicationTrainingFormPage() {
                 <div className="form-section">
                     <label>How frequently are emergency communication training sessions conducted for staff members?</label>
                     <div>
-                        <input type="text" name="access-rights" placeholder="How frequent" onChange={handleChange}/>  
+                        <input type="text" name="EmergencyCommunicationTrainingSessions" placeholder="How frequent" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -211,6 +211,9 @@ function EmergencyCommunicationTrainingFormPage() {
                         <input type="radio" name="Records Accessible" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

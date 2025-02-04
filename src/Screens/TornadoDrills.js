@@ -78,7 +78,7 @@ function TornadoDrillsFormPage() {
                 <div className="form-section">
                     <label>How often are tornado drills conducted within the facility?</label>
                     <div>
-                        <input type="text" name="access-rights" placeholder="How often" onChange={handleChange}/>  
+                        <input type="text" name="conductedTornadoDrills" placeholder="How often" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -106,7 +106,7 @@ function TornadoDrillsFormPage() {
                         <input type="radio" name="Drill Initiation Protocol" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the protocol" onChange={handleChange}/>  
+                        <input type="text" name="initiatingProtocol" placeholder="Describe the protocol" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -117,7 +117,7 @@ function TornadoDrillsFormPage() {
                         <input type="radio" name="Notification Method Testing" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the notification methods" onChange={handleChange}/>  
+                        <input type="text" name="methodTesting" placeholder="Describe the notification methods" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -128,7 +128,7 @@ function TornadoDrillsFormPage() {
                         <input type="radio" name="Absent Individuals System" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the system" onChange={handleChange}/>  
+                        <input type="text" name="absentSystem" placeholder="Describe the system" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -190,7 +190,7 @@ function TornadoDrillsFormPage() {
                         <input type="radio" name="Occupant Accountability Process" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the process" onChange={handleChange}/>  
+                        <input type="text" name="accountabilityProcess" placeholder="Describe the process" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -218,7 +218,7 @@ function TornadoDrillsFormPage() {
                         <input type="radio" name="Drill Evaluation Mechanism" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the mechanism" onChange={handleChange}/>  
+                        <input type="text" name="evacuationMechanism" placeholder="Describe the mechanism" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -262,6 +262,9 @@ function TornadoDrillsFormPage() {
                         <input type="radio" name="Deficiency Documentation Actions" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

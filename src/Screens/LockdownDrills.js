@@ -13,8 +13,8 @@ function LockdownDrillsPage() {
     // Add logic for handling button click, e.g., open a modal or navigate
 
     switch (section) {
-      case 'Drill Scenerios':
-        navigate('/DrillScenerios');
+      case 'Drill Scenarios':
+        navigate('/DrillScenarios');
         break;
       case 'Lockdown Signal Recognition':
         navigate('/LockdownSignalRecognition');
@@ -39,7 +39,7 @@ function LockdownDrillsPage() {
         <h2>Lockdown Drills</h2>
         <form>
           {/* Lockdown Drills Buttons */}
-          {['Drill Scenerios', 'Lockdown Signal Recognition'].map((section, index) => (
+          {['Drill Scenarios', 'Lockdown Signal Recognition'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>

@@ -46,7 +46,7 @@ function ActiveShooterDrillsWithPolicePage() {
       const buildingRef = doc(db, 'Buildings', buildingId);
 
       // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Continuous Improvement - Safety and Security/Evacuation Procedures Training');
+      const formsRef = collection(db, 'forms/Community Partnership/Active Shooter Drills with Police');
       await addDoc(formsRef, {
         buildling: buildingRef,
         formData: formData,

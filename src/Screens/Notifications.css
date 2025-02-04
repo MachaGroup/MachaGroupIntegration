@@ -1,0 +1,93 @@
+/* General Page Styling */
+.notification-page {
+    background-color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.back-button {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #333;
+}
+
+.title {
+    font-size: 1.8em;
+    color: #333;
+    margin: 0;
+}
+
+.logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+}
+
+/* Notifications Container */
+.notifications-container {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Notification Item */
+.notification-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    background-color: white;
+    border-radius: 5px;
+}
+
+.notification-item span {
+    font-size: 1em;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+/* Toggle Buttons */
+.toggle-btn {
+    padding: 10px 20px;
+    background-color: #74b9ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.toggle-btn:hover {
+    background-color: #1b578c;
+}
+
+.toggle-btn.active {
+    background-color: #28a745;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .title {
+        font-size: 1.4em;
+    }
+
+    .logo {
+        width: 50px;
+        height: 50px;
+    }
+}

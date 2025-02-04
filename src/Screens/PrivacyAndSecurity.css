@@ -1,0 +1,105 @@
+/* Layout for the entire page */
+.change-password-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.back-button {
+    align-self: flex-start;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.title {
+    font-size: 24px;
+    margin: 10px 0;
+}
+
+.logo {
+    width: 100px;
+    margin-bottom: 20px;
+}
+
+.password-container {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.save-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #74b9ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.save-button:hover {
+    background-color: #1b578c;
+}
+
+.toggle-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toggle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toggle-btn {
+    padding: 5px 10px;
+    background-color: #74b9ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.toggle-btn:hover {
+    background-color: #1b578c;
+}
+
+.toggle-btn.active {
+    background-color: #28a745;
+    color: white;
+}

@@ -67,51 +67,51 @@ function StaffInputOnPolicyImpactPage() {
             <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>5.4.1.2 Stakeholder Feedback</h1>
+            <h1>Staff Input On Policy Impact Assessment</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                <div className="form-section">
-                {/* Staff Input On Policy Impact */}
-                <h3>5.4.1.2.1 Staff Input On Policy Impact</h3>
-                <label>What methods are used to collect staff feedback on the effectiveness of security policies?</label>
-            <div>
-              <input type="text" name="feedbackMethods" placeholder="Describe methods for collecting staff feedback" onChange={handleChange}/>
+          <form onSubmit={handleSubmit}>
+            {/* Staff Input On Policy Impact */}
+            <h2>5.4.1.2.1 Staff Input On Policy Impact</h2>
+            <div className="form-section">
+              <label>What methods are used to collect staff feedback on the effectiveness of security policies?</label>
+              <div>
+                <input type="text" name="feedbackMethods" placeholder="Describe methods for collecting staff feedback" onChange={handleChange}/>
+              </div>
             </div>
-          </div>
 
-          <div className="form-section">
-            <label>How often are staff surveys or focus groups conducted to assess policy impact?</label>
-            <div>
-              <input type="text" name="surveyFrequency" placeholder="Describe frequency of staff surveys or focus groups" onChange={handleChange}/>
+            <div className="form-section">
+              <label>How often are staff surveys or focus groups conducted to assess policy impact?</label>
+              <div>
+                <input type="text" name="surveyFrequency" placeholder="Describe frequency of staff surveys or focus groups" onChange={handleChange}/>
+              </div>
             </div>
-          </div>
 
-          <div className="form-section">
-            <label>In what ways are staff encouraged to share their experiences with existing policies?</label>
-            <div>
-              <input type="text" name="staffEncouragement" placeholder="Describe how staff are encouraged to share experiences" onChange={handleChange}/>
+            <div className="form-section">
+              <label>In what ways are staff encouraged to share their experiences with existing policies?</label>
+              <div>
+                <input type="text" name="staffEncouragement" placeholder="Describe how staff are encouraged to share experiences" onChange={handleChange}/>
+              </div>
             </div>
-          </div>
 
-          <div className="form-section">
-            <label>How is staff feedback incorporated into the policy revision process?</label>
-            <div>
-              <input type="text" name="feedbackIncorporation" placeholder="Describe how feedback is incorporated into revisions" onChange={handleChange}/>
+            <div className="form-section">
+              <label>How is staff feedback incorporated into the policy revision process?</label>
+              <div>
+                <input type="text" name="feedbackIncorporation" placeholder="Describe how feedback is incorporated into revisions" onChange={handleChange}/>
+              </div>
             </div>
-          </div>
 
-          <div className="form-section">
-            <label>What follow-up actions are taken after collecting staff input to address concerns or suggestions?</label>
-            <div>
-              <input type="text" name="followUpActions" placeholder="Describe follow-up actions after collecting feedback" onChange={handleChange}/>
+            <div className="form-section">
+              <label>What follow-up actions are taken after collecting staff input to address concerns or suggestions?</label>
+              <div>
+                <input type="text" name="followUpActions" placeholder="Describe follow-up actions after collecting feedback" onChange={handleChange}/>
+              </div>
             </div>
-          </div>
 
-                    {/* Submit Button */}
-                    <button type="submit">Submit</button>
+                      {/* Submit Button */}
+                      <button type="submit">Submit</button>
 
             </form>
         </main>

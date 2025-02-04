@@ -97,8 +97,8 @@ function Settings() {
         <div className="settings-options">
           <button className="settings-button" onClick={() => navigateTo('/editprofile')}>Edit Profile</button>
           <button className="settings-button" onClick={() => navigateTo('/notifications')}>Notifications</button>
-          <button className="settings-button">Privacy & Security</button>
-          <button className="settings-button">Contact Us</button>
+          <button className="settings-button" onClick={() => navigateTo('/privacy&security')}>Privacy & Security</button>
+          <button className="settings-button" onClick={() => navigateTo('/contactus')}>Contact Us</button>
         </div>
 
         {/* Log out Link */}

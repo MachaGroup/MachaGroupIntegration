@@ -46,7 +46,7 @@ function FirewallImplementationPage() {
       const buildingRef = doc(db, 'Buildings', buildingId);
 
       // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Continuous Improvement - Safety and Security/Firewall Implementation');
+      const formsRef = collection(db, 'forms/Continuous Improvement - Safety and Security/Firewall Implementation and Configuration');
       await addDoc(formsRef, {
         buildling: buildingRef,
         formData: formData,

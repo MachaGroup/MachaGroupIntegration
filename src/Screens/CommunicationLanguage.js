@@ -90,7 +90,7 @@ function CommunicationLanguageFormPage() {
                         <input type="radio" name="LanguagePrevalenceIdentified" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="List the languages" onChange={handleChange}/>  
+                        <input type="text" name="languagePrevalanceIdentified" placeholder="List the languages" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -127,7 +127,7 @@ function CommunicationLanguageFormPage() {
                         <input type="radio" name="TranslationProcessDefined" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the process" onChange={handleChange}/>  
+                        <input type="text" name="translationProcessDefined" placeholder="Describe the process" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -164,7 +164,7 @@ function CommunicationLanguageFormPage() {
                         <input type="radio" name="AltCommunicationMethods" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the alternative methods" onChange={handleChange}/>  
+                        <input type="text" name="altCommunicationMethods" placeholder="Describe the alternative methods" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -210,7 +210,7 @@ function CommunicationLanguageFormPage() {
                         <input type="radio" name="FeedbackMechanismsExist" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the feedback mechanisms" onChange={handleChange}/>  
+                        <input type="text" name="feedbackMechansismsExist" placeholder="Describe the feedback mechanisms" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -221,6 +221,9 @@ function CommunicationLanguageFormPage() {
                         <input type="radio" name="EnhancementFeedbackUsed" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

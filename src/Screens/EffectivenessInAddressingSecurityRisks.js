@@ -67,7 +67,7 @@ function EffectivenessInAddressingSecurityRisksPage() {
             <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>5.4.1.1 Policy Evaluation Criteria</h1>
+            <h1>Effectiveness In Addressing Security Risks Assessment</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
@@ -75,7 +75,7 @@ function EffectivenessInAddressingSecurityRisksPage() {
             <form onSubmit={handleSubmit}>
                 <div className="form-section">
                 {/* Compliance with Regulations Section */}
-                <h3>5.4.1.1.2 Effectiveness In Addressing Security Risks</h3>
+                <h2>5.4.1.1.2 Effectiveness In Addressing Security Risks</h2>
                 <label>How is the effectiveness of current policies in mitigating security risks measured?</label>
             <div>
               <input type="text" name="effectivenessMeasurement" placeholder="Describe how policy effectiveness is measured" onChange={handleChange}/>

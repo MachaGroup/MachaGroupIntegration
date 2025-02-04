@@ -77,7 +77,7 @@ function EvacuationRoutesReviewFormPage() {
                 <div className="form-section">
                     <label>How often are evacuation routes reviewed and updated within the facility?</label>
                     <div>
-                        <input type="text" name="access-rights" placeholder="How often" onChange={handleChange}/>  
+                        <input type="text" name="reviewedEvacuationRoutes" placeholder="How often" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -96,7 +96,7 @@ function EvacuationRoutesReviewFormPage() {
                         <input type="radio" name="Schedule Procedure" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the schedule or procedure" onChange={handleChange}/>  
+                        <input type="text" name="scheduleProcedure" placeholder="Describe the schedule or procedure" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -108,7 +108,7 @@ function EvacuationRoutesReviewFormPage() {
                         <input type="radio" name="Structured Process" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the process" onChange={handleChange}/>  
+                        <input type="text" name="structuredProcess" placeholder="Describe the process" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -161,7 +161,7 @@ function EvacuationRoutesReviewFormPage() {
                         <input type="radio" name="Occupant Provisions" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the provisions" onChange={handleChange}/>  
+                        <input type="text" name="occupantProvisions" placeholder="Describe the provisions" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -231,6 +231,9 @@ function EvacuationRoutesReviewFormPage() {
                         <input type="radio" name="Trend Tracking" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

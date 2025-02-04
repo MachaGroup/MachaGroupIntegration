@@ -66,7 +66,7 @@ function LawEnforcementCoordinationFormPage() {
             <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Conflict Resolution Assessment</h1>
+            <h1>Law Enforcement Coordination Assessment</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
@@ -81,7 +81,7 @@ function LawEnforcementCoordinationFormPage() {
                         <input type="radio" name="Facility-LawComChannels" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the channels" onChange={handleChange}/>  
+                        <input type="text" name="facilityLawCommunicationChannels" placeholder="Describe the channels" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -100,7 +100,7 @@ function LawEnforcementCoordinationFormPage() {
                         <input type="radio" name="ComProtocolsAccessible" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the communication protocols" onChange={handleChange}/>  
+                        <input type="text" name="communicationProtocolsAccessible" placeholder="Describe the communication protocols" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -112,7 +112,7 @@ function LawEnforcementCoordinationFormPage() {
                         <input type="radio" name="EmergencyNotifyProtocol" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the protocols" onChange={handleChange}/>  
+                        <input type="text" name="emergencyNotifyProtocol" placeholder="Describe the protocols" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -123,7 +123,7 @@ function LawEnforcementCoordinationFormPage() {
                         <input type="radio" name="LawContactMethods" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the methods" onChange={handleChange}/>  
+                        <input type="text" name="lawContactMethods" placeholder="Describe the methods" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -193,7 +193,7 @@ function LawEnforcementCoordinationFormPage() {
                         <input type="radio" name="InfoSharingProtocol" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the protocol" onChange={handleChange}/>  
+                        <input type="text" name="informationSharingProtocol" placeholder="Describe the protocol" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -212,7 +212,7 @@ function LawEnforcementCoordinationFormPage() {
                         <input type="radio" name="SecureInfoSharing" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the method" onChange={handleChange}/>  
+                        <input type="text" name="secureInformationSharing" placeholder="Describe the method" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -240,7 +240,7 @@ function LawEnforcementCoordinationFormPage() {
                         <input type="radio" name="MutualAidActivation" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="auth-mechanisms" placeholder="Describe the process" onChange={handleChange}/>  
+                        <input type="text" name="mutualAidActivation" placeholder="Describe the process" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -268,6 +268,9 @@ function LawEnforcementCoordinationFormPage() {
                         <input type="radio" name="DebriefingRecommendations" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

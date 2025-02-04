@@ -66,7 +66,7 @@ function DrillSceneriosFormPage() {
             <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Conflict Resolution Assessment</h1>
+            <h1>Drill Scenarios Assessment</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
@@ -77,7 +77,7 @@ function DrillSceneriosFormPage() {
                 <div className="form-section">
                     <label>How often are lockdown drills conducted within the facility?</label>
                     <div>
-                        <input type="text" name="access-rights" placeholder="How often" onChange={handleChange}/>  
+                        <input type="text" name="conductedLockdownDrills" placeholder="How often" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -105,7 +105,7 @@ function DrillSceneriosFormPage() {
                         <input type="radio" name="Initiation Protocol" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the protocol" onChange={handleChange}/>   
+                        <input type="text" name="initiationProtocol" placeholder="Describe the protocol" onChange={handleChange}/>   
                     </div>
                 </div>
 
@@ -124,7 +124,7 @@ function DrillSceneriosFormPage() {
                         <input type="radio" name="Absent Individuals System" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the system" onChange={handleChange}/>  
+                        <input type="text" name="absentSystem" placeholder="Describe the system" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -186,7 +186,7 @@ function DrillSceneriosFormPage() {
                         <input type="radio" name="Coordination Protocol" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the protocol" onChange={handleChange}/>  
+                        <input type="text" name="coordinationProtocol" placeholder="Describe the protocol" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -205,7 +205,7 @@ function DrillSceneriosFormPage() {
                         <input type="radio" name="Designated Coordinators" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="List the individuals responsible" onChange={handleChange}/>  
+                        <input type="text" name="designatedIndividuals" placeholder="List the individuals responsible" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -217,7 +217,7 @@ function DrillSceneriosFormPage() {
                         <input type="radio" name="Occupant Accountability Process" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the process" onChange={handleChange}/>  
+                        <input type="text" name="accountingProcess" placeholder="Describe the process" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -228,7 +228,7 @@ function DrillSceneriosFormPage() {
                         <input type="radio" name="Accountability Roles Assigned" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="List the member's assigned roles" onChange={handleChange}/>  
+                        <input type="text" name="accountabilityRoles" placeholder="List the member's assigned roles" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -248,7 +248,7 @@ function DrillSceneriosFormPage() {
                         <input type="radio" name="Effectiveness Evaluation" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the mechanism" onChange={handleChange}/>  
+                        <input type="text" name="effectivenessEvaluationMechanism" placeholder="Describe the mechanism" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -267,6 +267,9 @@ function DrillSceneriosFormPage() {
                         <input type="radio" name="Implementation of Recommendations" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

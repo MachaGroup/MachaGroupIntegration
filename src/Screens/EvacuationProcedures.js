@@ -67,199 +67,202 @@ function EvacuationProceduresFormPage() {
             <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Conflict Resolution Assessment</h1>
+            <h1>Evacuation Procedures Assessment</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
         <main className="form-container">
             <form onSubmit={handleSubmit}>
-            {/* 2.2.1.1.1 Evacuation Procedures */}
-            <h2>Evacuation Routes and Procedures:</h2>
-            <div className="form-section">
-                <label>Are there clearly defined evacuation routes posted throughout the premises, indicating primary and secondary exit paths?</label>
-                <div>
-                    <input type="radio" name="defined evacuation routes" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="defined evacuation routes" value="no" onChange={handleChange}/> No
+                {/* 2.2.1.1.1 Evacuation Procedures */}
+                <h2>Evacuation Routes and Procedures:</h2>
+                <div className="form-section">
+                    <label>Are there clearly defined evacuation routes posted throughout the premises, indicating primary and secondary exit paths?</label>
+                    <div>
+                        <input type="radio" name="defined evacuation routes" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="defined evacuation routes" value="no" onChange={handleChange}/> No
+                    </div>
                 </div>
-            </div>
 
-            <div className="form-section">
-                <label>Have evacuation procedures been established for different scenarios, such as fire emergencies, bomb threats, or natural disasters?</label>
-                <div>
-                    <input type="radio" name="Established evacuation procedures" value="yes" onChange={handleChange}/>Yes
-                    <input type="radio" name="Established evacuation procedures" value="no" onChange={handleChange}/> No
+                <div className="form-section">
+                    <label>Have evacuation procedures been established for different scenarios, such as fire emergencies, bomb threats, or natural disasters?</label>
+                    <div>
+                        <input type="radio" name="Established evacuation procedures" value="yes" onChange={handleChange}/>Yes
+                        <input type="radio" name="Established evacuation procedures" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="establishedEvacuationProcedures" placeholder="Describe evacuation procedures" onChange={handleChange}/>
+                    </div>
                 </div>
-                <div>
-                    <input type="text" name="auth-mechanisms" placeholder="Describe evacuation procedures" onChange={handleChange}/>
-                </div>
-            </div>
 
-            <div className="form-section">
-                <label>Are staff members trained on evacuation procedures and their roles during evacuations?</label>
-                <div>
-                    <input type="radio" name="evacuation procedures training " value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="evacuation procedures training " value="no" onChange={handleChange}/> No
+                <div className="form-section">
+                    <label>Are staff members trained on evacuation procedures and their roles during evacuations?</label>
+                    <div>
+                        <input type="radio" name="evacuation procedures training " value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="evacuation procedures training " value="no" onChange={handleChange}/> No
+                    </div>
                 </div>
-            </div>
 
-            <h2>Assembly Points:</h2>
-            <div className="form-section">
-                <label>Have designated assembly points been identified outside the building where occupants should gather after evacuating?</label>
-                <div>
-                    <input type="radio" name="designated assembly points" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="designated assembly points" value="no" onChange={handleChange}/> No
+                <h2>Assembly Points:</h2>
+                <div className="form-section">
+                    <label>Have designated assembly points been identified outside the building where occupants should gather after evacuating?</label>
+                    <div>
+                        <input type="radio" name="designated assembly points" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="designated assembly points" value="no" onChange={handleChange}/> No
+                    </div>
                 </div>
-            </div>
 
-            <div className="form-section">
-                <label>Are assembly points located at safe distances from the building and away from potential hazards?</label>
-                <div>
-                    <input type="radio" name="assembly point safety" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="assembly point safety" value="no" onChange={handleChange}/> No
+                <div className="form-section">
+                    <label>Are assembly points located at safe distances from the building and away from potential hazards?</label>
+                    <div>
+                        <input type="radio" name="assembly point safety" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="assembly point safety" value="no" onChange={handleChange}/> No
+                    </div>
                 </div>
-            </div>
 
-            <div className="form-section">
-                <label>Do assembly points provide adequate space and facilities for occupants to gather and await further instructions?</label>
-                <div>
-                    <input type="radio" name="assembly point space" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="assembly point space" value="no" onChange={handleChange}/> No
+                <div className="form-section">
+                    <label>Do assembly points provide adequate space and facilities for occupants to gather and await further instructions?</label>
+                    <div>
+                        <input type="radio" name="assembly point space" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="assembly point space" value="no" onChange={handleChange}/> No
+                    </div>
                 </div>
-            </div>
 
-            <h2>Communication and Alert Systems:</h2>
-            <div className="form-section">
-                <label>Is there an effective communication system in place to alert occupants of the need to evacuate?</label>
-                <div>
-                    <input type="radio" name="effective alert system" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="effective alert system" value="no" onChange={handleChange}/> No
+                <h2>Communication and Alert Systems:</h2>
+                <div className="form-section">
+                    <label>Is there an effective communication system in place to alert occupants of the need to evacuate?</label>
+                    <div>
+                        <input type="radio" name="effective alert system" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="effective alert system" value="no" onChange={handleChange}/> No
+                    </div>
                 </div>
-            </div>
 
-            <div className="form-section">
-                <label>Are fire alarms, strobe lights, or other alerting devices installed and regularly tested to ensure they are functional?</label>
-                <div>
-                    <input type="radio" name="alerting devices installed" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="alerting devices installed" value="no" onChange={handleChange}/> No
+                <div className="form-section">
+                    <label>Are fire alarms, strobe lights, or other alerting devices installed and regularly tested to ensure they are functional?</label>
+                    <div>
+                        <input type="radio" name="alerting devices installed" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="alerting devices installed" value="no" onChange={handleChange}/> No
+                    </div>
                 </div>
-            </div>
 
-            <div className="form-section">
-                <label>Is there a mechanism for broadcasting evacuation instructions and updates to all occupants, including those with disabilities or language barriers?</label>
-                <div>
-                    <input type="radio" name="broadcasting mechanisim" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="broadcasting mechanisim" value="no" onChange={handleChange}/> No
+                <div className="form-section">
+                    <label>Is there a mechanism for broadcasting evacuation instructions and updates to all occupants, including those with disabilities or language barriers?</label>
+                    <div>
+                        <input type="radio" name="broadcasting mechanism" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="broadcasting mechanism" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="broadcastingMechanism" placeholder="Describe the mechanism" onChange={handleChange}/>
+                    </div>
                 </div>
-                <div>
-                    <input type="text" name="auth-mechanisms" placeholder="Describe the mechanism" onChange={handleChange}/>
-                </div>
-            </div>
 
-            <h2>Evacuation Procedures for Special Needs:</h2>
-            <div className="form-section">
-                <label>Are there procedures in place to assist occupants with disabilities or special needs during evacuations?</label>
-                <div>
-                    <input type="radio" name="disability evacuation procedure" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="disability evacuation procedure" value="no" onChange={handleChange}/> No
+                <h2>Evacuation Procedures for Special Needs:</h2>
+                <div className="form-section">
+                    <label>Are there procedures in place to assist occupants with disabilities or special needs during evacuations?</label>
+                    <div>
+                        <input type="radio" name="disability evacuation procedure" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="disability evacuation procedure" value="no" onChange={handleChange}/> No
+                    </div>
                 </div>
-            </div>
 
-            <div className="form-section">
-                <label>Are staff members trained to provide assistance to individuals who may require additional support during evacuations?</label>
-                <div>
-                    <input type="radio" name="disability assistance training" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="disability assistance training" value="no" onChange={handleChange}/> No
+                <div className="form-section">
+                    <label>Are staff members trained to provide assistance to individuals who may require additional support during evacuations?</label>
+                    <div>
+                        <input type="radio" name="disability assistance training" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="disability assistance training" value="no" onChange={handleChange}/> No
+                    </div>
                 </div>
-            </div>
 
-            <div className="form-section">
-                <label>Are evacuation routes and assembly points accessible to individuals with mobility impairments or other disabilities?</label>
-                <div>
-                    <input type="radio" name="disability evacuation accesibility" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="disability evacuation accesibility" value="no" onChange={handleChange}/> No
+                <div className="form-section">
+                    <label>Are evacuation routes and assembly points accessible to individuals with mobility impairments or other disabilities?</label>
+                    <div>
+                        <input type="radio" name="disability evacuation accesibility" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="disability evacuation accesibility" value="no" onChange={handleChange}/> No
+                    </div>
                 </div>
-            </div>
 
-            <h2>Accountability and Accountability:</h2>
-            <div className="form-section">
-                <label>Is there a system in place to account for all occupants and ensure everyone has evacuated safely?</label>
-                <div>
-                    <input type="radio" name="Evacuation account" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="Evacuation account" value="no" onChange={handleChange}/> No
+                <h2>Accountability and Accountability:</h2>
+                <div className="form-section">
+                    <label>Is there a system in place to account for all occupants and ensure everyone has evacuated safely?</label>
+                    <div>
+                        <input type="radio" name="Evacuation account" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="Evacuation account" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="evacuationAccount" placeholder="Describe the system" onChange={handleChange}/>
+                    </div>
                 </div>
-                <div>
-                    <input type="text" name="auth-mechanisms" placeholder="Describe the system" onChange={handleChange}/>
-                </div>
-            </div>
 
-            <div className="form-section">
-                <label>Are designated individuals assigned to perform accountability checks at assembly points and report any missing persons to emergency responders?</label>
-                <div>
-                    <input type="radio" name="Assigned accountability checker" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="Assigned accountability checker" value="no" onChange={handleChange}/> No
+                <div className="form-section">
+                    <label>Are designated individuals assigned to perform accountability checks at assembly points and report any missing persons to emergency responders?</label>
+                    <div>
+                        <input type="radio" name="Assigned accountability checker" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="Assigned accountability checker" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="assignedAccountabilityChecker" placeholder="List designated individuals" onChange={handleChange}/>
+                    </div>
                 </div>
-                <div>
-                    <input type="text" name="auth-mechanisms" placeholder="List designated individuals" onChange={handleChange}/>
-                </div>
-            </div>
 
-            <div className="form-section">
-                <label>Are procedures in place for re-entry into the building after evacuations have been completed and deemed safe?</label>
-                <div>
-                    <input type="radio" name="building reentry procedure" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="building reentry procedure" value="no" onChange={handleChange}/> No
+                <div className="form-section">
+                    <label>Are procedures in place for re-entry into the building after evacuations have been completed and deemed safe?</label>
+                    <div>
+                        <input type="radio" name="building reentry procedure" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="building reentry procedure" value="no" onChange={handleChange}/> No
+                    </div>
                 </div>
-            </div>
 
-            <h2>Training and Drills:</h2>
-            <div className="form-section">
-                <label>Are regular evacuation drills conducted to familiarize occupants with evacuation procedures and routes?</label>
-                <div>
-                    <input type="radio" name="regular evacuation drills" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="regular evacuation drills" value="no" onChange={handleChange}/> No
+                <h2>Training and Drills:</h2>
+                <div className="form-section">
+                    <label>Are regular evacuation drills conducted to familiarize occupants with evacuation procedures and routes?</label>
+                    <div>
+                        <input type="radio" name="regular evacuation drills" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="regular evacuation drills" value="no" onChange={handleChange}/> No
+                    </div>
                 </div>
-            </div>
 
-            <div className="form-section">
-                <label>Are drills tailored to address different scenarios and challenges that may arise during evacuations?</label>
-                <div>
-                    <input type="radio" name="different scenario drills" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="different scenario drills" value="no" onChange={handleChange}/> No
+                <div className="form-section">
+                    <label>Are drills tailored to address different scenarios and challenges that may arise during evacuations?</label>
+                    <div>
+                        <input type="radio" name="different scenario drills" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="different scenario drills" value="no" onChange={handleChange}/> No
+                    </div>
                 </div>
-            </div>
 
-            <div className="form-section">
-                <label>Are feedback and lessons learned from drills used to improve evacuation procedures and preparedness?</label>
-                <div>
-                    <input type="radio" name="drills feedback" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="drills feedback" value="no" onChange={handleChange}/> No
+                <div className="form-section">
+                    <label>Are feedback and lessons learned from drills used to improve evacuation procedures and preparedness?</label>
+                    <div>
+                        <input type="radio" name="drills feedback" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="drills feedback" value="no" onChange={handleChange}/> No
+                    </div>
                 </div>
-            </div>
 
-            <h2>Review and Updates:</h2>
-            <div className="form-section">
-                <label>Are evacuation procedures regularly reviewed and updated to reflect changes in building layout, occupancy, or emergency response protocols?</label>
-                <div>
-                    <input type="radio" name="evacuation procedures review" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="evacuation procedures review" value="no" onChange={handleChange}/> No
+                <h2>Review and Updates:</h2>
+                <div className="form-section">
+                    <label>Are evacuation procedures regularly reviewed and updated to reflect changes in building layout, occupancy, or emergency response protocols?</label>
+                    <div>
+                        <input type="radio" name="evacuation procedures review" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="evacuation procedures review" value="no" onChange={handleChange}/> No
+                    </div>
                 </div>
-            </div>
 
-            <div className="form-section">
-                <label>Is input from occupants, emergency responders, and other stakeholders solicited to identify areas for improvement in evacuation plans?</label>
-                <div>
-                    <input type="radio" name="solicited input" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="solicited input" value="no" onChange={handleChange}/> No
+                <div className="form-section">
+                    <label>Is input from occupants, emergency responders, and other stakeholders solicited to identify areas for improvement in evacuation plans?</label>
+                    <div>
+                        <input type="radio" name="solicited input" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="solicited input" value="no" onChange={handleChange}/> No
+                    </div>
                 </div>
-            </div>
 
-            <div className="form-section">
-                <label>Are updates communicated effectively to all occupants and staff members to ensure they are aware of changes to evacuation procedures?</label>
-                <div>
-                    <input type="radio" name="effective update communication" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="effective update communication" value="no" onChange={handleChange}/> No
+                <div className="form-section">
+                    <label>Are updates communicated effectively to all occupants and staff members to ensure they are aware of changes to evacuation procedures?</label>
+                    <div>
+                        <input type="radio" name="effective update communication" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="effective update communication" value="no" onChange={handleChange}/> No
+                    </div>
                 </div>
-            </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
             
             </form>
         </main>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
-//import './Notifications.css';  // Ensure this links to your CSS file
+import './Notifications.css';  // Ensure this links to your CSS file
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 
 function Notifications() {

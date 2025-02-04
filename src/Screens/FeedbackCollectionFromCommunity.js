@@ -6,7 +6,7 @@ import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
 
-function FireSafetyEducationForStudentsPage() {
+function FeedbackCollectionFromCommunityPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
   const db = getFirestore();
@@ -46,7 +46,7 @@ function FireSafetyEducationForStudentsPage() {
       const buildingRef = doc(db, 'Buildings', buildingId);
 
       // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Community Partnership/Fire Safety Education for Students');
+      const formsRef = collection(db, 'forms/Community Partnership/Feedback Collection from Community');
       await addDoc(formsRef, {
         buildling: buildingRef,
         formData: formData,
@@ -67,57 +67,57 @@ function FireSafetyEducationForStudentsPage() {
           <Navbar />
           {/* Back Button */}
       <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-          <h1>Fire Safety Education for Students</h1>
-          <img src={logo} alt="Logo" className="logo" />
+        <h1>Feedback Collection from Community</h1>
+        <img src={logo} alt="Logo" className="logo" />
       </header>
 
       <main className="form-container">
         <form onSubmit={handleSubmit}>
-          {/* Fire Safety Education for Students */}
-          <h2>6.1.2.1.1. Fire Safety Education for Students</h2>
+          {/* Feedback Collection from Community */}
+          <h2>6.3.2.3.1. Feedback Collection from Community</h2>
           <div className="form-section">
-            <label>What key fire safety concepts are included in the education program for students?</label>
+            <label>What methods are used to collect feedback from the community regarding school safety and emergency preparedness?</label>
             <div>
-              <input type="text" name="keyFireSafetyConcepts" placeholder="Describe the concepts" onChange={handleChange}/>
+              <input type="text" name="collectingFeedback" placeholder="Describe the methods" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
-            <label>How often are fire safety education sessions conducted throughout the academic year?</label>
+            <label>How often are community engagement surveys conducted to gather input from parents and local stakeholders?</label>
             <div>
-              <input type="text" name="conductedSessions" placeholder="Describe how often" onChange={handleChange}/>
+              <input type="text" name="conductedSurveys" placeholder="Describe how often" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
-            <label>What methods are used to engage students and make the fire safety education relatable and effective?</label>
+            <label>What types of questions are included in the surveys to assess community perceptions of safety?</label>
             <div>
-              <input type="text" name="engagingStudents" placeholder="Describe the methods" onChange={handleChange}/>
+              <input type="text" name="questionsInSurveys" placeholder="Describe the types" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
-            <label>Are there hands-on activities, such as fire drills or demonstrations, included in the program to enhance learning?</label>
+            <label>How is the feedback from community surveys analyzed and used to inform safety policies and practices?</label>
             <div>
-              <input type="radio" name="hands-on-activities" value="yes" onChange={handleChange} /> Yes
-              <input type="radio" name="hands-on-activities" value="no" onChange={handleChange} /> No
+              <input type="text" name="analyzingSurveys" placeholder="Describe how it's analyzed and used to inform" onChange={handleChange}/>
             </div>
           </div>
 
           <div className="form-section">
-            <label>How is the effectiveness of the fire safety education assessed, and what feedback is gathered from students and teachers?</label>
+            <label>What follow-up actions are taken to communicate the results of the surveys back to the community?</label>
             <div>
-              <input type="text" name="assessingEffectiveness" placeholder="Describe how it's assessed" onChange={handleChange}/>
+              <input type="text" name="FollowUpActions" placeholder="Describe the actions" onChange={handleChange}/>
             </div>
           </div>
 
           {/* Submit Button */}
           <button type="submit">Submit</button>
-
+        
         </form>
-      </main>        
+      </main>
     </div>
+
   )
 }
 
-export default FireSafetyEducationForStudentsPage;
+export default FeedbackCollectionFromCommunityPage;

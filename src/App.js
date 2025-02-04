@@ -94,7 +94,6 @@ import Branch4 from './Screens/Branch4';
 import AcceptableUsePolicy from './Screens/AcceptableUsePolicy';
 import DataPrivacyPolicy from './Screens/DataPrivacyPolicy';
 import RegulatoryComlpiance from './Screens/RegulatoryCompliance';
-import LegalCompliance from './Screens/LegalCompliance';
 import PeriodicReviews from './Screens/PeriodicReviews';
 import RevisionProcedures from './Screens/RevisionProcedures';
 import InternetUsage from './Screens/InternetUsage';
@@ -102,10 +101,7 @@ import DataHandling from './Screens/DataHandling';
 import DataCollectionAndRetention from './Screens/DataCollectionAndRetention';
 import DataProtectionMeasures from './Screens/DataProtectionMeasures';
 import FERPACompliance from './Screens/FERPACompliance';
-import HIPAACompliance from './Screens/HIPAACompliance';
 import GDPRCompliance from './Screens/GDPRCompliance';
-import CopyrightCompliance from './Screens/CopyrightCompliance';
-import AccessibilityCompliance from './Screens/AccessibilityCompliance';
 import PolicyEvaluationCriteria from './Screens/PolicyEvaluationCriteria';
 import StakeholderFeedback from './Screens/StakeholderFeedback';
 import ChangeManagementProcess from './Screens/ChangeManagementProcess';
@@ -125,7 +121,7 @@ import SevereWeatherMonitoring from './Screens/SevereWeatherMonitoring';
 import TornadoDrills from './Screens/TornadoDrills';
 import EarthquakeDrills from './Screens/EarthquakeDrills';
 import FireDrill from './Screens/FireDrill';
-import DrillScenerios from './Screens/DrillScenerios';
+import DrillScenarios from './Screens/DrillScenarios';
 import LockdownSignalRecognition from './Screens/LockdownSignalRecognition';
 import StaffRolesAndResponsibilities from './Screens/StaffRolesAndResponsibilities';
 import DebriefingAndFeedback from './Screens/DebriefingAndFeedback';
@@ -145,7 +141,7 @@ import CommunicationLanguage from './Screens/CommunicationLanguage';
 import TrainingProviders from './Screens/TrainingProviders';
 import TrainingMaterials from './Screens/TrainingMaterials';
 import RecertificationSchedule from './Screens/RecertificationSchedule';
-import ScenarioBasedTraining from './Screens/ScenerioBasedTraining';
+import ScenarioBasedTraining from './Screens/ScenarioBasedTraining';
 import PostIncidentSupport from './Screens/PostIncidentSupport';
 import CurriculumIntegration from './Screens/CurriculumIntegration';
 import StudentHandbooks from './Screens/StudentHandbooks';
@@ -383,8 +379,6 @@ import ParentTeacherAssociations2 from './Screens/ParentTeacherAssociations2';
 import FamilyEngagementEvents from './Screens/FamilyEngagementEvents';
 import VolunteerPrograms from './Screens/VolunteerPrograms';
 import CommunityOutreachPrograms from './Screens/CommunityOutreachPrograms';
-import CommunityServiceProjects from './Screens/CommunityServiceProjects';
-import BusinessPartnerships from './Screens/BusinessPartnerships';
 import CommunityEngagementSurveys from './Screens/CommunityEngagementSurveys';
 import BackToSchoolNights from './Screens/BackToSchoolNights';
 import ParentWorkshopsOnStudentSafety from './Screens/ParentWorkshopsOnStudentSafety';
@@ -392,6 +386,13 @@ import ParentTeacherConferences from './Screens/ParentTeacherConferences';
 import ClassroomHelpers from './Screens/ClassroomHelpers';
 import ParentChaperonesForFieldTrips from './Screens/ParentChaperonesForFieldTrips';
 import FundraisingEvents from './Screens/FundraisingEvents';
+import FeedbackCollectionFromCommunity from './Screens/FeedbackCollectionFromCommunity';
+import AssessingCommunityNeedsAndPriorities from './Screens/AssessingCommunityNeedsAndPriorities';
+import PlanningCommunityOutreachStrategies from './Screens/PlanningCommunityOutreachStrategies';
+import CommunicationChannels from './Screens/CommunicationChannels';
+import ResponseProtocols2 from './Screens/ResponseProtocols2';
+import PhishingSimulationExercises from './Screens/PhishingSimulationExercises';
+import PrivacyAndSecurity from './Screens/PrivacyAndSecurity';
 
 function App() {
   return (
@@ -493,7 +494,6 @@ function App() {
         <Route path="/acceptable-use-policy" element={<AcceptableUsePolicy />} />
         <Route path="/data-privacy-policy" element={<DataPrivacyPolicy />} />
         <Route path="/regulatory-compliance" element={<RegulatoryComlpiance />} />
-        <Route path="/legal-compliance" element={<LegalCompliance />} />
         <Route path="/periodic-reviews" element={<PeriodicReviews />} />
         <Route path="/revision-procedures" element={<RevisionProcedures />} />
         <Route path="/internet-usage" element={<InternetUsage />} />
@@ -501,10 +501,7 @@ function App() {
         <Route path="/data-collection-and-retention" element={<DataCollectionAndRetention />} />
         <Route path="/data-protection-measures" element={<DataProtectionMeasures />} />
         <Route path="/FERPA-compliance" element={<FERPACompliance />} />
-        <Route path="/HIPAA-compliance" element={<HIPAACompliance />} />
         <Route path="/GDPR-compliance" element={<GDPRCompliance />} />
-        <Route path="/copyright-compliance" element={<CopyrightCompliance />} />
-        <Route path="/accessibility-compliance" element={<AccessibilityCompliance />} />
         <Route path="/policy-evaluation-criteria" element={<PolicyEvaluationCriteria />} />
         <Route path="/stakeholder-feedback" element={<StakeholderFeedback />} />
         <Route path="/change-management-process" element={<ChangeManagementProcess />} />
@@ -574,7 +571,7 @@ function App() {
         <Route path="/CPRCertification" element={<CPRCertification />} />
         <Route path="/AEDTraining" element={<AEDTraining />} />
         <Route path="/ActiveShooterResponse" element={<ActiveShooterResponse />} />
-        <Route path="/EmergencyResponseProtocols" element={<EmergencyResponseProtocols />} />
+        <Route path="/ResponseProtocols2" element={<ResponseProtocols2 />} />
         <Route path="/EmergencyEvacuationProcedures" element={<EmergencyEvacuationProcedures />} />
         <Route path="/DeviceEncryption" element={<DeviceEncryption />} />
         <Route path="/FullDiskEncryption" element={<FullDiskEncryption />} />
@@ -594,14 +591,13 @@ function App() {
         <Route path="/TwoFactorAuthentication" element={<TwoFactorAuthentication />} />
         <Route path="/BiometricAuthentication" element={<BiometricAuthentication />} />
         <Route path="ConflictResolution" element={<ConflictResolution />} />
-        <Route path="EmergencyCommunication" element={<ConflictResolution />} />
+        <Route path="EmergencyCommunication" element={<EmergencyCommunication />} />
         <Route path="FirstAidResponse" element={<FirstAidResponse />} />
         <Route path="EvacuationProcedures" element={<EvacuationProcedures />}/>
         <Route path="FireExtinguisherLocations" element={<FireExtinguisherLocations />} />
         <Route path="FireAlarmSystems" element={<FireAlarmSystems />} />
         <Route path="ThreatRecognition" element={<ThreatRecognition />} />
         <Route path="CybersecurityTraining" element={<CybersecurityTraining />} />
-        <Route path="EmergencyCommunication" element={<EmergencyCommunication />} />
         <Route path="ClassroomLockdownProtocols" element={<ClassroomLockdownProtocols />} />
         <Route path="LockdownCommunicationProtocols" element={<LockdownCommunicationProtocols />} />
         <Route path="LawEnforcementCoordination" element={<LawEnforcementCoordination />} />
@@ -617,7 +613,7 @@ function App() {
         <Route path="TornadoDrills" element={<TornadoDrills />} />
         <Route path="EarthquakeDrills" element={<EarthquakeDrills />} />
         <Route path="FireDrill" element={<FireDrill />} />
-        <Route path="DrillScenerios" element={<DrillScenerios />} />
+        <Route path="DrillScenarios" element={<DrillScenarios />} />
         <Route path="LockdownSignalRecognition" element={<LockdownSignalRecognition />} />
         <Route path="StaffRolesAndResponsibilities" element={<StaffRolesAndResponsibilities />} />
         <Route path="DebriefingAndFeedback" element={<DebriefingAndFeedback />} />
@@ -707,7 +703,7 @@ function App() {
         <Route path="/tornado-drills" element={<TornadoDrills />} />
         <Route path="/earthquake-drills" element={<EarthquakeDrills />} />
         <Route path="/fire-drill" element={<FireDrill />} />
-        <Route path="/drill-scenerios" element={<DrillScenerios />} />
+        <Route path="/drill-scenarios" element={<DrillScenarios />} />
         <Route path="/lockdown-signal-recognition" element={<LockdownSignalRecognition />} />
         <Route path="/staff-roles-and-responsibilities" element={<StaffRolesAndResponsibilities />} />
         <Route path="/debriefing-and-feedback" element={<DebriefingAndFeedback />} />
@@ -878,8 +874,6 @@ function App() {
         <Route path='/family-engagement-events' element={<FamilyEngagementEvents />} />
         <Route path='/volunteer-programs' element={<VolunteerPrograms />} />
         <Route path='/community-outreach-programs' element={<CommunityOutreachPrograms />} />
-        <Route path='/community-service-projects' element={<CommunityServiceProjects />} />
-        <Route path='/business-partnerships' element={<BusinessPartnerships />} />
         <Route path='/community-engagement-surveys' element={<CommunityEngagementSurveys />} />
         <Route path='/back-to-school-nights' element={<BackToSchoolNights />} />
         <Route path='/parent-workshops-on-student-safety' element={<ParentWorkshopsOnStudentSafety />} />
@@ -887,6 +881,12 @@ function App() {
         <Route path='/classroom-helpers' element={<ClassroomHelpers />} />
         <Route path='/parent-chaperones-for-field-trips' element={<ParentChaperonesForFieldTrips />} />
         <Route path='/fundraising-events' element={<FundraisingEvents />} />
+        <Route path='/feedback-collection-from-community' element={<FeedbackCollectionFromCommunity />} />
+        <Route path='/assessing-community-needs-and-priorities' element={<AssessingCommunityNeedsAndPriorities />} />
+        <Route path='/planning-community-outreach-strategies' element={<PlanningCommunityOutreachStrategies />} />
+        <Route path='/CommunicationChannels' element={<CommunicationChannels />} />
+        <Route path='/PhishingSimulationExercises' element={<PhishingSimulationExercises />} />
+        <Route path='/privacy&security' element={<PrivacyAndSecurity />} />
 
 
       </Routes>

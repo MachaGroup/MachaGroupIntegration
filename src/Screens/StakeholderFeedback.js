@@ -13,9 +13,6 @@ function StakeholderFeedbackPage() {
       case 'Staff Input on Policy Impact':
         navigate('/StaffInputOnPolicyImpact');
         break;
-      case 'Student and Parent Feedback':
-        navigate('/StudentAndParentFeedback');
-        break;
       default:
         console.log('Unknown Section');
     }
@@ -35,7 +32,7 @@ function StakeholderFeedbackPage() {
         <h2>Stakeholder Feedback</h2>
         <form>
           {/* Stakeholder Feedback Buttons */}
-          {['Staff Input on Policy Impact', 'Student and Parent Feedback'].map((section, index) => (
+          {['Staff Input on Policy Impact'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>

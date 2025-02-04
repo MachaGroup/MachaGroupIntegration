@@ -67,7 +67,7 @@ function ComplianceWithRegulationsPage() {
             <Navbar />
             {/* Back Button */}
         <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>5.4.1.1 Policy Evaluation Criteria</h1>
+            <h1>Compliance with Regulations Assessment</h1>
             <img src={logo} alt="Logo" className="logo" />
         </header>
 
@@ -75,7 +75,7 @@ function ComplianceWithRegulationsPage() {
             <form onSubmit={handleSubmit}>
                 <div className="form-section">
                 {/* Compliance with Regulations Section */}
-                <h3>5.4.1.1.1 Compliance with Regulations</h3>
+                <h2>5.4.1.1.1 Compliance with Regulations</h2>
                 <label>How often are policies reviewed to ensure they align with changing regulations?</label>
                 <div>
                     <input type="text" name="policyReviewFrequency" placeholder="Describe how often policies are reviewed for regulatory compliance" onChange={handleChange}/>

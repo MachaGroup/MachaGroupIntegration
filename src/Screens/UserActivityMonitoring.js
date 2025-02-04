@@ -14,9 +14,6 @@ function UserActivityMonitoringPage() {
       case 'User Behavior Analytics (UBA)':
         navigate('/UserBehaviorAnalytics'); // Navigate to UBA page
         break;
-      case 'Anomaly Detection':
-        navigate('/AnomalyDetection'); // Navigate to Anomaly Detection page
-        break;
       default:
         console.log('Unknown section');
     }
@@ -36,7 +33,7 @@ function UserActivityMonitoringPage() {
         <h2>User Activity Monitoring</h2>
         <form>
           {/* User Activity Monitoring Buttons */}
-          {['User Behavior Analytics (UBA)', 'Anomaly Detection'].map((section, index) => (
+          {['User Behavior Analytics (UBA)'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>

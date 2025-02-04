@@ -107,7 +107,7 @@ function TwoWayRadiosFormPage() {
                         <input type="radio" name="Dead Zone Measures" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the measures" onChange={handleChange}/>  
+                        <input type="text" name="deadZoneMeasures" placeholder="Describe the measures" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -127,7 +127,7 @@ function TwoWayRadiosFormPage() {
                         <input type="radio" name="Channel Management" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the protocol" onChange={handleChange}/>  
+                        <input type="text" name="channelManagement" placeholder="Describe the protocol" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -156,7 +156,7 @@ function TwoWayRadiosFormPage() {
                         <input type="radio" name="Emergency Protocols" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the protocols" onChange={handleChange}/>  
+                        <input type="text" name="emergencyProtocols" placeholder="Describe the protocols" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -184,7 +184,7 @@ function TwoWayRadiosFormPage() {
                         <input type="radio" name="Storage Protocols" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the protocol" onChange={handleChange}/>  
+                        <input type="text" name="storageProtocols" placeholder="Describe the protocol" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -204,7 +204,7 @@ function TwoWayRadiosFormPage() {
                         <input type="radio" name="Drill Integration Procedures" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the procedures" onChange={handleChange}/>  
+                        <input type="text" name="drillIntegrationProcedures" placeholder="Describe the procedures" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -216,7 +216,7 @@ function TwoWayRadiosFormPage() {
                         <input type="radio" name="Feedback Mechanisms" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="access-rights" placeholder="Describe the mechanisms" onChange={handleChange}/>  
+                        <input type="text" name="feedbackMechanisms" placeholder="Describe the mechanisms" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -227,6 +227,9 @@ function TwoWayRadiosFormPage() {
                         <input type="radio" name="Improvement Recommendations" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
+
+                {/* Submit Button */}
+                <button type="submit">Submit</button>
 
             </form>
         </main>

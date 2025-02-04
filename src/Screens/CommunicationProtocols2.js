@@ -46,7 +46,7 @@ function CommunicationProtocols2FormPage() {
       const buildingRef = doc(db, 'Buildings', buildingId); 
 
       // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Personnel Training and Awareness/CPR Certification');
+      const formsRef = collection(db, 'forms/Continuous Improvement - Safety and Security/Communication Protocols2');
       await addDoc(formsRef, {
           building: buildingRef, // Reference to the building document
           formData: formData, // Store the form data as a nested object

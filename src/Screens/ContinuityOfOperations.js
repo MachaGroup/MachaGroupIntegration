@@ -1,17 +1,24 @@
-import React, { useState } from 'react';
-import './FormQuestions.css';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
-import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
+import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
 
 function ContinuityOfOperationsPage() {
-  const navigate = useNavigate();
+  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
   const db = getFirestore();
 
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState();
+
+  useEffect(() => {
+    if(!buildingId) {
+      alert('No builidng selected. Redirecting to Building Info...');
+      navigate('BuildingandAddress');
+    }
+  }, [buildingId, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,27 +28,31 @@ function ContinuityOfOperationsPage() {
     }));
   };
 
+  // Function to handle back button
   const handleBack = () => {
-    navigate(-1);
+    navigate(-1);  // Navigates to the previous page
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!buildingId) {
-      alert('Building ID is missing. Please start from the Building Information page.');
+    
+    if(!buildingId) {
+      alert('Building ID is missing. Please start the assessment from the correct page.');
       return;
     }
 
     try {
+      // Create a document reference to the building in the 'Buildings' collection
       const buildingRef = doc(db, 'Buildings', buildingId);
+
+      // Store the form data in the specified Firestore structure
       const formsRef = collection(db, 'forms/Cybersecurity/Continuity of Operations');
       await addDoc(formsRef, {
-        building: buildingRef,
+        buildling: buildingRef,
         formData: formData,
       });
-
-      alert('Form submitted successfully!');
+      console.log('From Data submitted successfully!')
+      alert('Form Submitted successfully!');
       navigate('/Form');
     } catch (error) {
       console.error('Error submitting form:', error);

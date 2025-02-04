@@ -14,9 +14,6 @@ function ComplianceManagementPage() {
         case 'Regulatory Compliance':
             navigate('/regulatory-compliance');
             break;
-        case 'Legal Compliance':
-            navigate('/legal-compliance');
-            break;
       default:
           console.log('Unknown section');
   }
@@ -33,10 +30,10 @@ function ComplianceManagementPage() {
 
       {/* Compliance Management Section */}
       <main className="form-container">
-        <h2>Compliance Management</h2>
+        <h2>Compliance Management**</h2>
         <form>
           {/* Compliance Management Buttons */}
-          {['Regulatory Compliance','Legal Compliance'].map((section, index) => (
+          {['Regulatory Compliance'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>

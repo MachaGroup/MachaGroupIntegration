@@ -19,9 +19,6 @@ function PhishingSimulationTrainingPage() {
       case 'Phishing Simulation Exercises':
         navigate('/PhishingSimulationExercises');
         break;
-      case 'Educating Users on Phishing Red Flags':
-        navigate('/EducatingUsersOnPhishingRedFlags');
-        break;
       default:
         console.log('Section not found');
     }
@@ -41,7 +38,7 @@ function PhishingSimulationTrainingPage() {
         <h2>Phishing Simulation Training</h2>
         <form>
           {/* Phishing Simulation Training Buttons */}
-          {['Simulated Phishing Campaigns', 'Phishing Awareness Training', 'Phishing Simulation Exercises', 'Educating Users on Phishing Red Flags'].map((section, index) => (
+          {['Simulated Phishing Campaigns', 'Phishing Awareness Training', 'Phishing Simulation Exercises'].map((section, index) => (
             <div key={index} className="form-section">
               <label>{section}</label>
               <button type="button" className="form-button" onClick={() => handleButtonClick(section)}>

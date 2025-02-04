@@ -137,13 +137,6 @@ function CPRCertificationFormPage() {
           <input type="radio" name="training-delivery-modes" value="yes" onChange={handleChange} /> Yes
           <input type="radio" name="training-delivery-modes" value="no" onChange={handleChange} /> No
         </div>
-        <div>
-          <select id="delivery-methods" multiple>
-          <input type="radio" name="trainingDeliveryModes" value="in-person" onChange={handleChange}/> In-person
-          <input type="radio" name="trainingDeliveryModes" value="online" onChange={handleChange}/> Online
-          <input type="radio" name='trainingDeliveryModes' value='blended' onChange={handleChange}/> Blended Learning Approaches
-          </select>
-        </div>
       </div>
 
       <div className="form-section">

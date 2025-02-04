@@ -1,63 +1,70 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext';
+import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
 
 function IsolationProceduresPage() {
-    const navigate = useNavigate();
-    const { buildingId } = useBuilding();
-    const db = getFirestore();
+  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
+  const { buildingId } = useBuilding();
+  const db = getFirestore();
 
-    const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState();
 
-    useEffect(() => {
-        if(!buildingId) {
-          alert('No builidng selected. Redirecting to Building Info...');
-          navigate('BuildingandAddress');
-        }
-      }, [buildingId, navigate]);
+  useEffect(() => {
+    if(!buildingId) {
+      alert('No builidng selected. Redirecting to Building Info...');
+      navigate('BuildingandAddress');
+    }
+  }, [buildingId, navigate]);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  // Function to handle back button
+  const handleBack = () => {
+    navigate(-1);  // Navigates to the previous page
+  };
 
-        if (!buildingId) {
-            alert('Building ID is missing. Please start from the Building Information page.');
-            return;
-        }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if(!buildingId) {
+      alert('Building ID is missing. Please start the assessment from the correct page.');
+      return;
+    }
 
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
-            const formsRef = collection(db, 'forms/Cybersecurity/Isolation Procedures');
-            await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-            });
+    try {
+      // Create a document reference to the building in the 'Buildings' collection
+      const buildingRef = doc(db, 'Buildings', buildingId);
 
-            console.log('Form data submitted successfully!');
-            alert('Form submitted successfully!');
-            navigate('/Form');
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Failed to submit the form. Please try again.');
-        }
-    };
+      // Store the form data in the specified Firestore structure
+      const formsRef = collection(db, 'forms/Cybersecurity/Isolation Procedures');
+      await addDoc(formsRef, {
+        buildling: buildingRef,
+        formData: formData,
+      });
+      console.log('From Data submitted successfully!')
+      alert('Form Submitted successfully!');
+      navigate('/Form');
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to submit the form. Please try again.');
+    }
+  };
 
     return (
         <div className="form-page">
             <header className="header">
             <Navbar />
-                <button className="back-button" onClick={() => navigate(-1)}>←</button>
+                <button className="back-button" onClick={handleBack}>←</button>
                 <h1>Isolation Procedures</h1>
                 <img src={logo} alt="Logo" className="logo" />
             </header>
