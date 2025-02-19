@@ -72,10 +72,8 @@ function SIEMSolutionsPage() {
 
       <main className="form-container">
         <form onSubmit={handleSubmit}>
-          <h2>4.3.3.1.1 Security Information and Event Management (SIEM) Solutions</h2>
-
           {/* Deployment and Integration */}
-          <h3>Deployment and Integration:</h3>
+          <h2>Deployment and Integration:</h2>
           <div className="form-section">
             <label>How is the SIEM solution integrated with other security systems and tools within the organization (e.g., firewalls, intrusion detection systems)?</label>
             <textarea name="siemIntegration" onChange={handleChange}></textarea>
@@ -93,7 +91,7 @@ function SIEMSolutionsPage() {
           </div>
 
           {/* Event Collection and Correlation */}
-          <h3>Event Collection and Correlation:</h3>
+          <h2>Event Collection and Correlation:</h2>
           <div className="form-section">
             <label>What types of security events and logs are collected by the SIEM solution (e.g., network traffic, system logs, application logs)?</label>
             <textarea name="eventLogs" onChange={handleChange}></textarea>
@@ -108,7 +106,7 @@ function SIEMSolutionsPage() {
           </div>
 
           {/* Real-time Monitoring and Alerts */}
-          <h3>Real-time Monitoring and Alerts:</h3>
+          <h2>Real-time Monitoring and Alerts:</h2>
           <div className="form-section">
             <label>Does the SIEM solution provide real-time monitoring and alerting capabilities for detected security events and incidents?</label>
             <div>
@@ -126,7 +124,7 @@ function SIEMSolutionsPage() {
           </div>
 
           {/* Incident Detection and Response */}
-          <h3>Incident Detection and Response:</h3>
+          <h2>Incident Detection and Response:</h2>
           <div className="form-section">
             <label>How effective is the SIEM solution in detecting and identifying various types of security incidents (e.g., malware infections, unauthorized access)?</label>
             <textarea name="incidentDetectionEffectiveness" onChange={handleChange}></textarea>
@@ -144,7 +142,7 @@ function SIEMSolutionsPage() {
           </div>
 
           {/* Data Storage and Retention */}
-          <h3>Data Storage and Retention:</h3>
+          <h2>Data Storage and Retention:</h2>
           <div className="form-section">
             <label>What is the policy for data storage and retention within the SIEM solution, including the duration for retaining logs and security events?</label>
             <textarea name="dataRetentionPolicy" onChange={handleChange}></textarea>
@@ -162,7 +160,7 @@ function SIEMSolutionsPage() {
           </div>
 
           {/* Reporting and Analysis */}
-          <h3>Reporting and Analysis:</h3>
+          <h2>Reporting and Analysis:</h2>
           <div className="form-section">
             <label>What types of reports and dashboards are available through the SIEM solution, and how are they used for security analysis and decision-making?</label>
             <textarea name="siemReports" onChange={handleChange}></textarea>
@@ -177,7 +175,7 @@ function SIEMSolutionsPage() {
           </div>
 
           {/* Maintenance and Improvement */}
-          <h3>Maintenance and Improvement</h3>
+          <h2>Maintenance and Improvement</h2>
           <div className="form-section">
             <label>What is the process for maintaining and updating the SIEM solution, including applying patches, updates, and new threat intelligence feeds?</label>
             <textarea name="siemMaintenance" onChange={handleChange}></textarea>

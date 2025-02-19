@@ -776,7 +776,7 @@ function App() {
         <Route path="/data-sharing-policies" element={<DataSharingPolicies />} />
         <Route path="/DataMinimization" element={<DataMinimization />} />
         <Route path="/DataRetentionPeriods" element={<DataRetentionPeriods />} />
-        <Route path="/EncyptionRequirements" element={<EncryptionRequirements />} />
+        <Route path="/EncryptionRequirements" element={<EncryptionRequirements />} />
         <Route path="/DataAccessControls" element={<DataAccessControls />} />
         <Route path="/StudentPrivacyRights" element={<StudentPrivacyRights />} />
         <Route path="/DataSecurityRequirements" element={<DataSecurityRequirements />} />

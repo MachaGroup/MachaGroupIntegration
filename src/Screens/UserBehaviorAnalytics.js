@@ -68,10 +68,8 @@ function UserBehaviorAnalyticsPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    <h2>4.3.3.2.1 User Behavior Analytics (UBA)</h2>
-
                     {/* Data Collection and Analysis */}
-                    <h3>Data Collection and Analysis:</h3>
+                    <h2>Data Collection and Analysis:</h2>
                     <div className="form-section">
                         <label>What types of user activity data are collected and analyzed (e.g., login times, access patterns, application usage)?</label>
                         <textarea name="userActivityData" onChange={handleChange}></textarea>
@@ -86,7 +84,7 @@ function UserBehaviorAnalyticsPage() {
                     </div>
 
                     {/* Baseline Behavior Establishment */}
-                    <h3>Baseline Behavior Establishment:</h3>
+                    <h2>Baseline Behavior Establishment:</h2>
                     <div className="form-section">
                         <label>How are baseline behaviors for users or user groups established, and how are these baselines maintained and updated?</label>
                         <textarea name="baselineEstablishment" onChange={handleChange}></textarea>
@@ -101,7 +99,7 @@ function UserBehaviorAnalyticsPage() {
                     </div>
 
                     {/* Anomaly Detection */}
-                    <h3>Anomaly Detection:</h3>
+                    <h2>Anomaly Detection:</h2>
                     <div className="form-section">
                         <label>How does UBA identify deviations from established baseline behaviors, and what algorithms or techniques are used for anomaly detection?</label>
                         <textarea name="anomalyDetection" onChange={handleChange}></textarea>
@@ -116,7 +114,7 @@ function UserBehaviorAnalyticsPage() {
                     </div>
 
                     {/* Alerting and Response */}
-                    <h3>Alerting and Response:</h3>
+                    <h2>Alerting and Response:</h2>
                     <div className="form-section">
                         <label>How are alerts generated for detected anomalies, and what is the process for investigating and responding to these alerts?</label>
                         <textarea name="alertingProcess" onChange={handleChange}></textarea>
@@ -131,7 +129,7 @@ function UserBehaviorAnalyticsPage() {
                     </div>
 
                     {/* Integration with Other Security Systems */}
-                    <h3>Integration with Other Security Systems:</h3>
+                    <h2>Integration with Other Security Systems:</h2>
                     <div className="form-section">
                         <label>How is UBA integrated with other security systems, such as Security Information and Event Management (SIEM) solutions or Intrusion Detection Systems (IDS)?</label>
                         <textarea name="ubaIntegration" onChange={handleChange}></textarea>
@@ -146,7 +144,7 @@ function UserBehaviorAnalyticsPage() {
                     </div>
 
                     {/* Privacy and Compliance */}
-                    <h3>Privacy and Compliance:</h3>
+                    <h2>Privacy and Compliance:</h2>
                     <div className="form-section">
                         <label>How does UBA ensure user privacy and comply with relevant regulations and policies (e.g., GDPR, CCPA)?</label>
                         <textarea name="privacyCompliance" onChange={handleChange}></textarea>
@@ -161,7 +159,7 @@ function UserBehaviorAnalyticsPage() {
                     </div>
 
                     {/* Effectiveness and Performance Evaluation */}
-                    <h3>Effectiveness and Performance Evaluation:</h3>
+                    <h2>Effectiveness and Performance Evaluation:</h2>
                     <div className="form-section">
                         <label>How is the effectiveness of UBA assessed, and what metrics or benchmarks are used to evaluate its performance?</label>
                         <textarea name="performanceMetrics" onChange={handleChange}></textarea>

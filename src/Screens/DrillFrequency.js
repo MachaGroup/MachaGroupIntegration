@@ -84,9 +84,8 @@ function DrillFrequencyFormPage() {
                 <div className="form-section">
                     <label>Is there a predefined schedule for conducting drills, such as monthly, quarterly, or semi-annually?</label>
                     <div>
-                        <input type="radio" name="predifinedSchedule" value="monthly" onChange={handleChange} /> Monthly
-                        <input type="radio" name="predifinedSchedule" value="qurterly" onChange={handleChange} /> Quarterly
-                        <input type="radio" name="predifinedSchedule" value='semi-annually' onChange={handleChange} /> Semi-Annually
+                        <input type="radio" name="predifinedSchedule" value="yes" onChange={handleChange} /> Yes
+                        <input type="radio" name="predifinedSchedule" value="no" onChange={handleChange} /> No
                     </div>
                 </div>
 

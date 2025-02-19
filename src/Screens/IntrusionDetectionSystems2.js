@@ -72,10 +72,8 @@ function IntrusionDetectionSystems2Page() {
 
       <main className="form-container">
         <form onSubmit={handleSubmit}>
-          <h2>4.3.3.1.2 Intrusion Detection Systems (IDS)</h2>
-
           {/* System Deployment and Configuration */}
-          <h3>System Deployment and Configuration:</h3>
+          <h2>System Deployment and Configuration:</h2>
           <div className="form-section">
             <label>How are IDS solutions deployed across the network (e.g., inline, passive, distributed) and what areas or segments do they cover?</label>
             <textarea name="idsDeployment" onChange={handleChange}></textarea>
@@ -93,7 +91,7 @@ function IntrusionDetectionSystems2Page() {
           </div>
 
           {/* Detection Capabilities */}
-          <h3>Detection Capabilities:</h3>
+          <h2>Detection Capabilities:</h2>
           <div className="form-section">
             <label>What types of intrusions and attacks does the IDS aim to detect (e.g., network-based attacks, host-based attacks, zero-day exploits)?</label>
             <textarea name="idsDetectionTypes" onChange={handleChange}></textarea>
@@ -108,7 +106,7 @@ function IntrusionDetectionSystems2Page() {
           </div>
 
           {/* Real-time Monitoring and Alerting */}
-          <h3>Real-time Monitoring and Alerting:</h3>
+          <h2>Real-time Monitoring and Alerting:</h2>
           <div className="form-section">
             <label>Does the IDS provide real-time monitoring of network and system activities to identify suspicious or malicious behavior?</label>
             <div>
@@ -126,7 +124,7 @@ function IntrusionDetectionSystems2Page() {
           </div>
 
           {/* Incident Response Integration */}
-          <h3>Incident Response Integration:</h3>
+          <h2>Incident Response Integration:</h2>
           <div className="form-section">
             <label>How is the IDS integrated with incident response processes and tools, such as SIEM systems or ticketing systems?</label>
             <textarea name="idsIncidentIntegration" onChange={handleChange}></textarea>
@@ -144,7 +142,7 @@ function IntrusionDetectionSystems2Page() {
           </div>
 
           {/* Data Logging and Analysis */}
-          <h3>Data Logging and Analysis:</h3>
+          <h2>Data Logging and Analysis:</h2>
           <div className="form-section">
             <label>What types of data and logs are collected by the IDS, and how are they stored and managed?</label>
             <textarea name="idsLogCollection" onChange={handleChange}></textarea>
@@ -162,7 +160,7 @@ function IntrusionDetectionSystems2Page() {
           </div>
 
           {/* System Maintenance and Updates */}
-          <h3>System Maintenance and Updates:</h3>
+          <h2>System Maintenance and Updates:</h2>
           <div className="form-section">
             <label>What is the process for updating and maintaining IDS signatures, rules, and configurations to stay current with emerging threats?</label>
             <textarea name="idsMaintenance" onChange={handleChange}></textarea>
@@ -180,7 +178,7 @@ function IntrusionDetectionSystems2Page() {
           </div>
 
           {/* Performance and Effectiveness Evaluation */}
-          <h3>Performance and Effectiveness Evaluation:</h3>
+          <h2>Performance and Effectiveness Evaluation:</h2>
           <div className="form-section">
             <label>How is the performance of the IDS monitored, and are there metrics or benchmarks used to assess its effectiveness?</label>
             <textarea name="idsPerformanceMonitoring" onChange={handleChange}></textarea>

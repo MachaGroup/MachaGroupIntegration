@@ -75,18 +75,10 @@ function FireExtinguisherLocationsFormPage() {
                 {/* 2.2.1.1.2 Visibility and Accessibility */}
                 <h2>Visibility and Accessibility:</h2>
                 <div className="form-section">
-                    <label>Are fire extinguishers located in easily accessible locations throughout the premises?</label>
-                        <div>
-                            <input type="radio" name="fire extinguishers accessible" value="yes" onChange={handleChange}/> Yes
-                            <input type="radio" name="fire extinguishers accessible" value="no" onChange={handleChange}/> No
-                        </div>
-                    </div>
-                
-                <div className="form-section">
                 <label>Are fire extinguishers located in easily accessible locations throughout the premises?</label>
                     <div>
-                        <input type="radio" name="extinguishers easily accessible" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="extinguishers easily accessible" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="fire extinguishers accessible" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="fire extinguishers accessible" value="no" onChange={handleChange}/> No
                     </div>
                 </div>
 

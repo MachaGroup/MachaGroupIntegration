@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import "./FormQuestions.css";
+import "./Navbar.css";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -19,13 +20,13 @@ const Navbar = () => {
   const sections = [
     {
       name: "Home",
-      path: "/Home",
+      path: "/Home", className: "section-home",
       subsections: [{ name: "Main", path: "/Main" },
         {name: "Main Form", path: "/Form"}],
     },
     {
       name: "Physical Security",
-      path: "/PhysicalSecurity",
+      path: "/PhysicalSecurity", className: "section-physical",
       subsections: [
         { name: "Security Gates", path: "/SecurityGates" },
         { name: "Turnstiles", path: "/Turnstiles" },
@@ -59,7 +60,7 @@ const Navbar = () => {
     },
     {
       name: "Emergency Preparedness",
-      path: "/EmergencyPreparedness",
+      path: "/EmergencyPreparedness", className: "section-emergency",
       subsections: [
         { name: "Conflict Resolution", path: "/ConflictResolution" },
         { name: "Emergency Communication", path: "/EmergencyCommunication" },
@@ -70,7 +71,7 @@ const Navbar = () => {
         { name: "Classroom Lockdown Protocols", path: "/ClassroomLockdownProtocols" },
         { name: "Lockdown Communication Protocols", path: "/LockdownCommunicationProtocols" },
         { name: "Law Enforcement Coordination", path: "/LawEnforcementCoordination" },
-        { name: "Disaster Drills", path: "/DisastorDrills" },
+        { name: "Disaster Drills", path: "/DisasterDrills" },
         { name: "Tornado Shelter Locations", path: "/TornadoShelterLocations" },
         { name: "Severe Weather Monitoring", path: "/SevereWeatherMonitoring" },
         { name: "Tornado Drills", path: "/TornadoDrills" },
@@ -98,7 +99,7 @@ const Navbar = () => {
     },
     {
       name: "Personnel Training and Awareness",
-      path: "/PersonnelTrainingAndAwareness",
+      path: "/PersonnelTrainingAndAwareness", className: "section-training",
       subsections: [
         { name: "Training Providers", path: "/TrainingProviders" },
         { name: "Training Materials", path: "/TrainingMaterials" },
@@ -124,7 +125,7 @@ const Navbar = () => {
         { name: "Incident Reporting Procedures", path: "/incident-reporting-procedures" },
         { name: "Curriculum Integration", path: "/CurriculumIntegration" },
         { name: "Student Handbooks", path: "/StudentHandbooks" },
-        { name: "Parent Involvement", path: "/ParentInvolvement" },
+        { name: "Parent Involvement", path: "/ParentInvolvement2" },
         { name: "Fire Drills", path: "/FireDrills" },
         { name: "Lockdown Drills", path: "/LockdownDrills2" },
         { name: "Severe Weather Preparedness", path: "/SevereWeatherPreparedness" },
@@ -155,7 +156,7 @@ const Navbar = () => {
     },
     {
       name: "Cybersecurity",
-      path: "/Cybersecurity",
+      path: "/Cybersecurity", className: "section-cyber",
       subsections: [
         { name: "Access Control Lists", path: "/AccessControlLists" },
         { name: "Firewall Policies", path: "/FirewallPolicies" },
@@ -185,7 +186,7 @@ const Navbar = () => {
         { name: "Strong Password Guidelines", path: "/strong-password-guidelines" },
         { name: "Multi-Factor Authentication (MFA) Awareness", path: "/multi-factor-authentication-awareness" },
         { name: "Security Information And Event Management", path: "/SecurityInformationAndEventManagement" },
-        { name: "Intrusion Detection Systems", path: "/IntrusionDetectionSystems" },
+        { name: "Intrusion Detection Systems", path: "/IntrusionDetectionSystems2" },
         { name: "User Behavior Analytics", path: "/UserBehaviorAnalytics" },
         { name: "Incident Response Team Roles And Responsibilities", path: "/IncidentResponseTeamRolesAndResponsibilities" },
         { name: "Communication Channels And Protocols", path: "/CommunicationChannelsAndProtocols" },
@@ -196,12 +197,12 @@ const Navbar = () => {
 
     {
       name: "Policy and Compliance",
-      path: "/PolicyAndCompliance",
+      path: "/PolicyAndCompliance", className: "section-policy",
       subsections: [
         { name: "Access Restrictions", path: "/AccessRestrictions" },
         { name: "Personal Device Usage", path: "/PersonalDeviceUsage" },
-        { name: "Data Classification", path: "/DataClassification" },
-        { name: "Data Sharing Policies", path: "/DataSharingPolicies" },
+        { name: "Data Classification", path: "/data-classification" },
+        { name: "Data Sharing Policies", path: "/data-sharing-policies" },
         { name: "Data Minimization", path: "/DataMinimization" },
         { name: "Data Retention Periods", path: "/DataRetentionPeriods" },
         { name: "Encryption Requirements", path: "/EncryptionRequirements" },
@@ -221,7 +222,7 @@ const Navbar = () => {
     },
     {
       name: "Community Partnership",
-      path: "/CommunityPartnership",
+      path: "/CommunityPartnership", className: "section-community",
       subsections: [
         { name: "SRO Roles and Responsibilities", path: "/sro-roles-and-responsibilities" },
         { name: "SRO Training and Certification", path: "/sro-training-and-certification" },
@@ -246,7 +247,7 @@ const Navbar = () => {
     },
     {
       name: "Continuous Improvement - Safety and Security",
-      path: "/ContinuousImprovement",
+      path: "/ContinuousImprovement", className: "section-improvement",
       subsections: [
         { name: "Physical Hazards Assessment", path: "/physical-hazards-assessment" },
         { name: "Environmental Hazards Assessment", path: "/enviromental-hazards-assessment" },
@@ -299,7 +300,7 @@ const Navbar = () => {
       {/* Main Navigation */}
       <ul className={`menu ${menuOpen ? "open" : ""}`}>
         {sections.map((section) => (
-          <li key={section.name}>
+          <li key={section.name} className={section.className}>
             <div className="section-title" onClick={() => toggleSection(section.name)}>
               <span>{section.name}</span>
             </div>

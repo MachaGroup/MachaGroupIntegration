@@ -71,20 +71,18 @@ function PatchManagementPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    <h2>4.4.2.2.2 Incident Response Patch Management</h2>
-
                     {/* Patch Identification */}
-                    <h3>4.4.2.2.2.1 Patch Identification</h3>
+                    <h2>4.4.2.2.2.1 Patch Identification</h2>
                     <div className="form-section">
-                        <label>4.4.2.2.2.1.1. How are security patches identified and prioritized for deployment?</label>
+                        <label>How are security patches identified and prioritized for deployment?</label>
                         <textarea name="patchIdentification" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.1.2. What sources are used to stay informed about available patches?</label>
+                        <label>What sources are used to stay informed about available patches?</label>
                         <textarea name="patchSources" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.1.3. Are there specific criteria for determining which patches are critical?</label>
+                        <label>Are there specific criteria for determining which patches are critical?</label>
                         <div>
                             <input type="radio" name="criticalPatchesCriteria" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="criticalPatchesCriteria" value="No" onChange={handleChange} /> No
@@ -92,17 +90,17 @@ function PatchManagementPage() {
                     </div>
 
                     {/* Patch Deployment Process */}
-                    <h3>4.4.2.2.2.2 Patch Deployment Process</h3>
+                    <h2>4.4.2.2.2.2 Patch Deployment Process</h2>
                     <div className="form-section">
-                        <label>4.4.2.2.2.2.1. What procedures are followed for deploying patches?</label>
+                        <label>What procedures are followed for deploying patches?</label>
                         <textarea name="patchDeploymentProcedures" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.2.2. How is patch deployment managed to ensure minimal disruption?</label>
+                        <label>How is patch deployment managed to ensure minimal disruption?</label>
                         <textarea name="minimalDisruption" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.2.3. Are there predefined steps for rolling out patches?</label>
+                        <label>Are there predefined steps for rolling out patches?</label>
                         <div>
                             <input type="radio" name="predefinedRolloutSteps" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="predefinedRolloutSteps" value="No" onChange={handleChange} /> No
@@ -110,17 +108,17 @@ function PatchManagementPage() {
                     </div>
 
                     {/* Testing and Validation */}
-                    <h3>4.4.2.2.2.3 Testing and Validation</h3>
+                    <h2>4.4.2.2.2.3 Testing and Validation</h2>
                     <div className="form-section">
-                        <label>4.4.2.2.2.3.1. What testing is conducted to validate that patches do not negatively impact system functionality?</label>
+                        <label>What testing is conducted to validate that patches do not negatively impact system functionality?</label>
                         <textarea name="patchTestingValidation" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.3.2. How are potential risks assessed and mitigated before applying patches to live systems?</label>
+                        <label>How are potential risks assessed and mitigated before applying patches to live systems?</label>
                         <textarea name="riskAssessmentMitigation" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.3.3. Are there procedures for verifying that patches have been successfully applied?</label>
+                        <label>Are there procedures for verifying that patches have been successfully applied?</label>
                         <div>
                             <input type="radio" name="patchVerification" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="patchVerification" value="No" onChange={handleChange} /> No
@@ -128,32 +126,32 @@ function PatchManagementPage() {
                     </div>
 
                     {/* Patch Documentation */}
-                    <h3>4.4.2.2.2.4 Patch Documentation</h3>
+                    <h2>4.4.2.2.2.4 Patch Documentation</h2>
                     <div className="form-section">
-                        <label>4.4.2.2.2.4.1. How is the patch management process documented?</label>
+                        <label>How is the patch management process documented?</label>
                         <textarea name="patchDocumentationProcess" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.4.2. What information is included to track patch history and compliance?</label>
+                        <label>What information is included to track patch history and compliance?</label>
                         <textarea name="patchHistoryTracking" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.4.3. How is documentation used for auditing patch management?</label>
+                        <label>How is documentation used for auditing patch management?</label>
                         <textarea name="patchAuditUsage" onChange={handleChange}></textarea>
                     </div>
 
                     {/* Compliance and Reporting */}
-                    <h3>4.4.2.2.2.5 Compliance and Reporting</h3>
+                    <h2>4.4.2.2.2.5 Compliance and Reporting</h2>
                     <div className="form-section">
-                        <label>4.4.2.2.2.5.1. What reporting mechanisms are in place to track patch deployments?</label>
+                        <label>What reporting mechanisms are in place to track patch deployments?</label>
                         <textarea name="reportingMechanisms" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.5.2. How are reports reviewed to identify gaps?</label>
+                        <label>How are reports reviewed to identify gaps?</label>
                         <textarea name="reportReview" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.5.3. Are there established procedures for reporting patch deployment issues?</label>
+                        <label>Are there established procedures for reporting patch deployment issues?</label>
                         <div>
                             <input type="radio" name="reportingIssues" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="reportingIssues" value="No" onChange={handleChange} /> No
@@ -161,17 +159,17 @@ function PatchManagementPage() {
                     </div>
 
                     {/* Patch Management Tools */}
-                    <h3>4.4.2.2.2.6 Patch Management Tools</h3>
+                    <h2>4.4.2.2.2.6 Patch Management Tools</h2>
                     <div className="form-section">
-                        <label>4.4.2.2.2.6.1. What tools are used to automate patching?</label>
+                        <label>What tools are used to automate patching?</label>
                         <textarea name="patchTools" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.6.2. How are tools maintained to ensure effectiveness?</label>
+                        <label>How are tools maintained to ensure effectiveness?</label>
                         <textarea name="toolsMaintenance" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.6.3. Are there integration requirements with existing infrastructure?</label>
+                        <label>Are there integration requirements with existing infrastructure?</label>
                         <div>
                             <input type="radio" name="integrationRequirements" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="integrationRequirements" value="No" onChange={handleChange} /> No
@@ -179,62 +177,62 @@ function PatchManagementPage() {
                     </div>
 
                     {/* Patch Rollback Procedures */}
-                    <h3>4.4.2.2.2.7 Patch Rollback Procedures</h3>
+                    <h2>4.4.2.2.2.7 Patch Rollback Procedures</h2>
                     <div className="form-section">
-                        <label>4.4.2.2.2.7.1. What rollback procedures are in place?</label>
+                        <label>What rollback procedures are in place?</label>
                         <textarea name="rollbackProcedures" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.7.2. How is the decision made to roll back a patch?</label>
+                        <label>How is the decision made to roll back a patch?</label>
                         <textarea name="rollbackDecision" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.7.3. How are rollback issues communicated?</label>
+                        <label>How are rollback issues communicated?</label>
                         <textarea name="rollbackIssues" onChange={handleChange}></textarea>
                     </div>
 
                     {/* Patch Management Policy */}
-                    <h3>4.4.2.2.2.8 Patch Management Policy</h3>
+                    <h2>4.4.2.2.2.8 Patch Management Policy</h2>
                     <div className="form-section">
-                        <label>4.4.2.2.2.8.1. What policies govern the patch management process?</label>
+                        <label>What policies govern the patch management process?</label>
                         <textarea name="patchPolicy" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.8.2. How are policies communicated to stakeholders?</label>
+                        <label>How are policies communicated to stakeholders?</label>
                         <textarea name="policyCommunication" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.8.3. Are policies periodically reviewed to ensure effectiveness?</label>
+                        <label>Are policies periodically reviewed to ensure effectiveness?</label>
                         <textarea name="policyReview" onChange={handleChange}></textarea>
                     </div>
 
                     {/* Training and Awareness */}
-                    <h3>4.4.2.2.2.9 Training and Awareness</h3>
+                    <h2>4.4.2.2.2.9 Training and Awareness</h2>
                     <div className="form-section">
-                        <label>4.4.2.2.2.9.1. What training is provided on patch management?</label>
+                        <label>What training is provided on patch management?</label>
                         <textarea name="trainingOnPatch" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.9.2. How is staff awareness of patch management importance ensured?</label>
+                        <label>How is staff awareness of patch management importance ensured?</label>
                         <textarea name="staffAwareness" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.9.3. Are there refresher training sessions for staff?</label>
+                        <label>Are there refresher training sessions for staff?</label>
                         <textarea name="refresherTraining" onChange={handleChange}></textarea>
                     </div>
 
                     {/* Incident Response Integration */}
-                    <h3>4.4.2.2.2.10 Incident Response Integration</h3>
+                    <h2>4.4.2.2.2.10 Incident Response Integration</h2>
                     <div className="form-section">
-                        <label>4.4.2.2.2.10.1. How is patch management integrated with incident response?</label>
+                        <label>How is patch management integrated with incident response?</label>
                         <textarea name="incidentIntegration" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.10.2. What role does patch management play in incident recovery?</label>
+                        <label>What role does patch management play in incident recovery?</label>
                         <textarea name="incidentRecoveryRole" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.2.10.3. Are there protocols for quick patch deployment during incidents?</label>
+                        <label>Are there protocols for quick patch deployment during incidents?</label>
                         <textarea name="quickPatchDeployment" onChange={handleChange}></textarea>
                     </div>
 

@@ -76,7 +76,7 @@ function FireAlarmSystemsPage() {
                     <h2>2.2.1.1.3 Fire Alarm Systems (e.g., automated sliding gates)</h2>
 
                     {/* Functionality and Reliability */}
-                    <h3>2.2.1.1.3.1 Functionality and Reliability:</h3>
+                    <h2>2.2.1.1.3.1 Functionality and Reliability:</h2>
                     <div className="form-section">
                         <label>2.2.1.1.3.1.1. Are the fire alarm systems installed throughout the premises to provide comprehensive coverage?</label>
                         <div>
@@ -102,7 +102,7 @@ function FireAlarmSystemsPage() {
                     </div>
 
                     {/* Testing Schedule */}
-                    <h3>2.2.1.1.3.2 Testing Schedule:</h3>
+                    <h2>2.2.1.1.3.2 Testing Schedule:</h2>
                     <div className="form-section">
                         <label>2.2.1.1.3.2.1. Is there a schdule for testing fire alarm systems, including frquency and procudres?</label>
                         <input
@@ -130,7 +130,7 @@ function FireAlarmSystemsPage() {
                     </div>
 
                     {/* Testing Procedures */}
-                    <h3>2.2.1.1.3.3 Testing Procedures:</h3>
+                    <h2>2.2.1.1.3.3 Testing Procedures:</h2>
                     <div className="form-section">
                         <label>2.2.1.1.3.3.1. Are testing procedures standardized and followed consistently by trained personnel?</label>
                         <div>
@@ -160,7 +160,7 @@ function FireAlarmSystemsPage() {
                     </div>
 
                     {/* Documentation and Regulations */}
-                    <h3>2.2.1.1.3.4 Documentation and Records:</h3>
+                    <h2>2.2.1.1.3.4 Documentation and Records:</h2>
                     <div className="form-section">
                         <label>2.2.1.1.3.4.1. Are records maintained for all fire alarm test, including dates, times, personnel involved, and results?</label>
                         <div>
@@ -190,7 +190,7 @@ function FireAlarmSystemsPage() {
                     </div>
 
                     {/* Notification and Communication */}
-                    <h3>2.2.1.1.3.5 Notification and Communication:</h3>
+                    <h2>2.2.1.1.3.5 Notification and Communication:</h2>
                     <div className="form-section">
                         <label>2.2.1.1.3.5.1. Is there a process for notifying building occupants in advance of scheduled fire alarm tests?</label>
                         <div>
@@ -212,7 +212,7 @@ function FireAlarmSystemsPage() {
                     </div>
 
                     <div className="form-section">
-                        <label>2.2.1.1.3.5.3. Is ther coordination with local fire departments or monitoring agencies to ensure they are aware of scheduled tests and can responds appropriately to any alarms?</label>
+                        <label>2.2.1.1.3.5.3. Is there coordination with local fire departments or monitoring agencies to ensure they are aware of scheduled tests and can responds appropriately to any alarms?</label>
                         <div>
                             <input type="radio" name="fireDepartmentCoordination" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="fireDepartmentCoordination" value="no" onChange={handleChange} /> No
@@ -220,7 +220,7 @@ function FireAlarmSystemsPage() {
                     </div>
 
                     {/* Emergency Response Integration */}
-                    <h3>2.2.1.1.3.6 Emergency Response Integration:</h3>
+                    <h2>2.2.1.1.3.6 Emergency Response Integration:</h2>
                     <div className="form-section">
                         <label>2.2.1.1.3.6.1. Are fire alarm systems integrated into the overall emergency response plan for the premises?</label>
                         <div>
@@ -246,9 +246,9 @@ function FireAlarmSystemsPage() {
                     </div>
 
                     {/* System Maintenance and Upkeep */}
-                    <h3>2.2.1.1.3.7 System Maintenance and Upkeep:</h3>
+                    <h2>2.2.1.1.3.7 System Maintenance and Upkeep:</h2>
                     <div className="form-section">
-                        <label>2.2.1.1.3.7.1. Is there a maintenance schedule in place for inspecting, servicing, and maintaining fire alarm systems??</label>
+                        <label>2.2.1.1.3.7.1. Is there a maintenance schedule in place for inspecting, servicing, and maintaining fire alarm systems?</label>
                         <div>
                             <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange} /> No

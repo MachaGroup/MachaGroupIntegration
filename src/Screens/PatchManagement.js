@@ -67,17 +67,15 @@ function PatchManagementPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    <h2>4.1.2.2.1 Patch Management (e.g., installing security updates)</h2>
-
                     {/* Timeliness and Efficiency */}
-                    <h3>4.1.2.2.1.1 Timeliness and Efficiency:</h3>
+                    <h2>4.1.2.2.1.1 Timeliness and Efficiency:</h2>
                     <div className="form-section">
-                        <label>4.1.2.2.1.1.1. How quickly are patches and security updates applied to devices once they are released by vendors?</label>
+                        <label>How quickly are patches and security updates applied to devices once they are released by vendors?</label>
                         <textarea name="patchTimeliness" onChange={handleChange}></textarea>
                     </div>
 
                     <div className="form-section">
-                        <label>4.1.2.2.1.1.2. Are there automated systems in place to regularly check for and deploy patches across all devices in the network?</label>
+                        <label>Are there automated systems in place to regularly check for and deploy patches across all devices in the network?</label>
                         <div>
                             <input type="radio" name="automatedPatchSystems" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="automatedPatchSystems" value="No" onChange={handleChange} /> No
@@ -85,14 +83,14 @@ function PatchManagementPage() {
                     </div>
 
                     <div className="form-section">
-                        <label>4.1.2.2.1.1.3. What processes are in place to ensure that critical patches are prioritized and installed without delay to mitigate security risks?</label>
+                        <label>What processes are in place to ensure that critical patches are prioritized and installed without delay to mitigate security risks?</label>
                         <textarea name="criticalPatchProcesses" onChange={handleChange}></textarea>
                     </div>
 
                     {/* Coverage and Scope */}
-                    <h3>4.1.2.2.1.2 Coverage and Scope:</h3>
+                    <h2>4.1.2.2.1.2 Coverage and Scope:</h2>
                     <div className="form-section">
-                        <label>4.1.2.2.1.2.1. Does the patch management strategy cover all operating systems, applications, and firmware used within the organization?</label>
+                        <label>Does the patch management strategy cover all operating systems, applications, and firmware used within the organization?</label>
                         <div>
                             <input type="radio" name="patchCoverage" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="patchCoverage" value="No" onChange={handleChange} /> No
@@ -100,63 +98,63 @@ function PatchManagementPage() {
                     </div>
 
                     <div className="form-section">
-                        <label>4.1.2.2.1.2.2. How are third-party applications managed, and is there a comprehensive inventory to ensure all software is up-to-date?</label>
+                        <label>How are third-party applications managed, and is there a comprehensive inventory to ensure all software is up-to-date?</label>
                         <textarea name="thirdPartyManagement" onChange={handleChange}></textarea>
                     </div>
 
                     <div className="form-section">
-                        <label>4.1.2.2.1.2.3. Are there mechanisms to ensure that both on-premises and remote devices receive necessary updates in a timely manner?</label>
+                        <label>Are there mechanisms to ensure that both on-premises and remote devices receive necessary updates in a timely manner?</label>
                         <textarea name="remoteUpdateMechanisms" onChange={handleChange}></textarea>
                     </div>
 
                     {/* Testing and Validation */}
-                    <h3>4.1.2.2.1.3 Testing and Validation:</h3>
+                    <h2>4.1.2.2.1.3 Testing and Validation:</h2>
                     <div className="form-section">
-                        <label>4.1.2.2.1.3.1. Is there a procedure for testing patches in a controlled environment before deployment to ensure compatibility and prevent disruption of services?</label>
+                        <label>Is there a procedure for testing patches in a controlled environment before deployment to ensure compatibility and prevent disruption of services?</label>
                         <textarea name="patchTestingProcedure" onChange={handleChange}></textarea>
                     </div>
 
                     <div className="form-section">
-                        <label>4.1.2.2.1.3.2. How are patches validated to confirm successful installation, and what steps are taken if a patch fails to apply correctly?</label>
+                        <label>How are patches validated to confirm successful installation, and what steps are taken if a patch fails to apply correctly?</label>
                         <textarea name="patchValidationSteps" onChange={handleChange}></textarea>
                     </div>
 
                     <div className="form-section">
-                        <label>4.1.2.2.1.3.3. Are rollback plans in place to revert changes if a patch causes unforeseen issues or incompatibility with existing systems?</label>
+                        <label>Are rollback plans in place to revert changes if a patch causes unforeseen issues or incompatibility with existing systems?</label>
                         <textarea name="rollbackPlans" onChange={handleChange}></textarea>
                     </div>
 
                     {/* Compliance and Reporting */}
-                    <h3>4.1.2.2.1.4 Compliance and Reporting:</h3>
+                    <h2>4.1.2.2.1.4 Compliance and Reporting:</h2>
                     <div className="form-section">
-                        <label>4.1.2.2.1.4.1. How does the patch management process ensure compliance with regulatory requirements and industry standards, such as GDPR, HIPAA, or PCI-DSS?</label>
+                        <label>How does the patch management process ensure compliance with regulatory requirements and industry standards, such as GDPR, HIPAA, or PCI-DSS?</label>
                         <textarea name="complianceAssurance" onChange={handleChange}></textarea>
                     </div>
 
                     <div className="form-section">
-                        <label>4.1.2.2.1.4.2. Are there audit trails and reporting mechanisms that document patch status, including deployed, pending, and failed updates, for all devices?</label>
+                        <label>Are there audit trails and reporting mechanisms that document patch status, including deployed, pending, and failed updates, for all devices?</label>
                         <textarea name="auditTrails" onChange={handleChange}></textarea>
                     </div>
 
                     <div className="form-section">
-                        <label>4.1.2.2.1.4.3. How often are patch management reports reviewed, and who is responsible for ensuring that devices are fully patched and compliant?</label>
+                        <label>How often are patch management reports reviewed, and who is responsible for ensuring that devices are fully patched and compliant?</label>
                         <textarea name="reportReviewFrequency" onChange={handleChange}></textarea>
                     </div>
 
                     {/* Security and Risk Management */}
-                    <h3>4.1.2.2.1.5 Security and Risk Management:</h3>
+                    <h2>4.1.2.2.1.5 Security and Risk Management:</h2>
                     <div className="form-section">
-                        <label>4.1.2.2.1.5.1. What strategies are in place to prioritize patches based on the severity of vulnerabilities and the criticality of affected systems?</label>
+                        <label>What strategies are in place to prioritize patches based on the severity of vulnerabilities and the criticality of affected systems?</label>
                         <textarea name="patchPrioritizationStrategies" onChange={handleChange}></textarea>
                     </div>
 
                     <div className="form-section">
-                        <label>4.1.2.2.1.5.2. How are patch management activities integrated into the broader cybersecurity strategy to address potential risks and minimize attack surfaces?</label>
+                        <label>How are patch management activities integrated into the broader cybersecurity strategy to address potential risks and minimize attack surfaces?</label>
                         <textarea name="cybersecurityIntegration" onChange={handleChange}></textarea>
                     </div>
 
                     <div className="form-section">
-                        <label>4.1.2.2.1.5.3. Are there procedures for handling out-of-band or emergency patches, particularly in response to zero-day vulnerabilities or active threats?</label>
+                        <label>Are there procedures for handling out-of-band or emergency patches, particularly in response to zero-day vulnerabilities or active threats?</label>
                         <textarea name="emergencyPatchProcedures" onChange={handleChange}></textarea>
                     </div>
 

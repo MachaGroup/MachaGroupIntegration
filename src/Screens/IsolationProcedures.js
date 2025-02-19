@@ -71,20 +71,18 @@ function IsolationProceduresPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    <h2>4.4.2.2.1 Isolation Procedures</h2>
-
                     {/* Isolation Strategy */}
-                    <h3>4.4.2.2.1.1 Isolation Strategy</h3>
+                    <h2>4.4.2.2.1.1 Isolation Strategy</h2>
                     <div className="form-section">
-                        <label>4.4.2.2.1.1.1. What criteria are used to determine which systems should be isolated during an incident?</label>
+                        <label>What criteria are used to determine which systems should be isolated during an incident?</label>
                         <textarea name="isolationCriteria" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.1.1.2. How are decisions made regarding the scope and extent of isolation?</label>
+                        <label>How are decisions made regarding the scope and extent of isolation?</label>
                         <textarea name="isolationScope" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.1.1.3. Are there predefined protocols for isolating different types of systems?</label>
+                        <label>Are there predefined protocols for isolating different types of systems?</label>
                         <div>
                             <input type="radio" name="predefinedProtocols" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="predefinedProtocols" value="No" onChange={handleChange} /> No
@@ -92,17 +90,17 @@ function IsolationProceduresPage() {
                     </div>
 
                     {/* Isolation Methods */}
-                    <h3>4.4.2.2.1.2 Isolation Methods</h3>
+                    <h2>4.4.2.2.1.2 Isolation Methods</h2>
                     <div className="form-section">
-                        <label>4.4.2.2.1.2.1. What methods or technologies are used to isolate affected systems?</label>
+                        <label>What methods or technologies are used to isolate affected systems?</label>
                         <textarea name="isolationMethods" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.1.2.2. How are these methods implemented to ensure effective containment?</label>
+                        <label>How are these methods implemented to ensure effective containment?</label>
                         <textarea name="methodImplementation" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.1.2.3. Are there automated tools to assist with isolation?</label>
+                        <label>Are there automated tools to assist with isolation?</label>
                         <div>
                             <input type="radio" name="automatedTools" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="automatedTools" value="No" onChange={handleChange} /> No
@@ -110,17 +108,17 @@ function IsolationProceduresPage() {
                     </div>
 
                     {/* Communication During Isolation */}
-                    <h3>4.4.2.2.1.3 Communication During Isolation</h3>
+                    <h2>4.4.2.2.1.3 Communication During Isolation</h2>
                     <div className="form-section">
-                        <label>4.4.2.2.1.3.1. How is communication managed during the isolation process?</label>
+                        <label>How is communication managed during the isolation process?</label>
                         <textarea name="communicationManagement" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.1.3.2. What procedures ensure isolation actions are documented?</label>
+                        <label>What procedures ensure isolation actions are documented?</label>
                         <textarea name="documentationProcedures" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.1.3.3. Are there channels for reporting isolation status?</label>
+                        <label>Are there channels for reporting isolation status?</label>
                         <div>
                             <input type="radio" name="reportingChannels" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="reportingChannels" value="No" onChange={handleChange} /> No
@@ -128,32 +126,32 @@ function IsolationProceduresPage() {
                     </div>
 
                     {/* Isolation Verification */}
-                    <h3>4.4.2.2.1.4 Isolation Verification</h3>
+                    <h2>4.4.2.2.1.4 Isolation Verification</h2>
                     <div className="form-section">
-                        <label>4.4.2.2.1.4.1. How is it verified that systems have been successfully isolated?</label>
+                        <label>How is it verified that systems have been successfully isolated?</label>
                         <textarea name="isolationVerification" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.1.4.2. What methods test and confirm the effectiveness of isolation?</label>
+                        <label>What methods test and confirm the effectiveness of isolation?</label>
                         <textarea name="verificationMethods" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.1.4.3. Are there benchmarks for successful isolation?</label>
+                        <label>Are there benchmarks for successful isolation?</label>
                         <textarea name="isolationBenchmarks" onChange={handleChange}></textarea>
                     </div>
 
                     {/* Impact Assessment */}
-                    <h3>4.4.2.2.1.5 Impact Assessment</h3>
+                    <h2>4.4.2.2.1.5 Impact Assessment</h2>
                     <div className="form-section">
-                        <label>4.4.2.2.1.5.1. How is the impact of isolation on business operations assessed?</label>
+                        <label>How is the impact of isolation on business operations assessed?</label>
                         <textarea name="impactAssessment" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.1.5.2. What measures minimize impact on critical functions?</label>
+                        <label>What measures minimize impact on critical functions?</label>
                         <textarea name="minimizingImpact" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.1.5.3. Are there contingency plans for operational issues caused by isolation?</label>
+                        <label>Are there contingency plans for operational issues caused by isolation?</label>
                         <div>
                             <input type="radio" name="contingencyPlans" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="contingencyPlans" value="No" onChange={handleChange} /> No
@@ -161,32 +159,32 @@ function IsolationProceduresPage() {
                     </div>
 
                     {/* Recovery and Reconnection */}
-                    <h3>4.4.2.2.1.6 Recovery and Reconnection</h3>
+                    <h2>4.4.2.2.1.6 Recovery and Reconnection</h2>
                     <div className="form-section">
-                        <label>4.4.2.2.1.6.1. What procedures are followed for recovery and reconnection?</label>
+                        <label>What procedures are followed for recovery and reconnection?</label>
                         <textarea name="recoveryProcedures" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.1.6.2. How is system integrity verified before reconnection?</label>
+                        <label>How is system integrity verified before reconnection?</label>
                         <textarea name="integrityVerification" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.1.6.3. What protocols ensure reconnection does not reintroduce the threat?</label>
+                        <label>What protocols ensure reconnection does not reintroduce the threat?</label>
                         <textarea name="reconnectionProtocols" onChange={handleChange}></textarea>
                     </div>
 
                     {/* Documentation and Reporting */}
-                    <h3>4.4.2.2.1.7 Documentation and Reporting</h3>
+                    <h2>4.4.2.2.1.7 Documentation and Reporting</h2>
                     <div className="form-section">
-                        <label>4.4.2.2.1.7.1. How are isolation actions documented?</label>
+                        <label>How are isolation actions documented?</label>
                         <textarea name="isolationDocumentation" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.1.7.2. What are the reporting requirements for the isolation process?</label>
+                        <label>What are the reporting requirements for the isolation process?</label>
                         <textarea name="reportingRequirements" onChange={handleChange}></textarea>
                     </div>
                     <div className="form-section">
-                        <label>4.4.2.2.1.7.3. How is documentation used to improve future isolation procedures?</label>
+                        <label>How is documentation used to improve future isolation procedures?</label>
                         <textarea name="futureImprovements" onChange={handleChange}></textarea>
                     </div>
 

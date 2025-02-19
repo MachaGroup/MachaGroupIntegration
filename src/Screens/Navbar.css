@@ -1,0 +1,30 @@
+.section-home { 
+    background-color: skyblue; 
+}
+
+.section-physical { 
+    background-color: lightgreen; 
+}
+
+.section-emergency { 
+    background-color: yellow; 
+}
+
+.section-training { 
+    background-color: orange; 
+}
+
+.section-cyber { 
+    background-color: red; 
+}
+
+.section-policy { 
+    background-color: purple; 
+}
+
+.section-community { 
+    background-color: salmon; 
+}
+
+.section-improvement { 
+    background-color: lightslategray; }
