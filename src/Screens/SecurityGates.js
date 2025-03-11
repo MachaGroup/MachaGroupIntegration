@@ -12,6 +12,7 @@ function SecurityGatesPage() {
     const db = getFirestore();
 
     const [formData, setFormData] = useState();
+    const [isSaved, setIsSaved] = useState(true);
 
     useEffect(() => {
         if(!buildingId) {
@@ -19,6 +20,18 @@ function SecurityGatesPage() {
           navigate('BuildingandAddress');
         }
       }, [buildingId, navigate]);
+
+    useEffect(() => {
+        // Auto-save feature every 15 seconds
+        const autoSaveInterval = setInterval(() => {
+            if (formData && !isSaved) {
+                handleAutoSave();
+            }
+        }, 15000); // 15000 ms = 15 seconds
+
+        // Clean up interval when component unmounts
+        return () => clearInterval(autoSaveInterval);
+    }, [formData, isSaved]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
