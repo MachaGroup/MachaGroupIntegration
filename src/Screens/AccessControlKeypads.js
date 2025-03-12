@@ -28,20 +28,9 @@ function AccessControlKeypadsPage() {
     }));
   };
 
-useEffect(() => {
-    // Auto-save feature every 15 seconds
-    const autoSaveInterval = setInterval(() => {
-        if (formData && !isSaved) {
-            handleAutoSave();
-        }
-    }, 15000); // 15000 ms = 15 seconds
-
-    // Clean up interval when component unmounts
-    return () => clearInterval(autoSaveInterval);
-}, [formData, isSaved]);
-
   // Function to handle back button
-  const handleBack = () => {
+  const handleBack = async () => {
+    await handleSave();
     navigate(-1);  // Navigates to the previous page
   };
 
