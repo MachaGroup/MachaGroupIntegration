@@ -30,10 +30,6 @@ function AccessControlKeypadsPage() {
 
   // Function to handle back button
   const handleBack = async () => {
-    await addDoc(formsRef, {
-      buildling: buildingRef,
-      formData: formData,
-    });
     navigate(-1);  // Navigates to the previous page
   };
 
