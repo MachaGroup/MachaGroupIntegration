@@ -21,17 +21,6 @@ function SecurityGatesPage() {
         }
       }, [buildingId, navigate]);
 
-    useEffect(() => {
-        // Auto-save feature every 15 seconds
-        const autoSaveInterval = setInterval(() => {
-            if (formData && !isSaved) {
-                handleAutoSave();
-            }
-        }, 15000); // 15000 ms = 15 seconds
-
-        // Clean up interval when component unmounts
-        return () => clearInterval(autoSaveInterval);
-    }, [formData, isSaved]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -65,9 +54,18 @@ function SecurityGatesPage() {
               formData: formData, // Store the form data as a nested object
           });
 
-          console.log('Form data submitted successfully!');
-          alert('Form submitted successfully!');
-          navigate('/Form');
+          useEffect(() => {
+            // Auto-save feature every 15 seconds
+            const autoSaveInterval = setInterval(() => {
+                if (formData && !isSaved) {
+                    handleAutoSave();
+                }
+            }, 15000); // 15000 ms = 15 seconds
+    
+            // Clean up interval when component unmounts
+            return () => clearInterval(autoSaveInterval);
+        }, [formData, isSaved]);
+          
         } catch (error) {
             console.error('Error submitting form:', error);
             alert('Failed to submit the form. Please try again.');
