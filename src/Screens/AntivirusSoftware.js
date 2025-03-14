@@ -79,6 +79,7 @@ function AntivirusSoftwarePage() {
                         <div>
                             <input type="radio" name="heuristicDetection" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="heuristicDetection" value="No" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="heuristicDetectionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -99,6 +100,7 @@ function AntivirusSoftwarePage() {
                         <div>
                             <input type="radio" name="scanScheduling" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="scanScheduling" value="No" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="scanSchedulingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -124,6 +126,7 @@ function AntivirusSoftwarePage() {
                         <div>
                             <input type="radio" name="customizableAlerts" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="customizableAlerts" value="No" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="customizableAlertsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -144,6 +147,7 @@ function AntivirusSoftwarePage() {
                         <div>
                             <input type="radio" name="threatIntelligenceSharing" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="threatIntelligenceSharing" value="No" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="threatIntelligenceSharingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
