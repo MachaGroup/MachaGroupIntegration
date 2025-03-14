@@ -42,7 +42,7 @@ function AccessControlKeypadsPage() {
     }
 
     try {
-      // Create a document reference to the building in the 'Buildings' collection
+      // Create a document reference to the building in the 'Buildings' collection.
       const buildingRef = doc(db, 'Buildings', buildingId);
 
       // Store the form data in the specified Firestore structure
