@@ -1,36 +1,55 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useBuilding } from '../Context/BuildingContext';
-import './FormQuestions.css';  // Ensure this is linked to your universal CSS
+import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
 
 function TurnstilesPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
+  const navigate = useNavigate();
   const { buildingId } = useBuilding();
   const db = getFirestore();
+  const storage = getStorage();
 
-  const [formData, setFormData] = useState();
+  const [formData, setFormData] = useState({});
+  const [image, setImage] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [uploadError, setUploadError] = useState(null);
 
   useEffect(() => {
     if (!buildingId) {
-      alert('No building selected. Redirecting to Building Info...')
-      navigate('BuildingandAddress')
+      alert('No building selected. Redirecting to Building Info...');
+      navigate('BuildingandAddress');
     }
   }, [buildingId, navigate]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    const { name, type, checked, value } = e.target;
+
+    if (type === 'radio') {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: checked ? value : '',
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
 
-  // Function to handle back button
+  const handleImageChange = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
+
   const handleBack = async () => {
-    if (formData && buildingId) { // Check if formData and buildingId exist
+    if (formData && buildingId) {
       try {
         const buildingRef = doc(db, 'Buildings', buildingId);
         const formsRef = collection(db, 'forms/Physical Security/Turnstiles');
@@ -55,30 +74,52 @@ function TurnstilesPage() {
       alert('Building ID is missing. Please start the assessment from the correct page.');
       return;
     }
-    try {
-      // Create a document refrence to the building in the "Buildings" collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
 
+    try {
+      const buildingRef = doc(db, 'Buildings', buildingId);
       const formsRef = collection(db, 'forms/Physical Security/Turnstiles');
+
+      if (image) {
+        const storageRef = ref(storage, `turnstile_images/${Date.now()}_${image.name}`);
+
+        const uploadTask = uploadBytesResumable(storageRef, image);
+
+        uploadTask.on('state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setUploadProgress(progress);
+          },
+          (error) => {
+            setUploadError(error);
+          },
+          () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              setImageUrl(downloadURL);
+              setFormData({ ...formData, imageUrl: downloadURL });
+              setUploadError(null);
+            });
+          }
+        );
+      }
+
       await addDoc(formsRef, {
-        building: buildingRef, // Reference to the building document
-        formData: formData, // Store the form data as a nested object
+        building: buildingRef,
+        formData: formData,
       });
       console.log('Form data submitted successfully!');
       alert('Form submitted successfully!');
-      navigate('/Form')
+      navigate('/Form');
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert('Failed to submite the form. Please try again.')
+      alert('Failed to submit the form. Please try again.');
     }
   };
 
   return (
     <div className="form-page">
       <header className="header">
-            <Navbar />
-        {/* Back Button */}
-      <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
+        <Navbar />
+        <button className="back-button" onClick={handleBack}>←</button>
         <h1>Turnstiles Assessment</h1>
         <img src={logo} alt="Logo" className="logo" />
       </header>
@@ -90,14 +131,16 @@ function TurnstilesPage() {
           <div className="form-section">
             <label>Are the turnstiles operational and functioning as intended?</label>
             <div>
-              <input type="radio" name="turnstilesOperational" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="turnstilesOperational" value="no" onChange={handleChange}/> No
+              <input type="radio" name="turnstilesOperational" value="yes" onChange={handleChange} /> Yes
+              <input type="radio" name="turnstilesOperational" value="no" onChange={handleChange} /> No
             </div>
-            <div>
-              <input type="text" name="turnstilesOperationalComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
+            <input
+              type="text"
+              name="turnstilesOperationalComment"
+              placeholder="Additional comments"
+              onChange={handleChange}
+            />
           </div>
-
           <div className="form-section">
             <label>Do the turnstiles rotate smoothly without any mechanical issues?</label>
             <div>
@@ -305,6 +348,14 @@ function TurnstilesPage() {
             </div>
           </div>
 
+          
+    
+          {/* ... (Rest of your form questions from the previous response) ... */}
+
+          {/* Image Upload */}
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+          {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+          {uploadError && <p style={{ color: 'red' }}>{uploadError.message}</p>}
           {/* Submit Button */}
           <button type="submit">Submit</button>
         </form>

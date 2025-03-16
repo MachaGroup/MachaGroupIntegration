@@ -1,17 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext'; 
 import './FormQuestions.css';
-import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
+import logo from '../assets/MachaLogo.png'; 
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
+
 
 function SecurityGatesPage() {
     const navigate = useNavigate();
-    const { buildingId } = useBuilding(); // Access and update buildingId from context
+    const { buildingId } = useBuilding(); 
     const db = getFirestore();
+    const functions = getFunctions();
+    const uploadImage = httpsCallable(functions, 'uploadSecurityGateImage');
 
     const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+
 
     useEffect(() => {
         if (!buildingId) {
@@ -21,15 +29,34 @@ function SecurityGatesPage() {
     }, [buildingId, navigate]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+        const { name, type, checked, value } = e.target; // Get checked property for radio buttons
+    
+        if (type === 'radio') {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: checked ? value : '', // Set value if checked, clear if unchecked
+            }));
+        } else {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+        }
+    };
+    
+    
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
     };
 
     const handleBack = async () => {
-        if (formData && buildingId) { // Check if formData and buildingId exist
+        if (formData && buildingId) { 
           try {
             const buildingRef = doc(db, 'Buildings', buildingId);
             const formsRef = collection(db, 'forms/Physical Security/Security Gates');
@@ -47,12 +74,25 @@ function SecurityGatesPage() {
         navigate(-1);
       };
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!buildingId) {
             alert('Building ID is missing. Please start from the Building Information page.');
             return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null); 
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message); 
+            }
         }
 
         try {
@@ -115,6 +155,9 @@ function SecurityGatesPage() {
                                 />
                             </div>
                         ))}
+                        <input type="file" onChange={handleImageChange} accept="image/*" />
+                        {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                        {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>} 
                         <button type="submit">Submit</button>
                     </form>
                 </main>
