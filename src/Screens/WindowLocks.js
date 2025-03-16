@@ -29,8 +29,23 @@ function WindowLocksPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Physical Security/Window Locks');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -80,6 +95,9 @@ function WindowLocksPage() {
               <input type="radio" name="operationalLocks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="operationalLocks" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="operationalLocksComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -87,6 +105,9 @@ function WindowLocksPage() {
             <div>
               <input type="radio" name="secureFastening" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="secureFastening" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="secureFasteningComments" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -103,6 +124,9 @@ function WindowLocksPage() {
               <input type="radio" name="backupSystems" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="backupSystems" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="backupSystemsComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           {/* Compatibility with Window Types */}
@@ -113,6 +137,9 @@ function WindowLocksPage() {
               <input type="radio" name="windowLockSuitability" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="windowLockSuitability" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="windowLockSuitabilityComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -121,6 +148,9 @@ function WindowLocksPage() {
               <input type="radio" name="secureFit" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="secureFit" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="secureFitComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -128,6 +158,9 @@ function WindowLocksPage() {
             <div>
               <input type="radio" name="windowSizes" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="windowSizes" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="windowSizesComments" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -139,6 +172,9 @@ function WindowLocksPage() {
               <input type="radio" name="accessibleLocks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="accessibleLocks" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="accessibleLocksComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -147,6 +183,9 @@ function WindowLocksPage() {
               <input type="radio" name="convenientUse" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="convenientUse" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="convenientUseComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -154,6 +193,9 @@ function WindowLocksPage() {
             <div>
               <input type="radio" name="accessibilityFeatures" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="accessibilityFeatures" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="accessibilityFeaturesComments" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -165,6 +207,9 @@ function WindowLocksPage() {
               <input type="radio" name="durableMaterials" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="durableMaterials" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="durableMaterialsComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -173,6 +218,9 @@ function WindowLocksPage() {
               <input type="radio" name="additionalSecurityFeatures" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="additionalSecurityFeatures" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="additionalSecurityFeaturesComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -180,6 +228,9 @@ function WindowLocksPage() {
             <div>
               <input type="radio" name="reliabilityTesting" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="reliabilityTesting" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="reliabilityTestingComments" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -191,6 +242,9 @@ function WindowLocksPage() {
               <input type="radio" name="integrationSecuritySystem" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="integrationSecuritySystem" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="integrationSecuritySystemComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -199,6 +253,9 @@ function WindowLocksPage() {
               <input type="radio" name="tamperAlerts" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="tamperAlerts" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="tamperAlertsComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -206,6 +263,9 @@ function WindowLocksPage() {
             <div>
               <input type="radio" name="surveillanceMonitoring" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="surveillanceMonitoring" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="surveillanceMonitoringComments" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -217,6 +277,9 @@ function WindowLocksPage() {
               <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="maintenanceScheduleComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -225,6 +288,9 @@ function WindowLocksPage() {
               <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="maintenanceTasksComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -232,6 +298,9 @@ function WindowLocksPage() {
             <div>
               <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="maintenanceRecordsComments" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -242,6 +311,9 @@ function WindowLocksPage() {
             <div>
               <input type="radio" name="compliance" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="compliance" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="complianceComments" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -257,6 +329,9 @@ function WindowLocksPage() {
             <div>
               <input type="radio" name="certifications" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="certifications" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="certificationsComments" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 

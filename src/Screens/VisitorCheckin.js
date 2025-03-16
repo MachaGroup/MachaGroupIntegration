@@ -29,8 +29,23 @@ function VisitorCheckInPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Physical Security/Visitor Check-In');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -81,6 +96,9 @@ function VisitorCheckInPage() {
               <input type="radio" name="validId" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="validId" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="validIdComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -89,6 +107,9 @@ function VisitorCheckInPage() {
               <input type="radio" name="verifyAuthenticity" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="verifyAuthenticity" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="verifyAuthenticityComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -96,6 +117,9 @@ function VisitorCheckInPage() {
             <div>
               <input type="radio" name="idMatchProcess" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="idMatchProcess" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="idMatchProcessComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -107,6 +131,9 @@ function VisitorCheckInPage() {
               <input type="radio" name="standardRegistration" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="standardRegistration" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="standardRegistrationComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -115,6 +142,9 @@ function VisitorCheckInPage() {
               <input type="radio" name="provideInfo" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="provideInfo" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="provideInfoComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -122,6 +152,9 @@ function VisitorCheckInPage() {
             <div>
               <input type="radio" name="recordInfo" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="recordInfo" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="recordInfoComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -133,6 +166,9 @@ function VisitorCheckInPage() {
               <input type="radio" name="accessGranted" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="accessGranted" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="accessGrantedComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -141,6 +177,9 @@ function VisitorCheckInPage() {
               <input type="radio" name="predeterminedCriteria" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="predeterminedCriteria" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="predeterminedCriteriaComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -148,6 +187,9 @@ function VisitorCheckInPage() {
             <div>
               <input type="radio" name="accessPrivileges" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="accessPrivileges" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="accessPrivilegesComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -159,6 +201,9 @@ function VisitorCheckInPage() {
               <input type="radio" name="issuedBadges" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="issuedBadges" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="issuedBadgesComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -167,6 +212,9 @@ function VisitorCheckInPage() {
               <input type="radio" name="badgeInfo" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="badgeInfo" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="badgeInfoComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -174,6 +222,9 @@ function VisitorCheckInPage() {
             <div>
               <input type="radio" name="reclaimBadges" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="reclaimBadges" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="reclaimBadgesComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -185,6 +236,9 @@ function VisitorCheckInPage() {
               <input type="radio" name="dataProtection" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="dataProtection" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="dataProtectionComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -193,6 +247,9 @@ function VisitorCheckInPage() {
               <input type="radio" name="staffTraining" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="staffTraining" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="staffTrainingComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -200,6 +257,9 @@ function VisitorCheckInPage() {
             <div>
               <input type="radio" name="disposeRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="disposeRecords" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="disposeRecordsComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -211,6 +271,9 @@ function VisitorCheckInPage() {
               <input type="radio" name="staffAssistance" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="staffAssistance" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="staffAssistanceComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -219,6 +282,9 @@ function VisitorCheckInPage() {
               <input type="radio" name="visitorGreeting" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="visitorGreeting" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="visitorGreetingComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -226,6 +292,9 @@ function VisitorCheckInPage() {
             <div>
               <input type="radio" name="inquiriesResponse" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="inquiriesResponse" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="inquiriesResponseComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -237,6 +306,9 @@ function VisitorCheckInPage() {
               <input type="radio" name="emergencyResponse" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="emergencyResponse" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="emergencyResponseComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -245,6 +317,9 @@ function VisitorCheckInPage() {
               <input type="radio" name="emergencyProcedures" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="emergencyProcedures" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="emergencyProceduresComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -252,6 +327,9 @@ function VisitorCheckInPage() {
             <div>
               <input type="radio" name="alertSystem" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="alertSystem" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="alertSystemComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 

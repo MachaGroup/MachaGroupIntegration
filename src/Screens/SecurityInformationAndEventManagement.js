@@ -28,8 +28,23 @@ function SIEMSolutionsPage() {
         }));
     };
 
-    const handleBack = () => {
-        navigate(-1);
+    const handleBack = async () => {
+      if (formData && buildingId) { // Check if formData and buildingId exist
+        try {
+          const buildingRef = doc(db, 'Buildings', buildingId);
+          const formsRef = collection(db, 'forms/Cybersecurity/Security Information and Event Management');
+          await addDoc(formsRef, {
+            building: buildingRef,
+            formData: formData,
+          });
+          console.log('Form Data submitted successfully on back!');
+          alert('Form data saved before navigating back!');
+        } catch (error) {
+          console.error('Error saving form data:', error);
+          alert('Failed to save form data before navigating back. Some data may be lost.');
+        }
+      }
+      navigate(-1);
     };
 
     const handleSubmit = async (e) => {
@@ -88,6 +103,9 @@ function SIEMSolutionsPage() {
               <input type="radio" name="siemCoverageGaps" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="siemCoverageGaps" value="No" onChange={handleChange} /> No
             </div>
+            <div>
+              <input type="text" name="siemCoverageGapComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           {/* Event Collection and Correlation */}
@@ -113,6 +131,9 @@ function SIEMSolutionsPage() {
               <input type="radio" name="realTimeMonitoring" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="realTimeMonitoring" value="No" onChange={handleChange} /> No
             </div>
+            <div>
+              <input type="text" name="realTimeMonitoringComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
           <div className="form-section">
             <label>How are alerts configured and managed to minimize false positives and ensure timely detection of genuine threats?</label>
@@ -135,6 +156,9 @@ function SIEMSolutionsPage() {
               <input type="radio" name="incidentWorkflowsIntegrated" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="incidentWorkflowsIntegrated" value="No" onChange={handleChange} /> No
             </div>
+            <div>
+              <input type="text" name="incidentWorkflowsIntegratedComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
           <div className="form-section">
             <label>How is the effectiveness of incident detection and response measured and evaluated?</label>
@@ -156,6 +180,9 @@ function SIEMSolutionsPage() {
             <div>
               <input type="radio" name="dataArchivingProcess" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="dataArchivingProcess" value="No" onChange={handleChange} /> No
+            </div>
+            <div>
+              <input type="text" name="dataArchivingProcessComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -189,6 +216,9 @@ function SIEMSolutionsPage() {
             <div>
               <input type="radio" name="siemUpgradePlans" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="siemUpgradePlans" value="No" onChange={handleChange} /> No
+            </div>
+            <div>
+              <input type="text" name="siemUpgradePlansComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 

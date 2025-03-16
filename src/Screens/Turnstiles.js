@@ -29,8 +29,23 @@ function TurnstilesPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Physical Security/Turnstiles');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -78,6 +93,9 @@ function TurnstilesPage() {
               <input type="radio" name="turnstilesOperational" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="turnstilesOperational" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="turnstilesOperationalComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -85,6 +103,9 @@ function TurnstilesPage() {
             <div>
               <input type="radio" name="turnstilesSmooth" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="turnstilesSmooth" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="turnstilesSmoothComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -100,6 +121,9 @@ function TurnstilesPage() {
             <div>
               <input type="radio" name="backupSystemsTurnstiles" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="backupSystemsTurnstiles" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="backupSystemsTurnstilesComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -118,6 +142,9 @@ function TurnstilesPage() {
               <input type="radio" name="authMechanismsTurnstiles" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="authMechanismsTurnstiles" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="authMechanismsTurnstilesComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -126,6 +153,9 @@ function TurnstilesPage() {
               <input type="radio" name="integratedSystemsTurnstiles" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="integratedSystemsTurnstiles" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="integratedSystemsTurnstilesComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -133,6 +163,9 @@ function TurnstilesPage() {
             <div>
               <input type="radio" name="logEntriesTurnstiles" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="logEntriesTurnstiles" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="logEntriesTurnstilesComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -144,6 +177,9 @@ function TurnstilesPage() {
               <input type="radio" name="safetyFeaturesTurnstiles" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="safetyFeaturesTurnstiles" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="safetyFeaturesTurnstilesComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -152,6 +188,9 @@ function TurnstilesPage() {
               <input type="radio" name="antiTailgating" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="antiTailgating" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="antiTailgatingComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -159,6 +198,9 @@ function TurnstilesPage() {
             <div>
               <input type="radio" name="safetySignageTurnstiles" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="safetySignageTurnstiles" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="safetySignageTurnstilesComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -169,6 +211,9 @@ function TurnstilesPage() {
             <div>
               <input type="radio" name="complianceRegulationsTurnstiles" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="complianceRegulationsTurnstiles" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="complianceRegulationsTurnstilesComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -185,6 +230,9 @@ function TurnstilesPage() {
               <input type="radio" name="inspectionsCertificationsTurnstiles" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="inspectionsCertificationsTurnstiles" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="inspectionsCertificationsTurnstilesComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           {/* 1.1.1.1.2.5 Maintenance and Upkeep */}
@@ -195,6 +243,9 @@ function TurnstilesPage() {
               <input type="radio" name="maintenanceScheduleTurnstiles" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceScheduleTurnstiles" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="maintenanceScheduleTurnstilesComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -203,6 +254,9 @@ function TurnstilesPage() {
               <input type="radio" name="maintenanceTasksTurnstiles" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceTasksTurnstiles" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="maintenanceTasksTurnstilesComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -210,6 +264,9 @@ function TurnstilesPage() {
             <div>
               <input type="radio" name="maintenanceRecordsTurnstiles" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceRecordsTurnstiles" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="maintenanceRecordsTurnstilesComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -221,6 +278,9 @@ function TurnstilesPage() {
               <input type="radio" name="userTrainingTurnstiles" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="userTrainingTurnstiles" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="userTrainingTurnstilesComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -229,6 +289,9 @@ function TurnstilesPage() {
               <input type="radio" name="instructionsGuidelinesTurnstiles" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="instructionsGuidelinesTurnstiles" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="instructionsGuidelinesTurnstilesComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -236,6 +299,9 @@ function TurnstilesPage() {
             <div>
               <input type="radio" name="reportingProcessTurnstiles" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="reportingProcessTurnstiles" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="reportingProcessTurnstilesComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 

@@ -29,8 +29,23 @@ function SimulatedPhishingCampaignsPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Cybersecurity/Simulated Phishing Campaigns');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -87,6 +102,9 @@ function SimulatedPhishingCampaignsPage() {
               <input type="radio" name="emailDifficultyVariety" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="emailDifficultyVariety" value="No" onChange={handleChange} /> No
             </div>
+            <div>
+              <input type="text" name="emailDifficultyVarietyComment" placeholder="Comments" onChange={handleChange}/>
+             </div>
           </div>
 
           {/* User Response and Feedback */}
@@ -100,6 +118,9 @@ function SimulatedPhishingCampaignsPage() {
             <div>
               <input type="radio" name="feedbackMechanism" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="feedbackMechanism" value="No" onChange={handleChange} /> No
+            </div>
+            <div>
+              <input type="text" name="feedbackMechanismComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
           <div className="form-section">
@@ -115,6 +136,9 @@ function SimulatedPhishingCampaignsPage() {
               <input type="radio" name="trainingResources" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="trainingResources" value="No" onChange={handleChange} /> No
             </div>
+            <div>
+              <input type="text" name="trainingResourcesComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
           <div className="form-section">
             <label>How often is phishing awareness training updated to reflect the latest phishing tactics and trends?</label>
@@ -125,6 +149,9 @@ function SimulatedPhishingCampaignsPage() {
             <div>
               <input type="radio" name="followUpTraining" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="followUpTraining" value="No" onChange={handleChange} /> No
+            </div>
+            <div>
+              <input type="text" name="followUpTrainingComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -144,6 +171,9 @@ function SimulatedPhishingCampaignsPage() {
               <input type="radio" name="benchmarkingProcess" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="benchmarkingProcess" value="No" onChange={handleChange} /> No
             </div>
+            <div>
+              <input type="text" name="benchmarkingProcessComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           {/* Continuous Improvement and Adaptation */}
@@ -157,6 +187,9 @@ function SimulatedPhishingCampaignsPage() {
             <div>
               <input type="radio" name="simulationUpdates" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="simulationUpdates" value="No" onChange={handleChange} /> No
+            </div>
+            <div>
+              <input type="text" name="simulationUpdatesComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
           <div className="form-section">
@@ -176,6 +209,9 @@ function SimulatedPhishingCampaignsPage() {
               <input type="radio" name="securityAnalysisProcess" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="securityAnalysisProcess" value="No" onChange={handleChange} /> No
             </div>
+            <div>
+              <input type="text" name="securityAnalysisProcessComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
           <div className="form-section">
             <label>How does coordination with these teams enhance the overall effectiveness of the phishing simulation program?</label>
@@ -193,6 +229,9 @@ function SimulatedPhishingCampaignsPage() {
             <div>
               <input type="radio" name="impactAssessment" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="impactAssessment" value="No" onChange={handleChange} /> No
+            </div>
+            <div>
+              <input type="text" name="impactAssessmentComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
           <div className="form-section">

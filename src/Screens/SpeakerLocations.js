@@ -29,8 +29,23 @@ function SpeakerLocationsFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Emergency Preparedness/Drill Frequency');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
   
   const handleSubmit = async (e) => {
@@ -80,6 +95,9 @@ function SpeakerLocationsFormPage() {
                         <input type="radio" name="strategicallyLocatedSpeakers" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="strategicallyLocatedSpeakers" value="no" onChange={handleChange} /> No
                     </div>
+                    <div>
+                        <input type="text" name="strategicallyLocatedSpeakersComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -87,6 +105,9 @@ function SpeakerLocationsFormPage() {
                     <div>
                         <input type="radio" name="minimizingDeadZones" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="minimizingDeadZones" value="no" onChange={handleChange} /> No
+                    </div>
+                    <div>
+                        <input type="text" name="minimizingDeadZonesComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -96,6 +117,9 @@ function SpeakerLocationsFormPage() {
                         <input type="radio" name="speakerPositioning" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="speakerPositioning" value="no" onChange={handleChange} /> No
                     </div>
+                    <div>
+                        <input type="text" name="speakerPositioningComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <h2>Audibility and Clarity:</h2>
@@ -104,6 +128,9 @@ function SpeakerLocationsFormPage() {
                     <div>
                         <input type="radio" name="deliveringAudioMessages" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="deliveringAudioMessages" value="no" onChange={handleChange} /> No
+                    </div>
+                    <div>
+                        <input type="text" name="deliveringAudioMessagesComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -123,6 +150,9 @@ function SpeakerLocationsFormPage() {
                     <div>
                         <input type="radio" name="adjustedSpeakerVolumes" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="adjustedSpeakerVolumes" value="no" onChange={handleChange} /> No
+                    </div>
+                    <div>
+                        <input type="text" name="adjustedSpeakerVolumesComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -144,6 +174,9 @@ function SpeakerLocationsFormPage() {
                         <input type="radio" name="backupPowerSources" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="backupPowerSources" value="no" onChange={handleChange} /> No
                     </div>
+                    <div>
+                        <input type="text" name="backupPowerSourceComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -151,6 +184,9 @@ function SpeakerLocationsFormPage() {
                     <div>
                         <input type="radio" name="reliabilityTesting" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="reliabilityTesting" value="no" onChange={handleChange} /> No
+                    </div>
+                    <div>
+                        <input type="text" name="reliabilityTestingComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -172,6 +208,9 @@ function SpeakerLocationsFormPage() {
                         <input type="radio" name="trainedSystemOperators" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="trainedSystemOperators" value="no" onChange={handleChange} /> No
                     </div>
+                    <div>
+                        <input type="text" name="trainedSystemOperatorsComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -192,6 +231,9 @@ function SpeakerLocationsFormPage() {
                         <input type="radio" name="integratedSystem" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="integratedSystem" value="no" onChange={handleChange} /> No
                     </div>
+                    <div>
+                        <input type="text" name="integratedSystemComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -200,6 +242,9 @@ function SpeakerLocationsFormPage() {
                         <input type="radio" name="coordinatedAlerts" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="coordinatedAlerts" value="no" onChange={handleChange} /> No
                     </div>
+                    <div>
+                        <input type="text" name="coordinatedAlertsComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -207,6 +252,9 @@ function SpeakerLocationsFormPage() {
                     <div>
                         <input type="radio" name="systemProcedures" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="systemProcedures" value="no" onChange={handleChange} /> No
+                    </div>
+                    <div>
+                        <input type="text" name="systemProceduresComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -251,6 +299,9 @@ function SpeakerLocationsFormPage() {
                         <input type="radio" name="maintainingSpeakers" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="maintainingSpeakers" value="no" onChange={handleChange} /> No
                     </div>
+                    <div>
+                        <input type="text" name="maintainingSpeakersComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -259,6 +310,9 @@ function SpeakerLocationsFormPage() {
                         <input type="radio" name="routineTests" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="routineTests" value="no" onChange={handleChange} /> No
                     </div>
+                    <div>
+                        <input type="text" name="routineTestsComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -266,6 +320,9 @@ function SpeakerLocationsFormPage() {
                     <div>
                         <input type="radio" name="maintainingDocuments" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="maintainingDocuments" value="no" onChange={handleChange} /> No
+                    </div>
+                    <div>
+                        <input type="text" name="maintainingDocumentsComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 

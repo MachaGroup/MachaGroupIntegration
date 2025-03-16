@@ -29,8 +29,23 @@ function SevereWeatherPreparednessFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Severe Weather Preparedness');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -87,6 +102,9 @@ function SevereWeatherPreparednessFormPage() {
                         <input type="radio" name="weatherWarningSigns" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="weatherWarningSigns" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="weatherWarningSignsComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <h2>Response to Severe Weather Alerts:</h2>
@@ -110,6 +128,9 @@ function SevereWeatherPreparednessFormPage() {
                     <div>
                         <input type="radio" name="shelteringProtocols" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="shelteringProtocols" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="shelteringProtocolsComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -141,6 +162,9 @@ function SevereWeatherPreparednessFormPage() {
                     <div>
                         <input type="radio" name="postEventEvaluation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="postEventEvaluation" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="postEventEvaluationComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 

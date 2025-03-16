@@ -29,8 +29,23 @@ function SecureEmailGatewaysPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Cybersecurity/Secure Email Gateways');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -85,6 +100,9 @@ function SecureEmailGatewaysPage() {
               <input type="radio" name="encryptionConsistency" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="encryptionConsistency" value="No" onChange={handleChange} /> No
             </div>
+            <div>
+              <input type="text" name="encryptionConsistencyComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -111,6 +129,9 @@ function SecureEmailGatewaysPage() {
               <input type="radio" name="keyManagementSecure" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="keyManagementSecure" value="No" onChange={handleChange} /> No
             </div>
+            <div>
+              <input type="text" name="keyManagementSecureComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           {/* Access Controls and Permissions */}
@@ -126,6 +147,9 @@ function SecureEmailGatewaysPage() {
             <div>
               <input type="radio" name="permissionsReviewed" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="permissionsReviewed" value="No" onChange={handleChange} /> No
+            </div>
+            <div>
+              <input type="text" name="permissionsReviewedComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -147,6 +171,9 @@ function SecureEmailGatewaysPage() {
             <div>
               <input type="radio" name="regularAudits" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="regularAudits" value="No" onChange={handleChange} /> No
+            </div>
+            <div>
+              <input type="text" name="regularAuditsComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 

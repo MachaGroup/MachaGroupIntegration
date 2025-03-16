@@ -29,8 +29,23 @@ function SecurityGuardsPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Physical Security/Stationed Guards');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -81,6 +96,9 @@ function SecurityGuardsPage() {
               <input type="radio" name="training" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="training" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="trainingComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -89,6 +107,9 @@ function SecurityGuardsPage() {
               <input type="radio" name="certified" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="certified" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="certifiedComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -96,6 +117,9 @@ function SecurityGuardsPage() {
             <div>
               <input type="radio" name="ongoingTraining" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="ongoingTraining" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="ongoingTrainingComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -107,6 +131,9 @@ function SecurityGuardsPage() {
               <input type="radio" name="professionalism" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="professionalism" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="professionalismComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -115,6 +142,9 @@ function SecurityGuardsPage() {
               <input type="radio" name="uniformed" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="uniformed" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="uniformedComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -122,6 +152,9 @@ function SecurityGuardsPage() {
             <div>
               <input type="radio" name="codesOfConduct" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="codesOfConduct" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="codesOfConductComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -133,6 +166,9 @@ function SecurityGuardsPage() {
               <input type="radio" name="vigilant" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="vigilant" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="vigilantComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -141,6 +177,9 @@ function SecurityGuardsPage() {
               <input type="radio" name="patrols" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="patrols" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="patrolsComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -148,6 +187,9 @@ function SecurityGuardsPage() {
             <div>
               <input type="radio" name="incidentReports" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="incidentReports" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="incidentReportsComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -159,6 +201,9 @@ function SecurityGuardsPage() {
               <input type="radio" name="emergencyResponse" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="emergencyResponse" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="emergencyResponseComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -167,6 +212,9 @@ function SecurityGuardsPage() {
               <input type="radio" name="lockdownProcedures" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="lockdownProcedures" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="lockdownProceduresComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -174,6 +222,9 @@ function SecurityGuardsPage() {
             <div>
               <input type="radio" name="communicationProtocols" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="communicationProtocols" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="communicationProtocolsComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -185,6 +236,9 @@ function SecurityGuardsPage() {
               <input type="radio" name="accessControl" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="accessControl" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="accessControlComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -193,6 +247,9 @@ function SecurityGuardsPage() {
               <input type="radio" name="visitorManagement" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="visitorManagement" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="visitorManagementComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -200,6 +257,9 @@ function SecurityGuardsPage() {
             <div>
               <input type="radio" name="confrontationalSituations" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="confrontationalSituations" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="confrontationalSituationsComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -211,6 +271,9 @@ function SecurityGuardsPage() {
               <input type="radio" name="collaboration" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="collaboration" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="collaborationComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -219,6 +282,9 @@ function SecurityGuardsPage() {
               <input type="radio" name="communicationDevices" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="communicationDevices" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="communicationDevicesComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -226,6 +292,9 @@ function SecurityGuardsPage() {
             <div>
               <input type="radio" name="meetings" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="meetings" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="meetingsComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -236,6 +305,9 @@ function SecurityGuardsPage() {
             <div>
               <input type="radio" name="compliance" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="compliance" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="complianceComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -252,6 +324,9 @@ function SecurityGuardsPage() {
               <input type="radio" name="audits" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="audits" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="auditsComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           {/* Performance Evaluation and Feedback */}
@@ -262,6 +337,9 @@ function SecurityGuardsPage() {
               <input type="radio" name="performanceEvaluation" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="performanceEvaluation" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="performanceEvaluationComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -270,6 +348,9 @@ function SecurityGuardsPage() {
               <input type="radio" name="incentives" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="incentives" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="incentivesComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -277,6 +358,9 @@ function SecurityGuardsPage() {
             <div>
               <input type="radio" name="feedback" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="feedback" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="feedbackComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 

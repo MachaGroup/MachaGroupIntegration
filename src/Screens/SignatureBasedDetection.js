@@ -28,9 +28,24 @@ function SignatureBasedDetectionPage() {
         }));
     };
 
-    const handleBack = () => {
+    const handleBack = async () => {
+        if (formData && buildingId) { // Check if formData and buildingId exist
+          try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formsRef = collection(db, 'forms/Cybersecurity/Signature-Based Detection');
+            await addDoc(formsRef, {
+              building: buildingRef,
+              formData: formData,
+            });
+            console.log('Form Data submitted successfully on back!');
+            alert('Form data saved before navigating back!');
+          } catch (error) {
+            console.error('Error saving form data:', error);
+            alert('Failed to save form data before navigating back. Some data may be lost.');
+          }
+        }
         navigate(-1);
-    };
+      };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -85,6 +100,9 @@ function SignatureBasedDetectionPage() {
                             <input type="radio" name="customSignatures" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="customSignatures" value="No" onChange={handleChange} /> No
                         </div>
+                        <div>
+                            <input type="text" name="customSignaturesComment" placeholder="Comments" onChange={handleChange}/>
+                        </div>
                     </div>
 
                     {/* Detection Accuracy and Coverage */}
@@ -134,6 +152,9 @@ function SignatureBasedDetectionPage() {
                             <input type="radio" name="scalability" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="scalability" value="No" onChange={handleChange} /> No
                         </div>
+                        <div>
+                            <input type="text" name="scalabilityComment" placeholder="Comments" onChange={handleChange}/>
+                        </div>
                     </div>
 
                     <div className="form-section">
@@ -153,6 +174,9 @@ function SignatureBasedDetectionPage() {
                         <div>
                             <input type="radio" name="signatureRefinement" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="signatureRefinement" value="No" onChange={handleChange} /> No
+                        </div>
+                        <div>
+                            <input type="text" name="signatureRefinementComment" placeholder="Comments" onChange={handleChange}/>
                         </div>
                     </div>
 

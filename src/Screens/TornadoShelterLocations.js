@@ -29,8 +29,23 @@ function TornadoShelterLocationsFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Emergency Preparedness/Tornado Shelter Locations');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   
@@ -81,6 +96,9 @@ function TornadoShelterLocationsFormPage() {
                         <input type="radio" name="Shelter Identified" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Shelter Identified" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="ShelterIdentifiedComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -89,6 +107,9 @@ function TornadoShelterLocationsFormPage() {
                         <input type="radio" name="Structural Soundness" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Structural Soundness" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="StructuralSoundnessComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -96,6 +117,9 @@ function TornadoShelterLocationsFormPage() {
                     <div>
                         <input type="radio" name="Accessibility Check" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Accessibility Check" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="AccessibilityCheckComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -106,6 +130,9 @@ function TornadoShelterLocationsFormPage() {
                         <input type="radio" name="Signage Presence" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Signage Presence" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="SignagePresenceComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -114,6 +141,9 @@ function TornadoShelterLocationsFormPage() {
                         <input type="radio" name="Signage Directions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Signage Directions" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="SignageDirectionsComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -121,6 +151,9 @@ function TornadoShelterLocationsFormPage() {
                     <div>
                         <input type="radio" name="Shelter on Maps" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Shelter on Maps" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="ShelterOnMapsComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -131,6 +164,9 @@ function TornadoShelterLocationsFormPage() {
                         <input type="radio" name="Occupancy Assessment" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Occupancy Assessment" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="OccupancyAssessmentComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -138,6 +174,9 @@ function TornadoShelterLocationsFormPage() {
                     <div>
                         <input type="radio" name="Space Sufficiency" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Space Sufficiency" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="SpaceSufficiencyComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -159,6 +198,9 @@ function TornadoShelterLocationsFormPage() {
                         <input type="radio" name="Structural Evaluation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Structural Evaluation" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="StructuralEvaluationComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -166,6 +208,9 @@ function TornadoShelterLocationsFormPage() {
                     <div>
                         <input type="radio" name="Hazard Minimization" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Hazard Minimization" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="HazardMinimizationComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -175,6 +220,9 @@ function TornadoShelterLocationsFormPage() {
                         <input type="radio" name="Safety Features" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Safety Features" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="SafetyFeaturesComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <h2>Accessibility and Inclusivity:</h2>
@@ -183,6 +231,9 @@ function TornadoShelterLocationsFormPage() {
                     <div>
                         <input type="radio" name="Disability Access" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Disability Access" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="DisabilityAccessComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -237,6 +288,9 @@ function TornadoShelterLocationsFormPage() {
                         <input type="radio" name="Drill Familiarity" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Drill Familiarity" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="DrillFamiliarityComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <h2>Regular Inspections and Maintenance:</h2>
@@ -246,6 +300,9 @@ function TornadoShelterLocationsFormPage() {
                         <input type="radio" name="Inspection Regularity" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Inspection Regularity" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="InspectionRegularityComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -254,6 +311,9 @@ function TornadoShelterLocationsFormPage() {
                         <input type="radio" name="Maintenance Done" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Maintenance Done" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="MaintenanceDoneComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -261,6 +321,9 @@ function TornadoShelterLocationsFormPage() {
                     <div>
                         <input type="radio" name="Drill Testing" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Drill Testing" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="DrillTestingComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 

@@ -29,8 +29,23 @@ function TrainingProvidersFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Training Providers');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -81,6 +96,9 @@ function TrainingProvidersFormPage() {
                 <input type="radio" name="providerCertification" value="yes" onChange={handleChange}/> Yes
                 <input type="radio" name="providerCertification" value="no" onChange={handleChange}/> No
               </div>
+              <div>
+                <input type="text" name="providerCertificationComment" placeholder="Comments" onChange={handleChange}/>
+              </div>
             </div>
 
             <div className="form-section">
@@ -88,6 +106,9 @@ function TrainingProvidersFormPage() {
               <div>
                 <input type="radio" name="providerStandardsCompliance" value="yes" onChange={handleChange}/> Yes
                 <input type="radio" name="providerStandardsCompliance" value="no" onChange={handleChange}/> No
+              </div>
+              <div>
+                <input type="text" name="providerStandardsComplianceComment" placeholder="Comments" onChange={handleChange}/>
               </div>
             </div>
 
@@ -97,6 +118,9 @@ function TrainingProvidersFormPage() {
               <div>
                 <input type="radio" name="instructorQualification" value="yes" onChange={handleChange}/> Yes
                 <input type="radio" name="instructorQualification" value="no" onChange={handleChange}/> No
+              </div>
+              <div>
+                <input type="text" name="instructorQualificationComment" placeholder="Comments" onChange={handleChange}/>
               </div>
             </div>
 
@@ -114,6 +138,9 @@ function TrainingProvidersFormPage() {
                 <input type="radio" name="curriculumComprehensiveness" value="yes" onChange={handleChange}/> Yes
                 <input type="radio" name="curriculumComprehensiveness" value="no" onChange={handleChange}/> No
               </div>
+              <div>
+                <input type="text" name="curriculumComprehensivenessComment" placeholder="Comments" onChange={handleChange}/>
+              </div>
             </div>
 
             <div className="form-section">
@@ -121,6 +148,9 @@ function TrainingProvidersFormPage() {
               <div>
                 <input type="radio" name="curriculumAlignment" value="yes" onChange={handleChange}/> Yes
                 <input type="radio" name="curriculumAlignment" value="no" onChange={handleChange}/> No
+              </div>
+              <div>
+                <input type="text" name="curriculumAlignmentComment" placeholder="Comments" onChange={handleChange}/>
               </div>
             </div>
 
@@ -131,6 +161,9 @@ function TrainingProvidersFormPage() {
                 <input type="radio" name="trainingEnvironment" value="yes" onChange={handleChange}/> Yes
                 <input type="radio" name="trainingEnvironment" value="no" onChange={handleChange}/> No
               </div>
+              <div>
+                <input type="text" name="trainingEnvironmentComment" placeholder="Comments" onChange={handleChange}/>
+              </div>
             </div>
 
             <div className="form-section">
@@ -138,6 +171,9 @@ function TrainingProvidersFormPage() {
               <div>
                 <input type="radio" name="trainingMethodsVariety" value="yes" onChange={handleChange}/> Yes
                 <input type="radio" name="trainingMethodsVariety" value="no" onChange={handleChange}/> No
+              </div>
+              <div>
+                <input type="text" name="trainingMethodsVarietyComment" placeholder="Comments" onChange={handleChange}/>
               </div>
             </div>
 
@@ -148,6 +184,9 @@ function TrainingProvidersFormPage() {
                 <input type="radio" name="participantEngagement" value="yes" onChange={handleChange}/> Yes
                 <input type="radio" name="participantEngagement" value="no" onChange={handleChange}/> No
               </div>
+              <div>
+                <input type="text" name="participantEngagementComment" placeholder="Comments" onChange={handleChange}/>
+              </div>
             </div>
 
             <div className="form-section">
@@ -155,6 +194,9 @@ function TrainingProvidersFormPage() {
               <div>
                 <input type="radio" name="practiceOpportunities" value="yes" onChange={handleChange}/> Yes
                 <input type="radio" name="practiceOpportunities" value="no" onChange={handleChange}/> No
+              </div>
+              <div>
+                <input type="text" name="practiceOpportunitiesComment" placeholder="Comments" onChange={handleChange}/>
               </div>
             </div>
 
@@ -165,6 +207,9 @@ function TrainingProvidersFormPage() {
                 <input type="radio" name="participantAssessment" value="yes" onChange={handleChange}/> Yes
                 <input type="radio" name="participantAssessment" value="no" onChange={handleChange}/> No
               </div>
+              <div>
+                <input type="text" name="participantAssessmentComment" placeholder="Comments" onChange={handleChange}/>
+              </div>
             </div>
 
             <div className="form-section">
@@ -172,6 +217,9 @@ function TrainingProvidersFormPage() {
               <div>
                 <input type="radio" name="instructorEvaluationFeedback" value="yes" onChange={handleChange}/> Yes
                 <input type="radio" name="instructorEvaluationFeedback" value="no" onChange={handleChange}/> No
+              </div>
+              <div>
+                <input type="text" name="instructorEvaluationFeedbackComment" placeholder="Comments" onChange={handleChange}/>
               </div>
             </div>
 
@@ -181,6 +229,9 @@ function TrainingProvidersFormPage() {
               <div>
                 <input type="radio" name="participantCertification" value="yes" onChange={handleChange}/> Yes
                 <input type="radio" name="participantCertification" value="no" onChange={handleChange}/> No
+              </div>
+              <div>
+                <input type="text" name="participantCertificationComment" placeholder="Comments" onChange={handleChange}/>
               </div>
             </div>
 
@@ -204,6 +255,9 @@ function TrainingProvidersFormPage() {
               <div>
                 <input type="radio" name="recommendationsImplementation" value="yes" onChange={handleChange}/> Yes
                 <input type="radio" name="recommendationsImplementation" value="no" onChange={handleChange}/> No
+              </div>
+              <div>
+                <input type="text" name="recommendationsImplementationComment" placeholder="Comments" onChange={handleChange}/>
               </div>
             </div>
 
