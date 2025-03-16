@@ -29,9 +29,24 @@ function AnonymousReportingSystemsFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Personnel Training and Awareness/Anonymous Reporting Systems');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -100,6 +115,7 @@ function AnonymousReportingSystemsFormPage() {
                     <div>
                         <input type="radio" name="accessProvisions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="accessProvisions" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="accessProvisionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -146,7 +162,7 @@ function AnonymousReportingSystemsFormPage() {
                         <input type="text" name="reportPrioritization" placeholder="Describe how they're prioritized" onChange={handleChange}/>  
                     </div>
                 </div>
-
+                /**/
                 <div className="form-section">
                     <label>What follow-up actions are taken in response to anonymous reports, and how are individuals who submit reports kept informed about the outcomes of their submissions?</label>
                     <div>
@@ -159,6 +175,7 @@ function AnonymousReportingSystemsFormPage() {
                     <div>
                         <input type="radio" name="ongoingDialogue" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="ongoingDialogue" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="ongoingDialogueComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -182,6 +199,7 @@ function AnonymousReportingSystemsFormPage() {
                     <div>
                         <input type="radio" name="systemReviews" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="systemReviews" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="systemReviewsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

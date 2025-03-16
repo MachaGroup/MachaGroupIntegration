@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function DataAccessControlsFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function DataAccessControlsFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Policy and Compliance/Data Access Controls');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -94,6 +109,7 @@ function DataAccessControlsFormPage() {
                     <div>
                         <input type="radio" name="updatingPolicies" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="updatingPolicies" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="updatingPoliciesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -117,6 +133,7 @@ function DataAccessControlsFormPage() {
                     <div>
                         <input type="radio" name="reviewedDefinitions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="reviewedDefinitions" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="reviewedDefinitionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -140,6 +157,7 @@ function DataAccessControlsFormPage() {
                     <div>
                         <input type="radio" name="auditingApprovals" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="auditingApprovals" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="auditingApprovalsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -163,6 +181,7 @@ function DataAccessControlsFormPage() {
                     <div>
                         <input type="radio" name="authenticationHandling" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="authenticationHandling" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="authenticationHandlingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -208,6 +227,7 @@ function DataAccessControlsFormPage() {
                     <div>
                         <input type="radio" name="handlingDiscrepancies" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="handlingDiscrepancies" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="handlingDiscrepanciesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -231,6 +251,7 @@ function DataAccessControlsFormPage() {
                     <div>
                         <input type="radio" name="safegaurdPreventions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="safegaurdPreventions" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="safegaurdPreventionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -254,6 +275,7 @@ function DataAccessControlsFormPage() {
                     <div>
                         <input type="radio" name="governAccess" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="governAccess" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="governAccessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -277,6 +299,7 @@ function DataAccessControlsFormPage() {
                     <div>
                         <input type="radio" name="documentingMechanisms" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="documentingMechanisms" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="documentingMechanismsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -300,6 +323,7 @@ function DataAccessControlsFormPage() {
                     <div>
                         <input type="radio" name="employeeResources" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="employeeResources" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="employeeResourcesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

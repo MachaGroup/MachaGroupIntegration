@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function EarthquakeDrillsPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function EarthquakeDrillsPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/Earthquake Drills');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
  
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,6 +101,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="earthquake DrillFrequency" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="earthquake DrillFrequency" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="earthquake DrillFrequencyComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -94,6 +110,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="DrillTiming" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="DrillTiming" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="DrillTimingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -103,6 +120,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="NotificationProtocol" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="NotificationProtocol" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="NotificationProtocolComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="initiatingProtocol" placeholder="Describe the protocol" onChange={handleChange}/>  
@@ -114,6 +132,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="NotificationTesting" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="NotificationTesting" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="NotificationTestingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -122,6 +141,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="AbsentOccupantSystem" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="AbsentOccupantSystem" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="AbsentOccupantSystemComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="absentSystem" placeholder="Describe the system" onChange={handleChange}/>  
@@ -134,6 +154,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="ProcedureClarity" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="ProcedureClarity" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="ProcedureClarityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -142,6 +163,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="OccupantDrillActions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="OccupantDrillActions" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="OccupantDrillActionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -150,6 +172,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="ScenarioSimulation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="ScenarioSimulation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="ScenarioSimulationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -159,6 +182,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="SafeZoneMarking" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="SafeZoneMarking" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="SafeZoneMarkingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -167,6 +191,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="SafeZoneMovement" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="SafeZoneMovement" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="SafeZoneMovementComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -175,6 +200,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="AlternateRoutes" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="AlternateRoutes" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="AlternateRoutesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="alternativeRoutes" placeholder="Describe the alternatives" onChange={handleChange}/>  
@@ -187,6 +213,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="OccupantAccounting" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="OccupantAccounting" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="OccupantAccountingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="occupantAccountingProcess" placeholder="Describe the process" onChange={handleChange}/>  
@@ -198,6 +225,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="StaffResponsibilities" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="StaffResponsibilities" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="StaffResponsibilitiesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -206,6 +234,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="participantFeedbackCollection" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="participantFeedbackCollection" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="participantFeedbackCollectionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -215,6 +244,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="earthquakeDrillEvaluation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="earthquakeDrillEvaluation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="earthquakeDrillEvaluationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="evaluatingMechanism" placeholder="Describe the mechanism" onChange={handleChange}/>  
@@ -226,6 +256,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="DebriefSessions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="DebriefSessions" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="DebriefSessionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -234,6 +265,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="RecommendationImplementation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="RecommendationImplementation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="RecommendationImplementationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -243,6 +275,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="DrillRecordKeeping" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="DrillRecordKeeping" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="DrillRecordKeepingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -251,6 +284,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="RecordReview" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="RecordReview" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="RecordReviewComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -259,6 +293,7 @@ function EarthquakeDrillsPage() {
                     <div>
                         <input type="radio" name="DeficiencyDocumentation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="DeficiencyDocumentation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="DeficiencyDocumentationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

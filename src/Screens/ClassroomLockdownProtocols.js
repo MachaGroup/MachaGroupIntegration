@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function ClassroomLockdownProtocolsFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function ClassroomLockdownProtocolsFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/Classroom Lockdown Protocols');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
  
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,6 +94,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="classroom doors locks" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="classroom doors locks" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="classroom doors locks-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -87,6 +103,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="locks  safety standard" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="locks  safety standard" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="locks  safety standard-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -95,6 +112,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="lock-operational" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="lock-operational" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="lock-operational-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -105,6 +123,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="barricading mechanism" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="barricading mechanism" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="barricading mechanism-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="barricadingMechanisms" placeholder="List the mechanisms" />
@@ -116,6 +135,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="barricading device operational" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="barricading device operational" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="barricading device operational-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -124,6 +144,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="barricading device efficiency" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="barricading device efficiency" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="barricading device efficiency-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -133,6 +154,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="lockdown procedure training" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="lockdown procedure training" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="lockdown procedure training-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -141,6 +163,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="regular lockdown drills" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="regular lockdown drills" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="regular lockdown drills-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -149,6 +172,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="regularly lockdown debriefing" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="regularly lockdown debriefing" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="regularly lockdown debriefing-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -158,6 +182,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="lockdown communication system" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="lockdown communication system" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="lockdown communication system-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="lockdownCommunicationSystem" placeholder="Describe the communication system" />
@@ -169,6 +194,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="emergency communication devices" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="emergency communication devices" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="emergency communication devices-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="emergencyCommunicationDevices" placeholder="List the devices" onChange={handleChange}/>
@@ -180,6 +206,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="designated protocol" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="designated protocol" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="designated protocol-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="designatedProtocol" placeholder="Describe the protocol" onChange={handleChange}/>
@@ -192,6 +219,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="designated safe zones" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="designated safe zones" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="designated safe zones-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="designatedSafeZones" placeholder="Describe the safe zones" onChange={handleChange}/>
@@ -203,6 +231,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="strategic safe zones" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="strategic safe zones" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="strategic safe zones-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -211,6 +240,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="safe zones vulnerabilities" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="safe zones vulnerabilities" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="safe zones vulnerabilities-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -220,6 +250,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="personel coordination" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="personel coordination" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="personel coordination-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -228,14 +259,16 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="law enforcement familiarity" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="law enforcement familiarity" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="law enforcement familiarity-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
                 
                 <div className="form-section">
                     <label>Are there regular meetings or exercises conducted with law enforcement to review and refine lockdown procedures?</label>
                     <div>
-                        <input type="radio" name=" law enforcement review" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name=" law enforcement review" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="law enforcement review" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="law enforcement review" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="law enforcement review-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -245,6 +278,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="guardians informed" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="guardians informed" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="guardians informed-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -253,6 +287,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="guardians communication" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="guardians communication" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="guardians communication-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="guardiansCommunication" placeholder="Describe the plan" onChange={handleChange}/>
@@ -264,6 +299,7 @@ function ClassroomLockdownProtocolsFormPage() {
                     <div>
                         <input type="radio" name="available support services" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="available support services" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="available support services-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

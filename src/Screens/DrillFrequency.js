@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function DrillFrequencyFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function DrillFrequencyFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/Drill Frequency');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,6 +101,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="predifinedSchedule" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="predifinedSchedule" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="predifinedSchedule-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -94,6 +110,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Regulation-Based Frequency" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Regulation-Based Frequency" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Regulation-Based Frequency-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -103,6 +120,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Schedule Consistency" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Schedule Consistency" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Schedule Consistency-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -111,6 +129,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Deviation Documentation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Deviation Documentation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Deviation Documentation-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -119,6 +138,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Compliance Process" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Compliance Process" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Compliance Process-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="complianceProcess" placeholder="Describe the process" onChange={handleChange}/>  
@@ -131,6 +151,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Scenario Diversity" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Scenario Diversity" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Scenario Diversity-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -139,6 +160,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Multi-Situation Coverage" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Multi-Situation Coverage" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Multi-Situation Coverage-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -147,6 +169,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Location Coverage" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Location Coverage" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Location Coverage-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -156,6 +179,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Stakeholder Involvement" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Stakeholder Involvement" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Stakeholder Involvement-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -164,6 +188,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Agency Coordination" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Agency Coordination" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Agency Coordination-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -172,6 +197,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Stakeholder Engagement" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Stakeholder Engagement" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Stakeholder Engagement-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -181,6 +207,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Drill Effectiveness" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Drill Effectiveness" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Drill Effectiveness-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -189,6 +216,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Feedback Mechanisms" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Feedback Mechanisms" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Feedback Mechanisms-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="feedbackMechanisms" placeholder="Describe the feedback mechanisms" onChange={handleChange}/>  
@@ -200,6 +228,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Outcome Analysis" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Outcome Analysis" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Outcome Analysis-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -209,6 +238,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Frequency Adjustment" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Frequency Adjustment" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Frequency Adjustment-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -217,6 +247,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Schedule Flexibility" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Schedule Flexibility" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Schedule Flexibility-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -225,6 +256,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Feedback Integration" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Feedback Integration" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Feedback Integration-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="feedbackIntegration" placeholder="Describe the process" onChange={handleChange}/>  
@@ -237,6 +269,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Drill Recordkeeping" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Drill Recordkeeping" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Drill Recordkeeping-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -245,6 +278,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Records Accessibility" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Records Accessibility" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Records Accessibility-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -253,6 +287,7 @@ function DrillFrequencyFormPage() {
                     <div>
                         <input type="radio" name="Retention Policy" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Retention Policy" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Retention Policy-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

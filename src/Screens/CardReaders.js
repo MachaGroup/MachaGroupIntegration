@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';  // Ensure this is linked to your universal CSS
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-
+/**/
 function CardReadersPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function CardReadersPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Physical Security/Card Readers');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,6 +95,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="operationalCardReader" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="operationalCardReader" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="operationalCardReaderComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -88,6 +104,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="authentication" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="authentication" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="authenticationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -96,6 +113,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="malfunction" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="malfunction" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="malfunctionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -104,6 +122,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="backupSystems" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="backupSystems" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="backupSystemsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -119,6 +138,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="issuedCards" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="issuedCards" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="issuedCardsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -127,6 +147,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="restrictedAccess" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="restrictedAccess" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="restrictedAccessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -135,6 +156,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="deactivationProcess" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="deactivationProcess" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="deactivationProcessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -145,6 +167,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="integration" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="integration" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="integrationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -153,6 +176,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="communication" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="communication" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="communicationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -161,6 +185,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="monitoring" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="monitoring" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="monitoringComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -169,6 +194,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="centralManagement" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="centralManagement" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="centralManagementComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -179,6 +205,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="securityFeatures" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="securityFeatures" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="securityFeaturesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -187,6 +214,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="encryption" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="encryption" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="encryptionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -195,6 +223,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="physicalSecurity" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="physicalSecurity" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="physicalSecurityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -205,6 +234,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="compliance" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="compliance" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="complianceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -218,6 +248,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="testingCertification" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="testingCertification" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="testingCertificationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -228,6 +259,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceScheduleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -236,6 +268,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceTasksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -244,6 +277,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -254,6 +288,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="userTraining" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="userTraining" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="userTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -262,6 +297,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="instructions" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="instructions" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="instructionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -270,6 +306,7 @@ function CardReadersPage() {
             <div>
               <input type="radio" name="reportingProcess" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="reportingProcess" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="reportingProcessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

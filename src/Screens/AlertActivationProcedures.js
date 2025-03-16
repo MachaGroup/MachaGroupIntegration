@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function AlertActivationProceduresFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function AlertActivationProceduresFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/Drill Frequency');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,6 +94,7 @@ function AlertActivationProceduresFormPage() {
                     <div>
                         <input type="radio" name="responsibleForActivatingAlerts" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="responsibleForActivatingAlerts" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="responsibleForActivatingAlertsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="responsibleForActivatingAlertsText" placeholder="List the individuals" onChange={handleChange} />  
@@ -90,6 +106,7 @@ function AlertActivationProceduresFormPage() {
                     <div>
                         <input type="radio" name="dutiesAndAuthorityClarity" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="dutiesAndAuthorityClarity" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="dutiesAndAuthorityClarityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -99,6 +116,7 @@ function AlertActivationProceduresFormPage() {
                     <div>
                         <input type="radio" name="chainOfCommand" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="chainOfCommand" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="chainOfCommandComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -107,6 +125,7 @@ function AlertActivationProceduresFormPage() {
                     <div>
                         <input type="radio" name="delegatingActivationResponsibilities" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="delegatingActivationResponsibilities" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="delegatingActivationResponsibilitiesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="delegatingActivationResponsibilitiesProcedures" placeholder="Describe the procedures" onChange={handleChange} />  
@@ -119,6 +138,7 @@ function AlertActivationProceduresFormPage() {
                     <div>
                         <input type="radio" name="activatingAlertsCriteria" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="activatingAlertsCriteria" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="activatingAlertsCriteriaComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="activatingAlertsCriteriaText" placeholder="Describe the criteria" onChange={handleChange} />  
@@ -130,6 +150,7 @@ function AlertActivationProceduresFormPage() {
                     <div>
                         <input type="radio" name="activationCriteriaFactors" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="activationCriteriaFactors" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="activationCriteriaFactorsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -139,6 +160,7 @@ function AlertActivationProceduresFormPage() {
                     <div>
                         <input type="radio" name="facilitatingCoordination" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="facilitatingCoordination" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="facilitatingCoordinationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="facilitatingCoordinationProtocols" placeholder="Describe the communication protocols" onChange={handleChange} />  
@@ -150,6 +172,7 @@ function AlertActivationProceduresFormPage() {
                     <div>
                         <input type="radio" name="communicatingAlertActivationDecisions" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="communicatingAlertActivationDecisions" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="communicatingAlertActivationDecisionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="communicatingAlertActivationDecisionsMethod" placeholder="Describe the designated" onChange={handleChange} />  
@@ -162,6 +185,7 @@ function AlertActivationProceduresFormPage() {
                     <div>
                         <input type="radio" name="alertActivationProceduresTraining" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="alertActivationProceduresTraining" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="alertActivationProceduresTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -170,6 +194,7 @@ function AlertActivationProceduresFormPage() {
                     <div>
                         <input type="radio" name="practiceExercises" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="practiceExercises" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="practiceExercisesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -179,6 +204,7 @@ function AlertActivationProceduresFormPage() {
                     <div>
                         <input type="radio" name="maintainingRecords" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="maintainingRecords" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="maintainingRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -187,6 +213,7 @@ function AlertActivationProceduresFormPage() {
                     <div>
                         <input type="radio" name="reportingAlertsToStakeholders" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="reportingAlertsToStakeholders" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="reportingAlertsToStakeholdersComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="reportingAlertsToStakeholdersProcess" placeholder="Describe the process" onChange={handleChange} />  
@@ -199,6 +226,7 @@ function AlertActivationProceduresFormPage() {
                     <div>
                         <input type="radio" name="testingActivationProcedures" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="testingActivationProcedures" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="testingActivationProceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -207,6 +235,7 @@ function AlertActivationProceduresFormPage() {
                     <div>
                         <input type="radio" name="feedbackMechanisms" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="feedbackMechanisms" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="feedbackMechanismsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="feedbackMechanismsText" placeholder="Describe the feedback mechanisms" onChange={handleChange} />  
@@ -219,6 +248,7 @@ function AlertActivationProceduresFormPage() {
                     <div>
                         <input type="radio" name="reviewingActivationProcedures" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="reviewingActivationProcedures" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="reviewingActivationProceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -227,6 +257,7 @@ function AlertActivationProceduresFormPage() {
                     <div>
                         <input type="radio" name="continuousImprovementCulture" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="continuousImprovementCulture" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="continuousImprovementCultureComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

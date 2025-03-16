@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function BackupPowerSystemsFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function BackupPowerSystemsFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/Drill Frequency');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,6 +94,7 @@ function BackupPowerSystemsFormPage() {
                     <div>
                         <input type="radio" name="installedBackupPowerSystem" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="installedBackupPowerSystem" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="installedBackupPowerSystemComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="installedBackupPowerSystemText" placeholder="Describe the backup system" onChange={handleChange} />  
@@ -106,6 +122,7 @@ function BackupPowerSystemsFormPage() {
                     <div>
                         <input type="radio" name="uninterruptedTransitions" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="uninterruptedTransitions" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="uninterruptedTransitionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -114,6 +131,7 @@ function BackupPowerSystemsFormPage() {
                     <div>
                         <input type="radio" name="automaticSwitchoverMechanisms" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="automaticSwitchoverMechanisms" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="automaticSwitchoverMechanismsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -123,6 +141,7 @@ function BackupPowerSystemsFormPage() {
                     <div>
                         <input type="radio" name="regularTests" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="regularTests" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="regularTestsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -131,6 +150,7 @@ function BackupPowerSystemsFormPage() {
                     <div>
                         <input type="radio" name="routineMaintenanceActivities" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="routineMaintenanceActivities" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="routineMaintenanceActivitiesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -140,6 +160,7 @@ function BackupPowerSystemsFormPage() {
                     <div>
                         <input type="radio" name="mitigatingRisks" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="mitigatingRisks" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="mitigatingRisksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="mitigatingRisksRedundancies" placeholder="Describe the redundants" onChange={handleChange} />  
@@ -151,6 +172,7 @@ function BackupPowerSystemsFormPage() {
                     <div>
                         <input type="radio" name="withstandingExternalThreats" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="withstandingExternalThreats" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="withstandingExternalThreatsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -160,6 +182,7 @@ function BackupPowerSystemsFormPage() {
                     <div>
                         <input type="radio" name="notifiedAdministrators" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="notifiedAdministrators" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="notifiedAdministratorsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -168,6 +191,7 @@ function BackupPowerSystemsFormPage() {
                     <div>
                         <input type="radio" name="capableRemoteMonitoring" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="capableRemoteMonitoring" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="capableRemoteMonitoringComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -177,6 +201,7 @@ function BackupPowerSystemsFormPage() {
                     <div>
                         <input type="radio" name="backupSystemIncludedInPlans" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="backupSystemIncludedInPlans" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="backupSystemIncludedInPlansComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -185,6 +210,7 @@ function BackupPowerSystemsFormPage() {
                     <div>
                         <input type="radio" name="trainedStaffMembers" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="trainedStaffMembers" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="trainedStaffMembersComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -194,6 +220,7 @@ function BackupPowerSystemsFormPage() {
                     <div>
                         <input type="radio" name="maintainingRecords" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="maintainingRecords" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="maintainingRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -202,6 +229,7 @@ function BackupPowerSystemsFormPage() {
                     <div>
                         <input type="radio" name="accessibleRecords" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="accessibleRecords" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="accessibleRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

@@ -46,5 +46,5 @@ function AccessPointsPage() {
     </div>
   );
 }
-
+/**/
 export default AccessPointsPage;

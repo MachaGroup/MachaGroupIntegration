@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
 import Navbar from "./Navbar";
-
+/**/
 function DeviceEncryptionPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding(); // Access and update buildingId from context
@@ -28,9 +28,24 @@ function DeviceEncryptionPage() {
         }));
     };
 
-    const handleBack = () => {
-        navigate(-1);
-    };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Cybersecurity/Device Encryption');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -80,6 +95,7 @@ function DeviceEncryptionPage() {
                         <div>
                             <input type="radio" name="encryptionPolicies" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="encryptionPolicies" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="encryptionPoliciesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -95,6 +111,7 @@ function DeviceEncryptionPage() {
                         <div>
                             <input type="radio" name="automaticEncryption" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="automaticEncryption" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="automaticEncryptionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -103,6 +120,7 @@ function DeviceEncryptionPage() {
                         <div>
                             <input type="radio" name="defaultEncryption" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="defaultEncryption" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="defaultEncryptionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -118,6 +136,7 @@ function DeviceEncryptionPage() {
                         <div>
                             <input type="radio" name="userTraining" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="userTraining" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="userTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -131,6 +150,7 @@ function DeviceEncryptionPage() {
                         <div>
                             <input type="radio" name="userRefreshers" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="userRefreshers" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="userRefreshersComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -146,6 +166,7 @@ function DeviceEncryptionPage() {
                         <div>
                             <input type="radio" name="auditTools" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="auditTools" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="auditToolsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 

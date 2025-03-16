@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
 import Navbar from "./Navbar";
-
+/**/
 function FirewallPoliciesPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding(); // Access and update buildingId from context
@@ -28,9 +28,24 @@ function FirewallPoliciesPage() {
         }));
     };
 
-    const handleBack = () => {
-        navigate(-1);
-    };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Cybersecurity/Firewall Policies');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -79,6 +94,7 @@ function FirewallPoliciesPage() {
                         <div>
                             <input type="radio" name="specificPolicies" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="specificPolicies" value="No" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="specificPoliciesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -104,6 +120,7 @@ function FirewallPoliciesPage() {
                         <div>
                             <input type="radio" name="automatedTools" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="automatedTools" value="No" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="automatedToolsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -136,6 +153,7 @@ function FirewallPoliciesPage() {
                         <div>
                             <input type="radio" name="documentationGuidelines" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="documentationGuidelines" value="No" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="documentationGuidelinesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 

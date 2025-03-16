@@ -6,7 +6,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import Navbar from "./Navbar";
 
-
+/**/
 function EmergencyCommunicationTrainingFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -30,9 +30,24 @@ function EmergencyCommunicationTrainingFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/Emergency Communication Training');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
  
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,6 +95,7 @@ function EmergencyCommunicationTrainingFormPage() {
                     <div>
                         <input type="radio" name="Training Programs Exist" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Training Programs Exist" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Training Programs Exist-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="trainingProgramsExist" placeholder="Describe the training programs" onChange={handleChange}/>  
@@ -91,6 +107,7 @@ function EmergencyCommunicationTrainingFormPage() {
                     <div>
                         <input type="radio" name="Training Content Scope" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Training Content Scope" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Training Content Scope-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -107,6 +124,7 @@ function EmergencyCommunicationTrainingFormPage() {
                     <div>
                         <input type="radio" name="Training Schedule Set" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Training Schedule Set" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Training Schedule Set-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -116,6 +134,7 @@ function EmergencyCommunicationTrainingFormPage() {
                     <div>
                         <input type="radio" name="Drills Included" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Drills Included" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Drills Included-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -124,6 +143,7 @@ function EmergencyCommunicationTrainingFormPage() {
                     <div>
                         <input type="radio" name="Drill Effectiveness" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Drill Effectiveness" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Drill Effectiveness-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -133,6 +153,7 @@ function EmergencyCommunicationTrainingFormPage() {
                     <div>
                         <input type="radio" name="Scenario Variety" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Scenario Variety" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Scenario Variety-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -141,6 +162,7 @@ function EmergencyCommunicationTrainingFormPage() {
                     <div>
                         <input type="radio" name="Scenario Complexity" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Scenario Complexity" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Scenario Complexity-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -150,6 +172,7 @@ function EmergencyCommunicationTrainingFormPage() {
                     <div>
                         <input type="radio" name="Role-Specific Focus" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Role-Specific Focus" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Role-Specific Focus-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -158,6 +181,7 @@ function EmergencyCommunicationTrainingFormPage() {
                     <div>
                         <input type="radio" name="Role Preparedness" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Role Preparedness" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Role Preparedness-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -167,6 +191,7 @@ function EmergencyCommunicationTrainingFormPage() {
                     <div>
                         <input type="radio" name="Feedback Provided" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Feedback Provided" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Feedback Provided-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -175,6 +200,7 @@ function EmergencyCommunicationTrainingFormPage() {
                     <div>
                         <input type="radio" name="Debrief Sessions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Debrief Sessions" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Debrief Sessions-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -184,6 +210,7 @@ function EmergencyCommunicationTrainingFormPage() {
                     <div>
                         <input type="radio" name="Plan Integration" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Plan Integration" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Plan Integration-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -192,6 +219,7 @@ function EmergencyCommunicationTrainingFormPage() {
                     <div>
                         <input type="radio" name="Plan Reinforcement" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Plan Reinforcement" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Plan Reinforcement-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
                  
@@ -201,6 +229,7 @@ function EmergencyCommunicationTrainingFormPage() {
                     <div>
                         <input type="radio" name="Training Records" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Training Records" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Training Records-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -209,6 +238,7 @@ function EmergencyCommunicationTrainingFormPage() {
                     <div>
                         <input type="radio" name="Records Accessible" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Records Accessible" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Records Accessible-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

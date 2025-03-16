@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function EncryptionRequirementsFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function EncryptionRequirementsFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Policy and Compliance/Encryption Requirements');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -94,6 +109,7 @@ function EncryptionRequirementsFormPage() {
                     <div>
                         <input type="radio" name="documentedStandards" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="documentedStandards" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="documentedStandardsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -139,6 +155,7 @@ function EncryptionRequirementsFormPage() {
                     <div>
                         <input type="radio" name="consistentPractices" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="consistentPractices" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="consistentPracticesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -177,6 +194,7 @@ function EncryptionRequirementsFormPage() {
                     <div>
                         <input type="radio" name="regulatoryRequirements" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="regulatoryRequirements" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="regulatoryRequirementsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -207,6 +225,7 @@ function EncryptionRequirementsFormPage() {
                     <div>
                         <input type="radio" name="effectivenessValidation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="effectivenessValidation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="effectivenessValidationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -230,6 +249,7 @@ function EncryptionRequirementsFormPage() {
                     <div>
                         <input type="radio" name="protectingData" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="protectingData" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="protectingDataComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -253,6 +273,7 @@ function EncryptionRequirementsFormPage() {
                     <div>
                         <input type="radio" name="monitoringMechanisms" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="monitoringMechanisms" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="monitoringMechanismsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -269,6 +290,7 @@ function EncryptionRequirementsFormPage() {
                     <div>
                         <input type="radio" name="regularAssessments" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="regularAssessments" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="regularAssessmentsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -299,6 +321,7 @@ function EncryptionRequirementsFormPage() {
                     <div>
                         <input type="radio" name="employeeResources" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="employeeResources" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="employeeResourcesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

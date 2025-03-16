@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function DataClassificationFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function DataClassificationFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Policy and Compliance/Data Classification');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -93,6 +108,7 @@ function DataClassificationFormPage() {
                     <div>
                         <input type="radio" name="sensitivityGuidelines" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="sensitivityGuidelines" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="sensitivityGuidelinesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -116,6 +132,7 @@ function DataClassificationFormPage() {
                     <div>
                         <input type="radio" name="standardizedLabels" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="standardizedLabels" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="standardizedLabelsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -154,6 +171,7 @@ function DataClassificationFormPage() {
                     <div>
                         <input type="radio" name="storingData" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="storingData" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="storingDataComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -184,6 +202,7 @@ function DataClassificationFormPage() {
                     <div>
                         <input type="radio" name="assistingGuidelines" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="assistingGuidelines" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="assistingGuidelinesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -207,6 +226,7 @@ function DataClassificationFormPage() {
                     <div>
                         <input type="radio" name="securityControls" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="securityControls" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="securityControlsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -223,6 +243,7 @@ function DataClassificationFormPage() {
                     <div>
                         <input type="radio" name="regularAudits" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="regularAudits" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="regularAuditsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -253,6 +274,7 @@ function DataClassificationFormPage() {
                     <div>
                         <input type="radio" name="documentingProtocols" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="documentingProtocols" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="documentingProtocolsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

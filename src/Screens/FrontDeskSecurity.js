@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-
+/**/
 function FrontDeskSecurityPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding(); // Access buildingId from context
@@ -29,9 +29,24 @@ function FrontDeskSecurityPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Physical Security/Front Desk Security');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,6 +95,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="visitorLog" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="visitorLog" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="visitorLogComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -88,6 +104,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="visitorIdSignIn" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="visitorIdSignIn" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="visitorIdSignInComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -96,6 +113,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="verifyCredentials" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="verifyCredentials" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="verifyCredentialsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -106,6 +124,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="enforceAccessControl" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="enforceAccessControl" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="enforceAccessControlComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -114,6 +133,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="challengeIndividuals" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="challengeIndividuals" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="challengeIndividualsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -122,6 +142,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="visitorBadges" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="visitorBadges" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="visitorBadgesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -132,6 +153,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="screeningProcedures" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="screeningProcedures" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="screeningProceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -140,6 +162,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="securityThreatProtocols" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="securityThreatProtocols" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="securityThreatProtocolsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -148,6 +171,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="professionalChecks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="professionalChecks" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="professionalChecksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -158,6 +182,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="visitorAssistance" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="visitorAssistance" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="visitorAssistanceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -166,6 +191,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="professionalGreeting" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="professionalGreeting" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="professionalGreetingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -174,6 +200,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="visitorInquiries" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="visitorInquiries" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="visitorInquiriesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -184,6 +211,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="emergencyResponseTraining" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="emergencyResponseTraining" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="emergencyResponseTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -192,6 +220,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="emergencyProcedures" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="emergencyProcedures" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="emergencyProceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -200,6 +229,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="emergencyEquipment" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="emergencyEquipment" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="emergencyEquipmentComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -210,6 +240,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="communicationBetweenPersonnel" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="communicationBetweenPersonnel" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="communicationBetweenPersonnelComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -218,6 +249,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="coordinationTraining" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="coordinationTraining" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="coordinationTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -226,6 +258,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="centralizedCommunication" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="centralizedCommunication" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="centralizedCommunicationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -236,6 +269,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="visitorRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="visitorRecords" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="visitorRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -244,6 +278,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="reportingProcess" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="reportingProcess" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="reportingProcessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -252,6 +287,7 @@ function FrontDeskSecurityPage() {
             <div>
               <input type="radio" name="reportReview" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="reportReview" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="reportReviewComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

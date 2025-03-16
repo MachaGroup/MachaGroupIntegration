@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function DebriefingAndFeedbackFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function DebriefingAndFeedbackFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/Debriefing and Feedback');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
  
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,6 +94,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Structured Debriefing" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Structured Debriefing" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Structured Debriefing-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="structuredDebriefingProcess" placeholder="Describe the process" onChange={handleChange}/>  
@@ -90,6 +106,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Facilitator Training" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Facilitator Training" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Facilitator Training-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -98,6 +115,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Stakeholder Participation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Stakeholder Participation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Stakeholder Participation-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -107,6 +125,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Objective Establishment" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Objective Establishment" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Objective Establishment-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="objectiveEstablishment" placeholder="Describe the sessions" onChange={handleChange}/>  
@@ -118,6 +137,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Outcome Focus" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Outcome Focus" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Outcome Focus-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -127,6 +147,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Participant Contribution" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Participant Contribution" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Participant Contribution-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -135,6 +156,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Feedback Solicitation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Feedback Solicitation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Feedback Solicitation-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -143,6 +165,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Facilitator Skills" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Facilitator Skills" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Facilitator Skills-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -152,6 +175,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Observation Records" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Observation Records" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Observation Records-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -160,6 +184,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Structured Documentation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Structured Documentation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Structured Documentation-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -168,6 +193,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Stakeholder Access" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Stakeholder Access" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Stakeholder Access-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -177,6 +203,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Actionable Items" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Actionable Items" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Actionable Items-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -185,6 +212,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Priority Assessment" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Priority Assessment" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Priority Assessment-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -193,6 +221,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Responsibility Assignment" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Responsibility Assignment" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Responsibility Assignment-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -202,6 +231,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Tracking Process" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Tracking Process" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Tracking Process-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="trackingProcess" placeholder="Describe the process" onChange={handleChange}/>  
@@ -213,6 +243,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Accountability Mechanism" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Accountability Mechanism" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Accountability Mechanism-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -221,6 +252,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Progress Updates" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Progress Updates" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Progress Updates-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -230,6 +262,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Driving Improvements" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Driving Improvements" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Driving Improvements-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -238,6 +271,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Feedback Integration" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Feedback Integration" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Feedback Integration-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -246,6 +280,7 @@ function DebriefingAndFeedbackFormPage() {
                     <div>
                         <input type="radio" name="Insight Sharing" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Insight Sharing" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Insight Sharing-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function FireDrillFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function FireDrillFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/Fire Drill');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,6 +101,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="RegularDrillSchedule" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="RegularDrillSchedule" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="RegularDrillScheduleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -94,6 +110,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="VaryingDrillTimes" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="VaryingDrillTimes" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="VaryingDrillTimesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -103,6 +120,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="DrillInitiationProtocol" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="DrillInitiationProtocol" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="DrillInitiationProtocolComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="initiatingProtocol" placeholder="Describe the protocol" onChange={handleChange}/>  
@@ -114,6 +132,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="NotificationTesting" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="NotificationTesting" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="NotificationTestingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -122,6 +141,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="AbsentIndividualSystem" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="AbsentIndividualSystem" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="AbsentIndividualSystemComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="absentSystem" placeholder="Describe the system" onChange={handleChange}/>  
@@ -134,6 +154,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="DefinedDrillProcedures" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="DefinedDrillProcedures" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="DefinedDrillProceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -142,6 +163,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="OccupantspeciificActions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="OccupantspeciificActions" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="OccupantspeciificActionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -150,6 +172,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="ScenarioBasedDrills" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="ScenarioBasedDrills" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="ScenarioBasedDrillsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -159,6 +182,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="MarkedEvacRoutes" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="MarkedEvacRoutes" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="MarkedEvacRoutesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="evacuationRoutes" placeholder="Describe the routes" onChange={handleChange}/>  
@@ -170,6 +194,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="SafeEvacKnowledge" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="SafeEvacKnowledge" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="SafeEvacKnowledgeComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -178,6 +203,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="AltEvacRoutes" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="AltEvacRoutes" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="AltEvacRoutesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="alternativeEvacuationRoutes" placeholder="Describe the alternatives" onChange={handleChange}/>  
@@ -190,6 +216,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="OccupantAccountProcess" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="OccupantAccountProcess" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="OccupantAccountProcessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="accountingProcess" placeholder="Describe the process" onChange={handleChange}/>  
@@ -201,6 +228,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="StaffDrillResponsibilities" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="StaffDrillResponsibilities" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="StaffDrillResponsibilitiesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="staffResponsibilities" placeholder="List the assigned roles and responsibilities" onChange={handleChange}/>  
@@ -212,6 +240,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="DrillFeedbackCollection" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="DrillFeedbackCollection" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="DrillFeedbackCollectiontComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -221,6 +250,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="EffectivenessEvaluation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="EffectivenessEvaluation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="EffectivenessEvaluationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="evaluatingEffectivenessMechanism" placeholder="Describe the mechanism" onChange={handleChange}/>  
@@ -232,6 +262,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="PostDrillDebriefing" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="PostDrillDebriefing" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="PostDrillDebriefingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -240,6 +271,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="RecommendationImplementation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="RecommendationImplementation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="RecommendationImplementationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -249,6 +281,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="DrillRecordKeeping" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="DrillRecordKeeping" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="DrillRecordKeepingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -257,6 +290,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="RecordPeriodicReview" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="RecordPeriodicReview" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="RecordPeriodicReviewComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -265,6 +299,7 @@ function FireDrillFormPage() {
                     <div>
                         <input type="radio" name="CorrectiveActionDocumentation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="CorrectiveActionDocumentation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="CorrectiveActionDocumentationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

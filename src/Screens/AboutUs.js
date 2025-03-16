@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
 import './AboutUs.css';  // Ensure the CSS file exists
 import logo from '../assets/MachaLogo.png';  // Adjust the path as needed
-
+/**/ 
 function AboutUs() {
   const navigate = useNavigate();  // Initialize useNavigate hook
 

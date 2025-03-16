@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
 import Navbar from "./Navbar";
-
+/**/
 function BackupTestingPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding(); // Access and update buildingId from context
@@ -28,9 +28,24 @@ function BackupTestingPage() {
         }));
     };
 
-    const handleBack = () => {
-        navigate(-1);
-    };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Cybersecurity/Backup Testing');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -82,6 +97,7 @@ function BackupTestingPage() {
             <div>
               <input type="radio" name="plannedUnplannedDrills" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="plannedUnplannedDrills" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="plannedUnplannedDrillsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -96,6 +112,7 @@ function BackupTestingPage() {
             <div>
               <input type="radio" name="fullPartialRecovery" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="fullPartialRecovery" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="fullPartialRecoveryComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -114,6 +131,7 @@ function BackupTestingPage() {
             <div>
               <input type="radio" name="documentTestResults" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="documentTestResults" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="documentTestResultsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -133,6 +151,7 @@ function BackupTestingPage() {
             <div>
               <input type="radio" name="definedRoles" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="definedRoles" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="definedRolesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -156,6 +175,7 @@ function BackupTestingPage() {
             <div>
               <input type="radio" name="updateMechanisms" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="updateMechanisms" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="updateMechanismsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -185,6 +205,7 @@ function BackupTestingPage() {
             <div>
               <input type="radio" name="automatedTools" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="automatedTools" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="automatedToolsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">

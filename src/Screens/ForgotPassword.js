@@ -3,7 +3,7 @@ import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/MachaLogo.png'; // Adjust this path if necessary
 import './ForgotPassword.css';
-
+/**/
 function ForgotPassword() {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');

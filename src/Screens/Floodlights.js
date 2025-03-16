@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function FloodlightsPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function FloodlightsPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Physical Security/Floodlights');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,6 +94,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="strategicPlacement" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="strategicPlacement" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="strategicPlacementComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -87,6 +103,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="coverageAreas" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="coverageAreas" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="coverageAreasComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -104,6 +121,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="brightness" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="brightness" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="brightnessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -112,6 +130,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="clearVisibility" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="clearVisibility" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="clearVisibilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -129,6 +148,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="timers" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="timers" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="timersComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -137,6 +157,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="lightingSchedules" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="lightingSchedules" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="lightingSchedulesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -145,6 +166,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="controlFlexibility" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="controlFlexibility" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="controlFlexibilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -155,6 +177,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="integratedSystems" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="integratedSystems" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="integratedSystemsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -163,6 +186,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="triggerRecording" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="triggerRecording" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="triggerRecordingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -171,6 +195,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="coordination" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="coordination" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="coordinationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -181,6 +206,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="energyEfficient" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="energyEfficient" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="energyEfficientComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -189,6 +215,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="energyOptimization" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="energyOptimization" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="energyOptimizationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -197,6 +224,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="monitoringSystem" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="monitoringSystem" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="monitoringSystemComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -207,6 +235,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceScheduleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -215,6 +244,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceTasksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -223,6 +253,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -233,6 +264,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="secureInstallations" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="secureInstallations" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="secureInstallationsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -241,6 +273,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="reinforcedStructures" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="reinforcedStructures" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="reinforcedStructuresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -249,6 +282,7 @@ function FloodlightsPage() {
             <div>
               <input type="radio" name="unauthorizedAccess" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="unauthorizedAccess" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="unauthorizedAccessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

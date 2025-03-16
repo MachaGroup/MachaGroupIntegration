@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-
+/**/
 function ActiveShooterResponseFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding(); // Access buildingId from context
@@ -29,9 +29,24 @@ function ActiveShooterResponseFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+                    if (formData && buildingId) { // Check if formData and buildingId exist
+                      try {
+                        const buildingRef = doc(db, 'Buildings', buildingId);
+                        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Active Shooter Response');
+                        await addDoc(formsRef, {
+                          building: buildingRef,
+                          formData: formData,
+                        });
+                        console.log('Form Data submitted successfully on back!');
+                        alert('Form data saved before navigating back!');
+                      } catch (error) {
+                        console.error('Error saving form data:', error);
+                        alert('Failed to save form data before navigating back. Some data may be lost.');
+                      }
+                    }
+                    navigate(-1);
+                  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -87,6 +102,7 @@ function ActiveShooterResponseFormPage() {
                   <div>
                     <input type="radio" name="asrMaterialsAlignment" value="yes" onChange={handleChange}/> Yes
                     <input type="radio" name="asrMaterialsAlignment" value="no" onChange={handleChange}/> No
+                    <textarea className='comment-box' name="asrMaterialsAlignmentComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                   </div>
                 </div>
 
@@ -110,6 +126,7 @@ function ActiveShooterResponseFormPage() {
                   <div>
                     <input type="radio" name="asrScenarioPractice" value="yes" onChange={handleChange}/> Yes
                     <input type="radio" name="asrScenarioPractice" value="no" onChange={handleChange}/> No
+                    <textarea className='comment-box' name="asrScenarioPracticeComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                   </div>
                 </div>
 
@@ -133,6 +150,7 @@ function ActiveShooterResponseFormPage() {
                   <div>
                     <input type="radio" name="asrCommunicationProtocols" value="yes" onChange={handleChange}/> Yes
                     <input type="radio" name="asrCommunicationProtocols" value="no" onChange={handleChange}/> No
+                    <textarea className='comment-box' name="asrCommunicationProtocolsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                   </div>
                 </div>
 
@@ -156,6 +174,7 @@ function ActiveShooterResponseFormPage() {
                   <div>
                     <input type="radio" name="asrDecisionFrameworks" value="yes" onChange={handleChange}/> Yes
                     <input type="radio" name="asrDecisionFrameworks" value="no" onChange={handleChange}/> No
+                    <textarea className='comment-box' name="asrDecisionFrameworksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                   </div>
                 </div>
 
@@ -179,6 +198,7 @@ function ActiveShooterResponseFormPage() {
                   <div>
                     <input type="radio" name="asrDebriefings" value="yes" onChange={handleChange}/> Yes
                     <input type="radio" name="asrDebriefings" value="no" onChange={handleChange}/> No
+                    <textarea className='comment-box' name="asrDebriefingsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                   </div>
                 </div>
 

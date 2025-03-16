@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-
+/**/
 function BulletCamerasPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding(); // Access buildingId from context
@@ -29,9 +29,24 @@ function BulletCamerasPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Physical Security/Bullet Cameras');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,6 +95,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="strategicPlacement" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="strategicPlacement" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="strategicPlacementComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -88,6 +104,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="coverageEntryPoints" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="coverageEntryPoints" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="coverageEntryPointsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -105,6 +122,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="secureMounting" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="secureMounting" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="secureMountingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -113,6 +131,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="optimalAngles" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="optimalAngles" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="optimalAnglesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -121,6 +140,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="protectedWiring" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="protectedWiring" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="protectedWiringComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -131,6 +151,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="weatherProofing" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="weatherProofing" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="weatherProofingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -139,6 +160,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="durableMaterials" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="durableMaterials" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="durableMaterialsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -147,6 +169,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="certification" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="certification" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="certificationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -157,6 +180,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="imageQuality" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="imageQuality" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="imageQualityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -165,6 +189,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="imageAdjustments" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="imageAdjustments" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="imageAdjustmentsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -173,6 +198,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="clearImages" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="clearImages" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="clearImagesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -183,6 +209,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="integratedSurveillance" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="integratedSurveillance" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="integratedSurveillanceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -191,6 +218,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="seamlessCommunication" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="seamlessCommunication" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="seamlessCommunicationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -199,6 +227,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="realTimeMonitoring" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="realTimeMonitoring" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="realTimeMonitoringComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -209,6 +238,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="remoteAccess" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="remoteAccess" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="remoteAccessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -217,6 +247,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="remoteAdjustments" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="remoteAdjustments" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="remoteAdjustmentsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -225,6 +256,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="secureAccess" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="secureAccess" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="secureAccessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -235,6 +267,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceScheduleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -243,6 +276,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceTasksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -251,6 +285,7 @@ function BulletCamerasPage() {
             <div>
               <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

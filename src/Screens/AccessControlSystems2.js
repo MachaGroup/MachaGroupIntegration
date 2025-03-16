@@ -47,5 +47,5 @@ function AccessControlSystems2Page() {
     </div>
   );
 }
-
+/**/
 export default AccessControlSystems2Page;

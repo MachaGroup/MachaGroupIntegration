@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
 import Navbar from "./Navbar";
-
+/**/
 function FireAlarmSystemsPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding(); // Access and update buildingId from context
@@ -29,9 +29,24 @@ function FireAlarmSystemsPage() {
     };
 
     // Function to handle back button
-    const handleBack = () => {
-        navigate(-1);  // Navigates to the previous page
-    };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/Fire Alarm Systems');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -82,6 +97,7 @@ function FireAlarmSystemsPage() {
                         <div>
                             <input type="radio" name="alarmsInstalled" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="alarmsInstalled" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="alarmsInstalledComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -90,6 +106,7 @@ function FireAlarmSystemsPage() {
                         <div>
                             <input type="radio" name="regularAlarmTesting" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="regularAlarmTesting" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="regularAlarmTestingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -98,6 +115,7 @@ function FireAlarmSystemsPage() {
                         <div>
                             <input type="radio" name="malfunctions" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="malfunctions" value="No" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="malfunctionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -118,6 +136,7 @@ function FireAlarmSystemsPage() {
                         <div>
                             <input type="radio" name="testingIntervals" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="testingIntervals" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="testingIntervalsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -126,6 +145,7 @@ function FireAlarmSystemsPage() {
                         <div>
                             <input type="radio" name="comprehensiveTesting" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="comprehensiveTesting" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="comprehensiveTestingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -136,6 +156,7 @@ function FireAlarmSystemsPage() {
                         <div>
                             <input type="radio" name="standardized" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="standardized" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="standardizedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -144,6 +165,7 @@ function FireAlarmSystemsPage() {
                         <div>
                             <input type="radio" name="fireAlarmTetsing" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="fireAlarmTetsing" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="fireAlarmTetsingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -166,6 +188,7 @@ function FireAlarmSystemsPage() {
                         <div>
                             <input type="radio" name="alarmRecords" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="alarmRecords" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="alarmRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -174,6 +197,7 @@ function FireAlarmSystemsPage() {
                         <div>
                             <input type="radio" name="retainedRecords" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="retainedRecords" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="retainedRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -208,6 +232,7 @@ function FireAlarmSystemsPage() {
                         <div>
                             <input type="radio" name="notificationChannels" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="notificationChannels" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="notificationChannelsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -216,6 +241,7 @@ function FireAlarmSystemsPage() {
                         <div>
                             <input type="radio" name="fireDepartmentCoordination" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="fireDepartmentCoordination" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="fireDepartmentCoordinationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -226,6 +252,7 @@ function FireAlarmSystemsPage() {
                         <div>
                             <input type="radio" name="alarmIntegration" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="alarmIntegration" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="alarmIntegrationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -234,6 +261,7 @@ function FireAlarmSystemsPage() {
                         <div>
                             <input type="radio" name="evacuationCoordination" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="evacuationCoordination" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="evacuationCoordinationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -242,6 +270,7 @@ function FireAlarmSystemsPage() {
                         <div>
                             <input type="radio" name="trainedPersonnelResponse" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="trainedPersonnelResponse" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="trainedPersonnelResponseComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -252,6 +281,7 @@ function FireAlarmSystemsPage() {
                         <div>
                             <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="maintenanceScheduleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -260,6 +290,7 @@ function FireAlarmSystemsPage() {
                         <div>
                             <input type="radio" name="maintenanceActivities" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="maintenanceActivities" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="maintenanceActivitiesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -268,6 +299,7 @@ function FireAlarmSystemsPage() {
                         <div>
                             <input type="radio" name="maintenanceIssues" value="yes" onChange={handleChange} /> Yes
                             <input type="radio" name="maintenanceIssues" value="no" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="maintenanceIssuesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 

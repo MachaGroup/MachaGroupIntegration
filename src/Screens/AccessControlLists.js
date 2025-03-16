@@ -1,24 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
-import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
+import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-
+/**/
 function AccessControlListsPage() {
     const navigate = useNavigate();
-    const { buildingId } = useBuilding(); // Access and update buildingId from context
+    const { buildingId } = useBuilding();
     const db = getFirestore();
-
     const [formData, setFormData] = useState({});
 
     useEffect(() => {
-        if(!buildingId) {
-          alert('No builidng selected. Redirecting to Building Info...');
-          navigate('BuildingandAddress');
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
         }
-      }, [buildingId, navigate]);
+    }, [buildingId, navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -28,9 +27,24 @@ function AccessControlListsPage() {
         }));
     };
 
-    const handleBack = () => {
+    const handleBack = async () => {
+        if (formData && buildingId) { // Check if formData and buildingId exist
+          try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formsRef = collection(db, 'forms/Cybersecurity/Access Control Lists');
+            await addDoc(formsRef, {
+              building: buildingRef,
+              formData: formData,
+            });
+            console.log('Form Data submitted successfully on back!');
+            alert('Form data saved before navigating back!');
+          } catch (error) {
+            console.error('Error saving form data:', error);
+            alert('Failed to save form data before navigating back. Some data may be lost.');
+          }
+        }
         navigate(-1);
-    };
+      };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -59,7 +73,7 @@ function AccessControlListsPage() {
     return (
         <div className="form-page">
             <header className="header">
-            <Navbar />
+                <Navbar />
                 <button className="back-button" onClick={handleBack}>←</button>
                 <h1>Access Control Lists Assessment</h1>
                 <img src={logo} alt="Logo" className="logo" />
@@ -82,8 +96,9 @@ function AccessControlListsPage() {
                     <div className="form-section">
                         <label>Are there specific guidelines or protocols in place for creating and updating ACLs to ensure they are aligned with the latest security standards and organizational needs?</label>
                         <div>
-                            <input type="radio" name="guidelinesProtocols" value="Yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="guidelinesProtocols" value="No" onChange={handleChange} /> No
+                            <input type="radio" name="guidelinesProtocols" value="Yes" onChange={handleChange} id="guidelinesProtocolsYes" /> Yes
+                            <input type="radio" name="guidelinesProtocols" value="No" onChange={handleChange} id="guidelinesProtocolsNo" /> No
+                            <textarea className='comment-box' name="guidelinesProtocolsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -102,8 +117,9 @@ function AccessControlListsPage() {
                     <div className="form-section">
                         <label>Are there automated tools or systems in place to assist with the management and deployment of ACLs across multiple firewall devices within the organization?</label>
                         <div>
-                            <input type="radio" name="automatedTools" value="Yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="automatedTools" value="No" onChange={handleChange} /> No
+                            <input type="radio" name="automatedTools" value="Yes" onChange={handleChange} id="automatedToolsYes" /> Yes
+                            <input type="radio" name="automatedTools" value="No" onChange={handleChange} id="automatedToolsNo" /> No
+                            <textarea className='comment-box' name="automatedToolsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -117,8 +133,9 @@ function AccessControlListsPage() {
                     <div className="form-section">
                         <label>Are there regular audits conducted on ACLs to identify any misconfigurations, redundant rules, or outdated entries that could potentially expose the network to risk?</label>
                         <div>
-                            <input type="radio" name="regularAudits" value="Yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="regularAudits" value="No" onChange={handleChange} /> No
+                            <input type="radio" name="regularAudits" value="Yes" onChange={handleChange} id="regularAuditsYes" /> Yes
+                            <input type="radio" name="regularAudits" value="No" onChange={handleChange} id="regularAuditsNo" /> No
+                            <textarea className='comment-box' name="regularAuditsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 

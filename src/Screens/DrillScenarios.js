@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function DrillSceneriosFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function DrillSceneriosFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/Drill Scenerios');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
  
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,6 +101,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Regular Drill Schedule" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Regular Drill Schedule" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Regular Drill Schedule-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -94,6 +110,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Drill Timing Variability" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Drill Timing Variability" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Drill Timing Variability-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -103,6 +120,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Initiation Protocol" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Initiation Protocol" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Initiation Protocol-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="initiationProtocol" placeholder="Describe the protocol" onChange={handleChange}/>   
@@ -114,6 +132,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Notification Methods Testing" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Notification Methods Testing" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Notification Methods Testing-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -122,6 +141,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Absent Individuals System" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Absent Individuals System" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Absent Individuals System-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="absentSystem" placeholder="Describe the system" onChange={handleChange}/>  
@@ -134,6 +154,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Scenario Planning" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Scenario Planning" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Scenario Planning-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -142,6 +163,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Simulated Threat Scenarios" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Simulated Threat Scenarios" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Simulated Threat Scenarios-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -150,6 +172,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Realistic Scenario Design" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Realistic Scenario Design" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Realistic Scenario Design-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -159,6 +182,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Procedure Communication" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Procedure Communication" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Procedure Communication-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -167,6 +191,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Occupant Specific Actions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Occupant Specific Actions" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Occupant Specific Actions-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -175,6 +200,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Scenario Simulation Variety" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Scenario Simulation Variety" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Scenario Simulation Variety-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -184,6 +210,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Coordination Protocol" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Coordination Protocol" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Coordination Protocol-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="coordinationProtocol" placeholder="Describe the protocol" onChange={handleChange}/>  
@@ -195,6 +222,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Communication Systems Test" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Communication Systems Test" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Communication Systems Test-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -203,6 +231,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Designated Coordinators" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Designated Coordinators" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Designated Coordinators-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="designatedIndividuals" placeholder="List the individuals responsible" onChange={handleChange}/>  
@@ -215,6 +244,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Occupant Accountability Process" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Occupant Accountability Process" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Occupant Accountability Process-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="accountingProcess" placeholder="Describe the process" onChange={handleChange}/>  
@@ -226,6 +256,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Accountability Roles Assigned" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Accountability Roles Assigned" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Accountability Roles Assigned-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="accountabilityRoles" placeholder="List the member's assigned roles" onChange={handleChange}/>  
@@ -237,6 +268,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Participants Feedback Collection" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Participants Feedback Collection" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Participants Feedback Collection-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -246,6 +278,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Effectiveness Evaluation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Effectiveness Evaluation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Effectiveness Evaluation-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="effectivenessEvaluationMechanism" placeholder="Describe the mechanism" onChange={handleChange}/>  
@@ -257,6 +290,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Debriefing Sessions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Debriefing Sessions" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Debriefing Sessions-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -265,6 +299,7 @@ function DrillSceneriosFormPage() {
                     <div>
                         <input type="radio" name="Implementation of Recommendations" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Implementation of Recommendations" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Implementation of Recommendations-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-
+/**/
 function FenceSensorsPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding(); // Access buildingId from context
@@ -29,9 +29,24 @@ function FenceSensorsPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Physical Security/Fence Sensors');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,6 +95,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="strategicPlacement" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="strategicPlacement" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="strategicPlacementComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -88,6 +104,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="fullCoverage" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="fullCoverage" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="fullCoverageComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -105,6 +122,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="sensitivityLevel" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="sensitivityLevel" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="sensitivityLevelComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -113,6 +131,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="falseAlarmAdjustments" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="falseAlarmAdjustments" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="falseAlarmAdjustmentsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -123,6 +142,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="quickResponse" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="quickResponse" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="quickResponseComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -131,6 +151,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="differentiationMechanism" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="differentiationMechanism" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="differentiationMechanismComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -139,6 +160,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="realTimeTransmission" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="realTimeTransmission" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="realTimeTransmissionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -149,6 +171,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="integratedAlarmSystem" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="integratedAlarmSystem" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="integratedAlarmSystemComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -157,6 +180,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="seamlessCommunication" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="seamlessCommunication" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="seamlessCommunicationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -165,6 +189,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="coordinationWithOtherDevices" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="coordinationWithOtherDevices" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="coordinationWithOtherDevicesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -175,6 +200,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="remoteMonitoring" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="remoteMonitoring" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="remoteMonitoringComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -183,6 +209,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="remoteAdjustments" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="remoteAdjustments" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="remoteAdjustmentsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -191,6 +218,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="secureProtocols" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="secureProtocols" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="secureProtocolsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -201,6 +229,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="durableDesign" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="durableDesign" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="durableDesignComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -209,6 +238,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="durableMaterials" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="durableMaterials" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="durableMaterialsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -217,6 +247,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="testingCertification" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="testingCertification" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="testingCertificationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -227,6 +258,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceScheduleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -235,6 +267,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceTasksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -243,6 +276,7 @@ function FenceSensorsPage() {
             <div>
               <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
