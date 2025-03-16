@@ -29,8 +29,23 @@ function PhishingAwarenessTrainingPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Cybersecurity/Phishing Awareness Training');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -82,6 +97,7 @@ function PhishingAwarenessTrainingPage() {
             <div>
               <input type="radio" name="interactiveTraining" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="interactiveTraining" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="interactiveTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -100,6 +116,7 @@ function PhishingAwarenessTrainingPage() {
             <div>
               <input type="radio" name="refresherCourses" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="refresherCourses" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="refresherCoursesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -114,6 +131,7 @@ function PhishingAwarenessTrainingPage() {
             <div>
               <input type="radio" name="roleBasedTraining" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="roleBasedTraining" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="roleBasedTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -125,6 +143,7 @@ function PhishingAwarenessTrainingPage() {
             <div>
               <input type="radio" name="realWorldExamples" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="realWorldExamples" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="realWorldExamplesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -139,6 +158,7 @@ function PhishingAwarenessTrainingPage() {
             <div>
               <input type="radio" name="questionsOpportunities" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="questionsOpportunities" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="questionsOpportunitiesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -157,6 +177,7 @@ function PhishingAwarenessTrainingPage() {
             <div>
               <input type="radio" name="crossDepartmentalEfforts" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="crossDepartmentalEfforts" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="crossDepartmentalEffortsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -171,6 +192,7 @@ function PhishingAwarenessTrainingPage() {
             <div>
               <input type="radio" name="regularReviews" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="regularReviews" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="regularReviewsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -189,6 +211,7 @@ function PhishingAwarenessTrainingPage() {
             <div>
               <input type="radio" name="complianceRequirements" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="complianceRequirements" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="complianceRequirementsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -207,6 +230,7 @@ function PhishingAwarenessTrainingPage() {
             <div>
               <input type="radio" name="additionalResources" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="additionalResources" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="additionalResourcesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -214,6 +238,7 @@ function PhishingAwarenessTrainingPage() {
             <div>
               <input type="radio" name="ongoingSupport" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="ongoingSupport" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="ongoingSupportComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">

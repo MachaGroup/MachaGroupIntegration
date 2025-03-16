@@ -28,9 +28,25 @@ function NetworkAnomalyDetectionPage() {
         }));
     };
 
-    const handleBack = () => {
+    // Function to handle back button
+    const handleBack = async () => {
+        if (formData && buildingId) { // Check if formData and buildingId exist
+          try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formsRef = collection(db, 'forms/Cybersecurity/Network Anomaly Detection');
+            await addDoc(formsRef, {
+              building: buildingRef,
+              formData: formData,
+            });
+            console.log('Form Data submitted successfully on back!');
+            alert('Form data saved before navigating back!');
+          } catch (error) {
+            console.error('Error saving form data:', error);
+            alert('Failed to save form data before navigating back. Some data may be lost.');
+          }
+        }
         navigate(-1);
-    };
+      };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -91,6 +107,7 @@ function NetworkAnomalyDetectionPage() {
                         <div>
                             <input type="radio" name="customizableParameters" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="customizableParameters" value="No" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="customizableParametersComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -104,6 +121,7 @@ function NetworkAnomalyDetectionPage() {
                         <div>
                             <input type="radio" name="mlAiFlexibility" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="mlAiFlexibility" value="No" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="mlAiFlexibilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 

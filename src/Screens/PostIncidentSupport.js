@@ -29,8 +29,23 @@ function PostIncidentSupportFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Post-Incident Support');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -87,6 +102,7 @@ function PostIncidentSupportFormPage() {
         <div>
           <input type="radio" name="mentalHealthResourcesAvailability" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="mentalHealthResourcesAvailability" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="mentalHealthResourcesAvailabilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -117,6 +133,7 @@ function PostIncidentSupportFormPage() {
         <div>
           <input type="radio" name="licensedMentalHealthAvailability" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="licensedMentalHealthAvailability" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="licensedMentalHealthAvailabilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -140,6 +157,7 @@ function PostIncidentSupportFormPage() {
         <div>
           <input type="radio" name="peerSupportEstablished" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="peerSupportEstablished" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="peerSupportEstablishedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -155,6 +173,7 @@ function PostIncidentSupportFormPage() {
         <div>
           <input type="radio" name="peerSupportIntegration" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="peerSupportIntegration" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="peerSupportIntegrationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -192,6 +211,7 @@ function PostIncidentSupportFormPage() {
         <div>
           <input type="radio" name="familyAssistancePlans" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="familyAssistancePlans" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="familyAssistancePlansComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -201,6 +221,7 @@ function PostIncidentSupportFormPage() {
         <div>
           <input type="radio" name="postIncidentSupportTraining" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="postIncidentSupportTraining" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="postIncidentSupportTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -216,6 +237,7 @@ function PostIncidentSupportFormPage() {
         <div>
           <input type="radio" name="resilienceTrainingWorkshops" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="resilienceTrainingWorkshops" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="resilienceTrainingWorkshopsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -253,6 +275,7 @@ function PostIncidentSupportFormPage() {
         <div>
           <input type="radio" name="lessonsLearnedUsed" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="lessonsLearnedUsed" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="lessonsLearnedUsedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 

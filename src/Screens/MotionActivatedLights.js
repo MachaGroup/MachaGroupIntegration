@@ -29,8 +29,23 @@ function MotionActivatedLightsPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Physical Security/Motion Activated Lights');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -79,6 +94,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="strategicPlacement" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="strategicPlacement" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="strategicPlacementComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -87,6 +103,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="keyAreasIllumination" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="keyAreasIllumination" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="keyAreasIlluminationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -104,6 +121,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="sensorConfiguration" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="sensorConfiguration" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="sensorConfigurationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -112,6 +130,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="movementDifferentiation" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="movementDifferentiation" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="movementDifferentiationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -120,6 +139,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="sensorAdjustments" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="sensorAdjustments" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="sensorAdjustmentsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -130,6 +150,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="lightProgramming" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="lightProgramming" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="lightProgrammingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -138,6 +159,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="timingAdjustments" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="timingAdjustments" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="timingAdjustmentsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -146,6 +168,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="customizableSettings" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="customizableSettings" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="customizableSettingsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -156,6 +179,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="brightness" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="brightness" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="brightnessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -164,6 +188,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="visibilityWithoutGlare" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="visibilityWithoutGlare" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="visibilityWithoutGlareComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -172,6 +197,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="tamperingPrevention" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="tamperingPrevention" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="tamperingPreventionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -182,6 +208,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="integrationSecuritySystems" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="integrationSecuritySystems" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="integrationSecuritySystems" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -190,6 +217,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="triggerAlert" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="triggerAlert" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="triggerAlertComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -198,6 +226,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="lightingCoordination" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="lightingCoordination" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="lightingCoordinationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -208,6 +237,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="energyEfficiency" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="energyEfficiency" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="energyEfficiencyComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -216,6 +246,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="optimizeEnergy" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="optimizeEnergy" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="optimizeEnergyComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -224,6 +255,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="monitorEnergy" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="monitorEnergy" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="monitorEnergyComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -234,6 +266,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceScheduleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -242,6 +275,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceTasksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -250,6 +284,7 @@ function MotionActivatedLightsPage() {
             <div>
               <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

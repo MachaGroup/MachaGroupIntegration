@@ -29,8 +29,23 @@ function RecertificationScheduleFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Recertification Schedule');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -94,6 +109,7 @@ function RecertificationScheduleFormPage() {
         <div>
           <input type="radio" name="recertificationVariations" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="recertificationVariations" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="recertificationVariationsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -110,6 +126,7 @@ function RecertificationScheduleFormPage() {
         <div>
           <input type="radio" name="reminderSystem" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="reminderSystem" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="reminderSystemComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -133,6 +150,7 @@ function RecertificationScheduleFormPage() {
         <div>
           <input type="radio" name="recertificationOptions" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="recertificationOptions" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="recertificationOptionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -178,6 +196,7 @@ function RecertificationScheduleFormPage() {
         <div>
           <input type="radio" name="staffFeedback" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="staffFeedback" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="staffFeedbackComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 

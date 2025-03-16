@@ -29,8 +29,23 @@ function PerimeterFencingPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Physical Security/Perimeter Fencing');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -80,6 +95,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="structuralSoundness" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="structuralSoundness" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="structuralSoundnessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -88,6 +104,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="fencingDamage" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="fencingDamage" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="fencingDamageComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -96,6 +113,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="securePosts" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="securePosts" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="securePostsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -104,6 +122,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="gapsBreaches" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="gapsBreaches" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="gapsBreachesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -114,6 +133,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="fencingHeight" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="fencingHeight" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="fencingHeightComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -122,6 +142,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="fencingCoverage" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="fencingCoverage" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="fencingCoverageComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -130,6 +151,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="additionalMeasures" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="additionalMeasures" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="additionalMeasuresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -140,6 +162,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="securedAccessPoints" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="securedAccessPoints" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="securedAccessPointsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -148,6 +171,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="gatesEquipment" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="gatesEquipment" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="gatesEquipmentComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -156,6 +180,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="restrictedAccess" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="restrictedAccess" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="restrictedAccessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -166,6 +191,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="visibility" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="visibility" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="visibilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -174,6 +200,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="blindSpots" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="blindSpots" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="blindSpotsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -182,6 +209,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="strategicSurveillance" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="strategicSurveillance" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="strategicSurveillanceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -192,6 +220,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="durableMaterials" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="durableMaterials" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="durableMaterialsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -200,6 +229,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="maintenanceInspection" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceInspection" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceInspectionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -208,6 +238,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="repairProvisions" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="repairProvisions" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="repairProvisionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -218,6 +249,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="regulatoryCompliance" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="regulatoryCompliance" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="regulatoryComplianceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -231,6 +263,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="inspectionsCompliance" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="inspectionsCompliance" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="inspectionsComplianceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -241,6 +274,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="integratedSecurityMeasures" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="integratedSecurityMeasures" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="integratedSecurityMeasuresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -249,6 +283,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="securityEffectiveness" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="securityEffectiveness" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="securityEffectivenessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -257,6 +292,7 @@ function PerimeterFencingPage() {
             <div>
               <input type="radio" name="coordinationResponse" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="coordinationResponse" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="coordinationResponseComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

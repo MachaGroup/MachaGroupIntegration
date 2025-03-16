@@ -29,8 +29,23 @@ function MotionSensorsPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Physical Security/Motion Sensors');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -80,6 +95,7 @@ function MotionSensorsPage() {
             <div>
               <input type="radio" name="strategicPlacement" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="strategicPlacement" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="strategicPlacementComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -88,6 +104,7 @@ function MotionSensorsPage() {
             <div>
               <input type="radio" name="coverage" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="coverage" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="coverageComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -105,6 +122,7 @@ function MotionSensorsPage() {
             <div>
               <input type="radio" name="sensitivityLevel" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="sensitivityLevel" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="sensitivityLevelComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -122,6 +140,7 @@ function MotionSensorsPage() {
             <div>
               <input type="radio" name="responseTime" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="responseTime" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="responseTimeComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -130,6 +149,7 @@ function MotionSensorsPage() {
             <div>
               <input type="radio" name="differentiateMechanism" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="differentiateMechanism" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="differentiateMechanismComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -138,6 +158,7 @@ function MotionSensorsPage() {
             <div>
               <input type="radio" name="alarmTransmission" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="alarmTransmission" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="alarmTransmissionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -148,6 +169,7 @@ function MotionSensorsPage() {
             <div>
               <input type="radio" name="systemIntegration" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="systemIntegration" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="systemIntegrationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -156,6 +178,7 @@ function MotionSensorsPage() {
             <div>
               <input type="radio" name="seamlessCommunication" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="seamlessCommunication" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="seamlessCommunicationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -164,6 +187,7 @@ function MotionSensorsPage() {
             <div>
               <input type="radio" name="coordinationAlarmDevices" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="coordinationAlarmDevices" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="coordinationAlarmDevicesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -174,6 +198,7 @@ function MotionSensorsPage() {
             <div>
               <input type="radio" name="remoteAccess" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="remoteAccess" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="remoteAccessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -182,6 +207,7 @@ function MotionSensorsPage() {
             <div>
               <input type="radio" name="remoteAdjustments" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="remoteAdjustments" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="remoteAdjustmentsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -190,6 +216,7 @@ function MotionSensorsPage() {
             <div>
               <input type="radio" name="secureAuthentication" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="secureAuthentication" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="secureAuthenticationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -200,6 +227,7 @@ function MotionSensorsPage() {
             <div>
               <input type="radio" name="environmentDurability" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="environmentDurability" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="environmentDurabilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -208,6 +236,7 @@ function MotionSensorsPage() {
             <div>
               <input type="radio" name="materialDurability" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="materialDurability" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="materialDurabilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -216,6 +245,7 @@ function MotionSensorsPage() {
             <div>
               <input type="radio" name="sensorCertification" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="sensorCertification" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="sensorCertificationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -226,6 +256,7 @@ function MotionSensorsPage() {
             <div>
               <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceScheduleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -234,6 +265,7 @@ function MotionSensorsPage() {
             <div>
               <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceTasksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -242,6 +274,7 @@ function MotionSensorsPage() {
             <div>
               <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

@@ -29,8 +29,23 @@ function ParentInvolvement2FormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Parent Involvement');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -85,6 +100,7 @@ function ParentInvolvement2FormPage() {
                     <div>
                         <input type="radio" name="parentWorkshops" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="parentWorkshops" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="parentWorkshopsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -100,6 +116,7 @@ function ParentInvolvement2FormPage() {
                     <div>
                         <input type="radio" name="parentEngagement" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="parentEngagement" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="parentEngagementComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -116,6 +133,7 @@ function ParentInvolvement2FormPage() {
                     <div>
                         <input type="radio" name="writtenCommunication" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="writtenCommunication" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="writtenCommunicationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -139,6 +157,7 @@ function ParentInvolvement2FormPage() {
                     <div>
                         <input type="radio" name="parentalResources" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="parentalResources" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="parentalResourcesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -154,6 +173,7 @@ function ParentInvolvement2FormPage() {
                     <div>
                         <input type="radio" name="homeDiscussionGuidance" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="homeDiscussionGuidance" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="homeDiscussionGuidanceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -184,6 +204,7 @@ function ParentInvolvement2FormPage() {
                     <div>
                         <input type="radio" name="parentInvolvement" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="parentInvolvement" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="parentInvolvementComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -200,6 +221,7 @@ function ParentInvolvement2FormPage() {
                     <div>
                         <input type="radio" name="parentParticipation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="parentParticipation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="parentParticipationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -215,6 +237,7 @@ function ParentInvolvement2FormPage() {
                     <div>
                         <input type="radio" name="parentalObservation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="parentalObservation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="parentalObservationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
