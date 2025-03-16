@@ -80,6 +80,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="strategicPlacement" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="strategicPlacement" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="strategicPlacement" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -88,6 +89,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="vulnerableSurfaces" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="vulnerableSurfaces" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="vulnerableSurfaces" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -105,6 +107,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="sensitivityLevel" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="sensitivityLevel" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="sensitivityLevel" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -113,6 +116,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="falseAlarmAdjustments" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="falseAlarmAdjustments" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="falseAlarmAdjustments" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -123,6 +127,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="quickResponse" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="quickResponse" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="quickResponse" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -131,6 +136,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="falseAlarmMechanism" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="falseAlarmMechanism" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="falseAlarmMechanism" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -139,6 +145,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="realTimeAlarms" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="realTimeAlarms" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="realTimeAlarms" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -149,6 +156,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="integratedWithAlarm" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="integratedWithAlarm" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="integratedWithAlarm" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -157,6 +165,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="communicationSeamless" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="communicationSeamless" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="communicationSeamless" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -165,6 +174,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="coordinationWithDevices" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="coordinationWithDevices" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="coordinationWithDevices" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -175,6 +185,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="remoteAccess" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="remoteAccess" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="remoteAccess" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -183,6 +194,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="remoteManagement" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="remoteManagement" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="remoteManagement" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -191,6 +203,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="secureAuthentication" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="secureAuthentication" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="secureAuthentication" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -201,6 +214,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="durability" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="durability" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="durability" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -209,6 +223,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="constructionMaterials" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="constructionMaterials" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="constructionMaterials" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -217,6 +232,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="reliabilityCertification" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="reliabilityCertification" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="reliabilityCertification" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -227,6 +243,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceSchedule" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -235,6 +252,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceTasks" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -243,6 +261,7 @@ function GlassBreakSensorsPage() {
             <div>
               <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceRecords" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

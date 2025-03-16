@@ -138,6 +138,7 @@ function HealthcareProviderEngagementFormPage() {
                     <div>
                         <input type="radio" name="interactiveLearning" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="interactiveLearning" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="interactiveLearning" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -176,6 +177,7 @@ function HealthcareProviderEngagementFormPage() {
                     <div>
                         <input type="radio" name="communityHealthEvents" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="communityHealthEvents" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="communityHealthEvents" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

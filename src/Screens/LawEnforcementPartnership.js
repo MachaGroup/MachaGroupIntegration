@@ -116,6 +116,7 @@ function LawEnforcementPartnershipFormPage() {
                     <div>
                         <input type="radio" name="trainingTailoring" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="trainingTailoring" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="trainingTailoring" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -154,6 +155,7 @@ function LawEnforcementPartnershipFormPage() {
                     <div>
                         <input type="radio" name="securityPersonnelTraining" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="securityPersonnelTraining" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="securityPersonnelTraining" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

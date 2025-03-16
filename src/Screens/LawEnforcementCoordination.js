@@ -90,6 +90,7 @@ function LawEnforcementCoordinationFormPage() {
                     <div>
                         <input type="radio" name="Facility-LawPOCs" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Facility-LawPOCs" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Facility-LawPOCs" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -132,6 +133,7 @@ function LawEnforcementCoordinationFormPage() {
                     <div>
                         <input type="radio" name="StaffLawComTraining" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="StaffLawComTraining" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="StaffLawComTraining" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -141,6 +143,7 @@ function LawEnforcementCoordinationFormPage() {
                     <div>
                         <input type="radio" name="ResponseTimeDefined" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="ResponseTimeDefined" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="ResponseTimeDefined" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -149,6 +152,7 @@ function LawEnforcementCoordinationFormPage() {
                     <div>
                         <input type="radio" name="ResponseTimeBenchmarks" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="ResponseTimeBenchmarks" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="ResponseTimeBenchmarks" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -157,6 +161,7 @@ function LawEnforcementCoordinationFormPage() {
                     <div>
                         <input type="radio" name="ResponseTimeTracking" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="ResponseTimeTracking" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="ResponseTimeTracking" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -166,6 +171,7 @@ function LawEnforcementCoordinationFormPage() {
                     <div>
                         <input type="radio" name="CollabPlanningMeetings" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="CollabPlanningMeetings" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="CollabPlanningMeetings" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -174,6 +180,7 @@ function LawEnforcementCoordinationFormPage() {
                     <div>
                         <input type="radio" name="TabletopExercises" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="TabletopExercises" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="TabletopExercises" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -182,6 +189,7 @@ function LawEnforcementCoordinationFormPage() {
                     <div>
                         <input type="radio" name="ExerciseFeedbackUsage" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="ExerciseFeedbackUsage" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="ExerciseFeedbackUsage" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -202,6 +210,7 @@ function LawEnforcementCoordinationFormPage() {
                     <div>
                         <input type="radio" name="InfoSharingTraining" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="InfoSharingTraining" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="InfoSharingTraining" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -222,6 +231,7 @@ function LawEnforcementCoordinationFormPage() {
                     <div>
                         <input type="radio" name="MutualAidExistence" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="MutualAidExistence" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="MutualAidExistence" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -230,6 +240,7 @@ function LawEnforcementCoordinationFormPage() {
                     <div>
                         <input type="radio" name="MutualAidReview" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="MutualAidReview" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="MutualAidReview" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -250,6 +261,7 @@ function LawEnforcementCoordinationFormPage() {
                     <div>
                         <input type="radio" name="PostIncidentDebriefs" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="PostIncidentDebriefs" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="PostIncidentDebriefs" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -258,6 +270,7 @@ function LawEnforcementCoordinationFormPage() {
                     <div>
                         <input type="radio" name="LawEnforcementInvolvement" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="LawEnforcementInvolvement" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="LawEnforcementInvolvement" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -266,6 +279,7 @@ function LawEnforcementCoordinationFormPage() {
                     <div>
                         <input type="radio" name="DebriefingRecommendations" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="DebriefingRecommendations" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="DebriefingRecommendations" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

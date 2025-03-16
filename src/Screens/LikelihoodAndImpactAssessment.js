@@ -101,6 +101,7 @@ function LikelihoodAndImpactAssessmentFormPage() {
                     <div>
                         <input type="radio" name="considering-reports" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="considering-reports" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="considering-reports" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
