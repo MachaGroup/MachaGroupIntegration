@@ -1,15 +1,25 @@
 import logo from '../assets/MachaLogo.png';
-import React from 'react';
+import React, { useState} from 'react';
 import { useNavigate } from 'react-router-dom';  // Import useNavigate
 import './FormQuestions.css';  // Ensure this is linked to your universal CSS
 import Navbar from "./Navbar";
 
+
 function StationedGuardsPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-
+  const [formData, setFormData] = useState({});
   // Function to handle back button
   const handleBack = () => {
     navigate(-1);  // Navigates to the previous page
+
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   return (
