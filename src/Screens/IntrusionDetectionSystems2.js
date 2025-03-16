@@ -28,8 +28,24 @@ function IntrusionDetectionSystems2Page() {
         }));
     };
 
-    const handleBack = () => {
-        navigate(-1);
+    // Function to handle back button
+    const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Cybersecurity/Intrusion Detection System2');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);  // Navigates to the previous page
     };
 
     const handleSubmit = async (e) => {
@@ -87,6 +103,7 @@ function IntrusionDetectionSystems2Page() {
             <div>
               <input type="radio" name="idsBlindSpots" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="idsBlindSpots" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="idsBlindSpots" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -112,6 +129,7 @@ function IntrusionDetectionSystems2Page() {
             <div>
               <input type="radio" name="realTimeMonitoring" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="realTimeMonitoring" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="realTimeMonitoring" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -134,6 +152,7 @@ function IntrusionDetectionSystems2Page() {
             <div>
               <input type="radio" name="incidentProtocols" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="incidentProtocols" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="incidentProtocols" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -156,6 +175,7 @@ function IntrusionDetectionSystems2Page() {
             <div>
               <input type="radio" name="logCorrelation" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="logCorrelation" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="logCorrelation" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -174,6 +194,7 @@ function IntrusionDetectionSystems2Page() {
             <div>
               <input type="radio" name="updateValidation" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="updateValidation" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="uploadValidation" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -188,6 +209,7 @@ function IntrusionDetectionSystems2Page() {
             <div>
               <input type="radio" name="periodicAssessment" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="periodicAssessment" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="periodicAssessment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">

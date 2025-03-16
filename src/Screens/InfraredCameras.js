@@ -29,9 +29,24 @@ function InfraredCamerasPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+      const handleBack = async () => {
+            if (formData && buildingId) { // Check if formData and buildingId exist
+              try {
+                const buildingRef = doc(db, 'Buildings', buildingId);
+                const formsRef = collection(db, 'forms/Physical Security/Infrared Cameras');
+                await addDoc(formsRef, {
+                  building: buildingRef,
+                  formData: formData,
+                });
+                console.log('Form Data submitted successfully on back!');
+                alert('Form data saved before navigating back!');
+              } catch (error) {
+                console.error('Error saving form data:', error);
+                alert('Failed to save form data before navigating back. Some data may be lost.');
+              }
+            }
+            navigate(-1);  // Navigates to the previous page
+      };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,6 +95,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="lowLightPerformance" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="lowLightPerformance" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="lowlightPerformance" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -88,6 +104,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="infraredLEDs" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="infraredLEDs" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="infraredLEDs" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -96,6 +113,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="lowLightAdjustments" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="lowLightAdjustments" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="lowLightAdjustments" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -106,6 +124,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="imageQuality" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="imageQuality" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="imageQuality" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -114,6 +133,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="imageClarity" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="imageClarity" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="imageClarity" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -122,6 +142,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="clearImages" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="clearImages" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="clearImages" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -132,6 +153,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="systemIntegration" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="systemIntegration" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="systemIntegration" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -140,6 +162,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="softwareCommunication" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="softwareCommunication" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="softwareCommunication" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -148,6 +171,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="realTimeMonitoring" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="realTimeMonitoring" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="realTimeMonitoring" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -158,6 +182,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="coverageAreas" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="coverageAreas" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="coverageAreas" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -166,6 +191,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="strategicPositioning" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="strategicPositioning" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="strategicPositioning" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -174,6 +200,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="blindSpots" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="blindSpots" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="blindSpots" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -184,6 +211,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="weatherResistance" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="weatherResistance" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="weatherResistance" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -192,6 +220,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="durableMaterials" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="durableMaterials" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="durableMaterials" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -200,6 +229,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="weatherProofingCertification" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="weatherProofingCertification" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="weatherProofingCertification" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -210,6 +240,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="remoteAccess" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="remoteAccess" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="remoteAccess" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -218,6 +249,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="remoteAdjustments" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="remoteAdjustments" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="remoteAdjustments" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -226,6 +258,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="secureProtocols" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="secureProtocols" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="secureProtocols" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -236,6 +269,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceSchedule" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -244,6 +278,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceTasks" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -252,6 +287,7 @@ function InfraredCamerasPage() {
             <div>
               <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceRecords" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

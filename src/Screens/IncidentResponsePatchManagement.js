@@ -29,9 +29,24 @@ function PatchManagementPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+    const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Cybersecurity/Incident Response Patch Management');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);  // Navigates to the previous page
+    };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,6 +101,7 @@ function PatchManagementPage() {
                         <div>
                             <input type="radio" name="criticalPatchesCriteria" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="criticalPatchesCriteria" value="No" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="criticalPatchesCriteria" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -104,6 +120,7 @@ function PatchManagementPage() {
                         <div>
                             <input type="radio" name="predefinedRolloutSteps" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="predefinedRolloutSteps" value="No" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="predefinedRolloutSteps" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -122,6 +139,7 @@ function PatchManagementPage() {
                         <div>
                             <input type="radio" name="patchVerification" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="patchVerification" value="No" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="patchVerification" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -155,6 +173,7 @@ function PatchManagementPage() {
                         <div>
                             <input type="radio" name="reportingIssues" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="reportingIssues" value="No" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="reportingIssues" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 
@@ -173,6 +192,7 @@ function PatchManagementPage() {
                         <div>
                             <input type="radio" name="integrationRequirements" value="Yes" onChange={handleChange} /> Yes
                             <input type="radio" name="integrationRequirements" value="No" onChange={handleChange} /> No
+                            <textarea className='comment-box' name="integrationRequirements" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                         </div>
                     </div>
 

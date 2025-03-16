@@ -29,9 +29,24 @@ function LockdownDrills2FormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+    const handleBack = async () => {
+              if (formData && buildingId) { // Check if formData and buildingId exist
+                try {
+                  const buildingRef = doc(db, 'Buildings', buildingId);
+                  const formsRef = collection(db, 'forms/Personnel Training and Awareness/Lockdown Drills');
+                  await addDoc(formsRef, {
+                    building: buildingRef,
+                    formData: formData,
+                  });
+                  console.log('Form Data submitted successfully on back!');
+                  alert('Form data saved before navigating back!');
+                } catch (error) {
+                  console.error('Error saving form data:', error);
+                  alert('Failed to save form data before navigating back. Some data may be lost.');
+                }
+              }
+              navigate(-1);  // Navigates to the previous page
+    };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,6 +101,7 @@ function LockdownDrills2FormPage() {
                     <div>
                         <input type="radio" name="lockdownInstructions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="lockdownInstructions" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="lockdownInstructions" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -95,6 +111,7 @@ function LockdownDrills2FormPage() {
                     <div>
                         <input type="radio" name="signalRecognition" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="signalRecognition" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="signalRecognition" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -133,6 +150,7 @@ function LockdownDrills2FormPage() {
                     <div>
                         <input type="radio" name="activityReporting" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="activityReporting" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="activityReporting" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -142,6 +160,7 @@ function LockdownDrills2FormPage() {
                     <div>
                         <input type="radio" name="debriefingParticipation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="debriefingParticipation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="debriefingParticipation" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

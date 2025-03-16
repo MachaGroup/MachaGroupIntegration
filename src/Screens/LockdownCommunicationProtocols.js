@@ -29,9 +29,24 @@ function LockdownCommunicationProtocolsFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-      navigate(-1);  // Navigates to the previous page
-  };
+    const handleBack = async () => {
+            if (formData && buildingId) { // Check if formData and buildingId exist
+              try {
+                const buildingRef = doc(db, 'Buildings', buildingId);
+                const formsRef = collection(db, 'forms/Emergency Preparedness/Fire Alarm Systems');
+                await addDoc(formsRef, {
+                  building: buildingRef,
+                  formData: formData,
+                });
+                console.log('Form Data submitted successfully on back!');
+                alert('Form data saved before navigating back!');
+              } catch (error) {
+                console.error('Error saving form data:', error);
+                alert('Failed to save form data before navigating back. Some data may be lost.');
+              }
+            }
+            navigate(-1);  // Navigates to the previous page
+    };
 
   const handleSubmit = async (e) => {
       e.preventDefault();
@@ -92,6 +107,7 @@ function LockdownCommunicationProtocolsFormPage() {
                     <div>
                         <input type="radio" name="variousChannels" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="variousChannels" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="variousChannels" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -100,6 +116,7 @@ function LockdownCommunicationProtocolsFormPage() {
                     <div>
                         <input type="radio" name="regularTestedCommunicationSystems" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="regularTestedCommunicationSystems" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="regularTestedCommunicationSystems" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -109,6 +126,7 @@ function LockdownCommunicationProtocolsFormPage() {
                     <div>
                         <input type="radio" name="silentAlarmSystemsInstalled" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="silentAlarmSystemsInstalled" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="silentAlarmSystemsInstalled" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -117,6 +135,7 @@ function LockdownCommunicationProtocolsFormPage() {
                     <div>
                         <input type="radio" name="activatingSilentAlarms" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="activatingSilentAlarms" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="activatingSilentAlarms" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -148,6 +167,7 @@ function LockdownCommunicationProtocolsFormPage() {
                     <div>
                         <input type="radio" name="activatingSilentAlarmTraining" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="activatingSilentAlarmTraining" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="activatingSilentAlarmTraining" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -168,6 +188,7 @@ function LockdownCommunicationProtocolsFormPage() {
                     <div>
                         <input type="radio" name="monitoringSilentAlarms" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="monitoringSilentAlarms" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="monitoringSilentAlarms" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -188,6 +209,7 @@ function LockdownCommunicationProtocolsFormPage() {
                     <div>
                         <input type="radio" name="integratedSilentAlarms" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="integratedSilentAlarms" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="integratedSilentAlarms" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -196,6 +218,7 @@ function LockdownCommunicationProtocolsFormPage() {
                     <div>
                         <input type="radio" name="alarmsTriggeringResponseActions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="alarmsTriggeringResponseActions" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="alarmstriggeringResponseActions" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -204,6 +227,7 @@ function LockdownCommunicationProtocolsFormPage() {
                     <div>
                         <input type="radio" name="silentAlarmSystemsCooedination" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="silentAlarmSystemsCooedination" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="silentAlarmSystemsCooedination" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -213,6 +237,7 @@ function LockdownCommunicationProtocolsFormPage() {
                     <div>
                         <input type="radio" name="purposeAndFunctionTraining" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="purposeAndFunctionTraining" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="purposeAndFunctionTraining" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -221,6 +246,7 @@ function LockdownCommunicationProtocolsFormPage() {
                     <div>
                         <input type="radio" name="trainingPrograms" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="trainingPrograms" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="trainingPrograms" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -229,6 +255,7 @@ function LockdownCommunicationProtocolsFormPage() {
                     <div>
                         <input type="radio" name="effectivenessDrills" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="effectivenessDrills" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="effectivenessDrills" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -238,6 +265,7 @@ function LockdownCommunicationProtocolsFormPage() {
                     <div>
                         <input type="radio" name="maintainingRecords" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="maintainingRecords" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="maintainingRecords" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -246,6 +274,7 @@ function LockdownCommunicationProtocolsFormPage() {
                     <div>
                         <input type="radio" name="reviewingRecords" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="reviewingRecords" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="reviewingRecords" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -254,6 +283,7 @@ function LockdownCommunicationProtocolsFormPage() {
                     <div>
                         <input type="radio" name="identifyingDeficiencies" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="identifyingDeficiencies" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="identifyingDeficiencies" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

@@ -29,9 +29,24 @@ function IntegrationWithParentCommunicationFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+        const handleBack = async () => {
+              if (formData && buildingId) { // Check if formData and buildingId exist
+                try {
+                  const buildingRef = doc(db, 'Buildings', buildingId);
+                  const formsRef = collection(db, 'forms/Emergency Preparedness/Drill Frequency');
+                  await addDoc(formsRef, {
+                    building: buildingRef,
+                    formData: formData,
+                  });
+                  console.log('Form Data submitted successfully on back!');
+                  alert('Form data saved before navigating back!');
+                } catch (error) {
+                  console.error('Error saving form data:', error);
+                  alert('Failed to save form data before navigating back. Some data may be lost.');
+                }
+              }
+              navigate(-1);  // Navigates to the previous page
+        };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -102,6 +117,7 @@ function IntegrationWithParentCommunicationFormPage() {
                     <div>
                         <input type="radio" name="automaticNotificationConfigurations" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="automaticNotificationConfigurations" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="automaticNotificationConfiguration" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -122,6 +138,7 @@ function IntegrationWithParentCommunicationFormPage() {
                     <div>
                         <input type="radio" name="optInOptOutAlerts" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="optInOptOutAlerts" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="optInOptOutAlerts" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -142,6 +159,7 @@ function IntegrationWithParentCommunicationFormPage() {
                     <div>
                         <input type="radio" name="implementingSafeguardMeasures" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="implementingSafeguardMeasures" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="implementingSafeguardMeasures" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -150,6 +168,7 @@ function IntegrationWithParentCommunicationFormPage() {
                     <div>
                         <input type="radio" name="integrationMechanisms" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="integrationMechanisms" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="integrationMechanisms" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -182,6 +201,7 @@ function IntegrationWithParentCommunicationFormPage() {
                     <div>
                         <input type="radio" name="informingParentsIntegration" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="informingParentsIntegration" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="informingParentsIntegration" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -190,6 +210,7 @@ function IntegrationWithParentCommunicationFormPage() {
                     <div>
                         <input type="radio" name="helpingParentsResources" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="helpingParentsResources" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="helpingParentsResources" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -210,6 +231,7 @@ function IntegrationWithParentCommunicationFormPage() {
                     <div>
                         <input type="radio" name="evaluatingParentFeedback" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="evaluatingParentFeedback" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="evaluatingParentFeedback" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -219,6 +241,7 @@ function IntegrationWithParentCommunicationFormPage() {
                     <div>
                         <input type="radio" name="testingIntegrationMechanisms" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="testingIntegrationMechanisms" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="testingIntegrationMechanisms" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -227,6 +250,7 @@ function IntegrationWithParentCommunicationFormPage() {
                     <div>
                         <input type="radio" name="testingScenarios" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="testingScenarios" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="testingScenarios" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
