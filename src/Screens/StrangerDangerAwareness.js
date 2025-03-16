@@ -29,8 +29,23 @@ function StangerDangerAwarenessFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Stranger Danger Awareness');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -93,6 +108,9 @@ function StangerDangerAwarenessFormPage() {
                     <div>
                         <input type="radio" name="engageInRolePlayingScenarios" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="engageInRolePlayingScenarios" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="engageInRolePlayingScenariosComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 

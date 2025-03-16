@@ -29,8 +29,23 @@ function RazorWirePage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Physical Security/Razor Wire');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -79,6 +94,7 @@ function RazorWirePage() {
             <div>
               <input type="radio" name="razorWireInstalled" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="razorWireInstalled" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="razorWireInstalledComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -87,6 +103,7 @@ function RazorWirePage() {
             <div>
               <input type="radio" name="razorWireCoverage" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="razorWireCoverage" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="razorWireCoverageComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -104,6 +121,7 @@ function RazorWirePage() {
             <div>
               <input type="radio" name="warningSigns" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="warningSigns" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="warningSignsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -112,6 +130,7 @@ function RazorWirePage() {
             <div>
               <input type="radio" name="razorWireSafety" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="razorWireSafety" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="razorWireSafetyComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -120,6 +139,7 @@ function RazorWirePage() {
             <div>
               <input type="radio" name="razorWireRestrictions" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="razorWireRestrictions" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="razorWireRestrictionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -130,6 +150,7 @@ function RazorWirePage() {
             <div>
               <input type="radio" name="razorWireEffectiveness" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="razorWireEffectiveness" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="razorWireEffectivenessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -145,6 +166,7 @@ function RazorWirePage() {
             <div>
               <input type="radio" name="additionalMeasures" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="additionalMeasures" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="additionalMeasuresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -155,6 +177,7 @@ function RazorWirePage() {
             <div>
               <input type="radio" name="compliance" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="compliance" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="complianceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -170,6 +193,7 @@ function RazorWirePage() {
             <div>
               <input type="radio" name="inspections" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="inspections" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="inspectionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -180,6 +204,7 @@ function RazorWirePage() {
             <div>
               <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceScheduleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -188,6 +213,7 @@ function RazorWirePage() {
             <div>
               <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceTasksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -196,6 +222,7 @@ function RazorWirePage() {
             <div>
               <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -206,6 +233,7 @@ function RazorWirePage() {
             <div>
               <input type="radio" name="alternativesConsidered" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="alternativesConsidered" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="alternativesConsideredComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -223,6 +251,7 @@ function RazorWirePage() {
             <div>
               <input type="radio" name="stakeholdersInformed" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="stakeholdersInformed" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="stakeholdersInformedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -231,6 +260,7 @@ function RazorWirePage() {
             <div>
               <input type="radio" name="mitigationEfforts" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="mitigationEfforts" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="mitigationEffortsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

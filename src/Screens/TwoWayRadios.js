@@ -30,8 +30,23 @@ function TwoWayRadiosFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Emergency Preparedness/Two-way Radios');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
  
   const handleSubmit = async (e) => {
@@ -81,6 +96,9 @@ function TwoWayRadiosFormPage() {
                         <input type="radio" name="Radios Provided" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Radios Provided" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                         <input type="text" name="RadiosProvidedComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -88,6 +106,9 @@ function TwoWayRadiosFormPage() {
                     <div>
                         <input type="radio" name="Adequate Radios" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Adequate Radios" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                         <input type="text" name="AdequateRadiosComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -97,6 +118,9 @@ function TwoWayRadiosFormPage() {
                     <div>
                         <input type="radio" name="Sufficient Coverage" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Sufficient Coverage" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                         <input type="text" name="SufficientCoverageComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -118,6 +142,9 @@ function TwoWayRadiosFormPage() {
                         <input type="radio" name="Channel Assignment" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Channel Assignment" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                         <input type="text" name="ChannelAssignmentComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -138,6 +165,9 @@ function TwoWayRadiosFormPage() {
                         <input type="radio" name="Radio Training" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Radio Training" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                         <input type="text" name="RadioTrainingComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -145,6 +175,9 @@ function TwoWayRadiosFormPage() {
                     <div>
                         <input type="radio" name="Drill Familiarization" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Drill Familiarization" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                         <input type="text" name="DrillFamiliarizationComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -166,6 +199,9 @@ function TwoWayRadiosFormPage() {
                         <input type="radio" name="Emergency Role Training" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Emergency Role Training" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                         <input type="text" name="EmergencyRoleTrainingComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <h2>Battery Management and Maintenance:</h2>
@@ -174,6 +210,9 @@ function TwoWayRadiosFormPage() {
                     <div>
                         <input type="radio" name="Battery Inspection" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Battery Inspection" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                         <input type="text" name="BatteryInspectionComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -194,6 +233,9 @@ function TwoWayRadiosFormPage() {
                     <div>
                         <input type="radio" name="Radio Integration" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Radio Integration" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                         <input type="text" name="RadioIntegrationComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -225,6 +267,9 @@ function TwoWayRadiosFormPage() {
                     <div>
                         <input type="radio" name="Improvement Recommendations" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Improvement Recommendations" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                         <input type="text" name="ImprovementRecommendationsComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 

@@ -29,8 +29,23 @@ function ParentAdvisoryCommitteesFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Parent Advisory Committees');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -94,6 +109,7 @@ function ParentAdvisoryCommitteesFormPage() {
                     <div>
                         <input type="radio" name="committeeInclusiveness" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="committeeInclusiveness" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="committeeInclusivenessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -117,6 +133,7 @@ function ParentAdvisoryCommitteesFormPage() {
                     <div>
                         <input type="radio" name="committeeEmpowerment" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="committeeEmpowerment" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="committeeEmpowermentComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -140,6 +157,7 @@ function ParentAdvisoryCommitteesFormPage() {
                     <div>
                         <input type="radio" name="committeeMeetingFrequency" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="committeeMeetingFrequency" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="committeeMeetingFrequencyComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -163,6 +181,7 @@ function ParentAdvisoryCommitteesFormPage() {
                     <div>
                         <input type="radio" name="transparencyInOutcomes" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="transparencyInOutcomes" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="transparencyInOutcomesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -172,6 +191,7 @@ function ParentAdvisoryCommitteesFormPage() {
                     <div>
                         <input type="radio" name="orientationAndTrainingForCommittees" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="orientationAndTrainingForCommittees" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="orientationAndTrainingForCommitteesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -187,6 +207,7 @@ function ParentAdvisoryCommitteesFormPage() {
                     <div>
                         <input type="radio" name="externalCollaborationOpportunities" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="externalCollaborationOpportunities" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="externalCollaborationOpportunitiesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

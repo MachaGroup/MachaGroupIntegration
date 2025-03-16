@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-
+/**/
 function EvacuationProcedures2FormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding(); // Access buildingId from context
@@ -29,9 +29,24 @@ function EvacuationProcedures2FormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Personnel Training and Awareness/Emergency Evacuation Procedures');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -87,6 +102,7 @@ function EvacuationProcedures2FormPage() {
         <div>
           <input type="radio" name="evacuationPlanAssessment" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="evacuationPlanAssessment" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="evacuationPlanAssessmentComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -103,6 +119,7 @@ function EvacuationProcedures2FormPage() {
         <div>
           <input type="radio" name="floorPlansVisibility" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="floorPlansVisibility" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="floorPlansVisibilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -111,6 +128,7 @@ function EvacuationProcedures2FormPage() {
         <div>
           <input type="radio" name="evacuationMapDetails" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="evacuationMapDetails" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="evacuationMapDetailsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -134,6 +152,7 @@ function EvacuationProcedures2FormPage() {
         <div>
           <input type="radio" name="evacuationTrainingFrequency" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="evacuationTrainingFrequency" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="evacuationTrainingFrequencyComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -157,6 +176,7 @@ function EvacuationProcedures2FormPage() {
         <div>
           <input type="radio" name="drillScenarioCustomization" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="drillScenarioCustomization" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="drillScenarioCustomizationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -180,6 +200,7 @@ function EvacuationProcedures2FormPage() {
         <div>
           <input type="radio" name="evacuationSynchronization" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="evacuationSynchronization" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="evacuationSynchronizationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 

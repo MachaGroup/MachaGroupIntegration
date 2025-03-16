@@ -29,8 +29,23 @@ function StaffRolesAndResponsibilitiesFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Emergency Preparedness/Staff Roles and Responsibilities');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
   
   const handleSubmit = async (e) => {
@@ -80,6 +95,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                         <input type="radio" name="Role Specificity" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Role Specificity" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="RoleSpecificityComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -87,6 +105,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                     <div>
                         <input type="radio" name="Role Communication" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Role Communication" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="RoleCommunicationComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -97,6 +118,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                         <input type="radio" name="Role Training" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Role Training" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="RoleTrainingComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -105,6 +129,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                         <input type="radio" name="Training Materials" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Training Materials" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="TrainingMaterialsComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -112,6 +139,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                     <div>
                         <input type="radio" name="Practice Feedback" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Practice Feedback" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="Practice FeedbackComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -133,6 +163,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                         <input type="radio" name="Effective Communication" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Effective Communication" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="Effective CommunicationComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -140,6 +173,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                     <div>
                         <input type="radio" name="Leadership Oversight" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Leadership Oversight" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="Leadership OversightComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -161,6 +197,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                         <input type="radio" name="Observer Assessment" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Observer Assessment" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="ObserverAssessmentComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -168,6 +207,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                     <div>
                         <input type="radio" name="Feedback Process" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Feedback Process" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="FeedbackProcessComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -178,6 +220,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                         <input type="radio" name="Adaptability Training" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Adaptability Training" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="AdaptabilityTrainingComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -186,6 +231,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                         <input type="radio" name="Contingency Plans" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Contingency Plans" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="ContingencyPlansComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -193,6 +241,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                     <div>
                         <input type="radio" name="Creative Problem-Solving" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Creative Problem-Solving" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="Creative Problem-SolvingComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -203,6 +254,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                         <input type="radio" name="Plan Alignment" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Plan Alignment" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="PlanAlignmentComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -211,6 +265,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                         <input type="radio" name="Framework Understanding" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Framework Understanding" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="FrameworkUnderstandingComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -218,6 +275,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                     <div>
                         <input type="radio" name="Role Updates" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Role Updates" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="RoleUpdatesComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -228,6 +288,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                         <input type="radio" name="Record Maintenance" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Record Maintenance" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="RecordMaintenanceComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -236,6 +299,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                         <input type="radio" name="Drill Review" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Drill Review" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="DrillReviewComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -243,6 +309,9 @@ function StaffRolesAndResponsibilitiesFormPage() {
                     <div>
                         <input type="radio" name="Evaluation Recommendations" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Evaluation Recommendations" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="EvaluationRecommendationsComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 

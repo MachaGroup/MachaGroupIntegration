@@ -29,8 +29,23 @@ function PasswordComplexityRequirementsPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Cybersecurity/Password Complexity Requirements');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -78,6 +93,7 @@ function PasswordComplexityRequirementsPage() {
             <div>
               <input type="radio" name="employeeAwareness" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="employeeAwareness" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="employeeAwarenessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -108,6 +124,7 @@ function PasswordComplexityRequirementsPage() {
             <div>
               <input type="radio" name="regularAudits" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="regularAudits" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="regularAuditsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -169,6 +186,7 @@ function PasswordComplexityRequirementsPage() {
             <div>
               <input type="radio" name="feedbackProcess" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="feedbackProcess" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="feedbackProcessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -189,6 +207,7 @@ function PasswordComplexityRequirementsPage() {
             <div>
               <input type="radio" name="employeeTraining" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="employeeTraining" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="employeeTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

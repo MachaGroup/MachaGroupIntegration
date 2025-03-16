@@ -29,8 +29,23 @@ function TornadoDrillsFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Emergency Preparedness/Tornado Drills');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   
@@ -88,13 +103,19 @@ function TornadoDrillsFormPage() {
                         <input type="radio" name="Drill Scheduling Regularity" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Drill Scheduling Regularity" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="DrillSchedulingRegularityComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
                     <label>Are drills conducted at different times of the day to account for varying occupancy levels and staff shifts?</label>
                     <div>
-                        <input type="radio" name="Drill Timing Variabilityh" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Drill Timing Variabilityh" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="Drill Timing Variability" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="Drill Timing Variability" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="DrillTimingVariabilityComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -139,6 +160,9 @@ function TornadoDrillsFormPage() {
                         <input type="radio" name="Defined Drill Procedures" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Defined Drill Procedures" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="DefinedDrillProceduresComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -147,6 +171,9 @@ function TornadoDrillsFormPage() {
                         <input type="radio" name="Occupant Action Procedures" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Occupant Action Procedures" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="OccupantActionProceduresComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -154,6 +181,9 @@ function TornadoDrillsFormPage() {
                     <div>
                         <input type="radio" name="Scenario Simulation Drills" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Scenario Simulation Drills" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="ScenarioSimulationDrillsComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -164,6 +194,9 @@ function TornadoDrillsFormPage() {
                         <input type="radio" name="Shelter Area Marking" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Shelter Area Marking" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="ShelterAreaMarkingComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -172,6 +205,9 @@ function TornadoDrillsFormPage() {
                         <input type="radio" name="Shelter Access Knowledge" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Shelter Access Knowledge" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="ShelterAccessKnowledgeComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -179,6 +215,9 @@ function TornadoDrillsFormPage() {
                     <div>
                         <input type="radio" name="Mobility Shelter Options" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Mobility Shelter Options" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="MobilityShelterOptionsComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -190,7 +229,7 @@ function TornadoDrillsFormPage() {
                         <input type="radio" name="Occupant Accountability Process" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="accountabilityProcess" placeholder="Describe the process" onChange={handleChange}/>  
+                        <input type="text" name="OccupantAccountabilityProcessProcess" placeholder="Describe the process" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -200,6 +239,9 @@ function TornadoDrillsFormPage() {
                         <input type="radio" name="Assigned Staff Roles" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Assigned Staff Roles" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="AssignedStaffRolesComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -207,6 +249,9 @@ function TornadoDrillsFormPage() {
                     <div>
                         <input type="radio" name="Participant Feedback Gathering" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Participant Feedback Gathering" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="ParticipantFeedbackGatheringComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -218,7 +263,7 @@ function TornadoDrillsFormPage() {
                         <input type="radio" name="Drill Evaluation Mechanism" value="no" onChange={handleChange}/> No
                     </div>
                     <div>
-                        <input type="text" name="evacuationMechanism" placeholder="Describe the mechanism" onChange={handleChange}/>  
+                        <input type="text" name="DrillEvaluationMechanism" placeholder="Describe the mechanism" onChange={handleChange}/>  
                     </div>
                 </div>
 
@@ -228,6 +273,9 @@ function TornadoDrillsFormPage() {
                         <input type="radio" name="Post-Drill Debriefing" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Post-Drill Debriefing" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="Post-DrillDebriefingComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -235,6 +283,9 @@ function TornadoDrillsFormPage() {
                     <div>
                         <input type="radio" name="Evaluation Recommendations Implementation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Evaluation Recommendations Implementation" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="EvaluationRecommendationsImplementationComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -245,6 +296,9 @@ function TornadoDrillsFormPage() {
                         <input type="radio" name="Drill Records Maintenance" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Drill Records Maintenance" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="DrillRecordsMaintenance" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -253,6 +307,9 @@ function TornadoDrillsFormPage() {
                         <input type="radio" name="Periodic Records Review" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Periodic Records Review" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="PeriodicRecordsReviewComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -260,6 +317,9 @@ function TornadoDrillsFormPage() {
                     <div>
                         <input type="radio" name="Deficiency Documentation Actions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Deficiency Documentation Actions" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="DeficiencyDocumentationActionsComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 

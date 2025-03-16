@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-
+/**/
 function ContinuityOfOperationsPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function ContinuityOfOperationsPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Cybersecurity/Continuity of Operations');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,6 +101,7 @@ function ContinuityOfOperationsPage() {
             <div>
               <input type="radio" name="dependenciesDocumented" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="dependenciesDocumented" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="dependenciesDocumentedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -96,6 +112,7 @@ function ContinuityOfOperationsPage() {
             <div>
               <input type="radio" name="hasCOOP" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="hasCOOP" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="hasCOOPComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -122,6 +139,7 @@ function ContinuityOfOperationsPage() {
             <div>
               <input type="radio" name="backupResourcesPrepared" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="backupResourcesPrepared" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="backupResourcesPreparedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -132,6 +150,7 @@ function ContinuityOfOperationsPage() {
             <div>
               <input type="radio" name="staffTraining" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="staffTraining" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="staffTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -143,6 +162,7 @@ function ContinuityOfOperationsPage() {
             <div>
               <input type="radio" name="staffAwarenessMechanisms" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="staffAwarenessMechanisms" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="staffAwarenessMechanismstComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -168,6 +188,7 @@ function ContinuityOfOperationsPage() {
             <div>
               <input type="radio" name="externalPartnerships" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="externalPartnerships" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="externalPartnershipsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -235,6 +256,7 @@ function ContinuityOfOperationsPage() {
             <div>
               <input type="radio" name="predefinedCommChannels" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="predefinedCommChannels" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="predefinedCommChannelsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">

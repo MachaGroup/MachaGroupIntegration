@@ -29,8 +29,23 @@ function PeerSupportNetworksFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'orms/Personnel Training and Awareness/Peer Support Networks');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -129,6 +144,7 @@ function PeerSupportNetworksFormPage() {
                     <div>
                         <input type="radio" name="inclusivityStrategies" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="inclusivityStrategies" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="inclusivityStrategiesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -166,6 +182,7 @@ function PeerSupportNetworksFormPage() {
                     <div>
                         <input type="radio" name="ongoingTraining" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="ongoingTraining" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="ongoingTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -181,6 +198,7 @@ function PeerSupportNetworksFormPage() {
                     <div>
                         <input type="radio" name="recognition" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="recognition" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="recognitionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -204,6 +222,7 @@ function PeerSupportNetworksFormPage() {
                     <div>
                         <input type="radio" name="proactiveOutreach" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="proactiveOutreach" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="proactiveOutreachComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -284,6 +303,7 @@ function PeerSupportNetworksFormPage() {
                     <div>
                         <input type="radio" name="researchOpportunities" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="researchOpportunities" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="researchOpportunitiesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

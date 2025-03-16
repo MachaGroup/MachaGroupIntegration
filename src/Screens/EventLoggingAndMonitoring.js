@@ -2,7 +2,7 @@ import React from 'react';
 import './AccessControl.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
 import { useNavigate } from 'react-router-dom'; // Ensure react-router-dom is installed and used for navigation
-
+/**/
 function EventLoggingAndMonitoringPage() {
   const navigate = useNavigate();
 

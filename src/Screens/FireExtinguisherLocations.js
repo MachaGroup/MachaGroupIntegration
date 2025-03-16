@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function FireExtinguisherLocationsFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function FireExtinguisherLocationsFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/Fire Extinguisher Locations');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
  
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,6 +94,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="fire extinguishers accessible" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="fire extinguishers accessible" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="fire extinguishers accessible-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -87,6 +103,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="extinguisher placement" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="extinguisher placement" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="extinguisher placement-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -95,6 +112,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="Visible extinguisher locations" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Visible extinguisher locations" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Visible extinguisher locations-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -103,6 +121,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="extinguishers heights locations" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="extinguishers heights locations" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="extinguishers heights locations-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -112,6 +131,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="strategic extinguisher placement" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="strategic extinguisher placement" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="strategic extinguisher placement-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -120,6 +140,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="extinguisher placement regulation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="extinguisher placement regulation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="extinguisher placement regulation-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -128,6 +149,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="sufficient extinguishers number" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="sufficient extinguishers number" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="sufficient extinguishers number-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -137,6 +159,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="extinguisher securely mounted" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="extinguisher securely mounted" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="extinguisher securely mounted-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -145,6 +168,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="regular extinguisher inspection" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="regular extinguisher inspection" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="regular extinguisher inspection-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -153,6 +177,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="regular extinguisher maintainance" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="regular extinguisher maintainance" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="regular extinguisher maintainance-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -162,6 +187,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="extinguisher clearly labeled" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="extinguisher clearly labeled" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="extinguisher clearly labeled-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -170,6 +196,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="extinguisher location identified" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="extinguisher location identified" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="extinguisher location identified-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -178,6 +205,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="occupant training" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="occupant training" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="occupant training-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -187,6 +215,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="user training" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="user training" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="user training-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -195,6 +224,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="occupants fire understanding" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="occupants fire understanding" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="occupants fire understanding-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -203,6 +233,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="regular fire drills" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="regular fire drills" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="regular fire drills-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -212,6 +243,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="fire extinguishers integration" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="fire extinguishers integration" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="fire extinguishers integration-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -220,6 +252,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="extinguisher use coordination" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="extinguisher use coordination" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="extinguisher use coordination-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -228,6 +261,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="designated trained personnel " value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="designated trained personnel " value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="designated trained personnel-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -237,6 +271,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="record keeping system" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="record keeping system" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="record keeping system-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="recordKeepingSystem" placeholder="Describe the system" />
@@ -248,6 +283,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="maintaining records" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="maintaining records" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="maintaining records-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -256,6 +292,7 @@ function FireExtinguisherLocationsFormPage() {
                     <div>
                         <input type="radio" name="issues identified" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="issues identified" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="issues identified-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

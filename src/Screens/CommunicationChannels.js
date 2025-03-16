@@ -6,7 +6,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import Navbar from "./Navbar";
 
-
+/**/
 function CommunicationChannelsFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -30,9 +30,24 @@ function CommunicationChannelsFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/Two-way Radios');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
  
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,6 +95,7 @@ function CommunicationChannelsFormPage() {
                     <div>
                         <input type="radio" name="designatedCommunicationChannels" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="designatedCommunicationChannels" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="designatedCommunicationChannelsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -88,6 +104,7 @@ function CommunicationChannelsFormPage() {
                     <div>
                         <input type="radio" name="clearDelineation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="clearDelineation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="clearDelineationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -97,6 +114,7 @@ function CommunicationChannelsFormPage() {
                     <div>
                         <input type="radio" name="reservedFrequency" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="reservedFrequency" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="reservedFrequencyComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -105,6 +123,7 @@ function CommunicationChannelsFormPage() {
                     <div>
                         <input type="radio" name="trainedStaff" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="trainedStaff" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="trainedStaffComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -114,6 +133,7 @@ function CommunicationChannelsFormPage() {
                     <div>
                         <input type="radio" name="managingProtocol" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="managingProtocol" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="managingProtocolComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -122,6 +142,7 @@ function CommunicationChannelsFormPage() {
                     <div>
                         <input type="radio" name="reallocatingProcedures" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="reallocatingProcedures" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="reallocatingProceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -131,6 +152,7 @@ function CommunicationChannelsFormPage() {
                     <div>
                         <input type="radio" name="compatibleChannels" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="compatibleChannels" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="compatibleChannelsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -139,6 +161,7 @@ function CommunicationChannelsFormPage() {
                     <div>
                         <input type="radio" name="compatiblilityTesting" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="compatiblilityTesting" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="compatiblilityTestingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -148,6 +171,7 @@ function CommunicationChannelsFormPage() {
                     <div>
                         <input type="radio" name="redundantCommunicationChannels" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="redundantCommunicationChannels" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="redundantCommunicationChannelsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -156,6 +180,7 @@ function CommunicationChannelsFormPage() {
                     <div>
                         <input type="radio" name="contingencyPlan" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="contingencyPlan" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="contingencyPlanComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -165,6 +190,7 @@ function CommunicationChannelsFormPage() {
                     <div>
                         <input type="radio" name="trainedStaff" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="trainedStaff" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="trainedStaffComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -173,6 +199,7 @@ function CommunicationChannelsFormPage() {
                     <div>
                         <input type="radio" name="practiceSessions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="practiceSessions" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="practiceSessionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -182,6 +209,7 @@ function CommunicationChannelsFormPage() {
                     <div>
                         <input type="radio" name="integratedCommunicationChannels" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="integratedCommunicationChannels" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="integratedCommunicationChannelsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -190,6 +218,7 @@ function CommunicationChannelsFormPage() {
                     <div>
                         <input type="radio" name="incorporatingChannelProcedures" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="incorporatingChannelProcedures" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="incorporatingChannelProceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -199,6 +228,7 @@ function CommunicationChannelsFormPage() {
                     <div>
                         <input type="radio" name="feedbackMechanisms" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="feedbackMechanisms" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="feedbackMechanismsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -207,6 +237,7 @@ function CommunicationChannelsFormPage() {
                     <div>
                         <input type="radio" name="enhancingRecommendations" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="enhancingRecommendations" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="enhancingRecommendationsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

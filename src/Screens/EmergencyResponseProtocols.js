@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
 import Navbar from "./Navbar";
-
+/**/
 function ResponseProtocolsFormPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding(); // Access and update buildingId from context
@@ -28,9 +28,24 @@ function ResponseProtocolsFormPage() {
         }));
     };
 
-    const handleBack = () => {
-        navigate(-1);
-    };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Personnel Training and Awareness/Emergency Response Protocols');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -101,6 +116,7 @@ function ResponseProtocolsFormPage() {
         <div>
           <input type="radio" name="protocolReview" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="protocolReview" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="protocolReviewComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -117,6 +133,7 @@ function ResponseProtocolsFormPage() {
         <div>
           <input type="radio" name="initialResponseTraining" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="initialResponseTraining" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="initialResponseTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -190,6 +207,7 @@ function ResponseProtocolsFormPage() {
         <div>
           <input type="radio" name="decisionFrameworkTraining" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="decisionFrameworkTraining" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="decisionFrameworkTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -227,6 +245,7 @@ function ResponseProtocolsFormPage() {
         <div>
           <input type="radio" name="scenarioDrills" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="scenarioDrills" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="scenarioDrillsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -242,6 +261,7 @@ function ResponseProtocolsFormPage() {
         <div>
           <input type="radio" name="debriefingSessions" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="debriefingSessions" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="debriefingSessionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 
@@ -279,6 +299,7 @@ function ResponseProtocolsFormPage() {
         <div>
           <input type="radio" name="postIncidentAnalyses" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="postIncidentAnalyses" value="no" onChange={handleChange}/> No
+          <textarea className='comment-box' name="postIncidentAnalysesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
         </div>
       </div>
 

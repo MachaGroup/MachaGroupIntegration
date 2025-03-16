@@ -29,8 +29,23 @@ function PasswordSecurity2FormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Password Security');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -80,6 +95,7 @@ function PasswordSecurity2FormPage() {
                     <div>
                         <input type="radio" name="passwordCreationTraining" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="passwordCreationTraining" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="passwordCreationTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
                 
@@ -103,6 +119,7 @@ function PasswordSecurity2FormPage() {
                     <div>
                         <input type="radio" name="passwordManagementToolsIntroduction" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="passwordManagementToolsIntroduction" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="passwordManagementToolsIntroductionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -126,6 +143,7 @@ function PasswordSecurity2FormPage() {
                     <div>
                         <input type="radio" name="passwordHygieneEducation" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="passwordHygieneEducation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="passwordHygieneEducationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -149,6 +167,7 @@ function PasswordSecurity2FormPage() {
                     <div>
                         <input type="radio" name="socialEngineeringTraining" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="socialEngineeringTraining" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="socialEngineeringTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -172,6 +191,7 @@ function PasswordSecurity2FormPage() {
                     <div>
                         <input type="radio" name="passwordPolicyCompliance" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="passwordPolicyCompliance" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="passwordPolicyComplianceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

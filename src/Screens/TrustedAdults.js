@@ -29,8 +29,23 @@ function TrustedAdultsFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Trusted Adults');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -86,6 +101,9 @@ function TrustedAdultsFormPage() {
                     <div>
                         <input type="radio" name="schoolInitiatives" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="schoolInitiatives" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="schoolInitiativesComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -154,6 +172,9 @@ function TrustedAdultsFormPage() {
                         <input type="radio" name="peerInitiatives" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="peerInitiatives" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="peerInitiativesComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -177,6 +198,9 @@ function TrustedAdultsFormPage() {
                         <input type="radio" name="dataAnalysis" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="dataAnalysis" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="dataAnalysisComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -192,6 +216,9 @@ function TrustedAdultsFormPage() {
                     <div>
                         <input type="radio" name="legalCompliance" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="legalCompliance" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="legalComplianceComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -222,6 +249,9 @@ function TrustedAdultsFormPage() {
                     <div>
                         <input type="radio" name="communityPartnerships" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="communityPartnerships" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="communityPartnershipsComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 

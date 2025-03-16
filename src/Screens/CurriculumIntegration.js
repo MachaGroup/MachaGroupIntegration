@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-
+/**/
 function CurriculumIntegrationFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function CurriculumIntegrationFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Personnel Training and Awareness/Curriculum Integration');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,6 +101,7 @@ function CurriculumIntegrationFormPage() {
                     <div>
                         <input type="radio" name="lessonIntegration" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="lessonIntegration" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="lessonIntegrationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -116,6 +132,7 @@ function CurriculumIntegrationFormPage() {
                     <div>
                         <input type="radio" name="protocolAlignment" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="protocolAlignment" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="protocolAlignmentComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -146,6 +163,7 @@ function CurriculumIntegrationFormPage() {
                     <div>
                         <input type="radio" name="simulationExercises" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="simulationExercises" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="simulationExercisesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -161,6 +179,7 @@ function CurriculumIntegrationFormPage() {
                     <div>
                         <input type="radio" name="collaborativeLearning" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="collaborativeLearning" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="collaborativeLearningComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -177,6 +196,7 @@ function CurriculumIntegrationFormPage() {
                     <div>
                         <input type="radio" name="formalAssessments" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="formalAssessments" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="formalAssessmentsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -192,6 +212,7 @@ function CurriculumIntegrationFormPage() {
                     <div>
                         <input type="radio" name="assessmentFeedback" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="assessmentFeedback" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="assessmentFeedbackComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -208,6 +229,7 @@ function CurriculumIntegrationFormPage() {
                     <div>
                         <input type="radio" name="parentalResources" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="parentalResources" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="parentalResourcesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -223,6 +245,7 @@ function CurriculumIntegrationFormPage() {
                     <div>
                         <input type="radio" name="parentalInvolvement" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="parentalInvolvement" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="parentalInvolvementComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

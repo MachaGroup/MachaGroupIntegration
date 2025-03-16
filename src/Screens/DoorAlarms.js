@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-
+/**/
 function DoorAlarmsPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding(); // Access buildingId from context
@@ -29,9 +29,24 @@ function DoorAlarmsPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Physical Security/Door Alarms');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,6 +95,7 @@ function DoorAlarmsPage() {
             <div>
               <input type="radio" name="entryPointCoverage" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="entryPointCoverage" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="entryPointCoverageComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -88,6 +104,7 @@ function DoorAlarmsPage() {
             <div>
               <input type="radio" name="doorCoverage" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="doorCoverage" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="doorCoverageComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -121,6 +138,7 @@ function DoorAlarmsPage() {
             <div>
               <input type="radio" name="delayMechanism" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="delayMechanism" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="delayMechanismComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -131,6 +149,7 @@ function DoorAlarmsPage() {
             <div>
               <input type="radio" name="responseTime" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="responseTime" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="responseTimeComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -139,6 +158,7 @@ function DoorAlarmsPage() {
             <div>
               <input type="radio" name="alarmIndication" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="alarmIndication" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="alarmIndicationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -147,6 +167,7 @@ function DoorAlarmsPage() {
             <div>
               <input type="radio" name="alarmTransmission" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="alarmTransmission" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="alarmTransmissionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -157,6 +178,7 @@ function DoorAlarmsPage() {
             <div>
               <input type="radio" name="systemIntegration" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="systemIntegration" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="systemIntegrationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -165,6 +187,7 @@ function DoorAlarmsPage() {
             <div>
               <input type="radio" name="alarmCommunication" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="alarmCommunication" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="alarmCommunicationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -173,6 +196,7 @@ function DoorAlarmsPage() {
             <div>
               <input type="radio" name="alarmCoordination" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="alarmCoordination" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="alarmCoordinationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -183,6 +207,7 @@ function DoorAlarmsPage() {
             <div>
               <input type="radio" name="remoteMonitoring" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="remoteMonitoring" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="remoteMonitoringComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -191,6 +216,7 @@ function DoorAlarmsPage() {
             <div>
               <input type="radio" name="remoteAcknowledge" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="remoteAcknowledge" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="remoteAcknowledgeComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -199,6 +225,7 @@ function DoorAlarmsPage() {
             <div>
               <input type="radio" name="secureProtocols" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="secureProtocols" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="secureProtocolsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -209,6 +236,7 @@ function DoorAlarmsPage() {
             <div>
               <input type="radio" name="tamperProof" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="tamperProof" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="tamperProofComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -217,6 +245,7 @@ function DoorAlarmsPage() {
             <div>
               <input type="radio" name="durableMaterials" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="durableMaterials" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="durableMaterialsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -225,6 +254,7 @@ function DoorAlarmsPage() {
             <div>
               <input type="radio" name="alarmTesting" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="alarmTesting" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="alarmTestingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -235,6 +265,7 @@ function DoorAlarmsPage() {
             <div>
               <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceScheduleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -243,6 +274,7 @@ function DoorAlarmsPage() {
             <div>
               <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceTasksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -251,6 +283,7 @@ function DoorAlarmsPage() {
             <div>
               <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

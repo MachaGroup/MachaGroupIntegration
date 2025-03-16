@@ -52,5 +52,5 @@ function AccessToCommunityResourcesPage() {
     </div>
   );
 }
-
+/**/
 export default AccessToCommunityResourcesPage;

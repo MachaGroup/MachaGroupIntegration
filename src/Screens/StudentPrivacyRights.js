@@ -29,8 +29,23 @@ function StudentPrivacyRightsFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Policy and Compliance/Student Privacy Rights');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -94,6 +109,9 @@ function StudentPrivacyRightsFormPage() {
                     <div>
                         <input type="radio" name="submittingRequests" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="submittingRequests" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="submittingRequestsComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -162,6 +180,9 @@ function StudentPrivacyRightsFormPage() {
                         <input type="radio" name="regularAudits" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="regularAudits" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="regularAuditsComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <h2>5.2.1.1.1.5 Parental Access Rights:</h2>
@@ -184,6 +205,9 @@ function StudentPrivacyRightsFormPage() {
                     <div>
                         <input type="radio" name="accessLimitations" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="accessLimitations" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="accessLimitationsComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -208,6 +232,9 @@ function StudentPrivacyRightsFormPage() {
                         <input type="radio" name="requirementExceptions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="requirementExceptions" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="requirementExceptionsComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <h2>5.2.1.1.1.7 Training and Awareness:</h2>
@@ -230,6 +257,9 @@ function StudentPrivacyRightsFormPage() {
                     <div>
                         <input type="radio" name="regulationGuidelines" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="regulationGuidelines" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="RegulationGuidelinesComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 

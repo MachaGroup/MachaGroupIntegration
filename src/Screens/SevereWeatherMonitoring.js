@@ -29,8 +29,23 @@ function SevereWeatherMonitoringFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Emergency Preparedness/Severe Weather Monitoring');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
    
@@ -81,6 +96,9 @@ function SevereWeatherMonitoringFormPage() {
                         <input type="radio" name="Alert Systems Operational" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Alert Systems Operational" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="AlertSystemsOperationalComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -89,6 +107,9 @@ function SevereWeatherMonitoringFormPage() {
                         <input type="radio" name="Timely Notifications Provided" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Timely Notifications Provided" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="TimelyNotificationsProvidedComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -96,6 +117,9 @@ function SevereWeatherMonitoringFormPage() {
                     <div>
                         <input type="radio" name="Multi-Channel Broadcasts" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Multi-Channel Broadcasts" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="Multi-ChannelBroadcastsComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -106,6 +130,9 @@ function SevereWeatherMonitoringFormPage() {
                         <input type="radio" name="External Source Link" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="External Source Link" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="ExternalSourceLinkComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -113,6 +140,9 @@ function SevereWeatherMonitoringFormPage() {
                     <div>
                         <input type="radio" name="Automatic Alert Relay" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Automatic Alert Relay" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="AutomaticAlertRelayComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -168,6 +198,9 @@ function SevereWeatherMonitoringFormPage() {
                         <input type="radio" name="Prompt Alert Communication" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Prompt Alert Communication" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="PromptAlertCommunicationComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -175,6 +208,9 @@ function SevereWeatherMonitoringFormPage() {
                     <div>
                         <input type="radio" name="Tailored Communication Methods" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Tailored Communication Methods" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="TailoredCommunicationMethodsComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -207,6 +243,9 @@ function SevereWeatherMonitoringFormPage() {
                         <input type="radio" name="Specific Actions Defined" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Specific Actions Defined" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="SpecificActionsDefinedComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -214,6 +253,9 @@ function SevereWeatherMonitoringFormPage() {
                     <div>
                         <input type="radio" name="Procedure Review Cycle" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Procedure Review Cycle" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="ProcedureReviewCycleComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -224,6 +266,9 @@ function SevereWeatherMonitoringFormPage() {
                         <input type="radio" name="Occupant Training Provided" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Occupant Training Provided" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="OccupantTrainingProvidedComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -232,6 +277,9 @@ function SevereWeatherMonitoringFormPage() {
                         <input type="radio" name="Training Material Availability" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Training Material Availability" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="TrainingMaterialAvailabilityComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -239,6 +287,9 @@ function SevereWeatherMonitoringFormPage() {
                     <div>
                         <input type="radio" name="Drill Simulation Conducted" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Drill Simulation Conducted" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="DrillSimulationConductedComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -270,6 +321,9 @@ function SevereWeatherMonitoringFormPage() {
                     <div>
                         <input type="radio" name="Improvement Recommendations Used" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Improvement Recommendations Used" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="ImprovementRecommendationsUsedComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 

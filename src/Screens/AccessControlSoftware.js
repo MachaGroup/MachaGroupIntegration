@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';  // Ensure this is linked to your universal CSS
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-
+/**/
 function AccessControlSoftwarePage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function AccessControlSoftwarePage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Physical Security/Access Control Software');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,6 +95,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="comprehensiveFunctionality" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="comprehensiveFunctionality" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="comprehensiveFunctionalityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -88,6 +104,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="centralManagement" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="centralManagement" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="centralManagementComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -96,6 +113,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="authenticationMethods" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="authenticationMethods" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="authenticationMethodsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -104,6 +122,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="realTimeMonitoring" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="realTimeMonitoring" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="realTimeMonitoringComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -114,6 +133,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="hardwareCompatibility" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="hardwareCompatibility" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="hardwareCompatibilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -122,6 +142,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="integrationInfrastructure" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="integrationInfrastructure" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="integrationInfrastructureComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -137,6 +158,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="encryptionSecurity" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="encryptionSecurity" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="encryptionSecurityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -145,6 +167,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="securePolicies" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="securePolicies" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="securePoliciesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -153,6 +176,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="multiFactorAuth" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="multiFactorAuth" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="multiFactorAuthComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -163,6 +187,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="scalability" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="scalability" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="scalabilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -171,6 +196,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="flexibility" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="flexibility" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="flexibilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -179,6 +205,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="adaptability" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="adaptability" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="adaptabilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -189,6 +216,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="userInterface" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="userInterface" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="userInterfaceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -197,6 +225,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="customization" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="customization" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="customizationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -205,6 +234,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="userDocumentation" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="userDocumentation" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="userDocumentationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -215,6 +245,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="compliance" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="compliance" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="complianceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -228,6 +259,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="testingCertification" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="testingCertification" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="testingCertificationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -238,6 +270,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="supportSystem" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="supportSystem" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="supportSystemComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -246,6 +279,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="sla" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="sla" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="slaComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -254,6 +288,7 @@ function AccessControlSoftwarePage() {
             <div>
               <input type="radio" name="disasterRecovery" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="disasterRecovery" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="disasterRecoveryComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

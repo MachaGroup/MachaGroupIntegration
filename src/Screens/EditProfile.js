@@ -3,7 +3,7 @@ import { getFirestore, doc, updateDoc, query, where, getDocs, collection } from 
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/MachaLogo.png'; // Adjust the path to your logo
-
+/**/
 function EditProfile() {
     const navigate = useNavigate();
     const [profilePicURL, setProfilePicURL] = useState(null); // Keep the state

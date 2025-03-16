@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function EmergencyAnnouncementProtocolsFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function EmergencyAnnouncementProtocolsFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/Drill Frequency');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,6 +94,7 @@ function EmergencyAnnouncementProtocolsFormPage() {
                     <div>
                         <input type="radio" name="standardizedMessageTemplates" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="standardizedMessageTemplates" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="standardizedMessageTemplatesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -87,6 +103,7 @@ function EmergencyAnnouncementProtocolsFormPage() {
                     <div>
                         <input type="radio" name="essentialInfo" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="essentialInfo" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="essentialInfoComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -96,6 +113,7 @@ function EmergencyAnnouncementProtocolsFormPage() {
                     <div>
                         <input type="radio" name="scriptedEmergencyAnnouncements" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="scriptedEmergencyAnnouncements" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="scriptedEmergencyAnnouncementsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -104,6 +122,7 @@ function EmergencyAnnouncementProtocolsFormPage() {
                     <div>
                         <input type="radio" name="scriptsAvoidingConfusion" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="scriptsAvoidingConfusion" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="scriptsAvoidingConfusionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -112,6 +131,7 @@ function EmergencyAnnouncementProtocolsFormPage() {
                     <div>
                         <input type="radio" name="appropriateAnnouncements" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="appropriateAnnouncements" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="appropriateAnnouncementsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -121,6 +141,7 @@ function EmergencyAnnouncementProtocolsFormPage() {
                     <div>
                         <input type="radio" name="structuredScriptedMessages" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="structuredScriptedMessages" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="structuredScriptedMessagesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -129,6 +150,7 @@ function EmergencyAnnouncementProtocolsFormPage() {
                     <div>
                         <input type="radio" name="messagesProvidingGuidance" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="messagesProvidingGuidance" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="messagesProvidingGuidanceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -138,6 +160,7 @@ function EmergencyAnnouncementProtocolsFormPage() {
                     <div>
                         <input type="radio" name="reviewedScripts" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="reviewedScripts" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="reviewedScriptsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -146,6 +169,7 @@ function EmergencyAnnouncementProtocolsFormPage() {
                     <div>
                         <input type="radio" name="ensuringConsistency" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="ensuringConsistency" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="ensuringConsistencyComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="ensuringConsistencyProcess" placeholder="Describe the process" onChange={handleChange} />  
@@ -158,6 +182,7 @@ function EmergencyAnnouncementProtocolsFormPage() {
                     <div>
                         <input type="radio" name="trainedIndividuals" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="trainedIndividuals" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="trainedIndividualsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -166,6 +191,7 @@ function EmergencyAnnouncementProtocolsFormPage() {
                     <div>
                         <input type="radio" name="trainingPrograms" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="trainingPrograms" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="trainingProgramsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -174,6 +200,7 @@ function EmergencyAnnouncementProtocolsFormPage() {
                     <div>
                         <input type="radio" name="deliveringMessagesResources" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="deliveringMessagesResources" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="deliveringMessagesResourcesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
                 
@@ -183,6 +210,7 @@ function EmergencyAnnouncementProtocolsFormPage() {
                     <div>
                         <input type="radio" name="adaptableScriptedMessages" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="adaptableScriptedMessages" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="adaptableScriptedMessagesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -191,6 +219,7 @@ function EmergencyAnnouncementProtocolsFormPage() {
                     <div>
                         <input type="radio" name="FlexibilityInTemplates" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="FlexibilityInTemplates" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="FlexibilityInTemplatesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -200,6 +229,7 @@ function EmergencyAnnouncementProtocolsFormPage() {
                     <div>
                         <input type="radio" name="evaluatedEffectiveness" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="evaluatedEffectiveness" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="evaluatedEffectivenessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -208,6 +238,7 @@ function EmergencyAnnouncementProtocolsFormPage() {
                     <div>
                         <input type="radio" name="solicitedFeedback" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="solicitedFeedback" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="solicitedFeedbackComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -216,6 +247,7 @@ function EmergencyAnnouncementProtocolsFormPage() {
                     <div>
                         <input type="radio" name="recommendationsRefineMessages" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="recommendationsRefineMessages" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="recommendationsRefineMessagesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

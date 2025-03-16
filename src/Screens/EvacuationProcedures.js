@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function EvacuationProceduresFormPage() {
     const navigate = useNavigate();  // Initialize useNavigate hook for navigation
     const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function EvacuationProceduresFormPage() {
     };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/Evacuation Procedures');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   
   const handleSubmit = async (e) => {
@@ -80,6 +95,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="defined evacuation routes" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="defined evacuation routes" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="defined evacuation routes-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -88,6 +104,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="Established evacuation procedures" value="yes" onChange={handleChange}/>Yes
                         <input type="radio" name="Established evacuation procedures" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Established evacuation procedures-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="establishedEvacuationProcedures" placeholder="Describe evacuation procedures" onChange={handleChange}/>
@@ -99,6 +116,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="evacuation procedures training " value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="evacuation procedures training " value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="evacuation procedures training-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -108,6 +126,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="designated assembly points" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="designated assembly points" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="designated assembly points-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -116,6 +135,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="assembly point safety" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="assembly point safety" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="assembly point safety-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -124,6 +144,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="assembly point space" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="assembly point space" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="assembly point space-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -133,6 +154,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="effective alert system" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="effective alert system" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="effective alert system-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -141,6 +163,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="alerting devices installed" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="alerting devices installed" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="alerting devices installed-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -149,6 +172,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="broadcasting mechanism" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="broadcasting mechanism" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="broadcasting mechanism-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="broadcastingMechanism" placeholder="Describe the mechanism" onChange={handleChange}/>
@@ -161,6 +185,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="disability evacuation procedure" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="disability evacuation procedure" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="disability evacuation procedure-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -169,6 +194,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="disability assistance training" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="disability assistance training" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="disability assistance training-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -177,6 +203,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="disability evacuation accesibility" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="disability evacuation accesibility" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="disability evacuation accesibility-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -186,6 +213,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="Evacuation account" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Evacuation account" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Evacuation account-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="evacuationAccount" placeholder="Describe the system" onChange={handleChange}/>
@@ -197,6 +225,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="Assigned accountability checker" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Assigned accountability checker" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Assigned accountability checker-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="assignedAccountabilityChecker" placeholder="List designated individuals" onChange={handleChange}/>
@@ -208,6 +237,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="building reentry procedure" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="building reentry procedure" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="building reentry procedure-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -217,6 +247,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="regular evacuation drills" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="regular evacuation drills" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="regular evacuation drills-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -225,6 +256,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="different scenario drills" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="different scenario drills" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="different scenario drills-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -233,6 +265,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="drills feedback" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="drills feedback" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="drills feedback-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -242,6 +275,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="evacuation procedures review" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="evacuation procedures review" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="evacuation procedures review-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -250,6 +284,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="solicited input" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="solicited input" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="solicited input-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -258,6 +293,7 @@ function EvacuationProceduresFormPage() {
                     <div>
                         <input type="radio" name="effective update communication" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="effective update communication" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="effective update communication-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

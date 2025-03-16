@@ -31,6 +31,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="guards-stationed" value="yes" /> Yes
               <input type="radio" name="guards-stationed" value="no" /> No
+              <textarea className='comment-box' name="guards-stationedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -39,6 +40,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="continuous-coverage" value="yes" /> Yes
               <input type="radio" name="continuous-coverage" value="no" /> No
+              <textarea className='comment-box' name="continuous-coverageComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -47,6 +49,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="backup-personnel" value="yes" /> Yes
               <input type="radio" name="backup-personnel" value="no" /> No
+              <textarea className='comment-box' name="backup-personnelComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -57,6 +60,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="training-security-procedures" value="yes" /> Yes
               <input type="radio" name="training-security-procedures" value="no" /> No
+              <textarea className='comment-box' name="training-security-proceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -65,6 +69,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="certifications" value="yes" /> Yes
               <input type="radio" name="certifications" value="no" /> No
+              <textarea className='comment-box' name="certificationsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -73,6 +78,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="conflict-resolution" value="yes" /> Yes
               <input type="radio" name="conflict-resolution" value="no" /> No
+              <textarea className='comment-box' name="conflict-resolutionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -83,6 +89,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="monitor-entrances" value="yes" /> Yes
               <input type="radio" name="monitor-entrances" value="no" /> No
+              <textarea className='comment-box' name="monitor-entrancesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -91,6 +98,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="recognize-threats" value="yes" /> Yes
               <input type="radio" name="recognize-threats" value="no" /> No
+              <textarea className='comment-box' name="recognize-threatsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -99,6 +107,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="communication-devices" value="yes" /> Yes
               <input type="radio" name="communication-devices" value="no" /> No
+              <textarea className='comment-box' name="communication-devicesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -109,6 +118,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="enforce-access-control" value="yes" /> Yes
               <input type="radio" name="enforce-access-control" value="no" /> No
+              <textarea className='comment-box' name="enforce-access-controlComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -117,6 +127,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="challenge-unauthorized" value="yes" /> Yes
               <input type="radio" name="challenge-unauthorized" value="no" /> No
+              <textarea className='comment-box' name="challenge-unauthorizedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -125,6 +136,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="inspection-conduct" value="yes" /> Yes
               <input type="radio" name="inspection-conduct" value="no" /> No
+              <textarea className='comment-box' name="inspection-conductComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -135,6 +147,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="assist-customers" value="yes" /> Yes
               <input type="radio" name="assist-customers" value="no" /> No
+              <textarea className='comment-box' name="assist-customersComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -143,6 +156,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="professional-greeting" value="yes" /> Yes
               <input type="radio" name="professional-greeting" value="no" /> No
+              <textarea className='comment-box' name="professional-greetingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -151,6 +165,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="handle-inquiries" value="yes" /> Yes
               <input type="radio" name="handle-inquiries" value="no" /> No
+              <textarea className='comment-box' name="handle-inquiriesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -161,6 +176,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="emergency-response" value="yes" /> Yes
               <input type="radio" name="emergency-response" value="no" /> No
+              <textarea className='comment-box' name="emergency-responseComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -169,6 +185,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="know-evacuation" value="yes" /> Yes
               <input type="radio" name="know-evacuation" value="no" /> No
+              <textarea className='comment-box' name="know-evacuationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -177,6 +194,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="first-aid" value="yes" /> Yes
               <input type="radio" name="first-aid" value="no" /> No
+              <textarea className='comment-box' name="first-aidComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -187,6 +205,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="effective-communication" value="yes" /> Yes
               <input type="radio" name="effective-communication" value="no" /> No
+              <textarea className='comment-box' name="effective-communicationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -195,6 +214,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="coordinate-response" value="yes" /> Yes
               <input type="radio" name="coordinate-response" value="no" /> No
+              <textarea className='comment-box' name="coordinate-responseComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -203,6 +223,7 @@ function StationedGuardsPage() {
             <div>
               <input type="radio" name="centralized-communication" value="yes" /> Yes
               <input type="radio" name="centralized-communication" value="no" /> No
+              <textarea className='comment-box' name="centralized-communicationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

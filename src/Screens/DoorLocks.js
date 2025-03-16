@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-
+/**/
 function DoorLocksPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function DoorLocksPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Physical Security/Door Locks');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,6 +94,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="operational" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="operational" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="operationalComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -87,6 +103,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="secureLocks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="secureLocks" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="secureLocksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -95,6 +112,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="malfunction" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="malfunction" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="malfunctionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -103,6 +121,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="backupSystems" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="backupSystems" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="backupSystemsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -120,6 +139,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="authSecure" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="authSecure" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="authSecureComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -128,6 +148,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="MFA" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="MFA" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="MFAComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -145,6 +166,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="validCredentials" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="validCredentials" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="validCredentialsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -153,6 +175,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="accessPermissions" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="accessPermissions" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="accessPermissionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -163,6 +186,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="integrationSecuritySystems" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="integrationSecuritySystems" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="integrationSecuritySystemsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -171,6 +195,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="realTimeMonitoring" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="realTimeMonitoring" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="realTimeMonitoringComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -179,6 +204,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="accessEventsLogging" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="accessEventsLogging" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="accessEventsLoggingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -189,6 +215,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="durability" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="durability" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="durabilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -197,6 +224,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="antiTamper" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="antiTamper" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="antiTamperComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -205,6 +233,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="environmentalResistance" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="environmentalResistance" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="environmentalResistanceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -215,6 +244,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceScheduleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -223,6 +253,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceTasksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -231,6 +262,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -241,6 +273,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="userTraining" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="userTraining" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="userTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -249,6 +282,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="userInstructions" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="userInstructions" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="userInstructionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -257,6 +291,7 @@ function DoorLocksPage() {
             <div>
               <input type="radio" name="reportingProcess" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="reportingProcess" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="reportingProcessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

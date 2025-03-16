@@ -29,8 +29,23 @@ function RovingPatrolsPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Physical Security/Roving Patrols');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -80,6 +95,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="regularPatrols" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="regularPatrols" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="regularPatrolsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -88,6 +104,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="wellDefinedRoutes" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="wellDefinedRoutes" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="wellDefinedRoutesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -108,6 +125,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="randomIntervals" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="randomIntervals" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="randomIntervalsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -116,6 +134,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="additionalPatrols" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="additionalPatrols" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="additionalPatrolsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -126,6 +145,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="activeMonitoring" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="activeMonitoring" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="activeMonitoringComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -134,6 +154,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="threatResponse" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="threatResponse" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="threatResponseComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -142,6 +163,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="thoroughInspections" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="thoroughInspections" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="thoroughInspectionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -152,6 +174,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="incidentResponse" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="incidentResponse" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="incidentResponseComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -160,6 +183,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="emergencyProcedures" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="emergencyProcedures" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="emergencyProceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -168,6 +192,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="coordinationWithGuards" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="coordinationWithGuards" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="coordinationWithGuardsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -178,6 +203,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="detailedRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="detailedRecords" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="detailedRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -186,6 +212,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="reportingProcess" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="reportingProcess" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="reportingProcessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -194,6 +221,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="reportReviews" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="reportReviews" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="reportReviewsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -204,6 +232,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="effectiveCommunication" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="effectiveCommunication" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="effectiveCommunicationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -212,6 +241,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="communicationDevices" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="communicationDevices" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="communicationDevicesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -220,6 +250,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="centralizedCommunication" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="centralizedCommunication" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="centralizedCommunicationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -230,6 +261,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="adequateTraining" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="adequateTraining" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="adequateTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -238,6 +270,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="ongoingTraining" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="ongoingTraining" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="ongoingTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -246,6 +279,7 @@ function RovingPatrolsPage() {
             <div>
               <input type="radio" name="situationHandling" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="situationHandling" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="situationHandlingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

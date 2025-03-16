@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-
+/**/
 function AccessControlKeypadsPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,24 +29,24 @@ function AccessControlKeypadsPage() {
   };
 
   // Function to handle back button
-    const handleBack = async () => {
-      if (formData && buildingId) { // Check if formData and buildingId exist
-        try {
-          const buildingRef = doc(db, 'Buildings', buildingId);
-          const formsRef = collection(db, 'forms/Physical Security/Access Control Keypads');
-          await addDoc(formsRef, {
-            building: buildingRef,
-            formData: formData,
-          });
-          console.log('Form Data submitted successfully on back!');
-          alert('Form data saved before navigating back!');
-        } catch (error) {
-          console.error('Error saving form data:', error);
-          alert('Failed to save form data before navigating back. Some data may be lost.');
-        }
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Physical Security/Access Control Keypads');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
       }
-      navigate(-1);
-    };
+    }
+    navigate(-1);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -94,6 +94,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="operational" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="operational" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="operationalComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -102,6 +103,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="reliablyAuthenticate" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="reliablyAuthenticate" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="reliablyAuthenticateComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -110,6 +112,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="malfunction" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="malfunction" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="malfunctionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -118,6 +121,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="backupSystems" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="backupSystems" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="backupSystemsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -128,6 +132,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="secureCodes" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="secureCodes" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="secureCodesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -136,6 +141,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="instructions" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="instructions" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="instructionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -144,6 +150,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="changeCodes" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="changeCodes" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="changeCodesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -154,6 +161,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="integrated" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="integrated" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="integratedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -162,6 +170,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="communicateSeamlessly" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="communicateSeamlessly" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="communicateSeamlesslyComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -170,6 +179,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="realTimeMonitoring" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="realTimeMonitoring" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="realTimeMonitoringComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -178,6 +188,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="accessRightsManaged" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="accessRightsManaged" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="accessRightsManagedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -188,6 +199,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="durableMaterials" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="durableMaterials" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="durableMaterialsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -196,6 +208,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="tamperAlarms" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="tamperAlarms" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="tamperAlarmsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -204,6 +217,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="testedReliability" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="testedReliability" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="testedReliabilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -214,6 +228,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="accessible" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="accessible" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="accessibleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -222,6 +237,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="clearInstructions" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="clearInstructions" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="clearInstructionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -230,6 +246,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="disabilityAccessibility" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="disabilityAccessibility" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="disabilityAccessibilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -240,6 +257,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceScheduleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -248,6 +266,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceTasksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -256,6 +275,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -266,6 +286,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="userTraining" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="userTraining" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="userTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -274,6 +295,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="instructionsAvailable" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="instructionsAvailable" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="instructionsAvailableComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -282,6 +304,7 @@ function AccessControlKeypadsPage() {
             <div>
               <input type="radio" name="reportingProcess" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="reportingProcess" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="reportingProcessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

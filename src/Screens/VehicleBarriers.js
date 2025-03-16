@@ -29,8 +29,23 @@ function VehicleBarriersPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Physical Security/Vehicle Barrier');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -80,6 +95,9 @@ function VehicleBarriersPage() {
               <input type="radio" name="barriersOperational" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersOperational" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="barriersOperationalComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -87,6 +105,9 @@ function VehicleBarriersPage() {
             <div>
               <input type="radio" name="barriersBlockAccess" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersBlockAccess" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="barriersBlockAccessComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -103,6 +124,9 @@ function VehicleBarriersPage() {
               <input type="radio" name="barriersBackup" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersBackup" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="barriersBackupComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           {/* Design and Construction */}
@@ -113,6 +137,9 @@ function VehicleBarriersPage() {
               <input type="radio" name="barriersWithstandImpact" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersWithstandImpact" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="barriersWithstandImpactComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -121,6 +148,9 @@ function VehicleBarriersPage() {
               <input type="radio" name="barriersCrashRated" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersCrashRated" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="barriersCrashRatedComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -128,6 +158,9 @@ function VehicleBarriersPage() {
             <div>
               <input type="radio" name="barriersDesignFeatures" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersDesignFeatures" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="barriersDesignFeaturesComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -146,6 +179,9 @@ function VehicleBarriersPage() {
               <input type="radio" name="barriersRemoteActivation" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersRemoteActivation" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="barriersRemoteActivationComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -153,6 +189,9 @@ function VehicleBarriersPage() {
             <div>
               <input type="radio" name="barriersRestrictedAccess" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersRestrictedAccess" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="barriersRestrictedAccessComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -164,6 +203,9 @@ function VehicleBarriersPage() {
               <input type="radio" name="barriersSafety" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersSafety" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="barriersSafetyComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -172,6 +214,9 @@ function VehicleBarriersPage() {
               <input type="radio" name="barriersWarningSignals" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersWarningSignals" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="barriersWarningSignalsComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -179,6 +224,9 @@ function VehicleBarriersPage() {
             <div>
               <input type="radio" name="barriersPhysicalSignage" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersPhysicalSignage" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="barriersPhysicalSignageComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -190,6 +238,9 @@ function VehicleBarriersPage() {
               <input type="radio" name="barriersMaintenanceSchedule" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersMaintenanceSchedule" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="barriersMaintenanceScheduleComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -198,6 +249,9 @@ function VehicleBarriersPage() {
               <input type="radio" name="barriersMaintenanceTasks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersMaintenanceTasks" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="barriersMaintenanceTasksComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -205,6 +259,9 @@ function VehicleBarriersPage() {
             <div>
               <input type="radio" name="barriersMaintenanceRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersMaintenanceRecords" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="barriersMaintenanceRecordsComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -215,6 +272,9 @@ function VehicleBarriersPage() {
             <div>
               <input type="radio" name="barriersCompliance" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersCompliance" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="barriersComplianceComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -229,6 +289,9 @@ function VehicleBarriersPage() {
               <input type="radio" name="barriersTesting" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersTesting" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="barriersTestingComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           {/* Emergency Procedures */}
@@ -239,6 +302,9 @@ function VehicleBarriersPage() {
               <input type="radio" name="barriersEmergencyPlan" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersEmergencyPlan" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="barriersEmergencyPlanComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -247,6 +313,9 @@ function VehicleBarriersPage() {
               <input type="radio" name="barriersEmergencyTraining" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersEmergencyTraining" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="barriersEmergencyTrainingComment" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -254,6 +323,9 @@ function VehicleBarriersPage() {
             <div>
               <input type="radio" name="barriersEmergencyResponse" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="barriersEmergencyResponse" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="barriersEmergencyResponseComment" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 

@@ -29,8 +29,23 @@ function MentalHealthServicesFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Mental Health Services');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -102,6 +117,7 @@ function MentalHealthServicesFormPage() {
                     <div>
                         <input type="radio" name="mentalHealthPartnerships" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="mentalHealthPartnerships" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="mentalHealthPartnershipsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -118,6 +134,7 @@ function MentalHealthServicesFormPage() {
                     <div>
                         <input type="radio" name="mobileCrisisIntervention" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="mobileCrisisIntervention" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="mobileCrisisInterventionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -134,6 +151,7 @@ function MentalHealthServicesFormPage() {
                     <div>
                         <input type="radio" name="mentalHealthCapacityBuilding" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="mentalHealthCapacityBuilding" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="mentalHealthCapacityBuildingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -150,6 +168,7 @@ function MentalHealthServicesFormPage() {
                     <div>
                         <input type="radio" name="mentalHealthAwarenessCampaigns" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="mentalHealthAwarenessCampaigns" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="mentalHealthAwarenessCampaignsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

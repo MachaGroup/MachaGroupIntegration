@@ -28,8 +28,24 @@ function ScenarioBasedTrainingFormPage() {
         }));
     };
 
-    const handleBack = () => {
-        navigate(-1);
+    //back button
+    const handleBack = async () => {
+      if (formData && buildingId) { // Check if formData and buildingId exist
+        try {
+          const buildingRef = doc(db, 'Buildings', buildingId);
+          const formsRef = collection(db, 'forms/Personnel Training and Awareness/Scenario Based Training');
+          await addDoc(formsRef, {
+            building: buildingRef,
+            formData: formData,
+          });
+          console.log('Form Data submitted successfully on back!');
+          alert('Form data saved before navigating back!');
+        } catch (error) {
+          console.error('Error saving form data:', error);
+          alert('Failed to save form data before navigating back. Some data may be lost.');
+        }
+      }
+      navigate(-1);
     };
 
     const handleSubmit = async (e) => {
@@ -88,6 +104,9 @@ function ScenarioBasedTrainingFormPage() {
           <input type="radio" name="scenarioSpecificity" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="scenarioSpecificity" value="no" onChange={handleChange}/> No
         </div>
+        <div>
+          <input type="text" name="scenarioSpecificityComment" placeholder="Comments" onChange={handleChange}/>
+        </div>
       </div>
 
       <div className="form-section">
@@ -102,6 +121,9 @@ function ScenarioBasedTrainingFormPage() {
         <div>
           <input type="radio" name="scenarioCategorization" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="scenarioCategorization" value="no" onChange={handleChange}/> No
+        </div>
+        <div>
+          <input type="text" name="scenarioCategorizationComment" placeholder="Comments" onChange={handleChange}/>
         </div>
       </div>
 
@@ -126,6 +148,9 @@ function ScenarioBasedTrainingFormPage() {
           <input type="radio" name="scenarioIntegration" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="scenarioIntegration" value="no" onChange={handleChange}/> No
         </div>
+        <div>
+        <input type="text" name="scenarioIntegrationComment" placeholder="Comments" onChange={handleChange}/>
+        </div>
       </div>
 
       <div className="form-section">
@@ -140,6 +165,9 @@ function ScenarioBasedTrainingFormPage() {
         <div>
           <input type="radio" name="scenarioContingencyPlans" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="scenarioContingencyPlans" value="no" onChange={handleChange}/> No
+        </div>
+        <div>
+          <input type="text" name="scenarioContingencyPlansComment" placeholder="Comments" onChange={handleChange}/>
         </div>
       </div>
 
@@ -164,6 +192,9 @@ function ScenarioBasedTrainingFormPage() {
           <input type="radio" name="activeParticipation" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="activeParticipation" value="no" onChange={handleChange}/> No
         </div>
+        <div>
+          <input type="text" name="activeParticipationComment" placeholder="Comments" onChange={handleChange}/>
+        </div>
       </div>
 
       <div className="form-section">
@@ -178,6 +209,9 @@ function ScenarioBasedTrainingFormPage() {
         <div>
           <input type="radio" name="scenarioTeamwork" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="scenarioTeamwork" value="no" onChange={handleChange}/> No
+        </div>
+        <div>
+          <input type="text" name="scenarioTeamworkComment" placeholder="Comments" onChange={handleChange}/>
         </div>
       </div>
 
@@ -202,6 +236,9 @@ function ScenarioBasedTrainingFormPage() {
           <input type="radio" name="reinforceKeyConcepts" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="reinforceKeyConcepts" value="no" onChange={handleChange}/> No
         </div>
+        <div>
+          <input type="text" name="reinforceKeyConceptsComment" placeholder="Comments" onChange={handleChange}/>
+        </div>
       </div>
 
       <div className="form-section">
@@ -216,6 +253,9 @@ function ScenarioBasedTrainingFormPage() {
         <div>
           <input type="radio" name="performanceMetrics" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="performanceMetrics" value="no" onChange={handleChange}/> No
+        </div>
+        <div>
+          <input type="text" name="performanceMetricsComment" placeholder="Comments" onChange={handleChange}/>
         </div>
       </div>
 
@@ -240,6 +280,9 @@ function ScenarioBasedTrainingFormPage() {
           <input type="radio" name="constructiveFeedback" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="constructiveFeedback" value="no" onChange={handleChange}/> No
         </div>
+        <div>
+          <input type="text" name="constructiveFeedbackComment" placeholder="Comments" onChange={handleChange}/>
+        </div>
       </div>
 
       <div className="form-section">
@@ -254,6 +297,9 @@ function ScenarioBasedTrainingFormPage() {
         <div>
           <input type="radio" name="debriefingImprovement" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="debriefingImprovement" value="no" onChange={handleChange}/> No
+        </div>
+        <div>
+          <input type="text" name="debriefingImprovementComment" placeholder="Comments" onChange={handleChange}/>
         </div>
       </div>
 
@@ -278,6 +324,9 @@ function ScenarioBasedTrainingFormPage() {
           <input type="radio" name="scenarioAdjustment" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="scenarioAdjustment" value="no" onChange={handleChange}/> No
         </div>
+        <div>
+          <input type="text" name="scenarioAdjustmentComment" placeholder="Comments" onChange={handleChange}/>
+        </div>
       </div>
 
       <div className="form-section">
@@ -292,6 +341,9 @@ function ScenarioBasedTrainingFormPage() {
         <div>
           <input type="radio" name="realisticSimulations" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="realisticSimulations" value="no" onChange={handleChange}/> No
+        </div>
+        <div>
+          <input type="text" name="realisticSimulationsComment" placeholder="Comments" onChange={handleChange}/>
         </div>
       </div>
 
@@ -316,6 +368,9 @@ function ScenarioBasedTrainingFormPage() {
           <input type="radio" name="testEmergencyComponents" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="testEmergencyComponents" value="no" onChange={handleChange}/> No
         </div>
+        <div>
+          <input type="text" name="testEmergencyComponentsComment" placeholder="Comments" onChange={handleChange}/>
+        </div>
       </div>
 
       <div className="form-section">
@@ -330,6 +385,9 @@ function ScenarioBasedTrainingFormPage() {
         <div>
           <input type="radio" name="emergencyTeamInvolvement" value="yes" onChange={handleChange}/> Yes
           <input type="radio" name="emergencyTeamInvolvement" value="no" onChange={handleChange}/> No
+        </div>
+        <div>
+          <input type="text" name="emergencyTeamInvolvementComment" placeholder="Comments" onChange={handleChange}/>
         </div>
       </div>
 

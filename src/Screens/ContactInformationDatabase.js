@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function ContactInformationDatabaseFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function ContactInformationDatabaseFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/Drill Frequency');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,6 +94,7 @@ function ContactInformationDatabaseFormPage() {
                     <div>
                         <input type="radio" name="centralizedSystem" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="centralizedSystem" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="centralizedSystemComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -87,6 +103,7 @@ function ContactInformationDatabaseFormPage() {
                     <div>
                         <input type="radio" name="includingContactDetails" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="includingContactDetails" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="includingContactDetailsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -103,6 +120,7 @@ function ContactInformationDatabaseFormPage() {
                     <div>
                         <input type="radio" name="verifyingContactDetails" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="verifyingContactDetails" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="verifyingContactDetailsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -112,6 +130,7 @@ function ContactInformationDatabaseFormPage() {
                     <div>
                         <input type="radio" name="contactInformationDatabaseList" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="contactInformationDatabaseList" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="contactInformationDatabaseListComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -120,6 +139,7 @@ function ContactInformationDatabaseFormPage() {
                     <div>
                         <input type="radio" name="categorizingContactDetails" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="categorizingContactDetails" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="categorizingContactDetailsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -129,6 +149,7 @@ function ContactInformationDatabaseFormPage() {
                     <div>
                         <input type="radio" name="authorizedDatabaseManaging" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="authorizedDatabaseManaging" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="authorizedDatabaseManagingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -137,6 +158,7 @@ function ContactInformationDatabaseFormPage() {
                     <div>
                         <input type="radio" name="implementedSecurityMeasures" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="implementedSecurityMeasures" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="implementedSecurityMeasuresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="implementedSecurityMeasuresText" placeholder="Describe the security measures" onChange={handleChange} />  
@@ -149,6 +171,7 @@ function ContactInformationDatabaseFormPage() {
                     <div>
                         <input type="radio" name="integratedAlertingSystems" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="integratedAlertingSystems" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="integratedAlertingSystemsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -157,6 +180,7 @@ function ContactInformationDatabaseFormPage() {
                     <div>
                         <input type="radio" name="synchronizingProcedures" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="synchronizingProcedures" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="synchronizingProceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="synchronizingProceduresText" placeholder="Describe the procedures" onChange={handleChange} />  
@@ -169,6 +193,7 @@ function ContactInformationDatabaseFormPage() {
                     <div>
                         <input type="radio" name="optInOptOutMechanisms" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="optInOptOutMechanisms" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="optInOptOutMechanismsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="optInOptOutMechanismsText" placeholder="Describe the mechanisms" onChange={handleChange} />  
@@ -180,6 +205,7 @@ function ContactInformationDatabaseFormPage() {
                     <div>
                         <input type="radio" name="updatingContactInformation" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="updatingContactInformation" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="updatingContactInformationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="updatingContactInformationProcess" placeholder="Describe the process" onChange={handleChange} />  
@@ -192,6 +218,7 @@ function ContactInformationDatabaseFormPage() {
                     <div>
                         <input type="radio" name="accessingDatabaseTraining" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="accessingDatabaseTraining" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="accessingDatabaseTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -200,6 +227,7 @@ function ContactInformationDatabaseFormPage() {
                     <div>
                         <input type="radio" name="userSupport" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="userSupport" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="userSupport" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -209,6 +237,7 @@ function ContactInformationDatabaseFormPage() {
                     <div>
                         <input type="radio" name="applicablePrivacyRegulations" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="applicablePrivacyRegulations" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="applicablePrivacyRegulationsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -217,6 +246,7 @@ function ContactInformationDatabaseFormPage() {
                     <div>
                         <input type="radio" name="safeguardingPersonalData" value="yes" onChange={handleChange} /> Yes
                         <input type="radio" name="safeguardingPersonalData" value="no" onChange={handleChange} /> No
+                        <textarea className='comment-box' name="safeguardingPersonalDataComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

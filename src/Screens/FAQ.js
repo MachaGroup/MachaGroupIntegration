@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
 import './FAQ.css'; // Ensure this links to your CSS file
 import logo from '../assets/MachaLogo.png'; // Ensure this is the correct path
-
+/**/
 function FAQ() {
   const [question, setQuestion] = useState(''); // Add useState hook
   const navigate = useNavigate();  // Initialize useNavigate hook

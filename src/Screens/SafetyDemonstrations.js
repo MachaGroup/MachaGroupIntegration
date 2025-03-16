@@ -29,8 +29,23 @@ function SafetyDemonstrationsFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Safety Demonstrations');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -87,6 +102,9 @@ function SafetyDemonstrationsFormPage() {
                         <input type="radio" name="safetyDemonstrationsIntegration" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="safetyDemonstrationsIntegration" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="safetyDemonstrationsIntegrationComment" placeholder="Comments" onChange={handleChange}/>   
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -110,6 +128,9 @@ function SafetyDemonstrationsFormPage() {
                         <input type="radio" name="demonstrationTechniquesMethods" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="demonstrationTechniquesMethods" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="demonstrationTechniquesMethodsComment" placeholder="Comments" onChange={handleChange}/>   
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -125,6 +146,9 @@ function SafetyDemonstrationsFormPage() {
                         <input type="radio" name="qualifiedInstructors" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="qualifiedInstructors" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="qualifiedInstructorsComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <h2>Practical Skills and Applications:</h2>
@@ -134,6 +158,10 @@ function SafetyDemonstrationsFormPage() {
                         <input type="radio" name="practicalSafetySkills" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="practicalSafetySkills" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="practicalSafetySkillsComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
+                    
                 </div>
 
                 <div className="form-section">
@@ -141,6 +169,9 @@ function SafetyDemonstrationsFormPage() {
                     <div>
                         <input type="radio" name="activeParticipantInvolvement" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="activeParticipantInvolvement" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="activeParticipantInvolvementComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -172,6 +203,9 @@ function SafetyDemonstrationsFormPage() {
                         <input type="radio" name="reviewSessions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="reviewSessions" value="no" onChange={handleChange}/> No
                     </div>
+                    <div>
+                        <input type="text" name="reviewSessionsComment" placeholder="Comments" onChange={handleChange}/>
+                    </div>
                 </div>
 
                 <div className="form-section">
@@ -186,6 +220,9 @@ function SafetyDemonstrationsFormPage() {
                     <div>
                         <input type="radio" name="refresherCourses" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="refresherCourses" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="refresherCoursesComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -209,6 +246,9 @@ function SafetyDemonstrationsFormPage() {
                     <div>
                         <input type="radio" name="periodicEvaluations" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="periodicEvaluations" value="no" onChange={handleChange}/> No
+                    </div>
+                    <div>
+                        <input type="text" name="periodicEvaluationsComment" placeholder="Comments" onChange={handleChange}/>
                     </div>
                 </div>
 

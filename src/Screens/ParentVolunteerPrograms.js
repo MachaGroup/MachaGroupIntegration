@@ -29,8 +29,23 @@ function ParentVolunteerProgramsFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Parent Volunteer Programs');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -94,6 +109,7 @@ function ParentVolunteerProgramsFormPage() {
                     <div>
                         <input type="radio" name="programsIntegratedWithPlans" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="programsIntegratedWithPlans" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="programsIntegratedWithPlansComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -117,6 +133,7 @@ function ParentVolunteerProgramsFormPage() {
                     <div>
                         <input type="radio" name="volunteerTrainingProvided" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="volunteerTrainingProvided" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="volunteerTrainingProvidedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -162,6 +179,7 @@ function ParentVolunteerProgramsFormPage() {
                     <div>
                         <input type="radio" name="integrationWithEmergencyPlans" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="integrationWithEmergencyPlans" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="integrationWithEmergencyPlansComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

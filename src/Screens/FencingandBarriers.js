@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
 import './SurveillanceSystems.css'; // Reuse the same CSS file for consistency in styling
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
-
+/**/
 function MainEntrancePage() {
   const navigate = useNavigate();  // Initialize useNavigate hook
 

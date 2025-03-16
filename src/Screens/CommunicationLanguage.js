@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 
 function CommunicationLanguageFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -30,9 +30,24 @@ function CommunicationLanguageFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/communication language');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
  
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,6 +95,7 @@ function CommunicationLanguageFormPage() {
                     <div>
                         <input type="radio" name="LanguageAssessConducted" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="LanguageAssessConducted" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="LanguageAssessConductedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -88,6 +104,7 @@ function CommunicationLanguageFormPage() {
                     <div>
                         <input type="radio" name="LanguagePrevalenceIdentified" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="LanguagePrevalenceIdentified" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="LanguagePrevalenceIdentifiedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="languagePrevalanceIdentified" placeholder="List the languages" onChange={handleChange}/>  
@@ -100,6 +117,7 @@ function CommunicationLanguageFormPage() {
                     <div>
                         <input type="radio" name="MultiLangNotifyCapable" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="MultiLangNotifyCapable" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="MultiLangNotifyCapableComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -108,6 +126,7 @@ function CommunicationLanguageFormPage() {
                     <div>
                         <input type="radio" name="NotifyLangCustomizable" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="NotifyLangCustomizable" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="NotifyLangCustomizableComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -117,6 +136,7 @@ function CommunicationLanguageFormPage() {
                     <div>
                         <input type="radio" name="TranslationServicesAvail" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="TranslationServicesAvail" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="TranslationServicesAvailComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -125,6 +145,7 @@ function CommunicationLanguageFormPage() {
                     <div>
                         <input type="radio" name="TranslationProcessDefined" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="TranslationProcessDefined" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="TranslationProcessDefinedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="translationProcessDefined" placeholder="Describe the process" onChange={handleChange}/>  
@@ -137,6 +158,7 @@ function CommunicationLanguageFormPage() {
                     <div>
                         <input type="radio" name="TemplatesMultiLangReady" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="TemplatesMultiLangReady" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="TemplatesMultiLangReadyComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -145,6 +167,7 @@ function CommunicationLanguageFormPage() {
                     <div>
                         <input type="radio" name="TranslationAccuracyMaintained" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="TranslationAccuracyMaintained" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="TranslationAccuracyMaintainedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -154,6 +177,7 @@ function CommunicationLanguageFormPage() {
                     <div>
                         <input type="radio" name="LimitedEnglishAccessibility" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="LimitedEnglishAccessibility" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="LimitedEnglishAccessibilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -162,6 +186,7 @@ function CommunicationLanguageFormPage() {
                     <div>
                         <input type="radio" name="AltCommunicationMethods" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="AltCommunicationMethods" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="AltCommunicationMethodsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="altCommunicationMethods" placeholder="Describe the alternative methods" onChange={handleChange}/>  
@@ -174,6 +199,7 @@ function CommunicationLanguageFormPage() {
                     <div>
                         <input type="radio" name="ParentsInformedMultilang" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="ParentsInformedMultilang" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="ParentsInformedMultilangComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -182,6 +208,7 @@ function CommunicationLanguageFormPage() {
                     <div>
                         <input type="radio" name="CommunityEngagementEfforts" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="CommunityEngagementEfforts" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="CommunityEngagementEffortsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -191,6 +218,7 @@ function CommunicationLanguageFormPage() {
                     <div>
                         <input type="radio" name="MultiLangTestingDone" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="MultiLangTestingDone" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="MultiLangTestingDoneComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -199,6 +227,7 @@ function CommunicationLanguageFormPage() {
                     <div>
                         <input type="radio" name="TranslationTestScenarios" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="TranslationTestScenarios" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="TranslationTestScenariosComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -208,6 +237,7 @@ function CommunicationLanguageFormPage() {
                     <div>
                         <input type="radio" name="FeedbackMechanismsExist" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="FeedbackMechanismsExist" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="FeedbackMechanismsExistComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="feedbackMechansismsExist" placeholder="Describe the feedback mechanisms" onChange={handleChange}/>  
@@ -219,6 +249,7 @@ function CommunicationLanguageFormPage() {
                     <div>
                         <input type="radio" name="EnhancementFeedbackUsed" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="EnhancementFeedbackUsed" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="EnhancementFeedbackUsedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

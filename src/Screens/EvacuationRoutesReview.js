@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function EvacuationRoutesReviewFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function EvacuationRoutesReviewFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/Evacuation Routes Review');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
  
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,6 +101,7 @@ function EvacuationRoutesReviewFormPage() {
                     <div>
                         <input type="radio" name="Regular Interval" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Regular Interval" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Regular Interval-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -94,6 +110,7 @@ function EvacuationRoutesReviewFormPage() {
                     <div>
                         <input type="radio" name="Schedule Procedure" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Schedule Procedure" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Schedule Procedure-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="scheduleProcedure" placeholder="Describe the schedule or procedure" onChange={handleChange}/>  
@@ -106,6 +123,7 @@ function EvacuationRoutesReviewFormPage() {
                     <div>
                         <input type="radio" name="Structured Process" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Structured Process" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Structured Process-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="structuredProcess" placeholder="Describe the process" onChange={handleChange}/>  
@@ -117,6 +135,7 @@ function EvacuationRoutesReviewFormPage() {
                     <div>
                         <input type="radio" name="Comprehensive Coverage" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Comprehensive Coverage" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Comprehensive Coverage-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -125,6 +144,7 @@ function EvacuationRoutesReviewFormPage() {
                     <div>
                         <input type="radio" name="Obstacle Assessment" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Obstacle Assessment" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Obstacle Assessment-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -134,6 +154,7 @@ function EvacuationRoutesReviewFormPage() {
                     <div>
                         <input type="radio" name="Regulation Compliance" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Regulation Compliance" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Regulation Compliance-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -142,6 +163,7 @@ function EvacuationRoutesReviewFormPage() {
                     <div>
                         <input type="radio" name="Knowledgeable Reviewers" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Knowledgeable Reviewers" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Knowledgeable Reviewers-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -151,6 +173,7 @@ function EvacuationRoutesReviewFormPage() {
                     <div>
                         <input type="radio" name="Disability Access" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Disability Access" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Disability Access-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -159,6 +182,7 @@ function EvacuationRoutesReviewFormPage() {
                     <div>
                         <input type="radio" name="Occupant Provisions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Occupant Provisions" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Occupant Provisions-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="occupantProvisions" placeholder="Describe the provisions" onChange={handleChange}/>  
@@ -171,6 +195,7 @@ function EvacuationRoutesReviewFormPage() {
                     <div>
                         <input type="radio" name="Sign Inspection" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Sign Inspection" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Sign Inspection-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -179,6 +204,7 @@ function EvacuationRoutesReviewFormPage() {
                     <div>
                         <input type="radio" name="Sign Updates" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Sign Updates" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Sign Updates-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -187,6 +213,7 @@ function EvacuationRoutesReviewFormPage() {
                     <div>
                         <input type="radio" name="Wayfinding Review" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Wayfinding Review" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Wayfinding Review-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -196,6 +223,7 @@ function EvacuationRoutesReviewFormPage() {
                     <div>
                         <input type="radio" name="Plan Alignment" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Plan Alignment" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Plan Alignment-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -204,6 +232,7 @@ function EvacuationRoutesReviewFormPage() {
                     <div>
                         <input type="radio" name="Response Integration" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Response Integration" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Response Integration-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -213,6 +242,7 @@ function EvacuationRoutesReviewFormPage() {
                     <div>
                         <input type="radio" name="Outcome Records" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Outcome Records" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Outcome Records-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -221,6 +251,7 @@ function EvacuationRoutesReviewFormPage() {
                     <div>
                         <input type="radio" name="Accessible Records" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Accessible Records" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Accessible Records-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -229,6 +260,7 @@ function EvacuationRoutesReviewFormPage() {
                     <div>
                         <input type="radio" name="Trend Tracking" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Trend Tracking" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Trend Tracking-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

@@ -5,7 +5,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Context for buildin
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-
+/**/
 function EndToEndEncryptionPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function EndToEndEncryptionPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Cybersecurity/End To End Encryption');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -81,6 +96,7 @@ function EndToEndEncryptionPage() {
             <div>
               <input type="radio" name="allChannelsEncrypted" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="allChannelsEncrypted" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="allChannelsEncryptedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -112,6 +128,7 @@ function EndToEndEncryptionPage() {
             <div>
               <input type="radio" name="secureKeyManagement" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="secureKeyManagement" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="secureKeyManagementComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -139,6 +156,7 @@ function EndToEndEncryptionPage() {
             <div>
               <input type="radio" name="employeeTraining" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="employeeTraining" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="employeeTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">

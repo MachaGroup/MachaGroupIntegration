@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function DataSharingPoliciesFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function DataSharingPoliciesFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Policy and Compliance/Data Sharing Policies');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -94,6 +109,7 @@ function DataSharingPoliciesFormPage() {
                     <div>
                         <input type="radio" name="approvedData" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="approvedData" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="approvedDataComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -117,6 +133,7 @@ function DataSharingPoliciesFormPage() {
                     <div>
                         <input type="radio" name="standardGuidelines" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="standardGuidelines" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="standardGuidelinesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -140,6 +157,7 @@ function DataSharingPoliciesFormPage() {
                     <div>
                         <input type="radio" name="thirdpartyRequirements" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="thirdpartyRequirements" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="thirdpartyRequirementsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -163,6 +181,7 @@ function DataSharingPoliciesFormPage() {
                     <div>
                         <input type="radio" name="regularReviews" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="regularReviews" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="regularReviewsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -186,6 +205,7 @@ function DataSharingPoliciesFormPage() {
                     <div>
                         <input type="radio" name="enforcedCompliance" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="enforcedCompliance" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="enforcedComplianceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -209,6 +229,7 @@ function DataSharingPoliciesFormPage() {
                     <div>
                         <input type="radio" name="verifyingPractices" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="verifyingPractices" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="verifyingPracticesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -254,6 +275,7 @@ function DataSharingPoliciesFormPage() {
                     <div>
                         <input type="radio" name="availableGuidelines" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="availableGuidelines" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="availableGuidelinesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -270,6 +292,7 @@ function DataSharingPoliciesFormPage() {
                     <div>
                         <input type="radio" name="regularAudits" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="regularAudits" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="regularAuditsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

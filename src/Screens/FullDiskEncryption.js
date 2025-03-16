@@ -5,7 +5,7 @@ import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
 import Navbar from "./Navbar";
-
+/**/
 function FullDiskEncryptionPage() {
   const navigate = useNavigate();
   const { buildingId } = useBuilding(); 
@@ -28,9 +28,24 @@ function FullDiskEncryptionPage() {
     }));
   };
 
-  const handleBack = () => {
-    navigate(-1);
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Cybersecurity/Full Disk Encryption');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -75,6 +90,7 @@ function FullDiskEncryptionPage() {
             <div>
               <input type="radio" name="fullDiskEncryptionEnabled" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="fullDiskEncryptionEnabled" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="fullDiskEncryptionEnabledComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -117,6 +133,7 @@ function FullDiskEncryptionPage() {
             <div>
               <input type="radio" name="userTraining" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="userTraining" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="userTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -137,6 +154,7 @@ function FullDiskEncryptionPage() {
             <div>
               <input type="radio" name="regularAudits" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="regularAudits" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="regularAuditsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

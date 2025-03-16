@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function FirstAidResponseFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function FirstAidResponseFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/First aid Response');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   
     const handleSubmit = async (e) => {
@@ -80,6 +95,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="available aid supplies" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="available aid supplies" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="available aid supplies-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -88,6 +104,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="adequate essential items" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="adequate essential items" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="adequate essential items-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -96,6 +113,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="kits regular  inspection" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="kits regular  inspection" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="kits regular  inspection-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -105,6 +123,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="staff Training" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="staff Training" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="staff Training-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -113,6 +132,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="valid certifications" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="valid certifications" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="valid certifications-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -121,6 +141,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="sufficient trained personnel" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="sufficient trained personnel" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="sufficient trained personnel-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -130,6 +151,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="established procedures" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="established procedures" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="established procedures-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="establishedProcedures" placeholder="Describe Emergency procedures " onChange={handleChange}/>
@@ -141,6 +163,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="Staff Actions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Staff Actions" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Staff Actions-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -149,6 +172,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="clear communication channel" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="clear communication channel" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="clear communication channel-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -158,6 +182,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="Medical responsible individual" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Medical responsible individual" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Medical responsible individual-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="medicalResponsibleIndividual" placeholder="List the contact or responsible individual" onChange={handleChange}/>
@@ -169,6 +194,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="Emergency contact details" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="Emergency contact details" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="Emergency contact details-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -176,7 +202,8 @@ function FirstAidResponseFormPage() {
                     <label>Are staff members trained to provide accurate information to emergency medical services regarding the nature and severity of the medical emergency?</label>
                     <div>
                         <input type="radio" name="staff accurate information" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="staf accurate information" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="staff accurate information" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="staff accurate information-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -186,6 +213,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="aid assistance document" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="aid assistance document" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="aid assistance document-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -194,6 +222,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="standardized reporting process" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="standardized reporting process" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="standardized reporting process-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="standardizedReportingProcess" placeholder="Describe the reporting process" onChange={handleChange}/>
@@ -205,6 +234,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="reports review" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="reports review" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="reports review-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -214,6 +244,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="designated areas" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="designated areas" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="designated areas-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -222,6 +253,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="medical equipment Maintainance" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="medical equipment Maintainance" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="medical equipment Maintainance-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -230,6 +262,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="medical equipment training" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="medical equipment training" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="medical equipment training-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -239,6 +272,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="training and education" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="training and education" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="training and education-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -247,6 +281,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="response procedures drills" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="response procedures drills" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="response procedures drills-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -255,6 +290,7 @@ function FirstAidResponseFormPage() {
                     <div>
                         <input type="radio" name="past incidents feedback" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="past incidents feedback" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="past incidents feedback-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

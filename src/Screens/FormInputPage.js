@@ -4,7 +4,7 @@ import { useBuilding } from '../Context/BuildingContext'; // Import the custom h
 import './FormInputPage.css'; // CSS file for styling
 import Navbar from "./Navbar"; // Import the Navbar
 import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
-
+/**/
 function FormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook
   const { buildingId } = useBuilding(); // Access the buildingId from context

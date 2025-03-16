@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function DataBreachNotificationProceduresFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding();
@@ -29,9 +29,24 @@ function DataBreachNotificationProceduresFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Policy and Compliance/Data Breach Notification Procedures');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -116,6 +131,7 @@ function DataBreachNotificationProceduresFormPage() {
                     <div>
                         <input type="radio" name="sentNotifications" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="sentNotifications" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="sentNotificationsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -139,6 +155,7 @@ function DataBreachNotificationProceduresFormPage() {
                     <div>
                         <input type="radio" name="consistencyGuidelines" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="consistencyGuidelines" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="consistencyGuidelinesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -184,6 +201,7 @@ function DataBreachNotificationProceduresFormPage() {
                     <div>
                         <input type="radio" name="reportingBreaches" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="reportingBreaches" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="reportingBreachesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -207,6 +225,7 @@ function DataBreachNotificationProceduresFormPage() {
                     <div>
                         <input type="radio" name="backupMethods" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="backupMethods" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="backupMethodsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -230,6 +249,7 @@ function DataBreachNotificationProceduresFormPage() {
                     <div>
                         <input type="radio" name="addressingQuestions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="addressingQuestions" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="addressingQuestionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -275,6 +295,7 @@ function DataBreachNotificationProceduresFormPage() {
                     <div>
                         <input type="radio" name="updatingProcedures" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="updatingProcedures" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="updatingProceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -298,6 +319,7 @@ function DataBreachNotificationProceduresFormPage() {
                     <div>
                         <input type="radio" name="handlingMedia" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="handlingMedia" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="handlingMediaComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

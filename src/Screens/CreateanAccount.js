@@ -4,7 +4,7 @@ import {firestore, auth} from "../firebaseConfig";
 import { addDoc, collection, Timestamp } from '@firebase/firestore';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import './CreateanAccount.css';
-
+/**/
 function CreateanAccount() {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');

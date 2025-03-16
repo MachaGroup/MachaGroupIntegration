@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 
 function CommunicationPlatformsFormPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
@@ -30,9 +30,24 @@ function CommunicationPlatformsFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Emergency Preparedness/Communiation Platforms');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
  
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,6 +95,7 @@ function CommunicationPlatformsFormPage() {
                     <div>
                         <input type="radio" name="CommPlatformEstablish" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="CommPlatformEstablish" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="CommPlatformEstablishComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="communicationPlatformEstablish" placeholder="Describe the designated communication platforms" onChange={handleChange}/>  
@@ -91,6 +107,7 @@ function CommunicationPlatformsFormPage() {
                     <div>
                         <input type="radio" name="PlatformChannelsUse" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="PlatformChannelsUse" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="PlatformChannelsUseComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -100,6 +117,7 @@ function CommunicationPlatformsFormPage() {
                     <div>
                         <input type="radio" name="PhoneLineDesignate" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="PhoneLineDesignate" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="PhoneLineDesignateComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -108,6 +126,7 @@ function CommunicationPlatformsFormPage() {
                     <div>
                         <input type="radio" name="CommRedundancyAvail" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="CommRedundancyAvail" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="CommRedundancyAvailComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -117,6 +136,7 @@ function CommunicationPlatformsFormPage() {
                     <div>
                         <input type="radio" name="BackupOptionsDesc" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="BackupOptionsDesc" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="BackupOptionsDescComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="backupOptionsDesc" placeholder="Describe the redundant communication options" />  
@@ -128,6 +148,7 @@ function CommunicationPlatformsFormPage() {
                     <div>
                         <input type="radio" name="BackupPlatformsUse" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="BackupPlatformsUse" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="BackupPlatformsUseComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -137,6 +158,7 @@ function CommunicationPlatformsFormPage() {
                     <div>
                         <input type="radio" name="PlatformAccessibility" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="PlatformAccessibility" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="PlatformAccessibilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -145,6 +167,7 @@ function CommunicationPlatformsFormPage() {
                     <div>
                         <input type="radio" name="LanguageFormatsAvail" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="LanguageFormatsAvail" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="LanguageFormatsAvailComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -154,6 +177,7 @@ function CommunicationPlatformsFormPage() {
                     <div>
                         <input type="radio" name="IntegrationPlans" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="IntegrationPlans" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="IntegrationPlansComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
                 <div className="form-section">
@@ -161,6 +185,7 @@ function CommunicationPlatformsFormPage() {
                     <div>
                         <input type="radio" name="EmergencyProcedures" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="EmergencyProcedures" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="EmergencyProceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -170,6 +195,7 @@ function CommunicationPlatformsFormPage() {
                     <div>
                         <input type="radio" name="PlatformTesting" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="PlatformTesting" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="PlatformTestingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -178,6 +204,7 @@ function CommunicationPlatformsFormPage() {
                     <div>
                         <input type="radio" name="ScenarioSimulations" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="ScenarioSimulations" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="ScenarioSimulationsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -187,6 +214,7 @@ function CommunicationPlatformsFormPage() {
                     <div>
                         <input type="radio" name="StaffTrainingComm" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="StaffTrainingComm" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="StaffTrainingCommComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -195,6 +223,7 @@ function CommunicationPlatformsFormPage() {
                     <div>
                         <input type="radio" name="StaffGuidelines" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="StaffGuidelines" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="StaffGuidelinesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -204,6 +233,7 @@ function CommunicationPlatformsFormPage() {
                     <div>
                         <input type="radio" name="ParentFeedback" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="ParentFeedback" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="ParentFeedbackComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="parentFeedback" placeholder="Describe the feedback mechanisms" onChange={handleChange}/>  
@@ -215,6 +245,7 @@ function CommunicationPlatformsFormPage() {
                     <div>
                         <input type="radio" name="ProtocolEnhancements" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="ProtocolEnhancements" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="ProtocolEnhancementsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

@@ -29,8 +29,23 @@ function PTZCamerasPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Physical Security/PTZ Cameras');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -80,6 +95,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="operational" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="operational" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="operationalComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -88,6 +104,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="flexibleMonitoring" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="flexibleMonitoring" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="flexibleMonitoringComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -96,6 +113,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="malfunction" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="malfunction" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="malfunctionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -104,6 +122,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="backupSystems" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="backupSystems" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="backupSystemsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -114,6 +133,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="coverage" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="coverage" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="coverageComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -122,6 +142,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="strategicPositioning" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="strategicPositioning" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="strategicPositioningComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -130,6 +151,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="presetPositions" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="presetPositions" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="presetPositionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -140,6 +162,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="imageQuality" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="imageQuality" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="imageQualityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -148,6 +171,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="imageAdjustments" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="imageAdjustments" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="imageAdjustmentsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -156,6 +180,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="zoomQuality" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="zoomQuality" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="zoomQualityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -166,6 +191,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="integrationSurveillance" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="integrationSurveillance" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="integrationSurveillanceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -174,6 +200,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="seamlessCommunication" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="seamlessCommunication" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="seamlessCommunicationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -182,6 +209,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="realTimeMonitoring" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="realTimeMonitoring" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="realTimeMonitoringComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -192,6 +220,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="durabilityWeatherResistance" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="durabilityWeatherResistance" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="durabilityWeatherResistanceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -200,6 +229,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="durableMaterials" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="durableMaterials" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="durableMaterialsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -208,6 +238,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="protectiveEnclosures" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="protectiveEnclosures" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="protectiveEnclosuresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -218,6 +249,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="remoteControl" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="remoteControl" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="remoteControlComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -226,6 +258,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="remoteAdjustments" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="remoteAdjustments" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="remoteAdjustmentsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -234,6 +267,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="secureAuthentication" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="secureAuthentication" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="secureAuthenticationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -244,6 +278,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceScheduleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -252,6 +287,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceTasksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -260,6 +296,7 @@ function PTZCamerasPage() {
             <div>
               <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

@@ -29,8 +29,23 @@ function PersonalDeviceUsageFormPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Policy and Compliance/Personal Device Usage');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -87,6 +102,7 @@ function PersonalDeviceUsageFormPage() {
                     <div>
                         <input type="radio" name="securityRequirements" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="securityRequirements" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="securityRequirementsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -117,6 +133,7 @@ function PersonalDeviceUsageFormPage() {
                     <div>
                         <input type="radio" name="deviceProtocols" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="deviceProtocols" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="deviceProtocolsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -140,6 +157,7 @@ function PersonalDeviceUsageFormPage() {
                     <div>
                         <input type="radio" name="passwordRequirements" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="passwordRequirements" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="passwordRequirementsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -156,6 +174,7 @@ function PersonalDeviceUsageFormPage() {
                     <div>
                         <input type="radio" name="resourceRestrictions" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="resourceRestrictions" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="resourceRestrictionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -186,6 +205,7 @@ function PersonalDeviceUsageFormPage() {
                     <div>
                         <input type="radio" name="policyConsequences" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="policyConsequences" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="policyConsequencesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -231,6 +251,7 @@ function PersonalDeviceUsageFormPage() {
                     <div>
                         <input type="radio" name="documentedProcedures" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="documentedProcedures" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="documentedProceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -276,6 +297,7 @@ function PersonalDeviceUsageFormPage() {
                     <div>
                         <input type="radio" name="assistingUsers" value="yes" onChange={handleChange}/> Yes
                         <input type="radio" name="assistingUsers" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="assistingUsersComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 

@@ -29,8 +29,23 @@ function WeatherproofCamerasPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Physical Security/WeatherProof Cameras');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -81,6 +96,9 @@ function WeatherproofCamerasPage() {
               <input type="radio" name="weatherProofDesign" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="weatherProofDesign" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="weatherProofDesignComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -89,6 +107,9 @@ function WeatherproofCamerasPage() {
               <input type="radio" name="durableMaterials" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="durableMaterials" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="durableMaterialsComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -96,6 +117,9 @@ function WeatherproofCamerasPage() {
             <div>
               <input type="radio" name="certificationTesting" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="certificationTesting" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="certificationTestingComments" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -107,6 +131,9 @@ function WeatherproofCamerasPage() {
               <input type="radio" name="secureMounting" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="secureMounting" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="secureMountingComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -115,6 +142,9 @@ function WeatherproofCamerasPage() {
               <input type="radio" name="optimalPositioning" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="optimalPositioning" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="optimalPositioningComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -122,6 +152,9 @@ function WeatherproofCamerasPage() {
             <div>
               <input type="radio" name="protectedWiring" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="protectedWiring" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="protectedWiringComments" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -133,6 +166,9 @@ function WeatherproofCamerasPage() {
               <input type="radio" name="imageQuality" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="imageQuality" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="imageQualityComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -141,6 +177,9 @@ function WeatherproofCamerasPage() {
               <input type="radio" name="imageAdjustments" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="imageAdjustments" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="imageAdjustmentsComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -148,6 +187,9 @@ function WeatherproofCamerasPage() {
             <div>
               <input type="radio" name="imageClarity" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="imageClarity" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="imageClarityComments" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -159,6 +201,9 @@ function WeatherproofCamerasPage() {
               <input type="radio" name="integrationSurveillance" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="integrationSurveillance" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="integrationSurveillanceComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -167,6 +212,9 @@ function WeatherproofCamerasPage() {
               <input type="radio" name="softwareCommunication" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="softwareCommunication" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="softwareCommunicationComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -174,6 +222,9 @@ function WeatherproofCamerasPage() {
             <div>
               <input type="radio" name="realTimeMonitoring" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="realTimeMonitoring" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="realTimeMonitoringComments" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -185,6 +236,9 @@ function WeatherproofCamerasPage() {
               <input type="radio" name="remoteControl" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="remoteControl" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="remoteControlComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -193,6 +247,9 @@ function WeatherproofCamerasPage() {
               <input type="radio" name="adjustableCameraSettings" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="adjustableCameraSettings" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="adjustableCameraSettingsComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -200,6 +257,9 @@ function WeatherproofCamerasPage() {
             <div>
               <input type="radio" name="secureProtocols" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="secureProtocols" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="secureProtocolsComments" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -211,6 +271,9 @@ function WeatherproofCamerasPage() {
               <input type="radio" name="comprehensiveCoverage" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="comprehensiveCoverage" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="comprehensiveCoverageComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -218,6 +281,9 @@ function WeatherproofCamerasPage() {
             <div>
               <input type="radio" name="strategicPositioning" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="strategicPositioning" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="strategicPositioningComments" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 
@@ -236,6 +302,9 @@ function WeatherproofCamerasPage() {
               <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="maintenanceScheduleComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -244,6 +313,9 @@ function WeatherproofCamerasPage() {
               <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
             </div>
+            <div>
+              <input type="text" name="maintenanceTasksComments" placeholder="Comments" onChange={handleChange}/>
+            </div>
           </div>
 
           <div className="form-section">
@@ -251,6 +323,9 @@ function WeatherproofCamerasPage() {
             <div>
               <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
+            </div>
+            <div>
+              <input type="text" name="maintenanceRecordsComments" placeholder="Comments" onChange={handleChange}/>
             </div>
           </div>
 

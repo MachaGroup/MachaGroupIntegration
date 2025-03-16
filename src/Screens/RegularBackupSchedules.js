@@ -29,8 +29,23 @@ function RegularBackupSchedulesPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Cybersecurity/Regular Backup Schedules');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
@@ -81,6 +96,7 @@ function RegularBackupSchedulesPage() {
             <div>
               <input type="radio" name="criticalDataIncluded" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="criticalDataIncluded" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="criticalDataIncludedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -98,6 +114,7 @@ function RegularBackupSchedulesPage() {
             <div>
               <input type="radio" name="automatedBackupSystems" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="automatedBackupSystems" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="automatedBackupSystemsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -119,6 +136,7 @@ function RegularBackupSchedulesPage() {
             <div>
               <input type="radio" name="secureBackupStorage" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="secureBackupStorage" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="secureBackupStorageComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -132,6 +150,7 @@ function RegularBackupSchedulesPage() {
             <div>
               <input type="radio" name="backupAlerts" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="backupAlerts" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="backupAlertsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -163,6 +182,7 @@ function RegularBackupSchedulesPage() {
             <div>
               <input type="radio" name="backupProceduresDocumented" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="backupProceduresDocumented" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="backupProceduresDocumentedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
           <div className="form-section">
@@ -184,6 +204,7 @@ function RegularBackupSchedulesPage() {
             <div>
               <input type="radio" name="backupRecoveryTested" value="Yes" onChange={handleChange} /> Yes
               <input type="radio" name="backupRecoveryTested" value="No" onChange={handleChange} /> No
+              <textarea className='comment-box' name="backupRecoveryTestedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

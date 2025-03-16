@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-
+/**/
 function DomeCamerasPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const { buildingId } = useBuilding(); // Access buildingId from context
@@ -29,9 +29,24 @@ function DomeCamerasPage() {
   };
 
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
-  };
+  const handleBack = async () => {
+          if (formData && buildingId) { // Check if formData and buildingId exist
+            try {
+              const buildingRef = doc(db, 'Buildings', buildingId);
+              const formsRef = collection(db, 'forms/Physical Security/Dome Cameras');
+              await addDoc(formsRef, {
+                building: buildingRef,
+                formData: formData,
+              });
+              console.log('Form Data submitted successfully on back!');
+              alert('Form data saved before navigating back!');
+            } catch (error) {
+              console.error('Error saving form data:', error);
+              alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+          }
+          navigate(-1);
+        };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,6 +95,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="strategicPlacement" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="strategicPlacement" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="strategicPlacementComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -88,6 +104,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="coverage" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="coverage" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="coverageComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -103,6 +120,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="secureMounting" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="secureMounting" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="secureMountingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -111,6 +129,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="protectiveHousing" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="protectiveHousing" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="protectiveHousingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -119,6 +138,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="concealedWiring" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="concealedWiring" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="concealedWiringComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -129,6 +149,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="imageQuality" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="imageQuality" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="imageQualityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -142,6 +163,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="imageClarity" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="imageClarity" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="imageClarityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -152,6 +174,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="systemIntegration" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="systemIntegration" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="systemIntegrationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -160,6 +183,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="communicationSeamless" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="communicationSeamless" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="communicationSeamlessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -168,6 +192,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="realTimeMonitoring" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="realTimeMonitoring" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="realTimeMonitoringComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -178,6 +203,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="remoteControl" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="remoteControl" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="remoteControlComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -186,6 +212,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="remoteAdjustments" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="remoteAdjustments" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="remoteAdjustmentsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -194,6 +221,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="encryptionProtocols" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="encryptionProtocols" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="encryptionProtocolsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -204,6 +232,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="durability" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="durability" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="durabilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -212,6 +241,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="durableMaterials" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="durableMaterials" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="durableMaterialsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -220,6 +250,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="damageProtection" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="damageProtection" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="damageProtectionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -230,6 +261,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceScheduleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -238,6 +270,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceTasksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 
@@ -246,6 +279,7 @@ function DomeCamerasPage() {
             <div>
               <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
               <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
+              <textarea className='comment-box' name="maintenanceRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
 

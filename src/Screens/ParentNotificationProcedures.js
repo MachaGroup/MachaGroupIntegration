@@ -30,8 +30,23 @@ function ParentNotificationProceduresFormPage() {
   };
   
   // Function to handle back button
-  const handleBack = () => {
-    navigate(-1);  // Navigates to the previous page
+  const handleBack = async () => {
+    if (formData && buildingId) { // Check if formData and buildingId exist
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Emergency Preparedness/Parent Notification Procedures');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
   };
  
   const handleSubmit = async (e) => {
@@ -78,8 +93,9 @@ function ParentNotificationProceduresFormPage() {
                 <div className="form-section">
                     <label>Are formal procedures established for notifying parents/guardians during emergencies or critical incidents?</label>
                     <div>
-                        <input type="radio" name="Notification Procedures Existence" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Notification Procedures Existence" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="NotificationProceduresExistence" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="NotificationProceduresExistence" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="NotificationProceduresExistenceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="notificationProceduresExistence" placeholder="Describe the procedures" onChange={handleChange}/>  
@@ -89,8 +105,9 @@ function ParentNotificationProceduresFormPage() {
                 <div className="form-section">
                     <label>Do notification procedures include the use of automated messaging systems or other technology-enabled methods for rapid communication?</label>
                     <div>
-                        <input type="radio" name="Notification Tech Methods" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Notification Tech Methods" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="NotificationTechMethods" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="NotificationTechMethods" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="NotificationTechMethodsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -98,8 +115,9 @@ function ParentNotificationProceduresFormPage() {
                 <div className="form-section">
                     <label>Is an automated messaging system implemented to facilitate timely and efficient communication with parents/guardians?</label>
                     <div>
-                        <input type="radio" name="Automated Messaging Implementation" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Automated Messaging Implementation" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="AutomatedMessagingImplementation" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="AutomatedMessagingImplementation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="AutomatedMessagingImplementationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="automatedMessagingImplementation" placeholder="Describe the automated messaging system" onChange={handleChange}/>  
@@ -109,8 +127,9 @@ function ParentNotificationProceduresFormPage() {
                 <div className="form-section">
                     <label>Does the automated messaging system have the capability to send notifications via various channels such as phone calls, text messages, emails, or mobile apps?</label>
                     <div>
-                        <input type="radio" name="Multichannel Notification Capability" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Multichannel Notification Capability" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="MultichannelNotificationCapability" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="MultichannelNotificationCapability" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="MultichannelNotificationCapabilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -118,16 +137,18 @@ function ParentNotificationProceduresFormPage() {
                 <div className="form-section">
                     <label>Are standardized message templates developed for various types of emergencies, such as lockdowns, evacuations, severe weather, or medical emergencies?</label>
                     <div>
-                        <input type="radio" name="Standardized Emergency Templates" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Standardized Emergency Templates" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="StandardizedEmergencyTemplates" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="StandardizedEmergencyTemplates" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="StandardizedEmergencyTemplatesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>Do these templates include essential information, such as the nature of the emergency, specific actions to take, and any additional instructions or precautions?</label>
                     <div>
-                        <input type="radio" name="Template Essential Info" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Template Essential Info" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="TemplateEssentialInfo" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="TemplateEssentialInfo" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="TemplateEssentialInfoComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -135,16 +156,18 @@ function ParentNotificationProceduresFormPage() {
                 <div className="form-section">
                     <label>Are emergency announcements scripted to convey information in a clear, concise, and easily understandable manner?</label>
                     <div>
-                        <input type="radio" name="Clear Emergency Scripts" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Clear Emergency Scripts" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="ClearEmergencyScripts" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="ClearEmergencyScripts" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="ClearEmergencyScriptsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>Do scripts avoid technical jargon or ambiguous language that could cause confusion or misunderstanding during emergencies?</label>
                     <div>
-                        <input type="radio" name="Avoid Jargon in Scripts" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Avoid Jargon in Scripts" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="AvoidJargonInScripts" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="AvoidJargonInScripts" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="AvoidJargonInScriptsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -152,16 +175,18 @@ function ParentNotificationProceduresFormPage() {
                 <div className="form-section">
                     <label>Are multiple communication channels utilized to ensure redundancy and reach a broad audience of parents/guardians?</label>
                     <div>
-                        <input type="radio" name="Redundant Communication Channels" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Redundant Communication Channels" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="RedundantCommunicationChannels" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="RedundantCommunicationChannels" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="RedundantCommunicationChannelsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>Is there a prioritization scheme for selecting communication channels based on factors such as urgency, audience preferences, and accessibility?</label>
                     <div>
-                        <input type="radio" name="Channel Prioritization Scheme" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Channel Prioritization Scheme" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="ChannelPrioritizationScheme" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="ChannelPrioritizationScheme" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="ChannelPrioritizationSchemeComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                     <div>
                         <input type="text" name="channelPrioritizationScheme" placeholder="Describe the scheme" onChange={handleChange}/>  
@@ -172,16 +197,18 @@ function ParentNotificationProceduresFormPage() {
                 <div className="form-section">
                     <label>Is parent contact information maintained in a centralized database or system, and is it regularly updated to ensure accuracy?</label>
                     <div>
-                        <input type="radio" name="Parent Contact Database" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Parent Contact Database" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="ParentContactDatabase" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="ParentContactDatabase" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="ParentContactDatabaseComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>Is there integration between the automated messaging system and parent contact databases to streamline the notification process?</label>
                     <div>
-                        <input type="radio" name="System Integration Process" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="System Integration Process" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="SystemIntegrationProcess" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="SystemIntegrationProcess" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="SystemIntegrationProcessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -189,16 +216,18 @@ function ParentNotificationProceduresFormPage() {
                 <div className="form-section">
                     <label>Are notification procedures tested and verified periodically to assess their effectiveness and reliability?</label>
                     <div>
-                        <input type="radio" name="Notification Testing Schedule" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Notification Testing Schedule" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="NotificationTestingSchedule" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="NotificationTestingSchedule" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="NotificationTestingScheduleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>Are test scenarios conducted to simulate emergency situations and evaluate the responsiveness and performance of the automated messaging system?</label>
                     <div>
-                        <input type="radio" name="Test Scenario Evaluation" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Test Scenario Evaluation" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="TestScenarioEvaluation" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="TestScenarioEvaluation" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="TestScenarioEvaluationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
@@ -206,16 +235,18 @@ function ParentNotificationProceduresFormPage() {
                 <div className="form-section">
                     <label>Are feedback mechanisms in place to solicit input from parents regarding the clarity, timeliness, and usefulness of emergency notifications?</label>
                     <div>
-                        <input type="radio" name="Parent Feedback Mechanisms" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Parent Feedback Mechanisms" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="ParentFeedbackMechanisms" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="ParentFeedbackMechanisms" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="ParentFeedbackMechanismsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
                 <div className="form-section">
                     <label>Are recommendations from feedback evaluations used to refine notification procedures and improve their efficacy in future emergency situations?</label>
                     <div>
-                        <input type="radio" name="Procedure Refinement Feedback" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Procedure Refinement Feedback" value="no" onChange={handleChange}/> No
+                        <input type="radio" name="ProcedureRefinementFeedback" value="yes" onChange={handleChange}/> Yes
+                        <input type="radio" name="ProcedureRefinementFeedback" value="no" onChange={handleChange}/> No
+                        <textarea className='comment-box' name="ProcedureRefinementFeedbackComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
                     </div>
                 </div>
 
