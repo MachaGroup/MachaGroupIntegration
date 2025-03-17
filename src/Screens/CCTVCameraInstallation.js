@@ -1,22 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-/**/
+
 function CCTVCameraInstallationPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
+  const navigate = useNavigate();
   const { buildingId } = useBuilding();
   const db = getFirestore();
+  const storage = getStorage();
 
-  const [formData, setFormData] = useState();
+  const [formData, setFormData] = useState({});
+  const [image, setImage] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [uploadError, setUploadError] = useState(null);
 
   useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress'); 
+    if (!buildingId) {
+      alert('No building selected. Redirecting to Building Info...');
+      navigate('BuildingandAddress');
     }
   }, [buildingId, navigate]);
 
@@ -28,46 +34,59 @@ function CCTVCameraInstallationPage() {
     }));
   };
 
-  // Function to handle back button
-  const handleBack = async () => {
-          if (formData && buildingId) { // Check if formData and buildingId exist
-            try {
-              const buildingRef = doc(db, 'Buildings', buildingId);
-              const formsRef = collection(db, 'forms/Continuous Improvement - Safety and Security/CCTV Camera Installation and Monitoring');
-              await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-              });
-              console.log('Form Data submitted successfully on back!');
-              alert('Form data saved before navigating back!');
-            } catch (error) {
-              console.error('Error saving form data:', error);
-              alert('Failed to save form data before navigating back. Some data may be lost.');
-            }
-          }
-          navigate(-1);
-        };
+  const handleImageChange = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if(!buildingId) {
+    if (!buildingId) {
       alert('Building ID is missing. Please start the assessment from the correct page.');
       return;
     }
 
     try {
-      // Create a document reference to the building in the 'Buildings' collection
       const buildingRef = doc(db, 'Buildings', buildingId);
-
-      // Store the form data in the specified Firestore structure
       const formsRef = collection(db, 'forms/Continuous Improvement - Safety and Security/CCTV Camera Installation and Monitoring');
+
+      if (image) {
+        if (!image.type.match('image/*')) {
+          setUploadError('Please select a valid image file (jpg, jpeg, png, etc.)');
+          return;
+        }
+        if (image.size > 5 * 1024 * 1024) {
+          setUploadError('Image file too large (Max 5MB)');
+          return;
+        }
+
+        const storageRef = ref(storage, `cctv_images/${Date.now()}_${image.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, image);
+
+        uploadTask.on('state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setUploadProgress(progress);
+          },
+          (error) => {
+            setUploadError(error);
+          },
+          async () => {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            setImageUrl(downloadURL);
+            setFormData({ ...formData, imageUrl: downloadURL });
+            setUploadError(null);
+          }
+        );
+      }
+
       await addDoc(formsRef, {
-        buildling: buildingRef,
+        building: buildingRef,
         formData: formData,
       });
-      console.log('Form Data submitted successfully!')
-      alert('Form Submitted successfully!');
+      console.log('Form Data submitted successfully!');
+      alert('Form submitted successfully!');
       navigate('/Form');
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -75,21 +94,18 @@ function CCTVCameraInstallationPage() {
     }
   };
 
-
   return (
     <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>7.3.1.2.1. CCTV Camera Installation and Monitoring</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
+      <header className="header">
+        <Navbar />
+        <button className="back-button" onClick={() => navigate(-1)}>←</button>
+        <h1>7.3.1.2.1. CCTV Camera Installation and Monitoring</h1>
+        <img src={logo} alt="Logo" className="logo" />
+      </header>
 
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-              {/* CCTV Camera Installation and Monitoring */}
-              <h2>7.3.1.2.1. CCTV Camera Installation and Monitoring</h2>
+      <main className="form-container">
+        <form onSubmit={handleSubmit}>
+        <h2>7.3.1.2.1. CCTV Camera Installation and Monitoring</h2>
               <div className="form-section">
                 <label>What criteria are used to determine the placement of CCTV cameras throughout the facility?</label>
                 <div>
@@ -124,15 +140,15 @@ function CCTVCameraInstallationPage() {
                   <input type="text" name="cctvSystemEvaluation" placeholder="Describe evaluation and update frequency" onChange={handleChange}/>
                 </div>
               </div>
-
-          
-                    {/* Submit Button */}
-                    <button type="submit">Submit</button>
-
-            </form>
-        </main>
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+          {uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
+          {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+          {uploadError && <p style={{ color: 'red' }}>{uploadError}</p>}
+          <button type="submit">Submit</button>
+        </form>
+      </main>
     </div>
-  )
+  );
 }
 
 export default CCTVCameraInstallationPage;

@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-/**/
-function BulletCamerasPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding(); // Access buildingId from context
-  const db = getFirestore();
 
-  const [formData, setFormData] = useState();
+function BulletCamerasPage() {
+  const navigate = useNavigate();
+  const { buildingId } = useBuilding();
+  const db = getFirestore();
+  const storage = getStorage();
+
+  const [formData, setFormData] = useState({});
+  const [image, setImage] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [uploadError, setUploadError] = useState(null);
 
   useEffect(() => {
       if (!buildingId) {
@@ -28,25 +34,11 @@ function BulletCamerasPage() {
       }));
   };
 
-  // Function to handle back button
-  const handleBack = async () => {
-          if (formData && buildingId) { // Check if formData and buildingId exist
-            try {
-              const buildingRef = doc(db, 'Buildings', buildingId);
-              const formsRef = collection(db, 'forms/Physical Security/Bullet Cameras');
-              await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-              });
-              console.log('Form Data submitted successfully on back!');
-              alert('Form data saved before navigating back!');
-            } catch (error) {
-              console.error('Error saving form data:', error);
-              alert('Failed to save form data before navigating back. Some data may be lost.');
-            }
-          }
-          navigate(-1);
-        };
+  const handleImageChange = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,14 +49,42 @@ function BulletCamerasPage() {
     }
 
     try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId); 
-
-      // Store the form data in the specified Firestore structure
+      const buildingRef = doc(db, 'Buildings', buildingId);
       const formsRef = collection(db, 'forms/Physical Security/Bullet Cameras');
+
+      if (image) {
+        if (!image.type.match('image/*')) {
+          setUploadError('Please select a valid image file (jpg, jpeg, png, etc.)');
+          return;
+        }
+        if (image.size > 5 * 1024 * 1024) {
+          setUploadError('Image file too large (Max 5MB)');
+          return;
+        }
+
+        const storageRef = ref(storage, `bulletCameras_images/${Date.now()}_${image.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, image);
+
+        uploadTask.on('state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setUploadProgress(progress);
+          },
+          (error) => {
+            setUploadError(error);
+          },
+          async () => {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            setImageUrl(downloadURL);
+            setFormData({ ...formData, imageUrl: downloadURL });
+            setUploadError(null);
+          }
+        );
+      }
+
       await addDoc(formsRef, {
-          building: buildingRef, // Reference to the building document
-          formData: formData, // Store the form data as a nested object
+          building: buildingRef,
+          formData: formData,
       });
 
       console.log('Form data submitted successfully!');
@@ -74,22 +94,20 @@ function BulletCamerasPage() {
         console.error('Error submitting form:', error);
         alert('Failed to submit the form. Please try again.');
     }
-};
+  };
 
   return (
     <div className="form-page">
       <header className="header">
             <Navbar />
-        {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
+        <button className="back-button" onClick={() => navigate(-1)}>←</button>
         <h1>Bullet Cameras Assessment</h1>
         <img src={logo} alt="Logo" className="logo" />
       </header>
 
       <main className="form-container">
         <form onSubmit={handleSubmit}>
-          {/* Placement and Coverage */}
-          <h2>Placement and Coverage:</h2>
+        <h2>Placement and Coverage:</h2>
           <div className="form-section">
             <label>Are the bullet cameras strategically positioned to overlook entrances and provide comprehensive surveillance coverage?</label>
             <div>
@@ -288,8 +306,10 @@ function BulletCamerasPage() {
               <textarea className='comment-box' name="maintenanceRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
-
-          {/* Submit Button */}
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+          {uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
+          {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+          {uploadError && <p style={{ color: 'red' }}>{uploadError}</p>}
           <button type="submit">Submit</button>
         </form>
       </main>

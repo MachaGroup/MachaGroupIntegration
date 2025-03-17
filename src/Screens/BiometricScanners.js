@@ -1,20 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext';
-import './FormQuestions.css';  // Ensure this is linked to your universal CSS
+import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-/**/
+
 function BiometricScannersPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
+  const navigate = useNavigate();
   const { buildingId } = useBuilding();
   const db = getFirestore();
+  const storage = getStorage();
 
-  const [formData, setFormData] = useState();
+  const [formData, setFormData] = useState({});
+  const [image, setImage] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [uploadError, setUploadError] = useState(null);
 
   useEffect(() => {
-    if(!buildingId) {
+    if (!buildingId) {
       alert('No building selected. Redirecting to Building Info...');
       navigate('BuildingandAddress');
     }
@@ -28,68 +34,78 @@ function BiometricScannersPage() {
     }));
   };
 
+  const handleImageChange = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the right page.');
+    if (!buildingId) {
+      alert('Building ID is missing. Please start the assessment from the correct page.');
       return;
     }
 
     try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buidlings', buildingId);
+      const buildingRef = doc(db, 'Buildings', buildingId);
+      const formsRef = collection(db, 'forms/Physical Security/Biometric Scanners');
 
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Physical Security/Biometric Scanners')
+      if (image) {
+        if (!image.type.match('image/*')) {
+          setUploadError('Please select a valid image file (jpg, jpeg, png, etc.)');
+          return;
+        }
+        if (image.size > 5 * 1024 * 1024) {
+          setUploadError('Image file too large (Max 5MB)');
+          return;
+        }
+
+        const storageRef = ref(storage, `biometricScanners_images/${Date.now()}_${image.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, image);
+
+        uploadTask.on('state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setUploadProgress(progress);
+          },
+          (error) => {
+            setUploadError(error);
+          },
+          async () => {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            setImageUrl(downloadURL);
+            setFormData({ ...formData, imageUrl: downloadURL });
+            setUploadError(null);
+          }
+        );
+      }
+
       await addDoc(formsRef, {
         building: buildingRef,
         formData: formData,
       });
-
-      console.log('Form data submitted successfully!');
+      console.log('Form Data submitted successfully!');
       alert('Form submitted successfully!');
       navigate('/Form');
     } catch (error) {
-      console.error('Error submitting the form:', error);
+      console.error('Error submitting form:', error);
       alert('Failed to submit the form. Please try again.');
     }
   };
 
-  // Function to handle back button
-  const handleBack = async () => {
-          if (formData && buildingId) { // Check if formData and buildingId exist
-            try {
-              const buildingRef = doc(db, 'Buildings', buildingId);
-              const formsRef = collection(db, 'forms/Physical Security/Biometric Scanners');
-              await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-              });
-              console.log('Form Data submitted successfully on back!');
-              alert('Form data saved before navigating back!');
-            } catch (error) {
-              console.error('Error saving form data:', error);
-              alert('Failed to save form data before navigating back. Some data may be lost.');
-            }
-          }
-          navigate(-1);
-        };
-
   return (
     <div className="form-page">
       <header className="header">
-            <Navbar />
-        {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-        <h1>1.1.1.2.2. Biometric Scanners Assessment</h1>
+        <Navbar />
+        <button className="back-button" onClick={() => navigate(-1)}>←</button>
+        <h1>Biometric Scanners Assessment</h1>
         <img src={logo} alt="Logo" className="logo" />
       </header>
 
       <main className="form-container">
         <form onSubmit={handleSubmit}>
-          {/* Functionality and Operation */}
-          <h2>Functionality and Operation:</h2>
+        <h2>Functionality and Operation:</h2>
           <div className="form-section">
             <label>Are the biometric scanners operational and functioning as intended?</label>
             <div>
@@ -309,8 +325,10 @@ function BiometricScannersPage() {
               <textarea className='comment-box' name="reportingProcessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
-
-          {/* Submit Button */}
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+          {uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
+          {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+          {uploadError && <p style={{ color: 'red' }}>{uploadError}</p>}
           <button type="submit">Submit</button>
         </form>
       </main>
