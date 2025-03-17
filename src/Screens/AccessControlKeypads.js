@@ -1,36 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-/**/
+
 function AccessControlKeypadsPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
+  const navigate = useNavigate();
   const { buildingId } = useBuilding();
   const db = getFirestore();
+  const storage = getStorage();
 
-  const [formData, setFormData] = useState();
+  const [formData, setFormData] = useState({});
+  const [image, setImage] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [uploadError, setUploadError] = useState(null);
 
   useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
+    if (!buildingId) {
+      alert('No building selected. Redirecting to Building Info...');
       navigate('BuildingandAddress');
     }
   }, [buildingId, navigate]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    const { name, type, checked, value } = e.target;
+
+    if (type === 'radio') {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: checked ? value : '',
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
 
-  // Function to handle back button
+  const handleImageChange = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
+
   const handleBack = async () => {
-    if (formData && buildingId) { // Check if formData and buildingId exist
+    if (formData && buildingId) {
       try {
         const buildingRef = doc(db, 'Buildings', buildingId);
         const formsRef = collection(db, 'forms/Physical Security/Access Control Keypads');
@@ -50,24 +69,45 @@ function AccessControlKeypadsPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if(!buildingId) {
+
+    if (!buildingId) {
       alert('Building ID is missing. Please start the assessment from the correct page.');
       return;
     }
 
     try {
-      // Create a document reference to the building in the 'Buildings' collection.
       const buildingRef = doc(db, 'Buildings', buildingId);
-
-      // Store the form data in the specified Firestore structure
       const formsRef = collection(db, 'forms/Physical Security/Access Control Keypads');
+
+      if (image) {
+        const storageRef = ref(storage, `keypad_images/${Date.now()}_${image.name}`);
+
+        const uploadTask = uploadBytesResumable(storageRef, image);
+
+        uploadTask.on('state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setUploadProgress(progress);
+          },
+          (error) => {
+            setUploadError(error);
+          },
+          () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              setImageUrl(downloadURL);
+              setFormData({ ...formData, imageUrl: downloadURL });
+              setUploadError(null);
+            });
+          }
+        );
+      }
+
       await addDoc(formsRef, {
-        buildling: buildingRef,
+        building: buildingRef,
         formData: formData,
       });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
+      console.log('Form data submitted successfully!');
+      alert('Form submitted successfully!');
       navigate('/Form');
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -78,9 +118,8 @@ function AccessControlKeypadsPage() {
   return (
     <div className="form-page">
       <header className="header">
-            <Navbar />
-        {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
+        <Navbar />
+        <button className="back-button" onClick={handleBack}>←</button>
         <h1>Access Control Keypads Assessment</h1>
         <img src={logo} alt="Logo" className="logo" />
       </header>
@@ -92,12 +131,13 @@ function AccessControlKeypadsPage() {
           <div className="form-section">
             <label>Are the access control keypads operational and functioning as intended?</label>
             <div>
-              <input type="radio" name="operational" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="operational" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="operationalComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
+              <input type="radio" name="operational" value="yes" onChange={handleChange} /> Yes
+              <input type="radio" name="operational" value="no" onChange={handleChange} /> No
             </div>
+            <textarea className='comment-box' name="operationalComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
           </div>
 
+          {/* ...rest of your form questions... */}
           <div className="form-section">
             <label>Do the keypads reliably authenticate users and grant access to restricted areas?</label>
             <div>
@@ -307,8 +347,11 @@ function AccessControlKeypadsPage() {
               <textarea className='comment-box' name="reportingProcessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
             </div>
           </div>
+          {/* Image Upload */}
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+          {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+          {uploadError && <p style={{ color: 'red' }}>{uploadError.message}</p>}
 
-          {/* Submit Button */}
           <button type="submit">Submit</button>
         </form>
       </main>

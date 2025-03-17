@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-/**/
+
 function AccessControlListsPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding();
     const db = getFirestore();
+    const storage = getStorage();
     const [formData, setFormData] = useState({});
+    const [image, setImage] = useState(null);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [uploadError, setUploadError] = useState(null);
 
     useEffect(() => {
         if (!buildingId) {
@@ -20,15 +26,28 @@ function AccessControlListsPage() {
     }, [buildingId, navigate]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+        const { name, type, checked, value } = e.target;
+        if (type === 'radio') {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: checked ? value : '',
+            }));
+        } else {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+        }
+    };
+
+    const handleImageChange = (e) => {
+        if (e.target.files[0]) {
+            setImage(e.target.files[0]);
+        }
     };
 
     const handleBack = async () => {
-        if (formData && buildingId) { // Check if formData and buildingId exist
+        if (formData && buildingId) { 
           try {
             const buildingRef = doc(db, 'Buildings', buildingId);
             const formsRef = collection(db, 'forms/Cybersecurity/Access Control Lists');
@@ -57,6 +76,29 @@ function AccessControlListsPage() {
         try {
             const buildingRef = doc(db, 'Buildings', buildingId);
             const formsRef = collection(db, 'forms/Cybersecurity/Access Control Lists');
+
+            if (image) {
+                const storageRef = ref(storage, `acl_images/${Date.now()}_${image.name}`);
+                const uploadTask = uploadBytesResumable(storageRef, image);
+
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        setUploadProgress(progress);
+                    },
+                    (error) => {
+                        setUploadError(error);
+                    },
+                    () => {
+                        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                            setImageUrl(downloadURL);
+                            setFormData({ ...formData, imageUrl: downloadURL });
+                            setUploadError(null);
+                        });
+                    }
+                );
+            }
+
             await addDoc(formsRef, {
                 building: buildingRef,
                 formData: formData,
@@ -88,6 +130,7 @@ function AccessControlListsPage() {
                         <textarea name="defineCriteria" onChange={handleChange}></textarea>
                     </div>
 
+                    {/* ...rest of your form questions... */}
                     <div className="form-section">
                         <label>How does the firewall utilize ACLs to differentiate between authorized and unauthorized network traffic, and what are the default settings for incoming and outgoing traffic?</label>
                         <textarea name="firewallUtilization" onChange={handleChange}></textarea>
@@ -177,6 +220,10 @@ function AccessControlListsPage() {
                         <label>How are ACLs integrated with other network security measures, such as intrusion detection systems (IDS) or security information and event management (SIEM) systems, to provide a comprehensive security posture?</label>
                         <textarea name="integrationSecurityMeasures" onChange={handleChange}></textarea>
                     </div>
+                    {/* Image Upload */}
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {uploadError && <p style={{ color: 'red' }}>{uploadError.message}</p>}
 
                     <button type="submit">Submit</button>
                 </form>

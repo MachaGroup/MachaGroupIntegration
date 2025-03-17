@@ -1,103 +1,141 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-/**/
-function ActiveShooterResponseFormPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding(); // Access buildingId from context
-  const db = getFirestore();
 
-  const [formData, setFormData] = useState();
+function ActiveShooterResponseFormPage() {
+  const navigate = useNavigate();
+  const { buildingId } = useBuilding();
+  const db = getFirestore();
+  const storage = getStorage(); // Initialize Firebase Storage
+
+  const [formData, setFormData] = useState({});
+  const [image, setImage] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [uploadError, setUploadError] = useState(null);
 
   useEffect(() => {
-      if (!buildingId) {
-          alert('No building selected. Redirecting to Building Info...');
-          navigate('/BuildingandAddress');
-      }
+    if (!buildingId) {
+      alert('No building selected. Redirecting to Building Info...');
+      navigate('/BuildingandAddress');
+    }
   }, [buildingId, navigate]);
 
   const handleChange = (e) => {
-      const { name, value } = e.target;
+    const { name, type, checked, value } = e.target;
+
+    if (type === 'radio') {
       setFormData((prevData) => ({
-          ...prevData,
-          [name]: value,
+        ...prevData,
+        [name]: checked ? value : '',
       }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
 
-  // Function to handle back button
+  const handleImageChange = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
+
   const handleBack = async () => {
-                    if (formData && buildingId) { // Check if formData and buildingId exist
-                      try {
-                        const buildingRef = doc(db, 'Buildings', buildingId);
-                        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Active Shooter Response');
-                        await addDoc(formsRef, {
-                          building: buildingRef,
-                          formData: formData,
-                        });
-                        console.log('Form Data submitted successfully on back!');
-                        alert('Form data saved before navigating back!');
-                      } catch (error) {
-                        console.error('Error saving form data:', error);
-                        alert('Failed to save form data before navigating back. Some data may be lost.');
-                      }
-                    }
-                    navigate(-1);
-                  };
+    if (formData && buildingId) {
+      try {
+        const buildingRef = doc(db, 'Buildings', buildingId);
+        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Active Shooter Response');
+        await addDoc(formsRef, {
+          building: buildingRef,
+          formData: formData,
+        });
+        console.log('Form Data submitted successfully on back!');
+        alert('Form data saved before navigating back!');
+      } catch (error) {
+        console.error('Error saving form data:', error);
+        alert('Failed to save form data before navigating back. Some data may be lost.');
+      }
+    }
+    navigate(-1);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!buildingId) {
-        alert('Building ID is missing. Please start the assessment from the correct page.');
-        return;
+      alert('Building ID is missing. Please start the assessment from the correct page.');
+      return;
     }
 
     try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId); 
-
-      // Store the form data in the specified Firestore structure
+      const buildingRef = doc(db, 'Buildings', buildingId);
       const formsRef = collection(db, 'forms/Personnel Training and Awareness/Active Shooter Response');
+
+      if (image) {
+        const storageRef = ref(storage, `activeShooterResponse_images/${Date.now()}_${image.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, image);
+
+        uploadTask.on('state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setUploadProgress(progress);
+          },
+          (error) => {
+            setUploadError(error);
+          },
+          () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              setImageUrl(downloadURL);
+              setFormData({ ...formData, imageUrl: downloadURL });
+              setUploadError(null);
+            });
+          }
+        );
+      }
+
       await addDoc(formsRef, {
-          building: buildingRef, // Reference to the building document
-          formData: formData, // Store the form data as a nested object
+        building: buildingRef,
+        formData: formData,
       });
 
       console.log('Form data submitted successfully!');
       alert('Form submitted successfully!');
       navigate('/Form');
     } catch (error) {
-        console.error('Error submitting form:', error);
-        alert('Failed to submit the form. Please try again.');
+      console.error('Error submitting form:', error);
+      alert('Failed to submit the form. Please try again.');
     }
-};
+  };
 
   return (
     <div className="form-page">
-        <header className="header">
-            <Navbar />
-              {/* Back Button */}
-          <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-              <h1>Active Shooter Response Assessment</h1>
-              <img src={logo} alt='Logo' className='logo' />
-        </header>
+      <header className="header">
+        <Navbar />
+        <button className="back-button" onClick={handleBack}>←</button>
+        <h1>Active Shooter Response Assessment</h1>
+        <img src={logo} alt='Logo' className='logo' />
+      </header>
 
-        <main className="form-container">
-          <form onSubmit={handleSubmit}>
-            {/* 3.1.1.2.8 Active Shooter Response */}
-            <h2>Training Curriculum and Content:</h2>
-            <div className="form-section">
-              <label>What topics and skills are covered in active shooter response training programs, such as situational awareness, threat recognition, decision-making under stress, and survival tactics?</label>
-              <div>
-                <input type="text" name="asrTrainingTopics" placeholder="List the topics/skills" onChange={handleChange}/>
-              </div>
+      <main className="form-container">
+        <form onSubmit={handleSubmit}>
+          {/* 3.1.1.2.8 Active Shooter Response */}
+          <h2>Training Curriculum and Content:</h2>
+          <div className="form-section">
+            <label>What topics and skills are covered in active shooter response training programs, such as situational awareness, threat recognition, decision-making under stress, and survival tactics?</label>
+            <div>
+              <input type="text" name="asrTrainingTopics" placeholder="List the topics/skills" onChange={handleChange} />
             </div>
-
-                <div className="form-section">
+          </div>
+          {/* ...rest of your form questions... */}
+          <div className="form-section">
                   <label>Are training materials and resources based on recognized active shooter response protocols, guidelines, and recommendations from law enforcement agencies, security experts, or government agencies?</label>
                   <div>
                     <input type="radio" name="asrMaterialsAlignment" value="yes" onChange={handleChange}/> Yes
@@ -208,11 +246,14 @@ function ActiveShooterResponseFormPage() {
                     <input type="text" name="asrFeedbackContribution" placeholder="Describe how they're encouraged" onChange={handleChange}/>
                   </div>
                 </div>
+          {/* Image Upload */}
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+          {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+          {uploadError && <p style={{ color: 'red' }}>{uploadError.message}</p>}
 
-                {/* Submit Button */}
-                <button type="submit">Submit</button>             
-            </form>
-        </main>
+          <button type="submit">Submit</button>
+        </form>
+      </main>
     </div>
   )
 }
