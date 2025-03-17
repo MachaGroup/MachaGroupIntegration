@@ -1,5 +1,6 @@
 import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
@@ -12,6 +13,12 @@ function EvacuationProceduresFormPage() {
     const db = getFirestore();
   
     const [formData, setFormData] = useState();
+  const storage = getStorage();
+  const [image, setImage] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [uploadError, setUploadError] = useState(null);
+
   
     useEffect(() => {
       if(!buildingId) {
@@ -20,7 +27,13 @@ function EvacuationProceduresFormPage() {
       }
     }, [buildingId, navigate]);
   
-    const handleChange = (e) => {
+    
+  const handleImageChange = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
+  const handleChange = (e) => {
       const { name, value } = e.target;
       setFormData((prevData) => ({
         ...prevData,
@@ -298,7 +311,11 @@ function EvacuationProceduresFormPage() {
                 </div>
 
                 {/* Submit Button */}
-                <button type="submit">Submit</button>
+                <input type="file" accept="image/*" onChange={handleImageChange} />
+{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
+{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
+<button type="submit">Submit</button>
             
             </form>
         </main>

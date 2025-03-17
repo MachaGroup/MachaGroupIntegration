@@ -3,17 +3,30 @@ import React, { useState} from 'react';
 import { useNavigate } from 'react-router-dom';  // Import useNavigate
 import './FormQuestions.css';  // Ensure this is linked to your universal CSS
 import Navbar from "./Navbar";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 
 function StationedGuardsPage() {
   const navigate = useNavigate();  // Initialize useNavigate hook for navigation
   const [formData, setFormData] = useState({});
+  const storage = getStorage();
+  const [image, setImage] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [uploadError, setUploadError] = useState(null);
+ 
   // Function to handle back button
   const handleBack = () => {
     navigate(-1);  // Navigates to the previous page
 
   };
 
+  
+  const handleImageChange = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -238,7 +251,11 @@ function StationedGuardsPage() {
           </div>
 
           {/* Submit Button */}
-          <button type="submit">Submit</button>
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+  {uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
+  {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+  {uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
+<button type="submit">Submit</button>
         </form>
       </main>
     </div>
