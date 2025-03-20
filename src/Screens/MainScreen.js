@@ -48,6 +48,7 @@ function MainScreen() {
 
       <div className="buttons-container">
         <button onClick={() => navigateTo('/BuildingandAddress')}>Create a Form</button>
+        <button onClick={() => navigateTo('/PastAssessments')}>View Past Assessments</button>
         <button onClick={() => navigateTo('/pricing')}>Pricing</button>
         <button onClick={() => navigateTo('/about')}>About Us</button>
         <button onClick={() => navigateTo('/faq')}>FAQ</button>

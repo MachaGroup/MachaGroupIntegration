@@ -393,6 +393,7 @@ import CommunicationChannels from './Screens/CommunicationChannels';
 import ResponseProtocols2 from './Screens/ResponseProtocols2';
 import PhishingSimulationExercises from './Screens/PhishingSimulationExercises';
 import PrivacyAndSecurity from './Screens/PrivacyAndSecurity';
+import PastAssessments from './Screens/PastAssessments';
 
 function App() {
   return (
@@ -887,6 +888,7 @@ function App() {
         <Route path='/CommunicationChannels' element={<CommunicationChannels />} />
         <Route path='/PhishingSimulationExercises' element={<PhishingSimulationExercises />} />
         <Route path='/privacy&security' element={<PrivacyAndSecurity />} />
+        <Route path='PastAssessments' element={<PastAssessments />} />
 
 
       </Routes>
