@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext';
@@ -102,6 +102,7 @@ function AccessControlListsPage() {
             await addDoc(formsRef, {
                 building: buildingRef,
                 formData: formData,
+                createdAt: serverTimestamp(),
             });
 
             alert('Form submitted successfully!');

@@ -1,0 +1,149 @@
+/* assessmentDetails.css */
+
+.assessment-details-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: sans-serif; /* Add a default font */
+}
+
+.assessment-details-container h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.assessment-details-container p {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.assessment-details-container strong {
+    font-weight: bold;
+}
+
+.back-button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 10px 0;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease; /* Smooth transition on hover */
+}
+
+.back-button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+.form-data-item {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.form-data-item p {
+    margin: 5px 0;
+}
+
+.form-data-item strong {
+    display: block; /* Makes the question a block element */
+    margin-bottom: 5px;
+}
+
+.assessment-details-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: sans-serif; /* Add a default font */
+}
+
+.assessment-details-container h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.assessment-details-container p {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.assessment-details-container strong {
+    font-weight: bold;
+}
+
+.back-button {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #333;
+  }
+  
+
+.back-button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+.question-answer-container {
+    border: 1px solid #888;            /* Darker border color */
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    background-color: #eee;           /* Darker background color */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+}
+
+.question-answer-container strong {
+    color: #444;                    /* Darker color for the question */
+}
+
+.export-csv-button {
+    background-color: #007bff; /* Blue */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 10px 0;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.export-csv-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+.export-pdf-button {
+    background-color: #007bff; /* Blue */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 10px 0;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.export-pdf-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+.hide-for-pdf {
+    display: none;
+}

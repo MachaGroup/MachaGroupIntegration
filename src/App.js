@@ -394,6 +394,7 @@ import ResponseProtocols2 from './Screens/ResponseProtocols2';
 import PhishingSimulationExercises from './Screens/PhishingSimulationExercises';
 import PrivacyAndSecurity from './Screens/PrivacyAndSecurity';
 import PastAssessments from './Screens/PastAssessments';
+import AssessmentDetails from './Screens/AssessmentDetails'; // Create this component
 
 function App() {
   return (
@@ -889,7 +890,7 @@ function App() {
         <Route path='/PhishingSimulationExercises' element={<PhishingSimulationExercises />} />
         <Route path='/privacy&security' element={<PrivacyAndSecurity />} />
         <Route path='PastAssessments' element={<PastAssessments />} />
-
+        <Route path="/assessment/:assessmentId" element={<AssessmentDetails />} />
 
       </Routes>
     </Router>
