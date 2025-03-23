@@ -395,6 +395,7 @@ import PhishingSimulationExercises from './Screens/PhishingSimulationExercises';
 import PrivacyAndSecurity from './Screens/PrivacyAndSecurity';
 import PastAssessments from './Screens/PastAssessments';
 import AssessmentDetails from './Screens/AssessmentDetails'; // Create this component
+import AccessControlListsPage from './Screens/AccessControlLists';
 
 function App() {
   return (
@@ -406,6 +407,8 @@ function App() {
         <Route path="/" element={<Login />} />
 
         {/* Other Routes */}
+        <Route path="/access-control-lists-form" element={<AccessControlListsPage />} />
+        <Route path="/assessment-details/:assessmentId" element={<AssessmentDetails />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/Form" element={<FormInputPage />} />
         <Route path="/Main" element={<MainScreen />} />

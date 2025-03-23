@@ -17,7 +17,6 @@ function AssessmentDetails() {
     const [error, setError] = useState(null);
     const db = getFirestore();
 
-    // Map field names to questions (this is less maintainable but works)
     const questions = {
         "defineCriteria": "What criteria are used to define Access Control Lists (ACLs) within the firewall, and how are these criteria determined based on the organization's security policy?",
         "firewallUtilization": "How does the firewall utilize ACLs to differentiate between authorized and unauthorized network traffic, and what are the default settings for incoming and outgoing traffic?",
@@ -202,16 +201,31 @@ function AssessmentDetails() {
         }).filter(item => item);
     };
 
+    const getFormRoute = (category1, category2) => {
+        if (category1 === "Cybersecurity" && category2 === "Access Control Lists") {
+            return `/access-control-lists-form`;
+        } else if (category1 === "AnotherCategory" && category2 === "AnotherSubcategory") {
+            return `/another-form`;
+        }
+        return '/';
+    };
+
+    const handleEditClick = () => {
+        const formRoute = getFormRoute(category1, category2);
+        navigate(`${formRoute}?buildingId=${assessment?.building.id}&assessmentId=${assessmentId}`);
+    };
+
     return (
         <div className="assessment-details-container">
             <div className="header-info">
-                <button className="back-button" onClick={handleBackClick}>Back</button> {/* Moved back button */}
+                <button className="back-button" onClick={handleBackClick}>Back</button>
                 <h1>{assessment?.buildingName || 'Building Name Not Found'}</h1>
                 <h2>{`${category1} - ${category2}`}</h2>
             </div>
             <h2>Assessment Details</h2>
             <button className="export-csv-button" onClick={handleExportCSV}>Export to CSV</button>
             <button className="export-pdf-button" onClick={handleExportPdf}>Export to PDF</button>
+            <button className="edit-button" onClick={handleEditClick}>Edit Assessment</button>
             {renderFormData()}
         </div>
     );
