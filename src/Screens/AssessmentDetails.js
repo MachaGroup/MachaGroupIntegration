@@ -1086,20 +1086,27 @@ function AssessmentDetails() {
         if (!assessment || !assessment.formData) {
             return null;
         }
-
-        const data = [
-            Object.entries(assessment.formData).map(([key, value]) => {
-                const question = questions[key] || key;
-                return { question, value };
-            }),
-        ];
-
-        const csv = Papa.unparse({
-            fields: ["question", "value"],
-            data: data[0],
+    
+        let csvContent = "Question,Answer,Comment\n"; // Add header
+    
+        // Add building name and assessment category
+        csvContent += `Building Name,"${assessment.buildingName || "N/A"}",\n`;
+        csvContent += `Category,"${category1 || "N/A"}",\n`;
+        csvContent += `Subcategory,"${category2 || "N/A"}",\n`;
+    
+        Object.entries(assessment.formData).forEach(([key, value]) => {
+            if (key.endsWith('Comment')) {
+                return; // Skip comment fields
+            }
+    
+            const question = questions[key] || key;
+            let displayValue = String(value).replace(/,/g, ';').replace(/\n/g, '<br>');
+            let comment = String(assessment.formData[key + 'Comment'] || '').replace(/,/g, ';').replace(/\n/g, '<br>');
+    
+            csvContent += `"${question}","${displayValue}","${comment}"\n`;
         });
-
-        return csv;
+    
+        return csvContent;
     };
 
     const downloadCSV = (csv, filename) => {
@@ -1124,41 +1131,103 @@ function AssessmentDetails() {
     };
 
     const handleExportPdf = () => {
-        const capture = document.querySelector(".assessment-details-container");
-        if (!capture) {
-            console.error("Target element not found");
-            return;
-        }
-
-        const backButton = document.querySelector(".back-button");
-        const csvButton = document.querySelector(".export-csv-button");
-        const pdfButton = document.querySelector(".export-pdf-button");
-
-        backButton.classList.add("hide-for-pdf");
-        csvButton.classList.add("hide-for-pdf");
-        pdfButton.classList.add("hide-for-pdf");
-
-        html2canvas(capture, { scale: 2 })
-            .then((canvas) => {
-                const imgData = canvas.toDataURL('image/png');
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const width = pdf.internal.pageSize.getWidth();
-                const height = pdf.internal.pageSize.getHeight();
-                pdf.addImage(imgData, 'PNG', 0, 0, width, height);
-                pdf.save(`assessment_${assessmentId}.pdf`);
-
-                backButton.classList.remove("hide-for-pdf");
-                csvButton.classList.remove("hide-for-pdf");
-                pdfButton.classList.remove("hide-for-pdf");
-            })
-            .catch((error) => {
-                console.error('Error capturing the component:', error);
-                setError('Failed to generate PDF.');
-                backButton.classList.remove("hide-for-pdf");
-                csvButton.classList.remove("hide-for-pdf");
-                pdfButton.classList.remove("hide-for-pdf");
-            });
+        const pdf = generatePdfDocument(assessment, questions, category1, category2);
+        pdf.save(`assessment_${assessmentId}.pdf`);
     };
+    
+
+const generatePdfDocument = (assessment, questions, category1, category2) => {
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    let y = 20;
+    const lineHeight = 7;
+    const margin = 15;
+    const pageWidth = pdf.internal.pageSize.getWidth() - 2 * margin;
+    const sectionTitleFontSize = 16;
+    const titleFontSize = 20;
+    const questionFontSize = 12;
+    const answerFontSize = 11;
+    const commentFontSize = 10;
+
+    // Function to add text with line breaks and "bold" effect
+    const addText = (text, x, currentY, options = {}) => {
+        const { fontSize = 12, maxWidth = pageWidth, isBold = false } = options;
+        pdf.setFontSize(fontSize);
+        let lines = pdf.splitTextToSize(text, maxWidth);
+
+        lines.forEach(line => {
+            if (isBold) {
+                // Simulate bold by drawing the text twice with a slight offset
+                pdf.text(line, x, currentY);
+                pdf.text(line, x + 0.1, currentY + 0.1);
+            } else {
+                pdf.text(line, x, currentY);
+            }
+            currentY += lineHeight;
+        });
+        return currentY;
+    };
+
+    // Function to draw a line
+    const drawLine = (currentY) => {
+        pdf.setLineWidth(0.5);
+        pdf.line(margin, currentY, pdf.internal.pageSize.getWidth() - margin, currentY);
+    };
+
+    // Add Title
+    pdf.setFontSize(titleFontSize);
+    pdf.setTextColor(40, 82, 134)
+    pdf.text(`Assessment Details`, margin, y);
+    pdf.setTextColor(0, 0, 0);
+    y += 2 * lineHeight;
+
+    // Add Assessment Details Section
+    pdf.setFontSize(sectionTitleFontSize);
+    pdf.text(`Assessment Information`, margin, y);
+    y += lineHeight;
+
+    pdf.setFontSize(questionFontSize);
+    y = addText(`Building: ${assessment.buildingName || 'N/A'}`, margin, y);
+    y = addText(`Category: ${category1 || 'N/A'}`, margin, y);
+    y = addText(`Subcategory: ${category2 || 'N/A'}`, margin, y);
+    y += lineHeight;
+
+    drawLine(y); // Draw a line after assessment information
+    y += lineHeight;
+
+    // Add Form Data Section
+    pdf.setFontSize(sectionTitleFontSize);
+    pdf.text(`Form Data`, margin, y);
+    y += lineHeight;
+
+    // Add form data
+    Object.entries(assessment.formData).forEach(([key, value]) => {
+        if (key.endsWith('Comment')) return;
+
+        const question = questions[key] || key;
+        const comment = assessment.formData[key + 'Comment'] || '';
+
+        pdf.setFontSize(questionFontSize);
+        y = addText(`Question: ${question}`, margin, y, { isBold: true });
+
+        pdf.setFontSize(answerFontSize);
+        y = addText(`Answer: ${value}`, margin + 5, y);
+
+        if (comment) {
+            pdf.setFontSize(commentFontSize);
+            y = addText(`Comment: ${comment}`, margin + 10, y);
+        }
+        y += lineHeight;
+
+        // If we're going to run off the page, add a new one
+        if (y > pdf.internal.pageSize.getHeight() - margin) {
+            pdf.addPage();
+            y = margin;
+        }
+    });
+
+    return pdf;
+};  
+
 
     const renderFormData = () => {
         if (!assessment.formData) return <p>No form data available.</p>;
