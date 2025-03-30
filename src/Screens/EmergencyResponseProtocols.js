@@ -1,64 +1,91 @@
 import React, { useState, useEffect } from 'react';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions'; // Correct imports
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
-import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
+import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-/**/
+
 function ResponseProtocolsFormPage() {
     const navigate = useNavigate();
-    const { buildingId } = useBuilding(); // Access and update buildingId from context
+    const { buildingId } = useBuilding();
     const db = getFirestore();
+    const functions = getFunctions();
+    const uploadResponseProtocolsImage = httpsCallable(functions, 'uploadResponseProtocolsImage');
+    const storage = getStorage();
 
-    const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
-
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [image, setImage] = useState(null);
 
     useEffect(() => {
-        if(!buildingId) {
-          alert('No builidng selected. Redirecting to Building Info...');
-          navigate('BuildingandAddress');
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('/BuildingandAddress');
+            return;
         }
-      }, [buildingId, navigate]);
 
-    
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+
+            try {
+                const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Emergency Response Protocols', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Emergency Response Protocols', buildingId);
+            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
+            console.log("Form data saved to Firestore:", newFormData);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
     };
 
-  const handleBack = async () => {
-          if (formData && buildingId) { // Check if formData and buildingId exist
-            try {
-              const buildingRef = doc(db, 'Buildings', buildingId);
-              const formsRef = collection(db, 'forms/Personnel Training and Awareness/Emergency Response Protocols');
-              await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-              });
-              console.log('Form Data submitted successfully on back!');
-              alert('Form data saved before navigating back!');
-            } catch (error) {
-              console.error('Error saving form data:', error);
-              alert('Failed to save form data before navigating back. Some data may be lost.');
-            }
-          }
-          navigate(-1);
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImage(file);
+        }
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
         };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -68,267 +95,149 @@ function ResponseProtocolsFormPage() {
             return;
         }
 
+        if (imageData) {
+            try {
+                const uploadResult = await uploadResponseProtocolsImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
 
         try {
-          // Create a document reference to the building in the 'Buildings' collection
-          const buildingRef = doc(db, 'Buildings', buildingId); 
-
-          // Store the form data in the specified Firestore structure
-          const formsRef = collection(db, 'forms/Personnel Training and Awareness/Emergency Response Protocols');
-          await addDoc(formsRef, {
-              building: buildingRef, // Reference to the building document
-              formData: formData, // Store the form data as a nested object
-          });
-
-          console.log('Form data submitted successfully!');
-          alert('Form submitted successfully!');
-          navigate('/Form');
+            const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Emergency Response Protocols', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
         } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Failed to submit the form. Please try again.');
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+
+        if (image) {
+            const imageRef = ref(storage, `images/ResponseProtocols/${buildingId}/${image.name}`);
+            const uploadTask = uploadBytesResumable(imageRef, image);
+
+            uploadTask.on(
+                'state_changed',
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    setUploadProgress(progress);
+                },
+                (error) => {
+                    console.error('Error uploading image:', error);
+                    setImageUploadError(error.message);
+                },
+                () => {
+                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                        setImageUrl(downloadURL);
+                        setFormData((prevData) => ({
+                            ...prevData,
+                            imageUrl: downloadURL,
+                        }));
+                    });
+                }
+            );
         }
     };
 
-  return (
-    <div className="form-page">
-  <header className="header">
-            <Navbar />
-    {/* Back Button */}
-    <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-    <h1>Response Protocols Assessment</h1>
-    <img src={logo} alt="Logo" className="logo" />
-  </header>
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
-  <main className="form-container">
-    <form onSubmit={handleSubmit}>
-      {/* 3.1.1.1.5 Response Protocols */}
-      <h2>Protocol Development:</h2>
-      <div className="form-section">
-        <label>How are emergency response protocols developed, and are they based on recognized standards, best practices, or regulatory requirements?</label>
-        <div>
-          <input type="text" name="protocolDevelopmentDescription" placeholder="Describe how protocols are developed" onChange={handleChange}/>
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
+    }
+
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>Response Protocols Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
+
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>Response Protocols Assessment</h2>
+                    {[
+                        { name: "protocolDevelopmentDescription", label: "How are emergency response protocols developed, and are they based on recognized standards, best practices, or regulatory requirements?" },
+                        { name: "specificEmergencyTypes", label: "Are response protocols tailored to address specific types of emergencies or threats commonly faced by the organization?" },
+                        { name: "protocolConsiderations", label: "What considerations are taken into account when determining the appropriate actions and procedures to include in response protocols?" },
+                        { name: "protocolReview", label: "Are response protocols reviewed and updated periodically to reflect changes in organizational needs, emerging threats, or lessons learned from incidents?" },
+                        { name: "immediateActions", label: "What immediate actions are outlined in the response protocols for various types of emergencies (e.g., evacuation, shelter-in-place, medical emergencies)?" },
+                        { name: "initialResponseTraining", label: "Are staff members trained on the specific steps to take during the initial moments of an emergency, such as alerting others, assessing the situation, and taking protective measures?" },
+                        { name: "protocolCommunication", label: "How are response protocols communicated to staff members to ensure they are aware of and understand their roles and responsibilities?" },
+                        { name: "initiatorTeams", label: "Are there designated individuals or teams responsible for initiating immediate actions in different areas or departments of the organization?" },
+                        { name: "externalCoordination", label: "How are response protocols coordinated with external emergency services (e.g., fire department, law enforcement) to facilitate a timely and effective response?" },
+                        { name: "communicationProcedures", label: "What communication procedures are included in the response protocols for disseminating information and instructions during emergencies?" },
+                        { name: "notificationChannelsDetails", label: "Are there established communication channels and protocols for notifying staff members, occupants, and relevant stakeholders about emergency situations?" },
+                        { name: "communicationSystems", label: "How are communication systems and technologies utilized to ensure rapid and reliable dissemination of critical information?" },
+                        { name: "backupMethods", label: "Are backup communication methods or redundancy measures in place to address potential failures or disruptions in primary communication channels?" },
+                        { name: "communicationTraining", label: "How are staff members trained on effective communication practices during emergencies, such as using clear and concise language, active listening, and relaying accurate information?" },
+                        { name: "decisionAuthority", label: "How is decision-making authority delineated within the response protocols, and are there clear lines of authority and accountability during emergency situations?" },
+                        { name: "decisionFrameworkTraining", label: "Are staff members trained on the decision-making framework outlined in the response protocols, including when to escalate issues or seek additional support?" },
+                        { name: "empowermentMechanisms", label: "What mechanisms are in place to empower staff members to make informed decisions and take appropriate actions based on the situational context and available information?" },
+                        { name: "delegationDetails", label: "Are there protocols for delegating decision-making authority to designated individuals or teams in the event of leadership absence or incapacitation?" },
+                        { name: "decisionDocumentation", label: "How are decisions documented and communicated within the organization to ensure transparency and accountability?" },
+                        { name: "trainingMethods", label: "How are staff members trained on the response protocols, and what methods or formats are used to deliver training (e.g., classroom sessions, practical exercises)?" },
+                        { name: "scenarioDrills", label: "Are scenario-based drills conducted to simulate emergency situations and allow staff members to practice implementing response protocols in a realistic setting?" },
+                        { name: "drillFrequency", label: "How often are training sessions and drills conducted to reinforce response protocols and maintain readiness among staff members?" },
+                        { name: "debriefingSessions", label: "Are debriefing sessions held after training exercises to review performance, identify areas for improvement, and incorporate lessons learned into future training activities?" },
+                        { name: "retentionMeasures", label: "What measures are in place to ensure that staff members retain knowledge and skills related to response protocols over time, including refresher training and ongoing reinforcement?" },
+                        { name: "protocolDocumentation", label: "How are response protocols documented and disseminated to ensure accessibility and consistency across the organization?" },
+                        { name: "reviewDetails", label: "Are response protocols regularly reviewed and evaluated to assess their effectiveness, identify gaps or weaknesses, and make necessary revisions?" },
+                        { name: "performanceMetrics", label: "What metrics or indicators are used to measure the performance and outcomes of response protocols during actual emergencies or drills?" },
+                        { name: "postIncidentAnalyses", label: "Are post-incident analyses conducted to evaluate the implementation of response protocols, identify opportunities for improvement, and inform revisions?" },
+                        { name: "lessonsLearnedSharing", label: "How are lessons learned from response protocols shared within the organization to enhance preparedness and resilience against future emergencies?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                {question.name.endsWith("Description") || question.name.endsWith("Types") || question.name.endsWith("Considerations") || question.name.endsWith("Actions") || question.name.endsWith("Communication") || question.name.endsWith("Teams") || question.name.endsWith("Coordination") || question.name.endsWith("Procedures") || question.name.endsWith("Details") || question.name.endsWith("Systems") || question.name.endsWith("Methods") || question.name.endsWith("Authority") || question.name.endsWith("Mechanisms") || question.name.endsWith("Documentation") || question.name.endsWith("Frequency") || question.name.endsWith("Metrics") || question.name.endsWith("Sharing") ? (
+                                    <input
+                                        type="text"
+                                        name={question.name}
+                                        placeholder={`Describe ${question.label.toLowerCase()}`}
+                                        value={formData[question.name] || ''}
+                                        onChange={handleChange}
+                                    />
+                                ) : (
+                                    <>
+                                        <input
+                                            type="radio"
+                                            name={question.name}
+                                            value="yes"
+                                            checked={formData[question.name] === "yes"}
+                                            onChange={handleChange}
+                                        /> Yes
+                                        <input
+                                            type="radio"
+                                            name={question.name}
+                                            value="no"
+                                            checked={formData[question.name] === "no"}
+                                            onChange={handleChange}
+                                        /> No
+                                        <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                    {uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: "red" }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
         </div>
-      </div>
-
-      <div className="form-section">
-        <label>Are response protocols tailored to address specific types of emergencies or threats commonly faced by the organization?</label>
-        <div>
-          <input type="text" name="specificEmergencyTypes" placeholder="Describe the specific types" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>What considerations are taken into account when determining the appropriate actions and procedures to include in response protocols?</label>
-        <div>
-          <input type="text" name="protocolConsiderations" placeholder="Describe the considerations" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Are response protocols reviewed and updated periodically to reflect changes in organizational needs, emerging threats, or lessons learned from incidents?</label>
-        <div>
-          <input type="radio" name="protocolReview" value="yes" onChange={handleChange}/> Yes
-          <input type="radio" name="protocolReview" value="no" onChange={handleChange}/> No
-          <textarea className='comment-box' name="protocolReviewComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-        </div>
-      </div>
-
-      <h2>Immediate Actions:</h2>
-      <div className="form-section">
-        <label>What immediate actions are outlined in the response protocols for various types of emergencies (e.g., evacuation, shelter-in-place, medical emergencies)?</label>
-        <div>
-          <input type="text" name="immediateActions" placeholder="Describe the actions" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Are staff members trained on the specific steps to take during the initial moments of an emergency, such as alerting others, assessing the situation, and taking protective measures?</label>
-        <div>
-          <input type="radio" name="initialResponseTraining" value="yes" onChange={handleChange}/> Yes
-          <input type="radio" name="initialResponseTraining" value="no" onChange={handleChange}/> No
-          <textarea className='comment-box' name="initialResponseTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>How are response protocols communicated to staff members to ensure they are aware of and understand their roles and responsibilities?</label>
-        <div>
-          <input type="text" name="protocolCommunication" placeholder="Describe how protocols are communicated" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Are there designated individuals or teams responsible for initiating immediate actions in different areas or departments of the organization?</label>
-        <div>
-          <input type="text" name="initiatorTeams" placeholder="List the designated individuals/teams" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>How are response protocols coordinated with external emergency services (e.g., fire department, law enforcement) to facilitate a timely and effective response?</label>
-        <div>
-          <input type="text" name="externalCoordination" placeholder="Describe how protocols are coordinated" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <h2>Communication Procedures:</h2>
-      <div className="form-section">
-        <label>What communication procedures are included in the response protocols for disseminating information and instructions during emergencies?</label>
-        <div>
-          <input type="text" name="communicationProcedures" placeholder="Describe the communication procedures" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Are there established communication channels and protocols for notifying staff members, occupants, and relevant stakeholders about emergency situations?</label>
-        <div>
-          <input type="text" name="notificationChannelsDetails" placeholder="Describe the channels/protocols" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>How are communication systems and technologies utilized to ensure rapid and reliable dissemination of critical information?</label>
-        <div>
-          <input type="text" name="communicationSystems" placeholder="Describe how these ensure rapid and reliability" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Are backup communication methods or redundancy measures in place to address potential failures or disruptions in primary communication channels?</label>
-        <div>
-          <input type="text" name="backupMethods" placeholder="Describe the backup methods/redundancy" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>How are staff members trained on effective communication practices during emergencies, such as using clear and concise language, active listening, and relaying accurate information?</label>
-        <div>
-          <input type="text" name="communicationTraining" placeholder="Describe how they're trained" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <h2>Decision-making Authority:</h2>
-      <div className="form-section">
-        <label>How is decision-making authority delineated within the response protocols, and are there clear lines of authority and accountability during emergency situations?</label>
-        <div>
-          <input type="text" name="decisionAuthority" placeholder="Describe the decision-making authority" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Are staff members trained on the decision-making framework outlined in the response protocols, including when to escalate issues or seek additional support?</label>
-        <div>
-          <input type="radio" name="decisionFrameworkTraining" value="yes" onChange={handleChange}/> Yes
-          <input type="radio" name="decisionFrameworkTraining" value="no" onChange={handleChange}/> No
-          <textarea className='comment-box' name="decisionFrameworkTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>What mechanisms are in place to empower staff members to make informed decisions and take appropriate actions based on the situational context and available information?</label>
-        <div>
-          <input type="text" name="empowermentMechanisms" placeholder="Describe the decision-making authority" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Are there protocols for delegating decision-making authority to designated individuals or teams in the event of leadership absence or incapacitation?</label>
-        <div>
-          <input type="text" name="delegationDetails" placeholder="Describe the protocols" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>How are decisions documented and communicated within the organization to ensure transparency and accountability?</label>
-        <div>
-          <input type="text" name="decisionDocumentation" placeholder="Describe how decisions are documented" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <h2>Training and Drills:</h2>
-      <div className="form-section">
-        <label>How are staff members trained on the response protocols, and what methods or formats are used to deliver training (e.g., classroom sessions, practical exercises)?</label>
-        <div>
-          <input type="text" name="trainingMethods" placeholder="Describe how staff members are trained" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Are scenario-based drills conducted to simulate emergency situations and allow staff members to practice implementing response protocols in a realistic setting?</label>
-        <div>
-          <input type="radio" name="scenarioDrills" value="yes" onChange={handleChange}/> Yes
-          <input type="radio" name="scenarioDrills" value="no" onChange={handleChange}/> No
-          <textarea className='comment-box' name="scenarioDrillsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>How often are training sessions and drills conducted to reinforce response protocols and maintain readiness among staff members?</label>
-        <div>
-          <input type="text" name="drillFrequency" placeholder="Describe how often" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Are debriefing sessions held after training exercises to review performance, identify areas for improvement, and incorporate lessons learned into future training activities?</label>
-        <div>
-          <input type="radio" name="debriefingSessions" value="yes" onChange={handleChange}/> Yes
-          <input type="radio" name="debriefingSessions" value="no" onChange={handleChange}/> No
-          <textarea className='comment-box' name="debriefingSessionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>What measures are in place to ensure that staff members retain knowledge and skills related to response protocols over time, including refresher training and ongoing reinforcement?</label>
-        <div>
-          <input type="text" name="retentionMeasures" placeholder="Describe the measures" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <h2>Documentation and Evaluation:</h2>
-      <div className="form-section">
-        <label>How are response protocols documented and disseminated to ensure accessibility and consistency across the organization?</label>
-        <div>
-          <input type="text" name="protocolDocumentation" placeholder="Describe how protocols are documented" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Are response protocols regularly reviewed and evaluated to assess their effectiveness, identify gaps or weaknesses, and make necessary revisions?</label>
-        <div>
-          <input type="text" name="reviewDetails" placeholder="Describe the protocols" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>What metrics or indicators are used to measure the performance and outcomes of response protocols during actual emergencies or drills?</label>
-        <div>
-          <input type="text" name="performanceMetrics" placeholder="Describe the metrics/indicators" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Are post-incident analyses conducted to evaluate the implementation of response protocols, identify opportunities for improvement, and inform revisions?</label>
-        <div>
-          <input type="radio" name="postIncidentAnalyses" value="yes" onChange={handleChange}/> Yes
-          <input type="radio" name="postIncidentAnalyses" value="no" onChange={handleChange}/> No
-          <textarea className='comment-box' name="postIncidentAnalysesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>How are lessons learned from response protocols shared within the organization to enhance preparedness and resilience against future emergencies?</label>
-        <div>
-          <input type="text" name="lessonsLearnedSharing" placeholder="Describe how lessons are learned" onChange={handleChange}/>
-        </div>
-      </div>
-
-      <button type='submit'>Submit</button>
-    </form>
-  </main>
-</div>
-
-  )
+    );
 }
 
 export default ResponseProtocolsFormPage;

@@ -1,354 +1,216 @@
-import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-/**/
+import { getFunctions, httpsCallable } from "firebase/functions";
+
 function EncryptionRequirementsFormPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadImage = httpsCallable(functions, 'uploadEncryptionRequirementsImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
- 
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
-    }
-  }, [buildingId, navigate]);
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
+        }
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
 
-  // Function to handle back button
-  const handleBack = async () => {
-          if (formData && buildingId) { // Check if formData and buildingId exist
             try {
-              const buildingRef = doc(db, 'Buildings', buildingId);
-              const formsRef = collection(db, 'forms/Policy and Compliance/Encryption Requirements');
-              await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-              });
-              console.log('Form Data submitted successfully on back!');
-              alert('Form data saved before navigating back!');
+                const formDocRef = doc(db, 'forms', 'Policy and Compliance', 'Encryption Requirements', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
             } catch (error) {
-              console.error('Error saving form data:', error);
-              alert('Failed to save form data before navigating back. Some data may be lost.');
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
             }
-          }
-          navigate(-1);
         };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Policy and Compliance', 'Encryption Requirements', buildingId);
+            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
+            console.log("Form data saved to Firestore:", newFormData);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Policy and Compliance', 'Encryption Requirements', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
-
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Policy and Compliance/Encryption Requirements');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
-  };
 
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>5.1.2.2.1 Encryption Requirements Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>5.1.2.2.1 Encryption Requirements Assessment</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
-
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                {/* 5.1.2.2.1 Encryption Requirements */}
-                <h2>5.1.2.2.1.1 Encryption Standards:</h2>
-                <div className="form-section">
-                    <label>What encryption standards or algorithms are required for protecting sensitive data (e.g., AES-256, RSA)?</label>
-                    <div>
-                        <input type="text" name="encryptionStandards" placeholder="Describe the standards" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are encryption standards selected and updated to address emerging security threats?</label>
-                    <div>
-                        <input type="text" name="selectedStandards" placeholder="Describe how it's selected and updated" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are encryption standards documented and communicated to relevant stakeholders?</label>
-                    <div>
-                        <input type="radio" name="documentedStandards" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="documentedStandards" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="documentedStandardsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>5.1.2.2.1.2 Data Classification:</h2>
-                <div className="form-section">
-                    <label>How is sensitive data identified and classified to determine the appropriate encryption measures?</label>
-                    <div>
-                        <input type="text" name="selectedStandards" placeholder="Describe how it's identified and classified" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What criteria are used to define what constitutes sensitive data within the organization?</label>
-                    <div>
-                        <input type="text" name="sensitiveData" placeholder="Describe the criteria" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How frequently are data classifications reviewed and updated?</label>
-                    <div>
-                        <input type="text" name="reviewedClassifications" placeholder="Describe how frequent" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.1.2.2.1.3 Encryption Implementation:</h2>
-                <div className="form-section">
-                    <label>What methods or tools are used to apply encryption to sensitive data (e.g., software, hardware)?</label>
-                    <div>
-                        <input type="text" name="encryptionTools" placeholder="Describe the methods" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is encryption integrated into data storage, transmission, and processing systems?</label>
-                    <div>
-                        <input type="text" name="integratedEnryption" placeholder="Describe how it's integrated" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are encryption practices consistent across different types of sensitive data and systems?</label>
-                    <div>
-                        <input type="radio" name="consistentPractices" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="consistentPractices" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="consistentPracticesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>5.1.2.2.1.4 Key Management:</h2>
-                <div className="form-section">
-                    <label>What procedures are in place for generating, distributing, storing, and managing encryption keys?</label>
-                    <div>
-                        <input type="text" name="managingKeys" placeholder="Describe the procedures" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are encryption keys protected from unauthorized access or compromise?</label>
-                    <div>
-                        <input type="text" name="accessProtected" placeholder="Describe how it's protected" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What processes are followed for key rotation, expiration, and revocation?</label>
-                    <div>
-                        <input type="text" name="expirationProcesses" placeholder="Describe the processes" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.1.2.2.1.5 Compliance and Regulatory Requirements:</h2>
-                <div className="form-section">
-                    <label>How does the organization's encryption approach comply with relevant regulations and standards (e.g., GDPR, HIPAA)?</label>
-                    <div>
-                        <input type="text" name="complyingRegulations" placeholder="Describe how it's approached" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there specific regulatory requirements that impact encryption practices, and how are they addressed?</label>
-                    <div>
-                        <input type="radio" name="regulatoryRequirements" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="regulatoryRequirements" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="regulatoryRequirementsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What measures are in place to ensure ongoing compliance with encryption-related regulations?</label>
-                    <div>
-                        <input type="text" name="complianceRegulations" placeholder="Describe the measures" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.1.2.2.1.6 Encryption for Data in Transit:</h2>
-                <div className="form-section">
-                    <label>What encryption protocols are used for securing data transmitted over networks (e.g., TLS, HTTPS)?</label>
-                    <div>
-                        <input type="text" name="securingData" placeholder="Describe the protocols" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is the integrity and confidentiality of data in transit ensured through encryption?</label>
-                    <div>
-                        <input type="text" name="dataIntegrity" placeholder="Describe how it's ensured" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there policies and procedures for validating the effectiveness of encryption for data in transit?</label>
-                    <div>
-                        <input type="radio" name="effectivenessValidation" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="effectivenessValidation" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="effectivenessValidationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>5.1.2.2.1.7 Encryption for Data at Rest:</h2>
-                <div className="form-section">
-                    <label>How is sensitive data encrypted when stored on physical media, such as hard drives and backup tapes?</label>
-                    <div>
-                        <input type="text" name="storedMedia" placeholder="Describe how it's encrypted" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What encryption techniques are used for cloud storage and other remote data repositories?</label>
-                    <div>
-                        <input type="text" name="encryptionTechniques" placeholder="Describe the techniques" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there safeguards to protect encrypted data from unauthorized access or physical theft?</label>
-                    <div>
-                        <input type="radio" name="protectingData" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="protectingData" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="protectingDataComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>5.1.2.2.1.8 Access Controls:</h2>
-                <div className="form-section">
-                    <label>What access controls are in place to ensure that only authorized personnel can manage and use encryption keys?</label>
-                    <div>
-                        <input type="text" name="authorizedPersonnel" placeholder="Describe the access controls" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are access permissions reviewed and updated to reflect changes in personnel or roles?</label>
-                    <div>
-                        <input type="text" name="reviewedPermissions" placeholder="Describe how it's reviewed and updated" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there logging and monitoring mechanisms to track access to encryption keys and sensitive data?</label>
-                    <div>
-                        <input type="radio" name="monitoringMechanisms" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="monitoringMechanisms" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="monitoringMechanismsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>5.1.2.2.1.9 Encryption Testing and Validation:</h2>
-                <div className="form-section">
-                    <label>How is the effectiveness of encryption measures tested and validated?</label>
-                    <div>
-                        <input type="text" name="encryptionMeasures" placeholder="Describe how it's tested and validated" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there regular security assessments or audits to evaluate the implementation of encryption?</label>
-                    <div>
-                        <input type="radio" name="regularAssessments" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="regularAssessments" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="regularAssessmentsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What processes are in place to address any vulnerabilities or issues identified during testing?</label>
-                    <div>
-                        <input type="text" name="identifiedVulnerabilities" placeholder="Describe the processes" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.1.2.2.1.10 Training and Awareness:</h2>
-                <div className="form-section">
-                    <label>What training is provided to employees regarding encryption practices and data protection?</label>
-                    <div>
-                        <input type="text" name="employeeTraining" placeholder="Describe the training" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is awareness of encryption requirements and best practices maintained among staff?</label>
-                    <div>
-                        <input type="text" name="awarenessRequirements" placeholder="Describe how it's maintained" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there resources or guidelines available to assist employees in understanding and implementing encryption?</label>
-                    <div>
-                        <input type="radio" name="employeeResources" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="employeeResources" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="employeeResourcesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                {/* Submit Button */}
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-
-            </form>
-        </main>
-    </div>
-  )
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>Encryption Requirements Assessment</h2>
+                    {[
+                        { name: "encryptionStandards", label: "What encryption standards or algorithms are required for protecting sensitive data (e.g., AES-256, RSA)?" },
+                        { name: "selectedStandards", label: "How are encryption standards selected and updated to address emerging security threats?" },
+                        { name: "documentedStandards", label: "Are encryption standards documented and communicated to relevant stakeholders?" },
+                        { name: "sensitiveData", label: "What criteria are used to define what constitutes sensitive data within the organization?" },
+                        { name: "reviewedClassifications", label: "How frequently are data classifications reviewed and updated?" },
+                        { name: "encryptionTools", label: "What methods or tools are used to apply encryption to sensitive data (e.g., software, hardware)?" },
+                        { name: "integratedEnryption", label: "How is encryption integrated into data storage, transmission, and processing systems?" },
+                        { name: "consistentPractices", label: "Are encryption practices consistent across different types of sensitive data and systems?" },
+                        { name: "managingKeys", label: "What procedures are in place for generating, distributing, storing, and managing encryption keys?" },
+                        { name: "accessProtected", label: "How are encryption keys protected from unauthorized access or compromise?" },
+                        { name: "expirationProcesses", label: "What processes are followed for key rotation, expiration, and revocation?" },
+                        { name: "complyingRegulations", label: "How does the organization's encryption approach comply with relevant regulations and standards (e.g., GDPR, HIPAA)?" },
+                        { name: "regulatoryRequirements", label: "Are there specific regulatory requirements that impact encryption practices, and how are they addressed?" },
+                        { name: "complianceRegulations", label: "What measures are in place to ensure ongoing compliance with encryption-related regulations?" },
+                        { name: "securingData", label: "What encryption protocols are used for securing data transmitted over networks (e.g., TLS, HTTPS)?" },
+                        { name: "dataIntegrity", label: "How is the integrity and confidentiality of data in transit ensured through encryption?" },
+                        { name: "effectivenessValidation", label: "Are there policies and procedures for validating the effectiveness of encryption for data in transit?" },
+                        { name: "storedMedia", label: "How is sensitive data encrypted when stored on physical media, such as hard drives and backup tapes?" },
+                        { name: "encryptionTechniques", label: "What encryption techniques are used for cloud storage and other remote data repositories?" },
+                        { name: "protectingData", label: "Are there safeguards to protect encrypted data from unauthorized access or physical theft?" },
+                        { name: "authorizedPersonnel", label: "What access controls are in place to ensure that only authorized personnel can manage and use encryption keys?" },
+                        { name: "reviewedPermissions", label: "How are access permissions reviewed and updated to reflect changes in personnel or roles?" },
+                        { name: "monitoringMechanisms", label: "Are there logging and monitoring mechanisms to track access to encryption keys and sensitive data?" },
+                        { name: "encryptionMeasures", label: "How is the effectiveness of encryption measures tested and validated?" },
+                        { name: "regularAssessments", label: "Are there regular security assessments or audits to evaluate the implementation of encryption?" },
+                        { name: "identifiedVulnerabilities", label: "What processes are in place to address any vulnerabilities or issues identified during testing?" },
+                        { name: "employeeTraining", label: "What training is provided to employees regarding encryption practices and data protection?" },
+                        { name: "awarenessRequirements", label: "How is awareness of encryption requirements and best practices maintained among staff?" },
+                        { name: "employeeResources", label: "Are there resources or guidelines available to assist employees in understanding and implementing encryption?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                {question.name === "documentedStandards" || question.name === "consistentPractices" || question.name === "regulatoryRequirements" || question.name === "effectivenessValidation" || question.name === "protectingData" || question.name === "monitoringMechanisms" || question.name === "regularAssessments" || question.name === "employeeResources" ? (
+                                    <>
+                                        <input
+                                            type="radio"
+                                            name={question.name}
+                                            value="yes"
+                                            checked={formData[question.name] === "yes"}
+                                            onChange={handleChange}
+                                        /> Yes
+                                        <input
+                                            type="radio"
+                                            name={question.name}
+                                            value="no"
+                                            checked={formData[question.name] === "no"}
+                                            onChange={handleChange}
+                                        /> No
+                                    </>
+                                ) : (
+                                    <input
+                                        type="text"
+                                        name={question.name}
+                                        value={formData[question.name] || ''}
+                                        onChange={handleChange}
+                                    />
+                                )}
+                            </div>
+                            {question.name === "documentedStandards" || question.name === "consistentPractices" || question.name === "regulatoryRequirements" || question.name === "effectivenessValidation" || question.name === "protectingData" || question.name === "monitoringMechanisms" || question.name === "regularAssessments" || question.name === "employeeResources" ? (
+                                <input
+                                    type="text"
+                                    name={`${question.name}Comment`}
+                                    placeholder="Additional comments"
+                                    value={formData[`${question.name}Comment`] || ''}
+                                    onChange={handleChange}
+                                />
+                            ) : null}
+                        </div>
+                    ))}
+                    <input type="file" onChange={handleImageChange} accept="image/*" />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default EncryptionRequirementsFormPage;

@@ -1,300 +1,205 @@
 import React, { useState, useEffect } from 'react';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions'; // Corrected import
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-/**/
+
 function EmergencyCommunicationFormPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadEmergencyCommunicationImage = httpsCallable(functions, 'uploadEmergencyCommunicationImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
+        }
 
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
-    }
-  }, [buildingId, navigate]);
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Function to handle back button
-  const handleBack = async () => {
-          if (formData && buildingId) { // Check if formData and buildingId exist
             try {
-              const buildingRef = doc(db, 'Buildings', buildingId);
-              const formsRef = collection(db, 'forms/Emergency Preparedness/Emergency Communication');
-              await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-              });
-              console.log('Form Data submitted successfully on back!');
-              alert('Form data saved before navigating back!');
+                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Emergency Communication', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
             } catch (error) {
-              console.error('Error saving form data:', error);
-              alert('Failed to save form data before navigating back. Some data may be lost.');
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
             }
-          }
-          navigate(-1);
         };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Emergency Communication', buildingId);
+            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
+            console.log("Form data saved to Firestore:", newFormData);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadEmergencyCommunicationImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Emergency Communication', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
-
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Emergency Preparedness/Emergency Communication');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
-  };
 
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Emergency Communication Assessment</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
+    return (
+        <div>
+            <div className="form-page">
+                <header className="header">
+                    <Navbar />
+                    <button className="back-button" onClick={handleBack}>←</button>
+                    <h1>Emergency Communication Assessment</h1>
+                    <img src={logo} alt="Logo" className="logo" />
+                </header>
 
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-            {/* 2.1.1.2 Emergency Communication */}
-            <h2>Emergency Communication:</h2>
-            <div className="form-section">
-                <label>Are there dedicated communication systems in place for alerting authorities during emergencies?</label>
-                <div>
-                    <input type="text" name="dedicatedCommunicationSystems" placeholder="List the communication systems" onChange={handleChange}/>
-                </div>
+                <main className="form-container">
+                    <form onSubmit={handleSubmit}>
+                        <h2>Emergency Communication Assessment</h2>
+                        {[
+                            { name: "dedicatedCommunicationSystems", label: "Are there dedicated communication systems in place for alerting authorities during emergencies?" },
+                            { name: "multipleChannels", label: "Do these systems include multiple channels such as telephone, radio, email, and text messaging?" },
+                            { name: "efficientCommunicationSystems", label: "Are communication systems capable of reaching relevant authorities quickly and efficiently?" },
+                            { name: "emergencyContactLists", label: "Have emergency contact lists been established for relevant authorities, including local law enforcement, fire department, and medical services?" },
+                            { name: "updatedContactDetails", label: "Are contact details regularly updated to ensure accuracy and reliability?" },
+                            { name: "designatedPoc", label: "Is there a designated point of contact responsible for initiating communication with authorities during emergencies?" },
+                            { name: "notifyAuthorities", label: "Are there clear protocols in place for when and how to notify authorities during different types of emergencies?" },
+                            { name: "staffRolesAndResponsibilities", label: "Do staff members understand their roles and responsibilities in initiating communication with authorities?" },
+                            { name: "chainOfCommand", label: "Is there a hierarchy or chain of command to follow for escalating emergency notifications as needed?" },
+                            { name: "alertingAuthorities", label: "Is the process for alerting authorities designed to be swift and efficient, minimizing response times?" },
+                            { name: "communicationSystemsTest", label: "Are communication systems tested regularly to ensure they are functioning properly and can deliver alerts promptly?" },
+                            { name: "mitigatingCommunicationFailures", label: "Are there redundancies or backup systems in place to mitigate communication failures during emergencies?" },
+                            { name: "provideDetailedInformation", label: "Are staff members trained to provide accurate and detailed information when alerting authorities?" },
+                            { name: "conveyEssentialDetail", label: "Do they know how to convey essential details such as the nature of the emergency, location, number of individuals affected, and any immediate hazards?" },
+                            { name: "informationVerification", label: "Is there a mechanism for verifying information before it is communicated to authorities to prevent misinformation or confusion?" },
+                            { name: "establishCommunicationProtocolsl", label: "Is there coordination and collaboration with authorities to establish communication protocols and ensure a rapid response to emergencies?" },
+                            { name: "facilitateCommunication", label: "Have contact points and procedures been established to facilitate communication between the organization and responding agencies?" },
+                            { name: "refineEmergencyCommunication", label: "Are there regular meetings or exercises conducted with authorities to review and refine emergency communication processes?" },
+                            { name: "emergencyCommunicationProcedures", label: "Are emergency communication procedures documented in written policies or protocols?" },
+                            { name: "reviewingAndEvaluating", label: "Is there a process for reviewing and evaluating the effectiveness of emergency communication during drills or actual incidents?" },
+                            { name: "lessonsLearned", label: "Are lessons learned from past emergencies used to improve communication procedures and response capabilities?" }
+                        ].map((question, index) => (
+                            <div key={index} className="form-section">
+                                <label>{question.label}</label>
+                                <div>
+                                    {question.name === "dedicatedCommunicationSystems" || question.name === "notifyAuthorities" || question.name === "mitigatingCommunicationFailures" || question.name === "informationVerification" || question.name === "facilitateCommunication" || question.name === "reviewingAndEvaluating" ? (
+                                        <input
+                                            type="text"
+                                            name={question.name}
+                                            placeholder={question.name === "dedicatedCommunicationSystems" ? "List the communication systems" : question.name === "notifyAuthorities" ? "Describe the protocols to notify authorities" : question.name === "mitigatingCommunicationFailures" ? "Describe the redundancies and backup systems" : question.name === "informationVerification" ? "Describe the mechanism for verifying information" : question.name === "facilitateCommunication" ? "Describe the contact points and procedures" : "Describe the process"}
+                                            value={formData[question.name] || ''}
+                                            onChange={handleChange}
+                                        />
+                                    ) : (
+                                        <>
+                                            <input
+                                                type="radio"
+                                                name={question.name}
+                                                value="yes"
+                                                checked={formData[question.name] === "yes"}
+                                                onChange={handleChange}
+                                            /> Yes
+                                            <input
+                                                type="radio"
+                                                name={question.name}
+                                                value="no"
+                                                checked={formData[question.name] === "no"}
+                                                onChange={handleChange}
+                                            /> No
+                                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" onChange={handleChange}></textarea>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                        <input type="file" onChange={handleImageChange} accept="image/*" />
+                        {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                        {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                        <button type="submit">Submit</button>
+                    </form>
+                </main>
             </div>
-
-            <div className="form-section">
-                <label>Do these systems include multiple channels such as telephone, radio, email, and text messaging?</label>
-                <div>
-                    <input type="radio" name="multipleChannels" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="multipleChannels" value="no" onChange={handleChange}/> No
-                    <textarea className='comment-box' name="multipleChannelsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                </div>
-            </div>
-
-            <div className="form-section">
-                <label>Are communication systems capable of reaching relevant authorities quickly and efficiently?</label>
-                <div>
-                    <input type="radio" name="efficientCommunicationSystems" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="efficientCommunicationSystems" value="no" onChange={handleChange}/> No
-                    <textarea className='comment-box' name="efficientCommunicationSystemsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                </div>
-            </div>
-            
-            <h2>Emergency Contacts:</h2>
-            <div className="form-section">
-                <label>Have emergency contact lists been established for relevant authorities, including local law enforcement, fire department, and medical services?</label>
-                <div>
-                    <input type="radio" name="emergencyContactLists" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="emergencyContactLists" value="no" onChange={handleChange}/> No
-                    <textarea className='comment-box' name="emergencyContactListsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                </div>
-            </div>
-
-            <div className="form-section">
-                <label>Are contact details regularly updated to ensure accuracy and reliability?</label>
-                <div>
-                    <input type="radio" name="updatedContactDetails" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="updatedContactDetails" value="no" onChange={handleChange}/> No
-                    <textarea className='comment-box' name="updatedContactDetailsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                </div>
-            </div>
-
-            <div className="form-section">
-                <label>Is there a designated point of contact responsible for initiating communication with authorities during emergencies?</label>
-                <div>
-                    <input type="radio" name="designatedPoc" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="designatedPoc" value="no" onChange={handleChange}/> No
-                    <textarea className='comment-box' name="designatedPocComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                </div>
-            </div>
-
-            <h2>Notification Protocols:</h2>
-            <div className="form-section">
-                <label>Are there clear protocols in place for when and how to notify authorities during different types of emergencies?</label>
-                <div>
-                    <input type="text" name="notifyAuthorities" placeholder="Describe the protocols to notify authorities" onChange={handleChange}/>
-                </div>
-            </div>
-
-            <div className="form-section">
-                <label>Do staff members understand their roles and responsibilities in initiating communication with authorities?</label>
-                <div>
-                    <input type="radio" name="staffRolesAndResponsibilities" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="staffRolesAndResponsibilities" value="no" onChange={handleChange}/> No
-                    <textarea className='comment-box' name="staffRolesAndResponsibilitiesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                </div>
-            </div>
-
-            <div className="form-section">
-                <label>Is there a hierarchy or chain of command to follow for escalating emergency notifications as needed?</label>
-                <div>
-                    <input type="radio" name="chainOfCommand" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="chainOfCommand" value="no" onChange={handleChange}/> No
-                    <textarea className='comment-box' name="chainOfCommandComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                </div>
-            </div>
-
-            <h2>Speed and Efficiency:</h2>
-            <div className="form-section">
-                <label>Is the process for alerting authorities designed to be swift and efficient, minimizing response times?</label>
-                <div>
-                    <input type="radio" name="alertingAuthorities" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="alertingAuthorities" value="no" onChange={handleChange}/> No
-                    <textarea className='comment-box' name="alertingAuthoritiesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                </div>
-            </div>
-
-            <div className="form-section">
-                <label>Are communication systems tested regularly to ensure they are functioning properly and can deliver alerts promptly?</label>
-                <div>
-                    <input type="radio" name="communicationSystemsTest" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="communicationSystemsTest" value="no" onChange={handleChange}/> No
-                    <textarea className='comment-box' name="communicationSystemsTestComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                </div>
-            </div>
-
-            <div className="form-section">
-                <label>Are there redundancies or backup systems in place to mitigate communication failures during emergencies?</label>
-                <div>
-                    <input type="text" name="mitigatingCommunicationFailures" placeholder="Describe the redundancies and backup systems" onChange={handleChange}/>
-                </div>
-            </div>
-
-            <h2>Information Accuracy:</h2>
-            <div className="form-section">
-                <label>Are staff members trained to provide accurate and detailed information when alerting authorities?</label>
-                <div>
-                    <input type="radio" name="provideDetailedInformation" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="provideDetailedInformation" value="no" onChange={handleChange}/> No
-                    <textarea className='comment-box' name="provideDetailedInformationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                </div>
-            </div>
-
-            <div className="form-section">
-                <label>Do they know how to convey essential details such as the nature of the emergency, location, number of individuals affected, and any immediate hazards?</label>
-                <div>
-                    <input type="radio" name="conveyEssentialDetail" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="conveyEssentialDetail" value="no" onChange={handleChange}/> No
-                    <textarea className='comment-box' name="conveyEssentialDetailComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                </div>
-            </div>
-
-            <div className="form-section">
-                <label>Is there a mechanism for verifying information before it is communicated to authorities to prevent misinformation or confusion?</label>
-                <div>
-                    <input type="text" name="informationVerification" placeholder="Describe the mechanism for verifying information" onChange={handleChange}/>
-                </div>
-            </div>
-
-            <h2>Coordination with Authorities:</h2>
-            <div className="form-section">
-                <label>Is there coordination and collaboration with authorities to establish communication protocols and ensure a rapid response to emergencies?</label>
-                <div>
-                    <input type="radio" name="establishCommunicationProtocolsl" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="establishCommunicationProtocolsl" value="no" onChange={handleChange}/> No
-                    <textarea className='comment-box' name="establishCommunicationProtocolslComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                </div>
-            </div>
-
-            <div className="form-section">
-                <label>Have contact points and procedures been established to facilitate communication between the organization and responding agencies?</label>
-                <div>
-                    <input type="text" name="facilitateCommunication" placeholder="Describe the contact points and procedures" onChange={handleChange}/>
-                </div>
-            </div>
-
-            <div className="form-section">
-                <label>Are there regular meetings or exercises conducted with authorities to review and refine emergency communication processes?</label>
-                <div>
-                    <input type="radio" name="refineEmergencyCommunication" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="refineEmergencyCommunication" value="no" onChange={handleChange}/> No
-                    <textarea className='comment-box' name="refineEmergencyCommunicationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                </div>
-            </div>
-
-            <h2>Documentation and Review:</h2>
-            <div className="form-section">
-                <label>Are emergency communication procedures documented in written policies or protocols?</label>
-                <div>
-                    <input type="radio" name="emergencyCommunicationProcedures" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="emergencyCommunicationProcedures" value="no" onChange={handleChange}/> No
-                    <textarea className='comment-box' name="emergencyCommunicationProceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                </div>
-            </div>
-
-            <div className="form-section">
-                <label>Is there a process for reviewing and evaluating the effectiveness of emergency communication during drills or actual incidents?</label>
-                <div>
-                    <input type="text" name="reviewingAndEvaluating" placeholder="Describe the process" onChange={handleChange}/>
-                </div>
-            </div>
-
-            <div className="form-section">
-                <label>Are lessons learned from past emergencies used to improve communication procedures and response capabilities?</label>
-                <div>
-                    <input type="radio" name="lessonsLearned" value="yes" onChange={handleChange}/> Yes
-                    <input type="radio" name="lessonsLearned" value="no" onChange={handleChange}/> No
-                    <textarea className='comment-box' name="lessonsLearnedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                </div>
-            </div>
-
-            {/* Submit Button */}
-            <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-            </form>
-        </main>
-    </div>
-  )
+        </div>
+    );
 }
 
 export default EmergencyCommunicationFormPage;

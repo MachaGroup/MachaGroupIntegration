@@ -1,332 +1,281 @@
 import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-/**/
+import { getFunctions, httpsCallable } from "firebase/functions";
+
 function ClassroomLockdownProtocolsFormPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadClassroomLockdownProtocolsImage = httpsCallable(functions, 'uploadClassroomLockdownProtocolsImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
+        }
 
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
-    }
-  }, [buildingId, navigate]);
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Function to handle back button
-  const handleBack = async () => {
-          if (formData && buildingId) { // Check if formData and buildingId exist
             try {
-              const buildingRef = doc(db, 'Buildings', buildingId);
-              const formsRef = collection(db, 'forms/Emergency Preparedness/Classroom Lockdown Protocols');
-              await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-              });
-              console.log('Form Data submitted successfully on back!');
-              alert('Form data saved before navigating back!');
+                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Classroom Lockdown Protocols', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
             } catch (error) {
-              console.error('Error saving form data:', error);
-              alert('Failed to save form data before navigating back. Some data may be lost.');
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
             }
-          }
-          navigate(-1);
         };
- 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Classroom Lockdown Protocols', buildingId);
+            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
+            console.log("Form data saved to Firestore:", newFormData);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start the assessment from the correct page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadClassroomLockdownProtocolsImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Classroom Lockdown Protocols', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
-
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Emergency Preparedness/Classroom Lockdown Protocols');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
-  };
 
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Classroom Lockdown Procedures Assessment</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>Classroom Lockdown Procedures Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                {/* 2.2.1.2.1 Classroom Lockdown Procedures */}
-                <h2>2.2.1.2.1 Door Locks:</h2>
-                <div className="form-section">
-                    <label>2.2.1.2.1.1 Are classroom doors equipped with locks that can be securely engaged from the inside?</label>
-                    <div>
-                        <input type="radio" name="classroom doors locks" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="classroom doors locks" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="classroom doors locks-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>2.2.1.2.1 Door Locks:</h2>
+                    {[
+                        { name: "classroomDoorsLocks", label: "Are classroom doors equipped with locks that can be securely engaged from the inside?" },
+                        { name: "locksSafetyStandard", label: "Do locks meet safety standards and regulations for lockdown procedures?" },
+                        { name: "lockOperational", label: "Are locks easy to operate and reliably secure, even under stress or pressure?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
+                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
+                            </div>
+                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>2.2.1.2.1.2 Do locks meet safety standards and regulations for lockdown procedures?</label>
-                    <div>
-                        <input type="radio" name="locks  safety standard" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="locks  safety standard" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="locks  safety standard-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
+                    <h2>2.2.1.2.2 Barricading Mechanisms:</h2>
+                    {[
+                        { name: "barricadingMechanism", label: "Are there barricading mechanisms available in classrooms to reinforce door security during lockdowns?" },
+                        { name: "barricadingDeviceOperational", label: "Do barricading devices effectively prevent unauthorized entry and provide additional time for occupants to seek shelter or escape?" },
+                        { name: "barricadingDeviceEfficiency", label: "Are barricading devices designed to be quickly deployed and easily removed by authorized personnel?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
+                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
+                            </div>
+                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                        </div>
+                    ))}
+                    <div className="form-section">
+                        <label>List the mechanisms</label>
+                        <input type="text" name="barricadingMechanismsList" value={formData.barricadingMechanismsList || ''} onChange={handleChange} />
                     </div>
-                </div>
 
-                <div className="form-section">
-                    <label>2.2.1.2.1.3 Are locks easy to operate and reliably secure, even under stress or pressure?</label>
-                    <div>
-                        <input type="radio" name="lock-operational" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="lock-operational" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="lock-operational-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <h2>Training and Drills:</h2>
+                    {[
+                        { name: "lockdownProcedureTraining", label: "Are staff members and students trained in lockdown procedures, including how to barricade doors effectively?" },
+                        { name: "regularLockdownDrills", label: "Are drills conducted regularly to practice lockdown scenarios and ensure familiarity with procedures?" },
+                        { name: "regularlyLockdownDebriefing", label: "Are debriefings held after drills to review performance, identify areas for improvement, and reinforce best practices?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
+                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
+                            </div>
+                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                        </div>
+                    ))}
 
-                { /* 2.2.1.2.2 Barricading Mechanisms*/ }
-                <h2>2.2.1.2.2 Barricading Mechanisms:</h2>
-                <div className="form-section">
-                    <label>Are there barricading mechanisms available in classrooms to reinforce door security during lockdowns?</label>
-                    <div>
-                        <input type="radio" name="barricading mechanism" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="barricading mechanism" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="barricading mechanism-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
+                    <h2>Communication Systems:</h2>
+                    {[
+                        { name: "lockdownCommunicationSystem", label: "Is there a communication system in place to alert occupants of lockdowns and provide instructions?" },
+                        { name: "emergencyCommunicationDevices", label: "Are emergency communication devices accessible in classrooms for contacting authorities or requesting assistance?" },
+                        { name: "designatedProtocol", label: "Is there a designated protocol for reporting suspicious activity or potential threats to school administrators or security personnel?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
+                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
+                            </div>
+                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                        </div>
+                    ))}
+                    <div className="form-section">
+                        <label>Describe the communication system</label>
+                        <input type="text" name="lockdownCommunicationSystemDescription" value={formData.lockdownCommunicationSystemDescription || ''} onChange={handleChange} />
                     </div>
-                    <div>
-                        <input type="text" name="barricadingMechanisms" placeholder="List the mechanisms" />
+                    <div className="form-section">
+                        <label>List the devices</label>
+                        <input type="text" name="emergencyCommunicationDevicesList" value={formData.emergencyCommunicationDevicesList || ''} onChange={handleChange} />
                     </div>
-                </div>
+                    <div className="form-section">
+                        <label>Describe the protocol</label>
+                        <input type="text" name="designatedProtocolDescription" value={formData.designatedProtocolDescription || ''} onChange={handleChange} />
+                    </div>
 
-                <div className="form-section">
-                    <label>Do barricading devices effectively prevent unauthorized entry and provide additional time for occupants to seek shelter or escape?</label>
-                    <div>
-                        <input type="radio" name="barricading device operational" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="barricading device operational" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="barricading device operational-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
+                    <h2>Safe Zones and Hiding Places:</h2>
+                    {[
+                        { name: "designatedSafeZones", label: "Are there designated safe zones or hiding places within classrooms where occupants can seek shelter during lockdowns?" },
+                        { name: "strategicSafeZones", label: "Are these areas strategically located to provide cover and concealment from potential threats?" },
+                        { name: "safeZonesVulnerabilities", label: "Have safe zones been assessed for potential vulnerabilities and reinforced as needed to enhance security?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
+                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
+                            </div>
+                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                        </div>
+                    ))}
+                    <div className="form-section">
+                        <label>Describe the safe zones</label>
+                        <input type="text" name="designatedSafeZonesDescription" value={formData.designatedSafeZonesDescription || ''} onChange={handleChange} />
                     </div>
-                </div>
 
-                <div className="form-section">
-                    <label>Are barricading devices designed to be quickly deployed and easily removed by authorized personnel?</label>
-                    <div>
-                        <input type="radio" name="barricading device efficiency" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="barricading device efficiency" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="barricading device efficiency-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <h2>Coordination with Authorities:</h2>
+                    {[
+                        { name: "personelCoordination", label: "Is there coordination between school personnel and local law enforcement agencies on lockdown procedures and response protocols?" },
+                        { name: "lawEnforcementFamiliarity", label: "Are law enforcement agencies familiar with school layouts and lockdown plans to facilitate their response in the event of an emergency?" },
+                        { name: "lawEnforcementReview", label: "Are there regular meetings or exercises conducted with law enforcement to review and refine lockdown procedures?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
+                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
+                            </div>
+                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                        </div>
+                    ))}
 
-                <h2>Training and Drills:</h2>
-                <div className="form-section">
-                    <label>Are staff members and students trained in lockdown procedures, including how to barricade doors effectively?</label>
-                    <div>
-                        <input type="radio" name="lockdown procedure training" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="lockdown procedure training" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="lockdown procedure training-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
+                    <h2>Parent and Guardian Communication:</h2>
+                    {[
+                        { name: "guardiansInformed", label: "Are parents and guardians informed of lockdown procedures and expectations for student safety?" },
+                        { name: "guardiansCommunication", label: "Is there a communication plan in place for notifying parents and guardians of lockdown events and providing updates as needed?" },
+                        { name: "availableSupportServices", label: "Are resources or support services available to assist families in coping with the emotional impact of lockdown situations?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
+                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
+                            </div>
+                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                        </div>
+                    ))}
+                    <div className="form-section">
+                        <label>Describe the plan</label>
+                        <input type="text" name="guardiansCommunicationDescription" value={formData.guardiansCommunicationDescription || ''} onChange={handleChange} />
                     </div>
-                </div>
 
-                <div className="form-section">
-                    <label>Are drills conducted regularly to practice lockdown scenarios and ensure familiarity with procedures?</label>
-                    <div>
-                        <input type="radio" name="regular lockdown drills" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="regular lockdown drills" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="regular lockdown drills-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
 
-                <div className="form-section">
-                    <label>Are debriefings held after drills to review performance, identify areas for improvement, and reinforce best practices?</label>
-                    <div>
-                        <input type="radio" name="regularly lockdown debriefing" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="regularly lockdown debriefing" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="regularly lockdown debriefing-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>Communication Systems:</h2>
-                <div className="form-section">
-                    <label>Is there a communication system in place to alert occupants of lockdowns and provide instructions?</label>
-                    <div>
-                        <input type="radio" name="lockdown communication system" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="lockdown communication system" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="lockdown communication system-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                    <div>
-                        <input type="text" name="lockdownCommunicationSystem" placeholder="Describe the communication system" />
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are emergency communication devices accessible in classrooms for contacting authorities or requesting assistance?</label>
-                    <div>
-                        <input type="radio" name="emergency communication devices" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="emergency communication devices" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="emergency communication devices-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                    <div>
-                        <input type="text" name="emergencyCommunicationDevices" placeholder="List the devices" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Is there a designated protocol for reporting suspicious activity or potential threats to school administrators or security personnel?</label>
-                    <div>
-                        <input type="radio" name="designated protocol" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="designated protocol" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="designated protocol-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                    <div>
-                        <input type="text" name="designatedProtocol" placeholder="Describe the protocol" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>Safe Zones and Hiding Places:</h2>
-                <div className="form-section">
-                    <label>Are there designated safe zones or hiding places within classrooms where occupants can seek shelter during lockdowns?</label>
-                    <div>
-                        <input type="radio" name="designated safe zones" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="designated safe zones" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="designated safe zones-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                    <div>
-                        <input type="text" name="designatedSafeZones" placeholder="Describe the safe zones" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are these areas strategically located to provide cover and concealment from potential threats?</label>
-                    <div>
-                        <input type="radio" name="strategic safe zones" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="strategic safe zones" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="strategic safe zones-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Have safe zones been assessed for potential vulnerabilities and reinforced as needed to enhance security?</label>
-                    <div>
-                        <input type="radio" name="safe zones vulnerabilities" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="safe zones vulnerabilities" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="safe zones vulnerabilities-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>Coordination with Authorities:</h2>
-                <div className="form-section">
-                    <label>Is there coordination between school personnel and local law enforcement agencies on lockdown procedures and response protocols?</label>
-                    <div>
-                        <input type="radio" name="personel coordination" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="personel coordination" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="personel coordination-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are law enforcement agencies familiar with school layouts and lockdown plans to facilitate their response in the event of an emergency?</label>
-                    <div>
-                        <input type="radio" name="law enforcement familiarity" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="law enforcement familiarity" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="law enforcement familiarity-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-                
-                <div className="form-section">
-                    <label>Are there regular meetings or exercises conducted with law enforcement to review and refine lockdown procedures?</label>
-                    <div>
-                        <input type="radio" name="law enforcement review" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="law enforcement review" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="law enforcement review-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>Parent and Guardian Communication:</h2>
-                <div className="form-section">
-                    <label>Are parents and guardians informed of lockdown procedures and expectations for student safety?</label>
-                    <div>
-                        <input type="radio" name="guardians informed" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="guardians informed" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="guardians informed-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Is there a communication plan in place for notifying parents and guardians of lockdown events and providing updates as needed?</label>
-                    <div>
-                        <input type="radio" name="guardians communication" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="guardians communication" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="guardians communication-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                    <div>
-                        <input type="text" name="guardiansCommunication" placeholder="Describe the plan" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are resources or support services available to assist families in coping with the emotional impact of lockdown situations?</label>
-                    <div>
-                        <input type="radio" name="available support services" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="available support services" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="available support services-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                {/* Submit Button */}
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-
-            </form>
-        </main>
-    </div>
-  )
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default ClassroomLockdownProtocolsFormPage;

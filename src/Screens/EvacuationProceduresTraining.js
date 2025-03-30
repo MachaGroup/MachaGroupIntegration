@@ -1,154 +1,160 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-/**/
+import { getFunctions, httpsCallable } from "firebase/functions";
+
 function EvacuationProceduresTrainingPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadImage = httpsCallable(functions, 'uploadEvacuationProceduresTrainingImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
+        }
 
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress'); 
-    }
-  }, [buildingId, navigate]);
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Function to handle back button
-  const handleBack = async () => {
-          if (formData && buildingId) { // Check if formData and buildingId exist
             try {
-              const buildingRef = doc(db, 'Buildings', buildingId);
-              const formsRef = collection(db, 'forms/Continuous Improvement - Safety and Security/Evacuation Procedures Training');
-              await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-              });
-              console.log('Form Data submitted successfully on back!');
-              alert('Form data saved before navigating back!');
+                const formDocRef = doc(db, 'forms', 'Continuous Improvement - Safety and Security', 'Evacuation Procedures Training', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
             } catch (error) {
-              console.error('Error saving form data:', error);
-              alert('Failed to save form data before navigating back. Some data may be lost.');
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
             }
-          }
-          navigate(-1);
         };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Continuous Improvement - Safety and Security', 'Evacuation Procedures Training', buildingId);
+            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
+            console.log("Form data saved to Firestore:", newFormData);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Continuous Improvement - Safety and Security', 'Evacuation Procedures Training', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
-
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Continuous Improvement - Safety and Security/Evacuation Procedures Training');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('Form Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
-  };
 
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>Evacuation Procedures Training</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Evacuation Procedures Training</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>7.2.3.1.2. Evacuation Procedures Training</h2>
+                    {[
+                        { name: "evacuationComponents", label: "What are the key components included in the evacuation procedures training for staff?", type: "text" },
+                        { name: "evacuationEffectiveness", label: "How is the effectiveness of the evacuation procedures assessed after training sessions?", type: "text" },
+                        { name: "evacuationRoutes", label: "Are there specific evacuation routes and assembly points that staff are trained to use, and how are these communicated?", type: "text" },
+                        { name: "evacuationTrainingReview", label: "How often is the evacuation procedures training updated or reviewed for relevance and compliance?", type: "text" },
+                        { name: "disabilityAccommodations", label: "What measures are in place to accommodate individuals with disabilities during evacuation procedures?", type: "text" },
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="text" name={question.name} value={formData[question.name] || ''} onChange={handleChange} />
+                            </div>
+                        </div>
+                    ))}
 
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-              {/* Evacuation Procedures Training */}
-              <h2>7.2.3.1.2. Evacuation Procedures Training</h2>
-              <div className="form-section">
-                <label>What are the key components included in the evacuation procedures training for staff?</label>
-                <div>
-                  <input type="text" name="evacuationComponents" placeholder="Describe key components of evacuation training" onChange={handleChange}/>
-                </div>
-              </div>
-
-              <div className="form-section">
-                <label>How is the effectiveness of the evacuation procedures assessed after training sessions?</label>
-                <div>
-                  <input type="text" name="evacuationEffectiveness" placeholder="Describe how effectiveness is assessed post-training" onChange={handleChange}/>
-                </div>
-              </div>
-
-              <div className="form-section">
-                <label>Are there specific evacuation routes and assembly points that staff are trained to use, and how are these communicated?</label>
-                <div>
-                  <input type="text" name="evacuationRoutes" placeholder="Describe evacuation routes and communication" onChange={handleChange}/>
-                </div>
-              </div>
-
-              <div className="form-section">
-                <label>How often is the evacuation procedures training updated or reviewed for relevance and compliance?</label>
-                <div>
-                  <input type="text" name="evacuationTrainingReview" placeholder="Describe frequency of review and updates to evacuation training" onChange={handleChange}/>
-                </div>
-              </div>
-
-              <div className="form-section">
-                <label>What measures are in place to accommodate individuals with disabilities during evacuation procedures?</label>
-                <div>
-                  <input type="text" name="disabilityAccommodations" placeholder="Describe measures for individuals with disabilities during evacuation" onChange={handleChange}/>
-                </div>
-              </div>
-          
-                    {/* Submit Button */}
                     <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-
-            </form>
-        </main>
-    </div>
-  )
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default EvacuationProceduresTrainingPage;

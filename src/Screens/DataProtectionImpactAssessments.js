@@ -1,340 +1,210 @@
 import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-/**/
+import { getFunctions, httpsCallable } from "firebase/functions";
+
 function DataProtectionImpactAssessmentsFormPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadDataProtectionImpactAssessmentsFormPageImage = httpsCallable(functions, 'uploadDataProtectionImpactAssessmentsFormPageImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const storage = getStorage();
+    const [image, setImage] = useState(null);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [uploadError, setUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
 
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('/BuildingandAddress');
+        } else {
+            loadFormData();
+        }
+    }, [buildingId, navigate]);
 
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
-    }
-  }, [buildingId, navigate]);
+    const loadFormData = async () => {
+        setLoading(true);
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formsRef = collection(db, 'forms/Policy and Compliance/Data Protection Impact Assessments');
+            const q = query(formsRef, where('building', '==', buildingRef));
+            const querySnapshot = await getDocs(q);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Function to handle back button
-  const handleBack = async () => {
-          if (formData && buildingId) { // Check if formData and buildingId exist
-            try {
-              const buildingRef = doc(db, 'Buildings', buildingId);
-              const formsRef = collection(db, 'forms/Policy and Compliance/Data Protection Impact Assessments');
-              await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-              });
-              console.log('Form Data submitted successfully on back!');
-              alert('Form data saved before navigating back!');
-            } catch (error) {
-              console.error('Error saving form data:', error);
-              alert('Failed to save form data before navigating back. Some data may be lost.');
+            if (!querySnapshot.empty) {
+                const docData = querySnapshot.docs[0].data().formData;
+                setFormData(docData);
             }
-          }
-          navigate(-1);
-        };
+        } catch (error) {
+            console.error('Error loading form data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+    const handleImageChange = (e) => {
+        if (e.target.files[0]) {
+            setImage(e.target.files[0]);
+        }
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+
+    const handleBack = async () => {
+        if (formData && buildingId) {
+            try {
+                const buildingRef = doc(db, 'Buildings', buildingId);
+                const formsRef = collection(db, 'forms/Policy and Compliance/Data Protection Impact Assessments');
+                const q = query(formsRef, where('building', '==', buildingRef));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    await addDoc(formsRef, {
+                        building: buildingRef,
+                        formData: formData,
+                    });
+                } else {
+                    const docId = querySnapshot.docs[0].id;
+                    const formDocRef = doc(db, 'forms/Policy and Compliance/Data Protection Impact Assessments', docId);
+                    await setDoc(formDocRef, {
+                        building: buildingRef,
+                        formData: formData,
+                    }, { merge: true });
+                }
+                console.log('Form Data submitted successfully on back!');
+                alert('Form data saved before navigating back!');
+            } catch (error) {
+                console.error('Error saving form data:', error);
+                alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+        }
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start the assessment from the correct page.');
+            return;
+        }
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formsRef = collection(db, 'forms/Policy and Compliance/Data Protection Impact Assessments');
+            const q = query(formsRef, where('building', '==', buildingRef));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                await addDoc(formsRef, {
+                    building: buildingRef,
+                    formData: formData,
+                });
+            } else {
+                const docId = querySnapshot.docs[0].id;
+                const formDocRef = doc(db, 'forms/Policy and Compliance/Data Protection Impact Assessments', docId);
+                await setDoc(formDocRef, {
+                    building: buildingRef,
+                    formData: formData,
+                }, { merge: true });
+            }
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            alert('Failed to submit the form. Please try again.');
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>5.2.1.2.1 Data Protection Impact Assessments (DPIA) Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Policy and Compliance/Data Protection Impact Assessments');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
-    }
-  };
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>5.2.1.2.1 Data Protection Impact Assessments (DPIA)</h2>
+                    {[
+                        { name: "conductingProcess", label: "5.2.1.2.1.1. What is the process for conducting Data Protection Impact Assessments (DPIAs) within your organization (e.g., step-by-step methodology)?", type: "text", securityGatesFormat: true },
+                        { name: "overseeingDPIAs", label: "5.2.1.2.1.2. Who is responsible for initiating and overseeing DPIAs (e.g., Data Protection Officer, compliance team)?", type: "text", securityGatesFormat: true },
+                        { name: "documentedResults", label: "5.2.1.2.1.3. How are the results of a DPIA documented and communicated to relevant stakeholders?", type: "text", securityGatesFormat: true },
+                        { name: "identifyingRisks", label: "5.2.1.2.1.4. How does your organization identify and assess risks associated with personal data processing activities (e.g., risk assessment frameworks, threat modeling)?", type: "text", securityGatesFormat: true },
+                        { name: "evaluatingRisks", label: "5.2.1.2.1.5. What criteria are used to evaluate the potential impact of these risks on individuals' privacy and data protection (e.g., severity of impact, likelihood of occurrence)?", type: "text", securityGatesFormat: true },
+                        { name: "mitigationStrategies", label: "5.2.1.2.1.6. How are risk mitigation strategies developed and implemented based on the DPIA findings?", type: "text", securityGatesFormat: true },
+                        { name: "stakeholderInvolvement", label: "5.2.1.2.1.7. How are stakeholders involved in the DPIA process (e.g., consultation with affected individuals, engagement with legal or compliance experts)?", type: "text", securityGatesFormat: true },
+                        { name: "gatheringFeedback", label: "5.2.1.2.1.8. What methods are used to gather feedback from stakeholders and incorporate it into the DPIA findings (e.g., surveys, interviews)?", type: "text", securityGatesFormat: true },
+                        { name: "informingStakeholders", label: "5.2.1.2.1.9. How are stakeholders informed about the outcomes of the DPIA and any actions taken as a result?", type: "text", securityGatesFormat: true },
+                        { name: "integratedPlanning", label: "5.2.1.2.1.10. How are DPIAs integrated into the project planning and development lifecycle (e.g., early identification of data protection requirements, incorporation into project milestones)?", type: "text", securityGatesFormat: true },
+                        { name: "addressedRecommendations", label: "5.2.1.2.1.11. What steps are taken to ensure that DPIA recommendations are addressed during the implementation of new projects or systems?", type: "text", securityGatesFormat: true },
+                        { name: "monitoredRecommendations", label: "5.2.1.2.1.12. How is compliance with DPIA recommendations monitored and enforced throughout the project lifecycle?", type: "text", securityGatesFormat: true },
+                        { name: "requiredDocumentation", label: "5.2.1.2.1.13. What documentation is required for a DPIA, and how is it maintained (e.g., assessment reports, risk mitigation plans)?", type: "text", securityGatesFormat: true },
+                        { name: "storedRecords", label: "5.2.1.2.1.14. How are DPIA records stored and protected to ensure they are accessible and secure (e.g., digital records, physical storage)?", type: "text", securityGatesFormat: true },
+                        { name: "reviewingDocumentation", label: "5.2.1.2.1.15. What procedures are in place for reviewing and updating DPIA documentation as needed?", type: "text", securityGatesFormat: true },
+                        { name: "reviewedDPIAs", label: "5.2.1.2.1.16. How often are DPIAs reviewed and updated to reflect changes in data processing activities or regulatory requirements (e.g., annual reviews, periodic audits)?", type: "text", securityGatesFormat: true },
+                        { name: "monitoringEffectiveness", label: "5.2.1.2.1.17. What mechanisms are in place to monitor the effectiveness of DPIA measures and their impact on data protection (e.g., performance metrics, feedback loops)?", type: "text", securityGatesFormat: true },
+                        { name: "lessonsLearned", label: "5.2.1.2.1.18. How are lessons learned from DPIA reviews used to improve future assessments and data protection practices?", type: "text", securityGatesFormat: true },
+                        { name: "relatedRequirements", label: "5.2.1.2.1.19. How does your organization ensure compliance with GDPR requirements related to DPIAs (e.g., adherence to Article 35, documentation requirements)?", type: "text", securityGatesFormat: true },
+                        { name: "addressingIssues", label: "5.2.1.2.1.20. What steps are taken to address any non-compliance issues identified during the DPIA process?", type: "text", securityGatesFormat: true },
+                        { name: "incorporatingChanges", label: "5.2.1.2.1.21. How are changes in GDPR regulations or guidance incorporated into your organization's DPIA practices?", type: "text", securityGatesFormat: true },
+                        { name: "staffTraining", label: "5.2.1.2.1.22. What training is provided to staff involved in conducting or overseeing DPIAs (e.g., data protection principles, assessment techniques)?", type: "text", securityGatesFormat: true },
+                        { name: "maintainingAwareness", label: "5.2.1.2.1.23. How is staff awareness of DPIA requirements and their role in the process maintained and updated?", type: "text", securityGatesFormat: true },
+                        { name: "supportResources", label: "5.2.1.2.1.24. Are there resources available to support staff in conducting effective DPIAs (e.g., guidelines, templates)?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
+                        { name: "involvingVendors", label: "5.2.1.2.1.25. How are third-party vendors or partners involved in the DPIA process, and what is their role in ensuring data protection (e.g., third-party assessments, contracts)?", type: "text", securityGatesFormat: true },
+                        { name: "evaluatingThirdPartyRisks", label: "5.2.1.2.1.26. What procedures are in place to evaluate and manage risks associated with third-party data processing activities?", type: "text", securityGatesFormat: true },
+                        { name: "ensuringCompliance", label: "5.2.1.2.1.27. How is compliance with DPIA requirements ensured when working with external parties?", type: "text", securityGatesFormat: true },
+                        { name: "potentialImpacts", label: "5.2.1.2.1.28. How are the potential impacts on data subjects considered and addressed during the DPIA process (e.g., data minimization, transparency)?", type: "text", securityGatesFormat: true },
+                        { name: "protectingSubjects", label: "5.2.1.2.1.29. What measures are in place to inform and protect data subjects based on DPIA findings (e.g., privacy notices, consent mechanisms)?", type: "text", securityGatesFormat: true },
+                        { name: "improvingPractices", label: "5.2.1.2.1.30. How is feedback from data subjects used to improve DPIA practices and data protection measures?", type: "text", securityGatesFormat: true },
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                {question.type === "text" && <input type="text" name={question.name} value={formData[question.name] || ''} placeholder={question.placeholder} onChange={handleChange} />}
+                                {question.type === "radio" && (
+                                    <div>
+                                        <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                        <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                        <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                                    </div>
+                                )}
+                                {question.securityGatesFormat && <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>}
+                            </div>
+                        </div>
+                    ))}
 
-
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>5.2.1.2.1 Data Protection Impact Assessments (DPIA) Assessment</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
-
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                {/* 5.2.1.2.1 Data Protection Impact Assessments (DPIA) */}
-                <h2>5.2.1.2.1.1 Assessment Process:</h2>
-                <div className="form-section">
-                    <label>What is the process for conducting Data Protection Impact Assessments (DPIAs) within your organization (e.g., step-by-step methodology)?</label>
-                    <div>
-                        <input type="text" name="conductingProcess" placeholder="Describe the process" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Who is responsible for initiating and overseeing DPIAs (e.g., Data Protection Officer, compliance team)?</label>
-                    <div>
-                        <input type="text" name="overseeingDPIAs" placeholder="Who's responsible" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are the results of a DPIA documented and communicated to relevant stakeholders?</label>
-                    <div>
-                        <input type="text" name="documentedResults" placeholder="Describe how they're documented" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.2.1.2.1.2 Risk Identification and Evaluation:</h2>
-                <div className="form-section">
-                    <label>How does your organization identify and assess risks associated with personal data processing activities (e.g., risk assessment frameworks, threat modeling)?</label>
-                    <div>
-                        <input type="text" name="identifyingRisks" placeholder="Describe how they identify risks" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What criteria are used to evaluate the potential impact of these risks on individuals' privacy and data protection (e.g., severity of impact, likelihood of occurrence)?</label>
-                    <div>
-                        <input type="text" name="evaluatingRisks" placeholder="Describe the criteria" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are risk mitigation strategies developed and implemented based on the DPIA findings?</label>
-                    <div>
-                        <input type="text" name="mitigationStrategies" placeholder="Describe how they're developed" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.2.1.2.1.3 Stakeholder Consultation:</h2>
-                <div className="form-section">
-                    <label>How are stakeholders involved in the DPIA process (e.g., consultation with affected individuals, engagement with legal or compliance experts)?</label>
-                    <div>
-                        <input type="text" name="mitigationStrategies" placeholder="Describe how they're involved" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What methods are used to gather feedback from stakeholders and incorporate it into the DPIA findings (e.g., surveys, interviews)?</label>
-                    <div>
-                        <input type="text" name="gatheringFeedback" placeholder="Describe the methods" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are stakeholders informed about the outcomes of the DPIA and any actions taken as a result?</label>
-                    <div>
-                        <input type="text" name="informingStakeholders" placeholder="Describe how they're informed" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.2.1.2.1.4 Integration with Project Planning:</h2>
-                <div className="form-section">
-                    <label>How are DPIAs integrated into the project planning and development lifecycle (e.g., early identification of data protection requirements, incorporation into project milestones)?</label>
-                    <div>
-                        <input type="text" name="integratedPlanning" placeholder="Describe how they're integrated" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What steps are taken to ensure that DPIA recommendations are addressed during the implementation of new projects or systems?</label>
-                    <div>
-                        <input type="text" name="addressedRecommendations" placeholder="Describe the steps" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is compliance with DPIA recommendations monitored and enforced throughout the project lifecycle?</label>
-                    <div>
-                        <input type="text" name="monitoredRecommendations" placeholder="Describe how they're monitored" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.2.1.2.1.5 Documentation and Record-Keeping:</h2>
-                <div className="form-section">
-                    <label>What documentation is required for a DPIA, and how is it maintained (e.g., assessment reports, risk mitigation plans)?</label>
-                    <div>
-                        <input type="text" name="requiredDocumentation" placeholder="Describe the documentation" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are DPIA records stored and protected to ensure they are accessible and secure (e.g., digital records, physical storage)?</label>
-                    <div>
-                        <input type="text" name="storedRecords" placeholder="Describe how they're stored" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What procedures are in place for reviewing and updating DPIA documentation as needed?</label>
-                    <div>
-                        <input type="text" name="reviewingDocumentation" placeholder="Describe the procedures" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.2.1.2.1.6 Review and Monitoring:</h2>
-                <div className="form-section">
-                    <label>How often are DPIAs reviewed and updated to reflect changes in data processing activities or regulatory requirements (e.g., annual reviews, periodic audits)?</label>
-                    <div>
-                        <input type="text" name="reviewedDPIAs" placeholder="Describe how often" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What mechanisms are in place to monitor the effectiveness of DPIA measures and their impact on data protection (e.g., performance metrics, feedback loops)?</label>
-                    <div>
-                        <input type="text" name="monitoringEffectiveness" placeholder="Describe the mechanisms" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are lessons learned from DPIA reviews used to improve future assessments and data protection practices?</label>
-                    <div>
-                        <input type="text" name="lessonsLearned" placeholder="Describe how they're used" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.2.1.2.1.7 Compliance with GDPR Requirements:</h2>
-                <div className="form-section">
-                    <label>How does your organization ensure compliance with GDPR requirements related to DPIAs (e.g., adherence to Article 35, documentation requirements)?</label>
-                    <div>
-                        <input type="text" name="relatedRequirements" placeholder="Describe how it's ensured" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What steps are taken to address any non-compliance issues identified during the DPIA process?</label>
-                    <div>
-                        <input type="text" name="addressingIssues" placeholder="Describe the steps" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are changes in GDPR regulations or guidance incorporated into your organization's DPIA practices?</label>
-                    <div>
-                        <input type="text" name="incorporatingChanges" placeholder="Describe how they're incorporated" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.2.1.2.1.8 Training and Awareness:</h2>
-                <div className="form-section">
-                    <label>What training is provided to staff involved in conducting or overseeing DPIAs (e.g., data protection principles, assessment techniques)?</label>
-                    <div>
-                        <input type="text" name="staffTraining" placeholder="Describe the training" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is staff awareness of DPIA requirements and their role in the process maintained and updated?</label>
-                    <div>
-                        <input type="text" name="maintainingAwareness" placeholder="Describe how it's maintained" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there resources available to support staff in conducting effective DPIAs (e.g., guidelines, templates)?</label>
-                    <div>
-                        <input type="radio" name="supportResources" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="supportResources" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="supportResourcesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>5.2.1.2.1.9 Third-Party Assessments:</h2>
-                <div className="form-section">
-                    <label>How are third-party vendors or partners involved in the DPIA process, and what is their role in ensuring data protection (e.g., third-party assessments, contracts)?</label>
-                    <div>
-                        <input type="text" name="involvingVendors" placeholder="Describe how they're involved" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What procedures are in place to evaluate and manage risks associated with third-party data processing activities?</label>
-                    <div>
-                        <input type="text" name="evaluatingRisks" placeholder="Describe the procedures" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is compliance with DPIA requirements ensured when working with external parties?</label>
-                    <div>
-                        <input type="text" name="ensuringCompliance" placeholder="Describe how it's ensured" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.2.1.2.1.10 Impact on Data Subjects:</h2>
-                <div className="form-section">
-                    <label>How are the potential impacts on data subjects considered and addressed during the DPIA process (e.g., data minimization, transparency)?</label>
-                    <div>
-                        <input type="text" name="potentialImpacts" placeholder="Describe how they're considered" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What measures are in place to inform and protect data subjects based on DPIA findings (e.g., privacy notices, consent mechanisms)?</label>
-                    <div>
-                        <input type="text" name="protectingSubjects" placeholder="Describe the measures" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is feedback from data subjects used to improve DPIA practices and data protection measures?</label>
-                    <div>
-                        <input type="text" name="improvingPractices" placeholder="Describe how it's used" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                {/* Submit Button */}
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-
-            </form>
-        </main>
-    </div>
-  )
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                    {uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default DataProtectionImpactAssessmentsFormPage;
