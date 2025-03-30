@@ -1,356 +1,205 @@
-import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function TornadoShelterLocationsFormPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadImage = httpsCallable(functions, 'uploadTornadoShelterLocationsImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
+        }
 
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
-    }
-  }, [buildingId, navigate]);
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-  
-  // Function to handle back button
-  const handleBack = async () => {
-    if (formData && buildingId) { // Check if formData and buildingId exist
-      try {
-        const buildingRef = doc(db, 'Buildings', buildingId);
-        const formsRef = collection(db, 'forms/Emergency Preparedness/Tornado Shelter Locations');
-        await addDoc(formsRef, {
-          building: buildingRef,
-          formData: formData,
-        });
-        console.log('Form Data submitted successfully on back!');
-        alert('Form data saved before navigating back!');
-      } catch (error) {
-        console.error('Error saving form data:', error);
-        alert('Failed to save form data before navigating back. Some data may be lost.');
-      }
-    }
-    navigate(-1);
-  };
+            try {
+                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Tornado Shelter Locations', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
 
-  
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Tornado Shelter Locations', buildingId);
+            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
+            console.log("Form data saved to Firestore:", newFormData);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
     const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Tornado Shelter Locations', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
-
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Emergency Preparedness/Tornado Shelter Locations');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
-  };
 
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Tornado Shelter Locations Assessment</h1>
-            <img src={logo} alt="Logo" className="logo" />
-      </header>
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>Tornado Shelter Locations Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                {/* 2.2.1.3.2 Tornado Shelter Locations */}
-                <h2>Identification of Shelter Areas:</h2>
-                <div className="form-section">
-                    <label>Have designated tornado shelter areas been identified throughout the facility?</label>
-                    <div>
-                        <input type="radio" name="Shelter Identified" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Shelter Identified" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="ShelterIdentifiedComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>Tornado Shelter Locations</h2>
+                    {[
+                        { name: "Shelter Identified", label: "Have designated tornado shelter areas been identified throughout the facility?" },
+                        { name: "Structural Soundness", label: "Are shelter areas located in structurally sound spaces that provide protection from flying debris and structural collapse?" },
+                        { name: "Accessibility Check", label: "Are shelter areas easily accessible to all occupants, including individuals with disabilities or mobility limitations?" },
+                        { name: "Signage Presence", label: "Are tornado shelter areas clearly marked with signage or visual indicators to guide occupants during emergencies?" },
+                        { name: "Signage Directions", label: "Do signs include directions to shelter areas and instructions for seeking refuge during tornado warnings?" },
+                        { name: "Shelter on Maps", label: "Are shelter locations identified on building maps and evacuation plans distributed to occupants?" },
+                        { name: "Occupancy Assessment", label: "Have shelter areas been assessed to ensure they can accommodate the facility's maximum occupancy load?" },
+                        { name: "Space Sufficiency", label: "Is there sufficient space within shelter areas to provide comfortable seating or standing room for occupants during extended sheltering periods?" },
+                        { name: "Overcrowding Measures", label: "Have measures been taken to minimize overcrowding and facilitate orderly entry into shelter areas?" },
+                        { name: "Structural Evaluation", label: "Have shelter areas been evaluated for structural integrity and resistance to tornado-force winds?" },
+                        { name: "Hazard Minimization", label: "Are shelter areas located in interior spaces or reinforced areas of the building to minimize exposure to external hazards?" },
+                        { name: "Safety Features", label: "Are there additional safety features in place, such as reinforced walls, sturdy furniture, or protective barriers, to enhance occupant safety?" },
+                        { name: "Disability Access", label: "Are shelter areas accessible to individuals with disabilities, including those who use mobility devices or require assistance?" },
+                        { name: "Accommodations Made", label: "Have accommodations been made to ensure equal access to shelter areas for all occupants, regardless of physical or cognitive abilities?" },
+                        { name: "Assistance Procedures", label: "Are there designated personnel or procedures in place to assist individuals with disabilities during tornado evacuations?" },
+                        { name: "Warning Protocol", label: "Is there a protocol for notifying occupants of tornado warnings and directing them to seek shelter?" },
+                        { name: "Communication Systems", label: "Are communication systems, such as public address announcements or emergency notifications, used to alert occupants to tornado threats and provide instructions?" },
+                        { name: "Drill Familiarity", label: "Are shelter locations included in communication materials and drills to familiarize occupants with sheltering procedures?" },
+                        { name: "Inspection Regularity", label: "Are shelter areas inspected regularly to ensure they remain in good condition and free from obstructions?" },
+                        { name: "Maintenance Done", label: "Is maintenance conducted to address any issues or damage that may compromise the safety and effectiveness of shelter areas?" },
+                        { name: "Drill Testing", label: "Are shelter areas tested periodically during drills to verify their suitability and readiness for use during tornado emergencies?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            {question.name === "Shelter Identified" || question.name === "Structural Soundness" || question.name === "Accessibility Check" || question.name === "Signage Presence" || question.name === "Signage Directions" || question.name === "Shelter on Maps" || question.name === "Occupancy Assessment" || question.name === "Space Sufficiency" || question.name === "Overcrowding Measures" || question.name === "Structural Evaluation" || question.name === "Hazard Minimization" || question.name === "Safety Features" || question.name === "Disability Access" || question.name === "Accommodations Made" || question.name === "Assistance Procedures" || question.name === "Warning Protocol" || question.name === "Communication Systems" || question.name === "Drill Familiarity" || question.name === "Inspection Regularity" || question.name === "Maintenance Done" || question.name === "Drill Testing" ? (
+                                <><div>
+                                    <input
+                                        type="radio"
+                                        name={question.name}
+                                        value="yes"
+                                        checked={formData[question.name] === "yes"}
+                                        onChange={handleChange} /> Yes
+                                    <input
+                                        type="radio"
+                                        name={question.name}
+                                        value="no"
+                                        checked={formData[question.name] === "no"}
+                                        onChange={handleChange} /> No
 
-                <div className="form-section">
-                    <label>Are shelter areas located in structurally sound spaces that provide protection from flying debris and structural collapse?</label>
-                    <div>
-                        <input type="radio" name="Structural Soundness" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Structural Soundness" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="StructuralSoundnessComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
 
-                <div className="form-section">
-                    <label>Are shelter areas easily accessible to all occupants, including individuals with disabilities or mobility limitations?</label>
-                    <div>
-                        <input type="radio" name="Accessibility Check" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Accessibility Check" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="AccessibilityCheckComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>Signage and Markings:</h2>
-                <div className="form-section">
-                    <label>Are tornado shelter areas clearly marked with signage or visual indicators to guide occupants during emergencies?</label>
-                    <div>
-                        <input type="radio" name="Signage Presence" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Signage Presence" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="SignagePresenceComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Do signs include directions to shelter areas and instructions for seeking refuge during tornado warnings?</label>
-                    <div>
-                        <input type="radio" name="Signage Directions" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Signage Directions" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="SignageDirectionsComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are shelter locations identified on building maps and evacuation plans distributed to occupants?</label>
-                    <div>
-                        <input type="radio" name="Shelter on Maps" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Shelter on Maps" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="ShelterOnMapsComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>Capacity and Space Requirements:</h2>
-                <div className="form-section">
-                    <label>Have shelter areas been assessed to ensure they can accommodate the facility's maximum occupancy load?</label>
-                    <div>
-                        <input type="radio" name="Occupancy Assessment" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Occupancy Assessment" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="OccupancyAssessmentComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Is there sufficient space within shelter areas to provide comfortable seating or standing room for occupants during extended sheltering periods?</label>
-                    <div>
-                        <input type="radio" name="Space Sufficiency" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Space Sufficiency" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="SpaceSufficiencyComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Have measures been taken to minimize overcrowding and facilitate orderly entry into shelter areas?</label>
-                    <div>
-                        <input type="radio" name="Overcrowding Measures" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Overcrowding Measures" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="overcrowdingMeasures" placeholder="Describe the measures" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <h2>Structural Integrity and Safety Features:</h2>
-                <div className="form-section">
-                    <label>Have shelter areas been evaluated for structural integrity and resistance to tornado-force winds?</label>
-                    <div>
-                        <input type="radio" name="Structural Evaluation" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Structural Evaluation" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="StructuralEvaluationComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are shelter areas located in interior spaces or reinforced areas of the building to minimize exposure to external hazards?</label>
-                    <div>
-                        <input type="radio" name="Hazard Minimization" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Hazard Minimization" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="HazardMinimizationComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there additional safety features in place, such as reinforced walls, sturdy furniture, or protective barriers, to enhance occupant safety?</label>
-                    <div>
-                        <input type="radio" name="Safety Features" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Safety Features" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="SafetyFeaturesComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>Accessibility and Inclusivity:</h2>
-                <div className="form-section">
-                    <label>Are shelter areas accessible to individuals with disabilities, including those who use mobility devices or require assistance?</label>
-                    <div>
-                        <input type="radio" name="Disability Access" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Disability Access" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="DisabilityAccessComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Have accommodations been made to ensure equal access to shelter areas for all occupants, regardless of physical or cognitive abilities?</label>
-                    <div>
-                        <input type="radio" name="Accommodations Made" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Accommodations Made" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="accommodationsMade" placeholder="Describe the accommodations" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there designated personnel or procedures in place to assist individuals with disabilities during tornado evacuations?</label>
-                    <div>
-                        <input type="radio" name="Assistance Procedures" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Assistance Procedures" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="assistanceProcedures" placeholder="Describe the procedures" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <h2>Communication and Notification:</h2>
-                <div className="form-section">
-                    <label>Is there a protocol for notifying occupants of tornado warnings and directing them to seek shelter?</label>
-                    <div>
-                        <input type="radio" name="Warning Protocol" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Warning Protocol" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="warningProtocol" placeholder="Describe the protocol" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are communication systems, such as public address announcements or emergency notifications, used to alert occupants to tornado threats and provide instructions?</label>
-                    <div>
-                        <input type="radio" name="Communication Systems" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Communication Systems" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="communicationSystems" placeholder="Describe the communication systems" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are shelter locations included in communication materials and drills to familiarize occupants with sheltering procedures?</label>
-                    <div>
-                        <input type="radio" name="Drill Familiarity" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Drill Familiarity" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="DrillFamiliarityComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>Regular Inspections and Maintenance:</h2>
-                <div className="form-section">
-                    <label>Are shelter areas inspected regularly to ensure they remain in good condition and free from obstructions?</label>
-                    <div>
-                        <input type="radio" name="Inspection Regularity" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Inspection Regularity" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="InspectionRegularityComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Is maintenance conducted to address any issues or damage that may compromise the safety and effectiveness of shelter areas?</label>
-                    <div>
-                        <input type="radio" name="Maintenance Done" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Maintenance Done" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="MaintenanceDoneComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are shelter areas tested periodically during drills to verify their suitability and readiness for use during tornado emergencies?</label>
-                    <div>
-                        <input type="radio" name="Drill Testing" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Drill Testing" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="DrillTestingComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                {/* Submit Button */}
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-
-            </form>
-        </main>
-    </div>
-  )
+                                </div><div>
+                                        <input
+                                            type="text"
+                                            name={`${question.name}Comment`}
+                                            placeholder="Comments"
+                                            value={formData[`${question.name}Comment`] || ''}
+                                            onChange={handleChange} />
+                                    </div></>
+                            ) : (
+                                <input
+                                    type="text"
+                                    name={question.name}
+                                    value={formData[question.name] || ''}
+                                    onChange={handleChange}
+                                    placeholder={question.label}
+                                />
+                            )}
+                        </div>
+                    ))}
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: "red" }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default TornadoShelterLocationsFormPage;

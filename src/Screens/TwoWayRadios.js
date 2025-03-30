@@ -1,302 +1,197 @@
 import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import Navbar from "./Navbar";
 
-
 function TwoWayRadiosFormPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
+  const navigate = useNavigate();
   const { buildingId } = useBuilding();
   const db = getFirestore();
+  const functions = getFunctions();
+  const uploadImage = httpsCallable(functions, 'uploadTwoWayRadiosImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [formData, setFormData] = useState({});
+  const [imageData, setImageData] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+  const [imageUploadError, setImageUploadError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
 
-  
   useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
+    if (!buildingId) {
+      alert('No building selected. Redirecting to Building Info...');
       navigate('BuildingandAddress');
-    }
-  }, [buildingId, navigate]);
-
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-  
-  // Function to handle back button
-  const handleBack = async () => {
-    if (formData && buildingId) { // Check if formData and buildingId exist
-      try {
-        const buildingRef = doc(db, 'Buildings', buildingId);
-        const formsRef = collection(db, 'forms/Emergency Preparedness/Two-way Radios');
-        await addDoc(formsRef, {
-          building: buildingRef,
-          formData: formData,
-        });
-        console.log('Form Data submitted successfully on back!');
-        alert('Form data saved before navigating back!');
-      } catch (error) {
-        console.error('Error saving form data:', error);
-        alert('Failed to save form data before navigating back. Some data may be lost.');
-      }
-    }
-    navigate(-1);
-  };
- 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
       return;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
+    const fetchFormData = async () => {
+      setLoading(true);
+      setLoadError(null);
 
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Emergency Preparedness/Two-way Radios');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
+      try {
+        const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Two-way Radios', buildingId);
+        const docSnapshot = await getDoc(formDocRef);
+
+        if (docSnapshot.exists()) {
+          setFormData(docSnapshot.data().formData || {});
+        } else {
+          setFormData({});
+        }
+      } catch (error) {
+        console.error("Error fetching form data:", error);
+        setLoadError("Failed to load form data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFormData();
+  }, [buildingId, db, navigate]);
+
+  const handleChange = async (e) => {
+    const { name, value } = e.target;
+    const newFormData = { ...formData, [name]: value };
+    setFormData(newFormData);
+
+    try {
+      const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Two-way Radios', buildingId);
+      await setDoc(formDocRef, { formData: newFormData }, { merge: true });
+      console.log("Form data saved to Firestore:", newFormData);
     } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
+      console.error("Error saving form data to Firestore:", error);
+      alert("Failed to save changes. Please check your connection and try again.");
     }
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImageData(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!buildingId) {
+      alert('Building ID is missing. Please start from the Building Information page.');
+      return;
+    }
+
+    if (imageData) {
+      try {
+        const uploadResult = await uploadImage({ imageData: imageData });
+        setImageUrl(uploadResult.data.imageUrl);
+        setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+        setImageUploadError(null);
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        setImageUploadError(error.message);
+      }
+    }
+
+    try {
+      const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Two-way Radios', buildingId);
+      await setDoc(formDocRef, { formData: formData }, { merge: true });
+      console.log('Form data submitted successfully!');
+      alert('Form submitted successfully!');
+      navigate('/Form');
+    } catch (error) {
+      console.error("Error saving form data to Firestore:", error);
+      alert("Failed to save changes. Please check your connection and try again.");
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (loadError) {
+    return <div>Error: {loadError}</div>;
+  }
+
   return (
     <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Two-Way Radios Assessment</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
+      <header className="header">
+        <Navbar />
+        <button className="back-button" onClick={handleBack}>←</button>
+        <h1>Two-Way Radios Assessment</h1>
+        <img src={logo} alt="Logo" className="logo" />
+      </header>
 
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                {/* 2.4.2.1.1 Two-Way Radios */}
-                <h2>Availability of Two-way Radios:</h2>
-                <div className="form-section">
-                    <label>Are two-way radios provided to staff members who require them for communication during emergencies or daily operations?</label>
-                    <div>
-                        <input type="radio" name="Radios Provided" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Radios Provided" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                         <input type="text" name="RadiosProvidedComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
+      <main className="form-container">
+        <form onSubmit={handleSubmit}>
+          <h2>Two-Way Radios</h2>
+          {[
+            { name: "Radios Provided", label: "Are two-way radios provided to staff members who require them for communication during emergencies or daily operations?" },
+            { name: "Adequate Radios", label: "Are there an adequate number of two-way radios available to ensure that all relevant staff members are equipped for communication?" },
+            { name: "Sufficient Coverage", label: "Do two-way radios provide sufficient coverage and range to facilitate communication across the entire facility or campus?" },
+            { name: "deadZoneMeasures", label: "Are there measures in place to address potential dead zones or areas with poor radio reception?" },
+            { name: "Channel Assignment", label: "Are specific radio channels assigned for different purposes, such as emergency communication, general staff communication, or coordination between departments?" },
+            { name: "channelManagement", label: "Is there a protocol for managing radio channels to prevent interference and ensure clear communication during emergencies?" },
+            { name: "Radio Training", label: "Are staff members trained on how to use two-way radios effectively, including proper radio etiquette, channel selection, and basic troubleshooting?" },
+            { name: "Drill Familiarization", label: "Are practice sessions or drills conducted to familiarize staff members with radio communication procedures and simulate emergency scenarios?" },
+            { name: "emergencyProtocols", label: "Are protocols established for using two-way radios during emergencies, specifying roles, responsibilities, and procedures for initiating, receiving, and relaying critical information?" },
+            { name: "Emergency Role Training", label: "Are staff members trained on emergency communication protocols and aware of their roles and responsibilities in using two-way radios during different types of emergencies?" },
+            { name: "Battery Inspection", label: "Are batteries for two-way radios regularly inspected, charged, and replaced as needed to ensure that radios remain operational during emergencies?" },
+            { name: "storageProtocols", label: "Is there a protocol for storing and maintaining two-way radios to prolong their lifespan and minimize the risk of malfunctions or equipment failures?" },
+            { name: "Radio Integration", label: "Are two-way radios integrated into broader emergency communication and response plans, ensuring seamless coordination with other communication systems and protocols?" },
+            { name: "drillIntegrationProcedures", label: "Are there designated procedures for incorporating two-way radio communication into emergency drills, exercises, and simulations to assess effectiveness and identify areas for improvement?" },
+            { name: "feedbackMechanisms", label: "Are feedback mechanisms in place to gather input from staff members regarding the usability, reliability, and effectiveness of two-way radios for communication during emergencies?" },
+            { name: "Improvement Recommendations", label: "Are recommendations for enhancing two-way radio communication protocols and equipment considered and implemented as part of ongoing improvement efforts?" },
+          ].map((question, index) => (
+            <div key={index} className="form-section">
+              <label>{question.label}</label>
+              {question.name === "Radios Provided" || question.name === "Adequate Radios" || question.name === "Sufficient Coverage" || question.name === "Channel Assignment" || question.name === "Radio Training" || question.name === "Drill Familiarization" || question.name === "Emergency Role Training" || question.name === "Battery Inspection" || question.name === "Radio Integration" || question.name === "Improvement Recommendations" ? (
+                <><div>
+                          <input
+                              type="radio"
+                              name={question.name}
+                              value="yes"
+                              checked={formData[question.name] === "yes"}
+                              onChange={handleChange} /> Yes
+                          <input
+                              type="radio"
+                              name={question.name}
+                              value="no"
+                              checked={formData[question.name] === "no"}
+                              onChange={handleChange} /> No
 
-                <div className="form-section">
-                    <label>Are there an adequate number of two-way radios available to ensure that all relevant staff members are equipped for communication?</label>
-                    <div>
-                        <input type="radio" name="Adequate Radios" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Adequate Radios" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                         <input type="text" name="AdequateRadiosComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>Coverage and Range:</h2>
-                <div className="form-section">
-                    <label>Do two-way radios provide sufficient coverage and range to facilitate communication across the entire facility or campus?</label>
-                    <div>
-                        <input type="radio" name="Sufficient Coverage" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Sufficient Coverage" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                         <input type="text" name="SufficientCoverageComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there measures in place to address potential dead zones or areas with poor radio reception?</label>
-                    <div>
-                        <input type="radio" name="Dead Zone Measures" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Dead Zone Measures" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="deadZoneMeasures" placeholder="Describe the measures" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <h2>Channel Assignment and Management:</h2>
-                <div className="form-section">
-                    <label>Are specific radio channels assigned for different purposes, such as emergency communication, general staff communication, or coordination between departments?</label>
-                    <div>
-                        <input type="radio" name="Channel Assignment" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Channel Assignment" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                         <input type="text" name="ChannelAssignmentComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Is there a protocol for managing radio channels to prevent interference and ensure clear communication during emergencies?</label>
-                    <div>
-                        <input type="radio" name="Channel Management" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Channel Management" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="channelManagement" placeholder="Describe the protocol" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <h2>Training and Familiarization:</h2>
-                <div className="form-section">
-                    <label>Are staff members trained on how to use two-way radios effectively, including proper radio etiquette, channel selection, and basic troubleshooting?</label>
-                    <div>
-                        <input type="radio" name="Radio Training" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Radio Training" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                         <input type="text" name="RadioTrainingComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are practice sessions or drills conducted to familiarize staff members with radio communication procedures and simulate emergency scenarios?</label>
-                    <div>
-                        <input type="radio" name="Drill Familiarization" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Drill Familiarization" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                         <input type="text" name="DrillFamiliarizationComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2> Emergency Communication Protocols:</h2>
-                <div className="form-section">
-                    <label>Are protocols established for using two-way radios during emergencies, specifying roles, responsibilities, and procedures for initiating, receiving, and relaying critical information?</label>
-                    <div>
-                        <input type="radio" name="Emergency Protocols" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Emergency Protocols" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="emergencyProtocols" placeholder="Describe the protocols" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are staff members trained on emergency communication protocols and aware of their roles and responsibilities in using two-way radios during different types of emergencies?</label>
-                    <div>
-                        <input type="radio" name="Emergency Role Training" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Emergency Role Training" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                         <input type="text" name="EmergencyRoleTrainingComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>Battery Management and Maintenance:</h2>
-                <div className="form-section">
-                    <label>Are batteries for two-way radios regularly inspected, charged, and replaced as needed to ensure that radios remain operational during emergencies?</label>
-                    <div>
-                        <input type="radio" name="Battery Inspection" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Battery Inspection" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                         <input type="text" name="BatteryInspectionComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Is there a protocol for storing and maintaining two-way radios to prolong their lifespan and minimize the risk of malfunctions or equipment failures?</label>
-                    <div>
-                        <input type="radio" name="Storage Protocols" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Storage Protocols" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="storageProtocols" placeholder="Describe the protocol" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <h2>Integration with Emergency Plans:</h2>
-                <div className="form-section">
-                    <label>Are two-way radios integrated into broader emergency communication and response plans, ensuring seamless coordination with other communication systems and protocols?</label>
-                    <div>
-                        <input type="radio" name="Radio Integration" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Radio Integration" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                         <input type="text" name="RadioIntegrationComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there designated procedures for incorporating two-way radio communication into emergency drills, exercises, and simulations to assess effectiveness and identify areas for improvement?</label>
-                    <div>
-                        <input type="radio" name="Drill Integration Procedures" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Drill Integration Procedures" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="drillIntegrationProcedures" placeholder="Describe the procedures" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <h2>Continuous Improvement:</h2>
-                <div className="form-section">
-                    <label>Are feedback mechanisms in place to gather input from staff members regarding the usability, reliability, and effectiveness of two-way radios for communication during emergencies?</label>
-                    <div>
-                        <input type="radio" name="Feedback Mechanisms" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Feedback Mechanisms" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="feedbackMechanisms" placeholder="Describe the mechanisms" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are recommendations for enhancing two-way radio communication protocols and equipment considered and implemented as part of ongoing improvement efforts?</label>
-                    <div>
-                        <input type="radio" name="Improvement Recommendations" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Improvement Recommendations" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                         <input type="text" name="ImprovementRecommendationsComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                {/* Submit Button */}
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-
-            </form>
-        </main>
+                      </div><input
+                              type="text"
+                              name={`${question.name}Comment`}
+                              placeholder="Comments"
+                              value={formData[`${question.name}Comment`] || ''}
+                              onChange={handleChange} /></>
+              ) : (
+                <input
+                  type="text"
+                  name={question.name}
+                  value={formData[question.name] || ''}
+                  onChange={handleChange}
+                  placeholder={question.label}
+                />
+              )}
+            </div>
+          ))}
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+          {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+          {imageUploadError && <p style={{ color: "red" }}>{imageUploadError}</p>}
+          <button type="submit">Submit</button>
+        </form>
+      </main>
     </div>
-  )
+  );
 }
 
 export default TwoWayRadiosFormPage;

@@ -1,274 +1,204 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function StudentLeadershipFormPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadImage = httpsCallable(functions, 'uploadStudentLeadershipImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
+        }
 
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+
+            try {
+                const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Student Leadership', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Student Leadership', buildingId);
+            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
+            console.log("Form data saved to Firestore:", newFormData);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Student Leadership', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
-  }, [buildingId, navigate]);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Function to handle back button
-  const handleBack = async () => {
-    if (formData && buildingId) { // Check if formData and buildingId exist
-      try {
-        const buildingRef = doc(db, 'Buildings', buildingId);
-        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Student Leadership');
-        await addDoc(formsRef, {
-          building: buildingRef,
-          formData: formData,
-        });
-        console.log('Form Data submitted successfully on back!');
-        alert('Form data saved before navigating back!');
-      } catch (error) {
-        console.error('Error saving form data:', error);
-        alert('Failed to save form data before navigating back. Some data may be lost.');
-      }
-    }
-    navigate(-1);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>Student Leadership Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Personnel Training and Awareness/Student Leadership');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
-    }
-  };
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>Student Leadership</h2>
+                    {[
+                        { name: "engagingStudentLeaders", label: "How do student leaders actively engage their peers in promoting safety awareness and implementing initiatives within the school or educational institution?" },
+                        { name: "successfulSafetyInitiatives", label: "Can you provide examples of successful peer-to-peer safety initiatives led by students, and how they have positively impacted safety culture or behavior among peers?" },
+                        { name: "studentLeadersCollaboratingSupportingSafety", label: "In what ways do student leaders collaborate with school staff, administrators, or external organizations to support and amplify their peer-to-peer safety efforts?" },
+                        { name: "leadershipRoles", label: "What leadership roles and responsibilities are entrusted to student leaders in driving peer-to-peer safety initiatives?" },
+                        { name: "selectingStudentLeaders", label: "How are student leaders selected or recruited for leadership roles related to safety education, and what criteria are used to identify potential candidates?" },
+                        { name: "providedTraining", label: "Can you describe the training, mentorship, or support provided to student leaders to enhance their leadership skills and effectiveness in promoting safety among peers?" },
+                        { name: "developmentOpportunities", label: "What opportunities are available for student leaders to develop essential skills and competencies related to promoting safety and emergency preparedness among their peers?" },
+                        { name: "studentLeaderstrainingPrograms", label: "Are training programs or workshops specifically designed to equip student leaders with communication, collaboration, problem-solving, and decision-making skills relevant to safety leadership roles?" },
+                        { name: "applyingKnowledge", label: "How do student leaders apply the knowledge and skills gained through training to effectively communicate safety messages, influence peer behavior, and respond to safety concerns within the school community?" },
+                        { name: "studentLeadersCollaboratingAligningSafety", label: "How do student leaders collaborate with school staff, administrators, or safety personnel to align peer-to-peer safety initiatives with institutional goals and priorities?" },
+                        { name: "successfulPartnerships", label: "Can you provide examples of successful partnerships or joint initiatives between student leaders and adult stakeholders in advancing safety education and preparedness within the school community?" },
+                        { name: "staffSupportingStudentLeaders", label: "In what ways do school staff and administrators support and empower student leaders to take ownership of safety initiatives and drive positive change among their peers?" },
+                        { name: "evaluatingStudentLedInitiatives", label: "How are student-led safety initiatives evaluated for their effectiveness and impact on safety culture, behavior change, and incident prevention within the school community?" },
+                        { name: "establishingMetrics", label: "Are specific metrics, indicators, or benchmarks established to assess the success of peer-to-peer safety initiatives led by student leaders?" },
+                        { name: "recognizingStudentLeaders", label: "How are student leaders recognized, celebrated, or rewarded for their contributions to promoting safety and fostering a culture of responsibility and preparedness among their peers?" },
+                        { name: "sustainableMeasures", label: "What measures are in place to ensure the sustainability and continuity of peer-to-peer safety initiatives beyond the tenure of current student leaders?" },
+                        { name: "implentingSuccessionPlans", label: "Are succession plans or leadership transition processes implemented to facilitate the seamless transfer of knowledge, skills, and responsibilities to incoming student leaders?" },
+                        { name: "mentoringFutureLeaders", label: "How do student leaders mentor, empower, and inspire younger students to become future safety leaders and continue the legacy of peer-to-peer safety initiatives within the school community?" },
+                        { name: "engagingStudentLeadersRasingAwareness", label: "How do student leaders engage with the broader school community, parents, local organizations, or stakeholders to raise awareness and garner support for safety initiatives?" },
+                        { name: "collaborativeStudentLedExamples", label: "Can you provide examples of collaborative projects, events, or campaigns led by student leaders that have extended the reach and impact of safety education beyond the school campus?" },
+                        { name: "leveragingPlatforms", label: "In what ways do student leaders leverage digital platforms, social media, or other communication channels to amplify their safety messages and mobilize collective action among peers and community members?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            {question.name === "studentLeaderstrainingPrograms" ? (
+                                <><div>
+                                    <input
+                                        type="radio"
+                                        name={question.name}
+                                        value="yes"
+                                        checked={formData[question.name] === "yes"}
+                                        onChange={handleChange} /> Yes
+                                    <input
+                                        type="radio"
+                                        name={question.name}
+                                        value="no"
+                                        checked={formData[question.name] === "no"}
+                                        onChange={handleChange} /> No
 
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Student Leadership Assessment</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
-
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                {/* 3.2.1.2.3 Student Leadership */}
-                <h2>Peer-to-Peer Safety Initiatives:</h2>
-                <div className="form-section">
-                    <label>How do student leaders actively engage their peers in promoting safety awareness and implementing initiatives within the school or educational institution?</label>
-                    <div>
-                        <input type="text" name="engagingStudentLeaders" placeholder="Describe how they engage" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Can you provide examples of successful peer-to-peer safety initiatives led by students, and how they have positively impacted safety culture or behavior among peers?</label>
-                    <div>
-                        <input type="text" name="successfulSafetyInitiatives" placeholder="Describe how they engage and impact" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>In what ways do student leaders collaborate with school staff, administrators, or external organizations to support and amplify their peer-to-peer safety efforts?</label>
-                    <div>
-                        <input type="text" name="studentLeadersCollaboratingSupportingSafety" placeholder="Describe how they collaborate" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <h2>Leadership Roles and Responsibilities:</h2>
-                <div className="form-section">
-                    <label>What leadership roles and responsibilities are entrusted to student leaders in driving peer-to-peer safety initiatives?</label>
-                    <div>
-                        <input type="text" name="leadershipRoles" placeholder="Describe the roles/responsibilities" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are student leaders selected or recruited for leadership roles related to safety education, and what criteria are used to identify potential candidates?</label>
-                    <div>
-                        <input type="text" name="selectingStudentLeaders" placeholder="Describe how they're selected" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Can you describe the training, mentorship, or support provided to student leaders to enhance their leadership skills and effectiveness in promoting safety among peers?</label>
-                    <div>
-                        <input type="text" name="providedTraining" placeholder="Describe the training/mentorship/support" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <h2>Training and Skill Development:</h2>
-                <div className="form-section">
-                    <label>What opportunities are available for student leaders to develop essential skills and competencies related to promoting safety and emergency preparedness among their peers?</label>
-                    <div>
-                        <input type="text" name="developmentOpportunities" placeholder="Describe the opportunities" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are training programs or workshops specifically designed to equip student leaders with communication, collaboration, problem-solving, and decision-making skills relevant to safety leadership roles?</label>
-                    <div>
-                        <input type="radio" name="studentLeaderstrainingPrograms" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="studentLeaderstrainingPrograms" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="studentLeaderstrainingProgramsComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How do student leaders apply the knowledge and skills gained through training to effectively communicate safety messages, influence peer behavior, and respond to safety concerns within the school community?</label>
-                    <div>
-                        <input type="text" name="applyingKnowledge" placeholder="Describe how they apply knowledge/skills" onChange={handleChange}/>  
-                    </div>
-                </div>
-                
-                <h2>Collaboration with School Staff and Administration:</h2>
-                <div className="form-section">
-                    <label>How do student leaders collaborate with school staff, administrators, or safety personnel to align peer-to-peer safety initiatives with institutional goals and priorities?</label>
-                    <div>
-                        <input type="text" name="studentLeadersCollaboratingAligningSafety" placeholder="Describe how they collaborate" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Can you provide examples of successful partnerships or joint initiatives between student leaders and adult stakeholders in advancing safety education and preparedness within the school community?</label>
-                    <div>
-                        <input type="text" name="successfulPartnerships" placeholder="Give examples" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>In what ways do school staff and administrators support and empower student leaders to take ownership of safety initiatives and drive positive change among their peers?</label>
-                    <div>
-                        <input type="text" name="staffSupportingStudentLeaders" placeholder="Describe the ways" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <h2>Evaluation and Recognition:</h2>
-                <div className="form-section">
-                    <label>How are student-led safety initiatives evaluated for their effectiveness and impact on safety culture, behavior change, and incident prevention within the school community?</label>
-                    <div>
-                        <input type="text" name="evaluatingStudentLedInitiatives" placeholder="Describe how they're evaluated" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are specific metrics, indicators, or benchmarks established to assess the success of peer-to-peer safety initiatives led by student leaders?</label>
-                    <div>
-                        <input type="text" name="establishingMetrics" placeholder="Describe the metrics/indicators/benchmarks" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are student leaders recognized, celebrated, or rewarded for their contributions to promoting safety and fostering a culture of responsibility and preparedness among their peers?</label>
-                    <div>
-                        <input type="text" name="recognizingStudentLeaders" placeholder="Describe how they're recognized" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <h2>Sustainability and Continuity:</h2>
-                <div className="form-section">
-                    <label>What measures are in place to ensure the sustainability and continuity of peer-to-peer safety initiatives beyond the tenure of current student leaders?</label>
-                    <div>
-                        <input type="text" name="sustainableMeasures" placeholder="Describe the measures" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are succession plans or leadership transition processes implemented to facilitate the seamless transfer of knowledge, skills, and responsibilities to incoming student leaders?</label>
-                    <div>
-                        <input type="text" name="implentingSuccessionPlans" placeholder="Describe the plans/leadership" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How do student leaders mentor, empower, and inspire younger students to become future safety leaders and continue the legacy of peer-to-peer safety initiatives within the school community?</label>
-                    <div>
-                        <input type="text" name="mentoringFutureLeaders" placeholder="Describe how students mentor" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <h2>Community Engagement and Outreach:</h2>
-                <div className="form-section">
-                    <label>How do student leaders engage with the broader school community, parents, local organizations, or stakeholders to raise awareness and garner support for safety initiatives?</label>
-                    <div>
-                        <input type="text" name="engagingStudentLeadersRasingAwareness" placeholder="Describe how students engage" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Can you provide examples of collaborative projects, events, or campaigns led by student leaders that have extended the reach and impact of safety education beyond the school campus?</label>
-                    <div>
-                        <input type="text" name="collaborativeStudentLedExamples" placeholder="Give examples" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>In what ways do student leaders leverage digital platforms, social media, or other communication channels to amplify their safety messages and mobilize collective action among peers and community members?</label>
-                    <div>
-                        <input type="text" name="leveragingPlatforms" placeholder="Describe the ways" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                {/* Submit Button */}
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-            </form>
-        </main>
-    </div>
-  )
+                                </div><div>
+                                        <input
+                                            type="text"
+                                            name={`${question.name}Comment`}
+                                            placeholder="Comments"
+                                            value={formData[`${question.name}Comment`] || ''}
+                                            onChange={handleChange} />
+                                    </div></>
+                            ) : (
+                                <input
+                                    type="text"
+                                    name={question.name}
+                                    value={formData[question.name] || ''}
+                                    onChange={handleChange}
+                                    placeholder={question.label}
+                                />
+                            )}
+                        </div>
+                    ))}
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: "red" }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default StudentLeadershipFormPage;

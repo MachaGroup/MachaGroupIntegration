@@ -1,344 +1,196 @@
-import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function StaffRolesAndResponsibilitiesFormPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadImage = httpsCallable(functions, 'uploadStaffRoles&ResponsibilitiesImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
+        }
 
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+
+            try {
+                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Staff Roles and Responsibilities', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Staff Roles and Responsibilities', buildingId);
+            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
+            console.log("Form data saved to Firestore:", newFormData);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Staff Roles and Responsibilities', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
-  }, [buildingId, navigate]);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-  
-  // Function to handle back button
-  const handleBack = async () => {
-    if (formData && buildingId) { // Check if formData and buildingId exist
-      try {
-        const buildingRef = doc(db, 'Buildings', buildingId);
-        const formsRef = collection(db, 'forms/Emergency Preparedness/Staff Roles and Responsibilities');
-        await addDoc(formsRef, {
-          building: buildingRef,
-          formData: formData,
-        });
-        console.log('Form Data submitted successfully on back!');
-        alert('Form data saved before navigating back!');
-      } catch (error) {
-        console.error('Error saving form data:', error);
-        alert('Failed to save form data before navigating back. Some data may be lost.');
-      }
-    }
-    navigate(-1);
-  };
-  
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>Staff Roles and Responsibilities Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Emergency Preparedness/Staff Roles and Responsibilities');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
-    }
-  };
-
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Staff Roles and Responsibilities Assessment</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
-
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                {/* 2.2.1.2.3 Staff Roles and Responsibilities */}
-                <h2>Role Assignment:</h2>
-                <div className="form-section">
-                    <label>Are staff members assigned specific roles and responsibilities during drills, such as evacuation team leaders, floor wardens, or first aid responders?</label>
-                    <div>
-                        <input type="radio" name="Role Specificity" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Role Specificity" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="RoleSpecificityComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are these assignments communicated to staff members in advance, along with clear expectations for their roles and duties?</label>
-                    <div>
-                        <input type="radio" name="Role Communication" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Role Communication" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="RoleCommunicationComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>Training and Preparation:</h2>
-                <div className="form-section">
-                    <label>Are staff members trained on their assigned roles and responsibilities before participating in drills?</label>
-                    <div>
-                        <input type="radio" name="Role Training" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Role Training" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="RoleTrainingComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are training materials provided to educate staff members on their duties, procedures, and communication protocols during drills?</label>
-                    <div>
-                        <input type="radio" name="Training Materials" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Training Materials" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="TrainingMaterialsComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are staff members given opportunities to practice their roles and receive feedback on their performance?</label>
-                    <div>
-                        <input type="radio" name="Practice Feedback" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Practice Feedback" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="Practice FeedbackComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>Coordination and Communication:</h2>
-                <div className="form-section">
-                    <label>Is there a system in place for coordinating the actions of staff members during drills, including communication channels and protocols?</label>
-                    <div>
-                        <input type="radio" name="Coordination System" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Coordination System" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="coordinationSystem" placeholder="Describe the system" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are staff members instructed on how to communicate effectively with each other, as well as with occupants, emergency responders, and management personnel?</label>
-                    <div>
-                        <input type="radio" name="Effective Communication" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Effective Communication" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="Effective CommunicationComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are designated leaders or coordinators appointed to oversee the execution of staff roles and facilitate communication during drills?</label>
-                    <div>
-                        <input type="radio" name="Leadership Oversight" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Leadership Oversight" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="Leadership OversightComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>Accountability and Monitoring:</h2>
-                <div className="form-section">
-                    <label>Is there a process for monitoring the performance of staff members in their assigned roles during drills?</label>
-                    <div>
-                        <input type="radio" name="Performance Monitoring" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Performance Monitoring" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="performanceMonitoring" placeholder="Describe the process" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are supervisors or observers tasked with assessing staff members' adherence to procedures, teamwork, and effectiveness in carrying out their responsibilities?</label>
-                    <div>
-                        <input type="radio" name="Observer Assessment" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Observer Assessment" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="ObserverAssessmentComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Is feedback provided to staff members after drills to recognize commendable efforts and identify areas for improvement?</label>
-                    <div>
-                        <input type="radio" name="Feedback Process" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Feedback Process" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="FeedbackProcessComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>Adaptability and Flexibility:</h2>
-                <div className="form-section">
-                    <label>Are staff members prepared to adapt to changing circumstances or unexpected events during drills?</label>
-                    <div>
-                        <input type="radio" name="Adaptability Training" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Adaptability Training" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="AdaptabilityTrainingComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are contingency plans established to address deviations from standard procedures or the need for improvised responses?</label>
-                    <div>
-                        <input type="radio" name="Contingency Plans" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Contingency Plans" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="ContingencyPlansComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are staff members encouraged to exercise initiative and creativity in problem-solving and decision-making during drills?</label>
-                    <div>
-                        <input type="radio" name="Creative Problem-Solving" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Creative Problem-Solving" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="Creative Problem-SolvingComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>Integration with Emergency Response Plans:</h2>
-                <div className="form-section">
-                    <label>Are staff roles and responsibilities aligned with the broader emergency response plans and protocols of the facility?</label>
-                    <div>
-                        <input type="radio" name="Plan Alignment" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Plan Alignment" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="PlanAlignmentComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Do staff members understand how their roles fit into the overall emergency response framework and support the safety and well-being of occupants?</label>
-                    <div>
-                        <input type="radio" name="Framework Understanding" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Framework Understanding" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="FrameworkUnderstandingComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are staff roles regularly reviewed and updated in conjunction with changes to emergency response plans or organizational structure?</label>
-                    <div>
-                        <input type="radio" name="Role Updates" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Role Updates" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="RoleUpdatesComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>Documentation and Review:</h2>
-                <div className="form-section">
-                    <label>Are records maintained to document staff assignments, actions, and performance during drills?</label>
-                    <div>
-                        <input type="radio" name="Record Maintenance" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Record Maintenance" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="RecordMaintenanceComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are drill records reviewed periodically to assess the effectiveness of staff roles and identify opportunities for enhancement?</label>
-                    <div>
-                        <input type="radio" name="Drill Review" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Drill Review" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="DrillReviewComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are recommendations from drill evaluations used to refine staff roles and responsibilities, as well as associated training and preparation efforts?</label>
-                    <div>
-                        <input type="radio" name="Evaluation Recommendations" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Evaluation Recommendations" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="EvaluationRecommendationsComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                {/* Submit Button */}
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-
-            </form>
-        </main>
-    </div>
-  )
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>Staff Roles and Responsibilities</h2>
+                    {[
+                        { name: "Role Specificity", label: "Are staff members assigned specific roles and responsibilities during drills, such as evacuation team leaders, floor wardens, or first aid responders?" },
+                        { name: "Role Communication", label: "Are these assignments communicated to staff members in advance, along with clear expectations for their roles and duties?" },
+                        { name: "Role Training", label: "Are staff members trained on their assigned roles and responsibilities before participating in drills?" },
+                        { name: "Training Materials", label: "Are training materials provided to educate staff members on their duties, procedures, and communication protocols during drills?" },
+                        { name: "Practice Feedback", label: "Are staff members given opportunities to practice their roles and receive feedback on their performance?" },
+                        { name: "Coordination System", label: "Is there a system in place for coordinating the actions of staff members during drills, including communication channels and protocols?" },
+                        { name: "Effective Communication", label: "Are staff members instructed on how to communicate effectively with each other, as well as with occupants, emergency responders, and management personnel?" },
+                        { name: "Leadership Oversight", label: "Are designated leaders or coordinators appointed to oversee the execution of staff roles and facilitate communication during drills?" },
+                        { name: "Performance Monitoring", label: "Is there a process for monitoring the performance of staff members in their assigned roles during drills?" },
+                        { name: "Observer Assessment", label: "Are supervisors or observers tasked with assessing staff members' adherence to procedures, teamwork, and effectiveness in carrying out their responsibilities?" },
+                        { name: "Feedback Process", label: "Is feedback provided to staff members after drills to recognize commendable efforts and identify areas for improvement?" },
+                        { name: "Adaptability Training", label: "Are staff members prepared to adapt to changing circumstances or unexpected events during drills?" },
+                        { name: "Contingency Plans", label: "Are contingency plans established to address deviations from standard procedures or the need for improvised responses?" },
+                        { name: "Creative Problem-Solving", label: "Are staff members encouraged to exercise initiative and creativity in problem-solving and decision-making during drills?" },
+                        { name: "Plan Alignment", label: "Are staff roles and responsibilities aligned with the broader emergency response plans and protocols of the facility?" },
+                        { name: "Framework Understanding", label: "Do staff members understand how their roles fit into the overall emergency response framework and support the safety and well-being of occupants?" },
+                        { name: "Role Updates", label: "Are staff roles regularly reviewed and updated in conjunction with changes to emergency response plans or organizational structure?" },
+                        { name: "Record Maintenance", label: "Are records maintained to document staff assignments, actions, and performance during drills?" },
+                        { name: "Drill Review", label: "Are drill records reviewed periodically to assess the effectiveness of staff roles and identify opportunities for enhancement?" },
+                        { name: "Evaluation Recommendations", label: "Are recommendations from drill evaluations used to refine staff roles and responsibilities, as well as associated training and preparation efforts?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input
+                                    type="radio"
+                                    name={question.name}
+                                    value="yes"
+                                    checked={formData[question.name] === "yes"}
+                                    onChange={handleChange}
+                                /> Yes
+                                <input
+                                    type="radio"
+                                    name={question.name}
+                                    value="no"
+                                    checked={formData[question.name] === "no"}
+                                    onChange={handleChange}
+                                /> No
+                            </div>
+                            <div>
+                                <input
+                                    type="text"
+                                    name={`${question.name}Comment`}
+                                    placeholder="Comments"
+                                    value={formData[`${question.name}Comment`] || ''}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        </div>
+                    ))}
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: "red" }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default StaffRolesAndResponsibilitiesFormPage;

@@ -1,63 +1,82 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
 
 function VisitorCheckInPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding(); // Access buildingId from context
+  const navigate = useNavigate();
+  const { buildingId } = useBuilding();
   const db = getFirestore();
+  const functions = getFunctions();
+  const uploadImage = httpsCallable(functions, 'uploadVisitorCheckInImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [formData, setFormData] = useState({});
+  const [imageData, setImageData] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
-
+  const [imageUploadError, setImageUploadError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
 
   useEffect(() => {
-      if (!buildingId) {
-          alert('No building selected. Redirecting to Building Info...');
-          navigate('/BuildingandAddress');
-      }
-  }, [buildingId, navigate]);
-
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
+    if (!buildingId) {
+      alert('No building selected. Redirecting to Building Info...');
+      navigate('BuildingandAddress');
+      return;
     }
-  };
-  const handleChange = (e) => {
-      const { name, value } = e.target;
-      setFormData((prevData) => ({
-          ...prevData,
-          [name]: value,
-      }));
-  };
 
-  // Function to handle back button
-  const handleBack = async () => {
-    if (formData && buildingId) { // Check if formData and buildingId exist
+    const fetchFormData = async () => {
+      setLoading(true);
+      setLoadError(null);
+
       try {
-        const buildingRef = doc(db, 'Buildings', buildingId);
-        const formsRef = collection(db, 'forms/Physical Security/Visitor Check-In');
-        await addDoc(formsRef, {
-          building: buildingRef,
-          formData: formData,
-        });
-        console.log('Form Data submitted successfully on back!');
-        alert('Form data saved before navigating back!');
+        const formDocRef = doc(db, 'forms', 'Physical Security', 'Visitor Check-In', buildingId);
+        const docSnapshot = await getDoc(formDocRef);
+
+        if (docSnapshot.exists()) {
+          setFormData(docSnapshot.data().formData || {});
+        } else {
+          setFormData({});
+        }
       } catch (error) {
-        console.error('Error saving form data:', error);
-        alert('Failed to save form data before navigating back. Some data may be lost.');
+        console.error("Error fetching form data:", error);
+        setLoadError("Failed to load form data. Please try again.");
+      } finally {
+        setLoading(false);
       }
+    };
+
+    fetchFormData();
+  }, [buildingId, db, navigate]);
+
+  const handleChange = async (e) => {
+    const { name, value } = e.target;
+    const newFormData = { ...formData, [name]: value };
+    setFormData(newFormData);
+
+    try {
+      const formDocRef = doc(db, 'forms', 'Physical Security', 'Visitor Check-In', buildingId);
+      await setDoc(formDocRef, { formData: newFormData }, { merge: true });
+      console.log("Form data saved to Firestore:", newFormData);
+    } catch (error) {
+      console.error("Error saving form data to Firestore:", error);
+      alert("Failed to save changes. Please check your connection and try again.");
     }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImageData(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleBack = () => {
     navigate(-1);
   };
 
@@ -65,293 +84,109 @@ function VisitorCheckInPage() {
     e.preventDefault();
 
     if (!buildingId) {
-        alert('Building ID is missing. Please start the assessment from the correct page.');
-        return;
+      alert('Building ID is missing. Please start from the Building Information page.');
+      return;
+    }
+
+    if (imageData) {
+      try {
+        const uploadResult = await uploadImage({ imageData: imageData });
+        setImageUrl(uploadResult.data.imageUrl);
+        setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+        setImageUploadError(null);
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        setImageUploadError(error.message);
+      }
     }
 
     try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId); 
-
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Physical Security/Visitor Check-In');
-      await addDoc(formsRef, {
-          building: buildingRef, // Reference to the building document
-          formData: formData, // Store the form data as a nested object
-      });
-
+      const formDocRef = doc(db, 'forms', 'Physical Security', 'Visitor Check-In', buildingId);
+      await setDoc(formDocRef, { formData: formData }, { merge: true });
       console.log('Form data submitted successfully!');
       alert('Form submitted successfully!');
       navigate('/Form');
     } catch (error) {
-        console.error('Error submitting form:', error);
-        alert('Failed to submit the form. Please try again.');
+      console.error("Error saving form data to Firestore:", error);
+      alert("Failed to save changes. Please check your connection and try again.");
     }
-};
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (loadError) {
+    return <div>Error: {loadError}</div>;
+  }
 
   return (
     <div className="form-page">
       <header className="header">
-            <Navbar />
-        {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
+        <Navbar />
+        <button className="back-button" onClick={handleBack}>←</button>
         <h1>Visitor Check-in Assessment</h1>
         <img src={logo} alt="Logo" className="logo" />
       </header>
 
       <main className="form-container">
         <form onSubmit={handleSubmit}>
-          {/* Identification Verification */}
-          <h2>Identification Verification:</h2>
-          <div className="form-section">
-            <label>Are visitors required to present valid identification upon check-in?</label>
-            <div>
-              <input type="radio" name="validId" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="validId" value="no" onChange={handleChange}/> No
+          <h2>Visitor Check-in</h2>
+          {[
+            { name: "validId", label: "Are visitors required to present valid identification upon check-in?" },
+            { name: "verifyAuthenticity", label: "Do staff members verify the authenticity of the identification presented by visitors?" },
+            { name: "idMatchProcess", label: "Is there a process in place to ensure that the identification matches the information provided during pre-registration or scheduling?" },
+            { name: "standardRegistration", label: "Is there a standardized process for registering visitors upon check-in?" },
+            { name: "provideInfo", label: "Are visitors required to provide relevant information such as name, affiliation, purpose of visit, and contact details?" },
+            { name: "recordInfo", label: "Is visitor information recorded accurately and legibly for future reference and tracking?" },
+            { name: "accessGranted", label: "Are visitors granted access to the premises only after successful check-in and verification of identification?" },
+            { name: "predeterminedCriteria", label: "Is access authorization based on predetermined criteria such as scheduled appointments, visitor type, or security clearance levels?" },
+            { name: "accessPrivileges", label: "Are visitor access privileges clearly communicated to security personnel and other relevant staff members?" },
+            { name: "issuedBadges", label: "Are visitors issued with temporary badges or passes upon check-in?" },
+            { name: "badgeInfo", label: "Do badges or passes prominently display relevant information such as visitor name, date of visit, and authorized areas or restrictions?" },
+            { name: "reclaimBadges", label: "Are there protocols in place for reclaiming badges or passes upon visitor departure to prevent unauthorized access?" },
+            { name: "dataProtection", label: "Is visitor information handled and stored securely to maintain confidentiality and protect sensitive data?" },
+            { name: "staffTraining", label: "Are staff members trained to handle visitor information in compliance with data protection regulations and organizational policies?" },
+            { name: "disposeRecords", label: "Is there a process for securely disposing of visitor records or data once they are no longer needed?" },
+            { name: "staffAssistance", label: "Are staff members trained to provide assistance and guidance to visitors during the check-in process?" },
+            { name: "visitorGreeting", label: "Do they greet visitors in a friendly and professional manner, making them feel welcome and valued?" },
+            { name: "inquiriesResponse", label: "Are staff members responsive to visitor inquiries and requests for assistance, providing accurate information and support as needed?" },
+            { name: "emergencyResponse", label: "Are staff members trained to respond appropriately to security incidents, medical emergencies, or other crises that may occur during the check-in process?" },
+            { name: "emergencyProcedures", label: "Do they know emergency procedures, evacuation routes, and protocols for contacting emergency services?" },
+            { name: "alertSystem", label: "Is there a system in place to alert security personnel or initiate emergency response procedures if necessary?" },
+          ].map((question, index) => (
+            <div key={index} className="form-section">
+              <label>{question.label}</label>
+              <div>
+                <input
+                  type="radio"
+                  name={question.name}
+                  value="yes"
+                  checked={formData[question.name] === "yes"}
+                  onChange={handleChange}
+                /> Yes
+                <input
+                  type="radio"
+                  name={question.name}
+                  value="no"
+                  checked={formData[question.name] === "no"}
+                  onChange={handleChange}
+                /> No
+                
+              </div>
+              <input
+                  type="text"
+                  name={`${question.name}Comment`}
+                  placeholder="Comments"
+                  value={formData[`${question.name}Comment`] || ''}
+                  onChange={handleChange}
+                />
             </div>
-            <div>
-              <input type="text" name="validIdComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Do staff members verify the authenticity of the identification presented by visitors?</label>
-            <div>
-              <input type="radio" name="verifyAuthenticity" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="verifyAuthenticity" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="verifyAuthenticityComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Is there a process in place to ensure that the identification matches the information provided during pre-registration or scheduling?</label>
-            <div>
-              <input type="radio" name="idMatchProcess" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="idMatchProcess" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="idMatchProcessComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          {/* Registration Process */}
-          <h2>Registration Process:</h2>
-          <div className="form-section">
-            <label>Is there a standardized process for registering visitors upon check-in?</label>
-            <div>
-              <input type="radio" name="standardRegistration" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="standardRegistration" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="standardRegistrationComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are visitors required to provide relevant information such as name, affiliation, purpose of visit, and contact details?</label>
-            <div>
-              <input type="radio" name="provideInfo" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="provideInfo" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="provideInfoComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Is visitor information recorded accurately and legibly for future reference and tracking?</label>
-            <div>
-              <input type="radio" name="recordInfo" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="recordInfo" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="recordInfoComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          {/* Access Authorization */}
-          <h2>Access Authorization:</h2>
-          <div className="form-section">
-            <label>Are visitors granted access to the premises only after successful check-in and verification of identification?</label>
-            <div>
-              <input type="radio" name="accessGranted" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="accessGranted" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="accessGrantedComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Is access authorization based on predetermined criteria such as scheduled appointments, visitor type, or security clearance levels?</label>
-            <div>
-              <input type="radio" name="predeterminedCriteria" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="predeterminedCriteria" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="predeterminedCriteriaComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are visitor access privileges clearly communicated to security personnel and other relevant staff members?</label>
-            <div>
-              <input type="radio" name="accessPrivileges" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="accessPrivileges" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="accessPrivilegesComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          {/* Visitor Badges or Passes */}
-          <h2>Visitor Badges or Passes:</h2>
-          <div className="form-section">
-            <label>Are visitors issued with temporary badges or passes upon check-in?</label>
-            <div>
-              <input type="radio" name="issuedBadges" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="issuedBadges" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="issuedBadgesComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Do badges or passes prominently display relevant information such as visitor name, date of visit, and authorized areas or restrictions?</label>
-            <div>
-              <input type="radio" name="badgeInfo" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="badgeInfo" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="badgeInfoComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are there protocols in place for reclaiming badges or passes upon visitor departure to prevent unauthorized access?</label>
-            <div>
-              <input type="radio" name="reclaimBadges" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="reclaimBadges" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="reclaimBadgesComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          {/* Confidentiality and Data Protection */}
-          <h2>Confidentiality and Data Protection:</h2>
-          <div className="form-section">
-            <label>Is visitor information handled and stored securely to maintain confidentiality and protect sensitive data?</label>
-            <div>
-              <input type="radio" name="dataProtection" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="dataProtection" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="dataProtectionComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are staff members trained to handle visitor information in compliance with data protection regulations and organizational policies?</label>
-            <div>
-              <input type="radio" name="staffTraining" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="staffTraining" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="staffTrainingComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Is there a process for securely disposing of visitor records or data once they are no longer needed?</label>
-            <div>
-              <input type="radio" name="disposeRecords" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="disposeRecords" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="disposeRecordsComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          {/* Customer Service and Assistance */}
-          <h2>Customer Service and Assistance:</h2>
-          <div className="form-section">
-            <label>Are staff members trained to provide assistance and guidance to visitors during the check-in process?</label>
-            <div>
-              <input type="radio" name="staffAssistance" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="staffAssistance" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="staffAssistanceComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Do they greet visitors in a friendly and professional manner, making them feel welcome and valued?</label>
-            <div>
-              <input type="radio" name="visitorGreeting" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="visitorGreeting" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="visitorGreetingComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are staff members responsive to visitor inquiries and requests for assistance, providing accurate information and support as needed?</label>
-            <div>
-              <input type="radio" name="inquiriesResponse" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="inquiriesResponse" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="inquiriesResponseComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          {/* Emergency Response Preparedness */}
-          <h2>Emergency Response Preparedness:</h2>
-          <div className="form-section">
-            <label>Are staff members trained to respond appropriately to security incidents, medical emergencies, or other crises that may occur during the check-in process?</label>
-            <div>
-              <input type="radio" name="emergencyResponse" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="emergencyResponse" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="emergencyResponseComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Do they know emergency procedures, evacuation routes, and protocols for contacting emergency services?</label>
-            <div>
-              <input type="radio" name="emergencyProcedures" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="emergencyProcedures" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="emergencyProceduresComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Is there a system in place to alert security personnel or initiate emergency response procedures if necessary?</label>
-            <div>
-              <input type="radio" name="alertSystem" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="alertSystem" value="no" onChange={handleChange}/> No
-            </div>
-            <div>
-              <input type="text" name="alertSystemComment" placeholder="Comments" onChange={handleChange}/>
-            </div>
-          </div>
-
-          {/* Submit Button */}
+          ))}
           <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
+          {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+          {imageUploadError && <p style={{ color: "red" }}>{imageUploadError}</p>}
+          <button type="submit">Submit</button>
         </form>
       </main>
     </div>
