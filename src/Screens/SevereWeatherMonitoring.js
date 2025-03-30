@@ -1,356 +1,215 @@
-import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function SevereWeatherMonitoringFormPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadImage = httpsCallable(functions, 'uploadSevereWeatherMonitoringImage');
+
+
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
  
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
+        }
+
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null); // Clear previous errors
+
+            try {
+                const formDocRef = doc(db, 'forms','Emergency Preparedness','Severe Weather Monitoring', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({}); // Initialize if document doesn't exist
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            // Persist data to Firestore on every change
+            const formDocRef = doc(db, 'forms','Emergency Preparedness','Severe Weather Monitoring', buildingId);
+            await setDoc(formDocRef, { formData: newFormData }, { merge: true }); // Use merge to preserve existing fields
+            console.log("Form data saved to Firestore:", newFormData);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
 
 
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
+    const handleBack = () => {
+        navigate(-1); // Just navigate back
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const formDocRef = doc(db, 'forms','Emergency Preparedness','Severe Weather Monitoring', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
-  }, [buildingId, navigate]);
+
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
+    }
 
   
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>Severe Weather Monitoring Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-  // Function to handle back button
-  const handleBack = async () => {
-    if (formData && buildingId) { // Check if formData and buildingId exist
-      try {
-        const buildingRef = doc(db, 'Buildings', buildingId);
-        const formsRef = collection(db, 'forms/Emergency Preparedness/Severe Weather Monitoring');
-        await addDoc(formsRef, {
-          building: buildingRef,
-          formData: formData,
-        });
-        console.log('Form Data submitted successfully on back!');
-        alert('Form data saved before navigating back!');
-      } catch (error) {
-        console.error('Error saving form data:', error);
-        alert('Failed to save form data before navigating back. Some data may be lost.');
-      }
-    }
-    navigate(-1);
-  };
-
-   
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
-    }
-
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
-
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Emergency Preparedness/Severe Weather Monitoring');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
-    }
-  };
-
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Severe Weather Monitoring Assessment</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
-
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                {/* 2.2.1.1.9 Severe Weather Monitoring */}
-                <h2>Weather Alert Systems:</h2>
-                <div className="form-section">
-                    <label>Are weather alert systems installed and operational within the facility?</label>
-                    <div>
-                        <input type="radio" name="Alert Systems Operational" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Alert Systems Operational" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="AlertSystemsOperationalComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Do alert systems provide timely notifications of severe weather events, including tornadoes, thunderstorms, hurricanes, or other hazards?</label>
-                    <div>
-                        <input type="radio" name="Timely Notifications Provided" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Timely Notifications Provided" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="TimelyNotificationsProvidedComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are alert systems capable of broadcasting alerts through various communication channels, such as sirens, public address systems, text messages, or mobile apps?</label>
-                    <div>
-                        <input type="radio" name="Multi-Channel Broadcasts" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Multi-Channel Broadcasts" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="Multi-ChannelBroadcastsComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>Integration with External Sources:</h2>
-                <div className="form-section">
-                    <label>Is the facility connected to external weather monitoring services or agencies for receiving up-to-date weather forecasts and warnings?</label>
-                    <div>
-                        <input type="radio" name="External Source Link" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="External Source Link" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="ExternalSourceLinkComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are alert systems configured to automatically receive and relay weather alerts issued by national or local weather authorities?</label>
-                    <div>
-                        <input type="radio" name="Automatic Alert Relay" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Automatic Alert Relay" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="AutomaticAlertRelayComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Is there redundancy built into alert systems to ensure reliable reception and dissemination of weather alerts, even during power outages or network disruptions?</label>
-                    <div>
-                        <input type="radio" name="Alert System Redundancy" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Alert System Redundancy" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="alertSystemRedundancy" placeholder="Describe the redundancy" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <h2>Alert Activation Protocols:</h2>
-                <div className="form-section">
-                    <label>Are there established protocols for activating weather alert systems based on the severity and proximity of approaching weather events?</label>
-                    <div>
-                        <input type="radio" name="Activation Protocols Set" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Activation Protocols Set" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="activationProtocolsSet" placeholder="Describe the protocols" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Do designated personnel have the authority and training to initiate alert activations in accordance with established protocols?</label>
-                    <div>
-                        <input type="radio" name="Designated Personnel Authority" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Designated Personnel Authority" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="designatedPersonnelAuthority" placeholder="List the designated personnel" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Is there a process for verifying the authenticity and reliability of weather alerts before activating alert systems?</label>
-                    <div>
-                        <input type="radio" name="Alert Verification Process" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Alert Verification Process" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="alertVerificationProcess" placeholder="Describe the process" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <h2>Notification and Communication:</h2>
-                <div className="form-section">
-                    <label>Are weather alerts communicated promptly to all occupants and stakeholders within the facility?</label>
-                    <div>
-                        <input type="radio" name="Prompt Alert Communication" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Prompt Alert Communication" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="PromptAlertCommunicationComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are communication methods used to relay weather alerts tailored to the preferences and accessibility needs of different occupants, such as visual, auditory, or text-based alerts?</label>
-                    <div>
-                        <input type="radio" name="Tailored Communication Methods" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Tailored Communication Methods" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="TailoredCommunicationMethodsComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Is there a process for verifying the authenticity and reliability of weather alerts before activating alert systems?</label>
-                    <div>
-                        <input type="radio" name="Authenticity Verification" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Authenticity Verification" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="authenticityVerification" placeholder="Describe the protocol" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <h2>Response Procedures:</h2>
-                <div className="form-section">
-                    <label>Are response procedures established for different types of severe weather events, such as tornadoes, hurricanes, floods, or lightning storms?</label>
-                    <div>
-                        <input type="radio" name="Response Procedures Set" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Response Procedures Set" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="responseProceduresSet" placeholder="Describe the procedures" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Do response procedures outline specific actions to be taken by occupants, staff members, and security personnel in response to weather alerts?</label>
-                    <div>
-                        <input type="radio" name="Specific Actions Defined" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Specific Actions Defined" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="SpecificActionsDefinedComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are response procedures regularly reviewed and updated based on lessons learned from past incidents or changes in weather patterns?</label>
-                    <div>
-                        <input type="radio" name="Procedure Review Cycle" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Procedure Review Cycle" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="ProcedureReviewCycleComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>Training and Education:</h2>
-                <div className="form-section">
-                    <label>Are staff members and occupants trained on how to interpret weather alerts and respond appropriately during severe weather events?</label>
-                    <div>
-                        <input type="radio" name="Occupant Training Provided" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Occupant Training Provided" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="OccupantTrainingProvidedComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are training materials and resources provided to educate occupants on sheltering procedures, evacuation routes, and other safety measures related to severe weather?</label>
-                    <div>
-                        <input type="radio" name="Training Material Availability" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Training Material Availability" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="TrainingMaterialAvailabilityComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are drills or simulations conducted periodically to practice response procedures and ensure readiness for severe weather emergencies?</label>
-                    <div>
-                        <input type="radio" name="Drill Simulation Conducted" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Drill Simulation Conducted" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="DrillSimulationConductedComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>Evaluation and Improvement:</h2>
-                <div className="form-section">
-                    <label>Is there a process for evaluating the effectiveness of weather alert systems and response procedures?</label>
-                    <div>
-                        <input type="radio" name="System Evaluation Process" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="System Evaluation Process" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="systemEvaluationProcess" placeholder="Describe the process" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are feedback mechanisms in place to gather input from occupants and stakeholders on the timeliness and clarity of weather alerts and response efforts?</label>
-                    <div>
-                        <input type="radio" name="Feedback Mechanisms Active" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Feedback Mechanisms Active" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="feedbackMechanismsActive" placeholder="Describe the feedback mechanisms" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are recommendations from evaluations and feedback used to improve weather monitoring systems, communication protocols, and preparedness for future severe weather events?</label>
-                    <div>
-                        <input type="radio" name="Improvement Recommendations Used" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Improvement Recommendations Used" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="ImprovementRecommendationsUsedComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                {/* Submit Button */}
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-
-            </form>
-        </main>
-    </div>
-  )
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>Weather Alert Systems:</h2>
+                    {[
+                        { name: "Alert Systems Operational", label: "Are weather alert systems installed and operational within the facility?" },
+                        { name: "Timely Notifications Provided", label: "Do alert systems provide timely notifications of severe weather events, including tornadoes, thunderstorms, hurricanes, or other hazards?" },
+                        { name: "Multi-Channel Broadcasts", label: "Are alert systems capable of broadcasting alerts through various communication channels, such as sirens, public address systems, text messages, or mobile apps?" },
+                        { name: "External Source Link", label: "Is the facility connected to external weather monitoring services or agencies for receiving up-to-date weather forecasts and warnings?" },
+                        { name: "Automatic Alert Relay", label: "Are alert systems configured to automatically receive and relay weather alerts issued by national or local weather authorities?" },
+                        { name: "alertSystemRedundancy", label: "Is there redundancy built into alert systems to ensure reliable reception and dissemination of weather alerts, even during power outages or network disruptions?" },
+                        { name: "Activation Protocols Set", label: "Are there established protocols for activating weather alert systems based on the severity and proximity of approaching weather events?" },
+                        { name: "Designated Personnel Authority", label: "Do designated personnel have the authority and training to initiate alert activations in accordance with established protocols?" },
+                        { name: "Alert Verification Process", label: "Is there a process for verifying the authenticity and reliability of weather alerts before activating alert systems?" },
+                        { name: "Prompt Alert Communication", label: "Are weather alerts communicated promptly to all occupants and stakeholders within the facility?" },
+                        { name: "Tailored Communication Methods", label: "Are communication methods used to relay weather alerts tailored to the preferences and accessibility needs of different occupants, such as visual, auditory, or text-based alerts?" },
+                        { name: "authenticityVerification", label: "Is there a process for verifying the authenticity and reliability of weather alerts before activating alert systems?" },
+                        { name: "Response Procedures Set", label: "Are response procedures established for different types of severe weather events, such as tornadoes, hurricanes, floods, or lightning storms?" },
+                        { name: "Specific Actions Defined", label: "Do response procedures outline specific actions to be taken by occupants, staff members, and security personnel in response to weather alerts?" },
+                        { name: "Procedure Review Cycle", label: "Are response procedures regularly reviewed and updated based on lessons learned from past incidents or changes in weather patterns?" },
+                        { name: "Occupant Training Provided", label: "Are staff members and occupants trained on how to interpret weather alerts and respond appropriately during severe weather events?" },
+                        { name: "Training Material Availability", label: "Are training materials and resources provided to educate occupants on sheltering procedures, evacuation routes, and other safety measures related to severe weather?" },
+                        { name: "Drill Simulation Conducted", label: "Are drills or simulations conducted periodically to practice response procedures and ensure readiness for severe weather emergencies?" },
+                        { name: "System Evaluation Process", label: "Is there a process for evaluating the effectiveness of weather alert systems and response procedures?" },
+                        { name: "Feedback Mechanisms Active", label: "Are feedback mechanisms in place to gather input from occupants and stakeholders on the timeliness and clarity of weather alerts and response efforts?" },
+                        { name: "Improvement Recommendations Used", label: "Are recommendations from evaluations and feedback used to improve weather monitoring systems, communication protocols, and preparedness for future severe weather events?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                {question.name === "Alert Systems Operational" || question.name === "Timely Notifications Provided" || question.name === "Multi-Channel Broadcasts" || question.name === "External Source Link" || question.name === "Automatic Alert Relay" || question.name === "Activation Protocols Set" || question.name === "Designated Personnel Authority" || question.name === "Alert Verification Process" || question.name === "Prompt Alert Communication" || question.name === "Tailored Communication Methods" || question.name === "Authenticity Verification" || question.name === "Response Procedures Set" || question.name === "Specific Actions Defined" || question.name === "Procedure Review Cycle" || question.name === "Occupant Training Provided" || question.name === "Training Material Availability" || question.name === "Drill Simulation Conducted" || question.name === "System Evaluation Process" || question.name === "Feedback Mechanisms Active" || question.name === "Improvement Recommendations Used" ? (
+                                    <>
+                                        <input
+                                            type="radio"
+                                            name={question.name}
+                                            value="yes"
+                                            checked={formData[question.name] === "yes"}
+                                            onChange={handleChange}
+                                        /> Yes
+                                        <input
+                                            type="radio"
+                                            name={question.name}
+                                            value="no"
+                                            checked={formData[question.name] === "no"}
+                                            onChange={handleChange}
+                                        /> No
+                            
+                                    </>
+                                ) : (
+                                    <input
+                                        type="text"
+                                        name={question.name}
+                                        value={formData[question.name] || ''}
+                                        onChange={handleChange}
+                                    />
+                                )}
+                            </div>
+                            <div>
+                            <input
+                                            type="text"
+                                            name={`${question.name}Comment`}
+                                            placeholder="Comments"
+                                            value={formData[`${question.name}Comment`] || ''}
+                                            onChange={handleChange}
+                                        />
+                            </div>
+                        </div>
+                    ))}
+                    <input type="file" onChange={handleImageChange} accept="image/*" />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default SevereWeatherMonitoringFormPage;

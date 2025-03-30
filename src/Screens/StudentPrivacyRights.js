@@ -1,358 +1,213 @@
-import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function StudentPrivacyRightsFormPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadImage = httpsCallable(functions, 'uploadStudentPrivacyRightsImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
+        }
 
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+
+            try {
+                const formDocRef = doc(db, 'forms', 'Policy and Compliance', 'Student Privacy Rights', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Policy and Compliance', 'Student Privacy Rights', buildingId);
+            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
+            console.log("Form data saved to Firestore:", newFormData);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Policy and Compliance', 'Student Privacy Rights', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
-  }, [buildingId, navigate]);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Function to handle back button
-  const handleBack = async () => {
-    if (formData && buildingId) { // Check if formData and buildingId exist
-      try {
-        const buildingRef = doc(db, 'Buildings', buildingId);
-        const formsRef = collection(db, 'forms/Policy and Compliance/Student Privacy Rights');
-        await addDoc(formsRef, {
-          building: buildingRef,
-          formData: formData,
-        });
-        console.log('Form Data submitted successfully on back!');
-        alert('Form data saved before navigating back!');
-      } catch (error) {
-        console.error('Error saving form data:', error);
-        alert('Failed to save form data before navigating back. Some data may be lost.');
-      }
-    }
-    navigate(-1);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>Student Privacy Rights Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Policy and Compliance/Student Privacy Rights');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
-    }
-  };
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>Student Privacy Rights</h2>
+                    {[
+                        { name: "requestProcedures", label: "What procedures are in place for students and parents to request access to educational records?" },
+                        { name: "verifiedRecords", label: "How is access to educational records verified to ensure that only authorized individuals receive information?" },
+                        { name: "submittingRequests", label: "Are there specific forms or channels for submitting requests to access records?" },
+                        { name: "reviewProcess", label: "What process is available for students and parents to review and request amendments to educational records?" },
+                        { name: "documentedRequests", label: "How are requests for amendments documented and processed?" },
+                        { name: "approvingRequests", label: "What are the criteria for approving or denying amendment requests, and how are decisions communicated?" },
+                        { name: "disclosedConsent", label: "Under what circumstances can educational records be disclosed without consent, and how is this information communicated to students and parents?" },
+                        { name: "handlingRequests", label: "What procedures are in place to handle requests for disclosure of educational records from third parties, such as law enforcement or other institutions?" },
+                        { name: "recordedDisclosures", label: "How are disclosures recorded and tracked to ensure compliance with FERPA regulations?" },
+                        { name: "protectingRecords", label: "What measures are in place to protect the confidentiality and security of educational records?" },
+                        { name: "controlledRecords", label: "How is access to educational records controlled and monitored to prevent unauthorized access or breaches?" },
+                        { name: "regularAudits", label: "Are there regular audits or assessments of data security practices related to educational records?" },
+                        { name: "parentsRights", label: "How are parents informed about their rights to access their child's educational records?" },
+                        { name: "grantProcedures", label: "What procedures are followed to grant or deny parental access requests in accordance with FERPA requirements?" },
+                        { name: "accessLimitations", label: "Are there any limitations on parental access, and how are these limitations communicated?" },
+                        { name: "studentConsent", label: "What procedures are in place to obtain student consent for the release of educational records when required?" },
+                        { name: "documentedConsent", label: "How is consent documented, and what are the procedures for revoking consent?" },
+                        { name: "requirementExceptions", label: "Are there any exceptions to the requirement for student consent, and how are these exceptions managed?" },
+                        { name: "staffTraining", label: "What training is provided to staff regarding FERPA requirements and student privacy rights?" },
+                        { name: "maintainedAwareness", label: "How is awareness maintained among staff about the importance of protecting student privacy and handling educational records appropriately?" },
+                        { name: "regulationGuidelines", label: "Are there resources or guidelines available to assist staff in understanding and complying with FERPA regulations?" },
+                        { name: "filingProcess", label: "What process is available for students and parents to file complaints regarding violations of privacy rights or FERPA compliance issues?" },
+                        { name: "investigatedComplaints", label: "How are complaints investigated, and what procedures are followed to resolve them?" },
+                        { name: "trackingIssues", label: "What mechanisms are in place to track and address recurring issues or concerns related to student privacy?" },
+                        { name: "reviewedPolicies", label: "How often are policies and procedures related to FERPA compliance reviewed and updated?" },
+                        { name: "updateProcesses", label: "What processes are used to ensure that updates reflect changes in regulations or best practices?" },
+                        { name: "communicatedChanges", label: "How are changes communicated to students, parents, and staff?" },
+                        { name: "documentingCompliance", label: "What records are maintained to document compliance with FERPA, and how are these records managed?" },
+                        { name: "retainedRecords", label: "How long are records related to student privacy rights and FERPA compliance retained?" },
+                        { name: "storingProcedures", label: "What procedures are in place for securely storing and disposing of records?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            {question.name === "submittingRequests" || question.name === "regularAudits" || question.name === "accessLimitations" || question.name === "requirementExceptions" || question.name === "regulationGuidelines" ? (
+                                <><div>
+                                    <input
+                                        type="radio"
+                                        name={question.name}
+                                        value="yes"
+                                        checked={formData[question.name] === "yes"}
+                                        onChange={handleChange} /> Yes
+                                    <input
+                                        type="radio"
+                                        name={question.name}
+                                        value="no"
+                                        checked={formData[question.name] === "no"}
+                                        onChange={handleChange} /> No
 
-
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>5.2.1.1.1 Student Privacy Rights Assessment</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
-
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                {/* 5.2.1.1.1 Student Privacy Rights Assessment */}
-                <h2>5.2.1.1.1.1 Access to Educational Records:</h2>
-                <div className="form-section">
-                    <label>What procedures are in place for students and parents to request access to educational records?</label>
-                    <div>
-                        <input type="text" name="requestProcedures" placeholder="Describe the procedures" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is access to educational records verified to ensure that only authorized individuals receive information?</label>
-                    <div>
-                        <input type="text" name="verifiedRecords" placeholder="Describe how it's verified" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there specific forms or channels for submitting requests to access records?</label>
-                    <div>
-                        <input type="radio" name="submittingRequests" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="submittingRequests" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="submittingRequestsComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>5.2.1.1.1.2 Rights to Review and Amend Records:</h2>
-                <div className="form-section">
-                    <label>What process is available for students and parents to review and request amendments to educational records?</label>
-                    <div>
-                        <input type="text" name="reviewProcess" placeholder="Describe the process" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are requests for amendments documented and processed?</label>
-                    <div>
-                        <input type="text" name="documentedRequests" placeholder="Describe how they're documented" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What are the criteria for approving or denying amendment requests, and how are decisions communicated?</label>
-                    <div>
-                        <input type="text" name="approvingRequests" placeholder="Describe the criteria" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.2.1.1.1.3 Disclosure of Information:</h2>
-                <div className="form-section">
-                    <label>Under what circumstances can educational records be disclosed without consent, and how is this information communicated to students and parents?</label>
-                    <div>
-                        <input type="text" name="disclosedConsent" placeholder="Describe the circumstances" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What procedures are in place to handle requests for disclosure of educational records from third parties, such as law enforcement or other institutions?</label>
-                    <div>
-                        <input type="text" name="handlingRequests" placeholder="Describe the procedures" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are disclosures recorded and tracked to ensure compliance with FERPA regulations?</label>
-                    <div>
-                        <input type="text" name="recordedDisclosures" placeholder="Describe how they're recorded and tracked" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.2.1.1.1.4 Confidentiality and Security:</h2>
-                <div className="form-section">
-                    <label>What measures are in place to protect the confidentiality and security of educational records?</label>
-                    <div>
-                        <input type="text" name="protectingRecords" placeholder="Describe the measures" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is access to educational records controlled and monitored to prevent unauthorized access or breaches?</label>
-                    <div>
-                        <input type="text" name="controlledRecords" placeholder="Describe how it's controlled and monitored" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there regular audits or assessments of data security practices related to educational records?</label>
-                    <div>
-                        <input type="radio" name="regularAudits" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="regularAudits" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="regularAuditsComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>5.2.1.1.1.5 Parental Access Rights:</h2>
-                <div className="form-section">
-                    <label>How are parents informed about their rights to access their child's educational records?</label>
-                    <div>
-                        <input type="text" name="parentsRights" placeholder="Describe how they're informed" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What procedures are followed to grant or deny parental access requests in accordance with FERPA requirements?</label>
-                    <div>
-                        <input type="text" name="grantProcedures" placeholder="Describe the procedures" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there any limitations on parental access, and how are these limitations communicated?</label>
-                    <div>
-                        <input type="radio" name="accessLimitations" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="accessLimitations" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="accessLimitationsComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>5.2.1.1.1.6 Student Consent for Release:</h2>
-                <div className="form-section">
-                    <label>What procedures are in place to obtain student consent for the release of educational records when required?</label>
-                    <div>
-                        <input type="text" name="studentConsent" placeholder="Describe the procedures" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is consent documented, and what are the procedures for revoking consent?</label>
-                    <div>
-                        <input type="text" name="documentedConsent" placeholder="Describe how it's documented" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there any exceptions to the requirement for student consent, and how are these exceptions managed?</label>
-                    <div>
-                        <input type="radio" name="requirementExceptions" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="requirementExceptions" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="requirementExceptionsComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>5.2.1.1.1.7 Training and Awareness:</h2>
-                <div className="form-section">
-                    <label>What training is provided to staff regarding FERPA requirements and student privacy rights?</label>
-                    <div>
-                        <input type="text" name="staffTraining" placeholder="Describe the training" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is awareness maintained among staff about the importance of protecting student privacy and handling educational records appropriately?</label>
-                    <div>
-                        <input type="text" name="maintainedAwareness" placeholder="Describe how it's maintained" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there resources or guidelines available to assist staff in understanding and complying with FERPA regulations?</label>
-                    <div>
-                        <input type="radio" name="regulationGuidelines" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="regulationGuidelines" value="no" onChange={handleChange}/> No
-                    </div>
-                    <div>
-                        <input type="text" name="RegulationGuidelinesComment" placeholder="Comments" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <h2>5.2.1.1.1.8 Complaint Resolution:</h2>
-                <div className="form-section">
-                    <label>What process is available for students and parents to file complaints regarding violations of privacy rights or FERPA compliance issues?</label>
-                    <div>
-                        <input type="text" name="filingProcess" placeholder="Describe the process" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are complaints investigated, and what procedures are followed to resolve them?</label>
-                    <div>
-                        <input type="text" name="investigatedComplaints" placeholder="Describe how it's investigated" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What mechanisms are in place to track and address recurring issues or concerns related to student privacy?</label>
-                    <div>
-                        <input type="text" name="trackingIssues" placeholder="Describe the mechanisms" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.2.1.1.1.9 Periodic Reviews and Updates:</h2>
-                <div className="form-section">
-                    <label>How often are policies and procedures related to FERPA compliance reviewed and updated?</label>
-                    <div>
-                        <input type="text" name="reviewedPolicies" placeholder="Describe how often it's reviewed" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What processes are used to ensure that updates reflect changes in regulations or best practices?</label>
-                    <div>
-                        <input type="text" name="updateProcesses" placeholder="Describe the process" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are changes communicated to students, parents, and staff?</label>
-                    <div>
-                        <input type="text" name="communicatedChanges" placeholder="Describe how often it's communicated" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.2.1.1.1.10 Documentation and Record-Keeping:</h2>
-                <div className="form-section">
-                    <label>What records are maintained to document compliance with FERPA, and how are these records managed?</label>
-                    <div>
-                        <input type="text" name="documentingCompliance" placeholder="Describe the maintained records" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How long are records related to student privacy rights and FERPA compliance retained?</label>
-                    <div>
-                        <input type="text" name="retainedRecords" placeholder="Describe how long it's related" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What procedures are in place for securely storing and disposing of records?</label>
-                    <div>
-                        <input type="text" name="storingProcedures" placeholder="Describe the procedures" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                {/* Submit Button */}
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-
-            </form>
-        </main>
-    </div>
-  )
+                                </div><div>
+                                        <input
+                                            type="text"
+                                            name={`${question.name}Comment`}
+                                            placeholder="Comments"
+                                            value={formData[`${question.name}Comment`] || ''}
+                                            onChange={handleChange} />
+                                    </div></>
+                            ) : (
+                                <input
+                                    type="text"
+                                    name={question.name}
+                                    value={formData[question.name] || ''}
+                                    onChange={handleChange}
+                                    placeholder={question.label}
+                                />
+                            )}
+                        </div>
+                    ))}
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: "red" }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default StudentPrivacyRightsFormPage;

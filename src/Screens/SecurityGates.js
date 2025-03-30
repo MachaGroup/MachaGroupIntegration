@@ -21,7 +21,7 @@ function SecurityGatesPage() {
     const [imageUploadError, setImageUploadError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState(null);
-
+ 
 
     useEffect(() => {
         if (!buildingId) {

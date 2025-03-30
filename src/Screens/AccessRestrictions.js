@@ -1,371 +1,214 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
-import logo from '../assets/MachaLogo.png';  // Adjust the path relative to the current file location
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function AccessRestrictionsPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding();
     const db = getFirestore();
-    const storage = getStorage(); // Initialize Firebase Storage
+    const functions = getFunctions();
+    const uploadImage = httpsCallable(functions, 'uploadAccessRestrictionsImage');
+
 
     const [formData, setFormData] = useState({});
-    const [image, setImage] = useState(null);
-    const [uploadProgress, setUploadProgress] = useState(0);
+    const [imageData, setImageData] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
-    const [uploadError, setUploadError] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
+ 
 
     useEffect(() => {
-      if(!buildingId) {
-        alert('No building selected. Redirecting to Building Info...');
-        navigate('BuildingandAddress');
-      }
-    }, [buildingId, navigate]);
-  
-    const handleChange = (e) => {
-      const { name, type, checked, value } = e.target;
-      if (type === 'radio') {
-          setFormData((prevData) => ({
-              ...prevData,
-              [name]: checked ? value : '',
-          }));
-      } else {
-          setFormData((prevData) => ({
-              ...prevData,
-              [name]: value,
-          }));
-      }
-    };
-  
-    const handleImageChange = (e) => {
-      if (e.target.files[0]) {
-        setImage(e.target.files[0]);
-      }
-    };
-  
-    const handleBack = async () => {
-      if (formData && buildingId) {
-        try {
-          const buildingRef = doc(db, 'Buildings', buildingId);
-          const formsRef = collection(db, 'forms/Policy and Compliance/Access Restrictions');
-          await addDoc(formsRef, {
-            building: buildingRef,
-            formData: formData,
-          });
-          console.log('Form Data submitted successfully on back!');
-          alert('Form data saved before navigating back!');
-        } catch (error) {
-          console.error('Error saving form data:', error);
-          alert('Failed to save form data before navigating back. Some data may be lost.');
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
         }
-      }
-      navigate(-1);
-    };
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      
-      if(!buildingId) {
-        alert('Building ID is missing. Please start the assessment from the correct page.');
-        return;
-      }
-  
-      try {
-        const buildingRef = doc(db, 'Buildings', buildingId);
-        const formsRef = collection(db, 'forms/Policy and Compliance/Access Restrictions');
 
-        if (image) {
-          const storageRef = ref(storage, `accessRestrictions_images/${Date.now()}_${image.name}`);
-          const uploadTask = uploadBytesResumable(storageRef, image);
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null); // Clear previous errors
 
-          uploadTask.on('state_changed',
-            (snapshot) => {
-              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              setUploadProgress(progress);
-            },
-            (error) => {
-              setUploadError(error);
-            },
-            () => {
-              getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                setImageUrl(downloadURL);
-                setFormData({ ...formData, imageUrl: downloadURL });
-                setUploadError(null);
-              });
+            try {
+                const formDocRef = doc(db, 'forms', 'Policy and Compliance', 'Access Restrictions', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({}); // Initialize if document doesn't exist
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
             }
-          );
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            // Persist data to Firestore on every change
+            const formDocRef = doc(db, 'forms', 'Policy and Compliance', 'Access Restrictions', buildingId);
+            await setDoc(formDocRef, { formData: newFormData }, { merge: true }); // Use merge to preserve existing fields
+            console.log("Form data saved to Firestore:", newFormData);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
         }
-  
-        await addDoc(formsRef, {
-          building: buildingRef,
-          formData: formData,
-        });
-        console.log('From Data submitted successfully!')
-        alert('Form Submitted successfully!');
-        navigate('/Form');
-      } catch (error) {
-        console.error('Error submitting form:', error);
-        alert('Failed to submit the form. Please try again.');
-      }
     };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+
+    const handleBack = () => {
+        navigate(-1); // Just navigate back
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Policy and Compliance', 'Access Restrictions', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
+    }
  
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            <button className="back-button" onClick={handleBack}>←</button> 
-            <h1>5.1.1.1.1 Access Restrictions Assessment</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>5.1.1.1.1 Access Restrictions Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                {/* 5.1.1.1.1 Access Restrictions */}
-                <h2>5.1.1.1.1.1 Recertification Frequency:</h2>
-                <div className="form-section">
-                    <label>What types of websites or online content are explicitly prohibited by the Acceptable Use Policy (AUP) (e.g., adult content, gambling sites)?</label>
-                    <div>
-                        <input type="text" name="prohibitedWebsites" placeholder="List the types" onChange={handleChange} />  
-                    </div>
-                </div>
-                {/* ...rest of your form questions... */}
-                <div className="form-section">
-    <label>How are these restrictions defined and categorized within the policy?</label>
-    <div>
-        <input type="text" name="definedRestrictions" placeholder="Describe how they're defined" onChange={handleChange} />  
-    </div>
-</div>
-
-<div className="form-section">
-    <label>Are there clear guidelines on what constitutes prohibited websites or online activities?</label>
-    <div>
-        <input type="radio" name="clearGuidelines" value="yes" onChange={handleChange}/> Yes
-        <input type="radio" name="clearGuidelines" value="no" onChange={handleChange}/> No
-        <textarea className='comment-box' name="clearGuidelinesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-    </div>
-</div>
-
-<h2>5.1.1.1.1.2 Implementation and Enforcement:</h2>
-<div className="form-section">
-    <label>How are access restrictions enforced on the network (e.g., through web filters, firewalls)?</label>
-    <div>
-        <input type="text" name="enforcedRestrictions" placeholder="Describe how they're enforced" onChange={handleChange} />  
-    </div>
-</div>
-
-<div className="form-section">
-    <label>What tools or technologies are used to block access to prohibited websites?</label>
-    <div>
-        <input type="text" name="blockedAccess" placeholder="List the tools/technologies" onChange={handleChange} />  
-    </div>
-</div>
-
-<div className="form-section">
-    <label>How frequently are these tools updated to ensure effectiveness against new or evolving threats?</label>
-    <div>
-        <input type="text" name="frequentUpdates" placeholder="Describe the frequency" onChange={handleChange} />  
-    </div>
-</div>
-
-<h2>5.1.1.1.1.3 User Notification and Awareness:</h2>
-<div className="form-section">
-    <label>How are users informed about the access restrictions and prohibited websites (e.g., through training, policy documents)?</label>
-    <div>
-        <input type="text" name="informedUsers" placeholder="Describe how they're informed" onChange={handleChange} />  
-    </div>
-</div>
-
-<div className="form-section">
-    <label>Are there mechanisms in place to notify users when they attempt to access a restricted site?</label>
-    <div>
-        <input type="radio" name="notifiedUsers" value="yes" onChange={handleChange}/> Yes
-        <input type="radio" name="notifiedUsers" value="no" onChange={handleChange}/> No
-        <textarea className='comment-box' name="notifiedUsersComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-    </div>
-</div>
-
-<div className="form-section">
-    <label>How is compliance with the AUP communicated to users to ensure they understand the restrictions?</label>
-    <div>
-        <input type="text" name="aupCompliance" placeholder="Describe how it's ensured" onChange={handleChange} />  
-    </div>
-</div>
-
-<h2>5.1.1.1.1.4 Exceptions and Approvals:</h2>
-<div className="form-section">
-    <label>What procedures are in place for requesting exceptions to the access restrictions (e.g., for educational or research purposes)?</label>
-    <div>
-        <input type="text" name="requestingExceptions" placeholder="Describe the procedures" onChange={handleChange} />  
-    </div>
-</div>
-
-<div className="form-section">
-    <label>Who is authorized to review and approve requests for access to restricted websites?</label>
-    <div>
-        <input type="text" name="authorizedUser" placeholder="Who is authorized" onChange={handleChange} />  
-    </div>
-</div>
-
-<div className="form-section">
-    <label>Are there documented processes for handling and documenting exceptions?</label>
-    <div>
-        <input type="radio" name="handlingExpectations" value="yes" onChange={handleChange}/> Yes
-        <input type="radio" name="handlingExpectations" value="no" onChange={handleChange}/> No
-        <textarea className='comment-box' name="handlingExpectationsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-    </div>
-</div>
-
-<h2>5.1.1.1.1.5 Monitoring and Reporting:</h2>
-<div className="form-section">
-    <label>How is user activity monitored to ensure compliance with access restrictions (e.g., logging, auditing)?</label>
-    <div>
-        <input type="text" name="monitoredActivity" placeholder="Describe how it's monitored" onChange={handleChange} />  
-    </div>
-</div>
-
-<div className="form-section">
-    <label>What methods are used to track and report attempts to access prohibited websites?</label>
-    <div>
-        <input type="text" name="reportMethods" placeholder="Describe the methods" onChange={handleChange} />  
-    </div>
-</div>
-
-<div className="form-section">
-    <label>How are violations of access restrictions addressed and managed?</label>
-    <div>
-        <input type="text" name="addressedViolations" placeholder="Describe how it's addressed" onChange={handleChange} />  
-    </div>
-</div>
-
-<h2>5.1.1.1.1.6 Policy Review and Updates:</h2>
-<div className="form-section">
-    <label>How frequently is the Acceptable Use Policy reviewed and updated to reflect changes in technology and threats?</label>
-    <div>
-        <input type="text" name="reviewedPolicy" placeholder="Describe the frequency" onChange={handleChange} />  
-    </div>
-</div>
-
-<div className="form-section">
-    <label>Who is responsible for reviewing and revising the policy, and what criteria are used for updates?</label>
-    <div>
-        <input type="text" name="revisingPolicy" placeholder="Who's responsible/describe the criteria" onChange={handleChange} />  
-    </div>
-</div>
-
-<div className="form-section">
-    <label>How are updates communicated to users to ensure they are aware of any changes in access restrictions?</label>
-    <div>
-        <input type="text" name="communicatedUpdates" placeholder="Describe how it's ensured" onChange={handleChange} />  
-    </div>
-</div>
-
-<h2>5.1.1.1.1.7Legal and Regulatory Compliance:</h2>
-<div className="form-section">
-    <label>What legal or regulatory requirements impact the development and enforcement of access restrictions (e.g., data protection laws)?</label>
-    <div>
-        <input type="text" name="impactedRequirements" placeholder="Describe the requirements" onChange={handleChange} />  
-    </div>
-</div>
-
-<div className="form-section">
-    <label>How does the policy ensure compliance with relevant laws and regulations regarding internet usage?</label>
-    <div>
-        <input type="text" name="ensuredCompliance" placeholder="Describe how it ensures compliance" onChange={handleChange} />  
-    </div>
-</div>
-
-<div className="form-section">
-    <label>Are there procedures for addressing legal or regulatory issues related to access restrictions?</label>
-    <div>
-        <input type="radio" name="legalIssues" value="yes" onChange={handleChange}/> Yes
-        <input type="radio" name="legalIssues" value="no" onChange={handleChange}/> No
-        <textarea className='comment-box' name="legalIssuesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-    </div>
-</div>
-
-<h2>5.1.1.1.1.8 User Education and Training:</h2>
-<div className="form-section">
-    <label>What training programs are in place to educate users about the Acceptable Use Policy and access restrictions?</label>
-    <div>
-        <input type="text" name="trainingPrograms" placeholder="Describe the programs" onChange={handleChange} />  
-    </div>
-</div>
-
-<div className="form-section">
-    <label>How is the effectiveness of the training assessed and improved over time?</label>
-    <div>
-        <input type="text" name="assessedTraining" placeholder="Describe how it's assessed" onChange={handleChange} />  
-    </div>
-</div>
-
-<div className="form-section">
-    <label>Are there resources available for users to better understand the reasons for access restrictions?</label>
-    <div>
-        <input type="radio" name="accessRestrictions" value="yes" onChange={handleChange}/> Yes
-        <input type="radio" name="accessRestrictions" value="no" onChange={handleChange}/> No
-        <textarea className='comment-box' name="accessRestrictionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-    </div>
-</div>
-
-<h2>5.1.1.1.1.9 Incident Management:</h2>
-<div className="form-section">
-    <label>What steps are taken when a user repeatedly attempts to access prohibited websites or violates access restrictions?</label>
-    <div>
-        <input type="text" name="violatingAccess" placeholder="List the steps" onChange={handleChange} />  
-    </div>
-</div>
-
-<div className="form-section">
-    <label>How are incidents related to access restriction violations documented and managed?</label>
-    <div>
-        <input type="text" name="restrictionViolations" placeholder="Describe how it's related" onChange={handleChange} />  
-    </div>
-</div>
-
-<div className="form-section">
-    <label>What disciplinary actions are outlined in the policy for non-compliance?</label>
-    <div>
-        <input type="text" name="disciplinaryActions" placeholder="Describe the actions" onChange={handleChange} />  
-    </div>
-</div>
-
-<h2>5.1.1.1.1.10 Feedback and Improvement:</h2>
-<div className="form-section">
-    <label>How is feedback collected from users regarding the effectiveness and impact of access restrictions?</label>
-    <div>
-        <input type="text" name="collectedFeedback" placeholder="Describe how it's collected" onChange={handleChange} />  
-    </div>
-</div>
-
-<div className="form-section">
-    <label>Are there mechanisms for users to provide suggestions or report issues related to access restrictions?</label>
-    <div>
-        <input type="radio" name="relatedSuggestions" value="yes" onChange={handleChange}/> Yes
-        <input type="radio" name="relatedSuggestions" value="no" onChange={handleChange}/> No
-        <textarea className='comment-box' name="relatedSuggestionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-    </div>
-</div>
-
-<div className="form-section">
-    <label>How is feedback used to make improvements to the Acceptable Use Policy and access restriction mechanisms?</label>
-    <div>
-        <input type="text" name="improvementFeedback" placeholder="Describe how it's used" onChange={handleChange} />  
-    </div>
-</div>
-                {/* Image Upload */}
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-                {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                {uploadError && <p style={{ color: 'red' }}>{uploadError.message}</p>}
-
-                <button type="submit">Submit</button>
-            </form>
-        </main>
-    </div>
-  )
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>5.1.1.1.1.1 Recertification Frequency</h2>
+                    {[
+                        { name: "prohibitedWebsites", label: "What types of websites or online content are explicitly prohibited by the Acceptable Use Policy (AUP) (e.g., adult content, gambling sites)?" },
+                        { name: "definedRestrictions", label: "How are these restrictions defined and categorized within the policy?" },
+                        { name: "clearGuidelines", label: "Are there clear guidelines on what constitutes prohibited websites or online activities?" },
+                        { name: "enforcedRestrictions", label: "How are access restrictions enforced on the network (e.g., through web filters, firewalls)?" },
+                        { name: "blockedAccess", label: "What tools or technologies are used to block access to prohibited websites?" },
+                        { name: "frequentUpdates", label: "How frequently are these tools updated to ensure effectiveness against new or evolving threats?" },
+                        { name: "informedUsers", label: "How are users informed about the access restrictions and prohibited websites (e.g., through training, policy documents)?" },
+                        { name: "notifiedUsers", label: "Are there mechanisms in place to notify users when they attempt to access a restricted site?" },
+                        { name: "aupCompliance", label: "How is compliance with the AUP communicated to users to ensure they understand the restrictions?" },
+                        { name: "requestingExceptions", label: "What procedures are in place for requesting exceptions to the access restrictions (e.g., for educational or research purposes)?" },
+                        { name: "authorizedUser", label: "Who is authorized to review and approve requests for access to restricted websites?" },
+                        { name: "handlingExpectations", label: "Are there documented processes for handling and documenting exceptions?" },
+                        { name: "monitoredActivity", label: "How is user activity monitored to ensure compliance with access restrictions (e.g., logging, auditing)?" },
+                        { name: "reportMethods", label: "What methods are used to track and report attempts to access prohibited websites?" },
+                        { name: "addressedViolations", label: "How are violations of access restrictions addressed and managed?" },
+                        { name: "reviewedPolicy", label: "How frequently is the Acceptable Use Policy reviewed and updated to reflect changes in technology and threats?" },
+                        { name: "revisingPolicy", label: "Who is responsible for reviewing and revising the policy, and what criteria are used for updates?" },
+                        { name: "communicatedUpdates", label: "How are updates communicated to users to ensure they are aware of any changes in access restrictions?" },
+                        { name: "impactedRequirements", label: "What legal or regulatory requirements impact the development and enforcement of access restrictions (e.g., data protection laws)?" },
+                        { name: "ensuredCompliance", label: "How does the policy ensure compliance with relevant laws and regulations regarding internet usage?" },
+                        { name: "legalIssues", label: "Are there procedures for addressing legal or regulatory issues related to access restrictions?" },
+                        { name: "trainingPrograms", label: "What training programs are in place to educate users about the Acceptable Use Policy and access restrictions?" },
+                        { name: "assessedTraining", label: "How is the effectiveness of the training assessed and improved over time?" },
+                        { name: "accessRestrictions", label: "Are there resources available for users to better understand the reasons for access restrictions?" },
+                        { name: "violatingAccess", label: "What steps are taken when a user repeatedly attempts to access prohibited websites or violates access restrictions?" },
+                        { name: "restrictionViolations", label: "How are incidents related to access restriction violations documented and managed?" },
+                        { name: "disciplinaryActions", label: "What disciplinary actions are outlined in the policy for non-compliance?" },
+                        { name: "collectedFeedback", label: "How is feedback collected from users regarding the effectiveness and impact of access restrictions?" },
+                        { name: "relatedSuggestions", label: "Are there mechanisms for users to provide suggestions or report issues related to access restrictions?" },
+                        { name: "improvementFeedback", label: "How is feedback used to make improvements to the Acceptable Use Policy and access restriction mechanisms?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                {question.name === "clearGuidelines" || question.name === "notifiedUsers" || question.name === "handlingExpectations" || question.name === "legalIssues" || question.name === "accessRestrictions" || question.name === "relatedSuggestions" ? (
+                                    <>
+                                        <input
+                                            type="radio"
+                                            name={question.name}
+                                            value="yes"
+                                            checked={formData[question.name] === "yes"}
+                                            onChange={handleChange}
+                                        /> Yes
+                                        <input
+                                            type="radio"
+                                            name={question.name}
+                                            value="no"
+                                            checked={formData[question.name] === "no"}
+                                            onChange={handleChange}
+                                        /> No
+                                        <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                                    </>
+                                ) : (
+                                    <input
+                                        type="text"
+                                        name={question.name}
+                                        value={formData[question.name] || ''}
+                                        onChange={handleChange}
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                    <input type="file" onChange={handleImageChange} accept="image/*" />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default AccessRestrictionsPage;

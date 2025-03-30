@@ -1,64 +1,84 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
-import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
+import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
 
 function UserBehaviorAnalyticsPage() {
     const navigate = useNavigate();
-    const { buildingId } = useBuilding(); // Access and update buildingId from context
+    const { buildingId } = useBuilding();
     const db = getFirestore();
+    const functions = getFunctions();
+    const uploadImage = httpsCallable(functions, 'uploadUserBehaviorAnalyticsImage');
 
-    const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
-
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
     useEffect(() => {
-        if(!buildingId) {
-          alert('No builidng selected. Redirecting to Building Info...');
-          navigate('BuildingandAddress');
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
         }
-      }, [buildingId, navigate]);
 
-    
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+
+            try {
+                const formDocRef = doc(db, 'forms', 'Cybersecurity', 'User Behavior Analytics', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Cybersecurity', 'User Behavior Analytics', buildingId);
+            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
+            console.log("Form data saved to Firestore:", newFormData);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
     };
 
-    const handleBack = async () => {
-        if (formData && buildingId) { // Check if formData and buildingId exist
-          try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
-            const formsRef = collection(db, 'forms/Cybersecurity/User Behavior Analytics');
-            await addDoc(formsRef, {
-              building: buildingRef,
-              formData: formData,
-            });
-            console.log('Form Data submitted successfully on back!');
-            alert('Form data saved before navigating back!');
-          } catch (error) {
-            console.error('Error saving form data:', error);
-            alert('Failed to save form data before navigating back. Some data may be lost.');
-          }
-        }
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
         navigate(-1);
-      };
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -68,22 +88,37 @@ function UserBehaviorAnalyticsPage() {
             return;
         }
 
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId); 
-            const formsRef = collection(db, 'forms/Cybersecurity/User Behavior Analytics');
-            await addDoc(formsRef, {
-                building: buildingRef, 
-                formData: formData, 
-            });
+        if (imageData) {
+            try {
+                const uploadResult = await uploadImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
 
+        try {
+            const formDocRef = doc(db, 'forms', 'Cybersecurity', 'User Behavior Analytics', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
             console.log('Form data submitted successfully!');
             alert('Form submitted successfully!');
             navigate('/Form');
         } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Failed to submit the form. Please try again.');
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
         }
     };
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
+    }
 
     return (
         <div className="form-page">
@@ -96,116 +131,44 @@ function UserBehaviorAnalyticsPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    {/* Data Collection and Analysis */}
-                    <h2>Data Collection and Analysis:</h2>
-                    <div className="form-section">
-                        <label>What types of user activity data are collected and analyzed (e.g., login times, access patterns, application usage)?</label>
-                        <textarea name="userActivityData" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How is user behavior data collected, and are there any privacy considerations or limitations in the data collection process?</label>
-                        <textarea name="dataCollectionProcess" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>What methods are used to analyze user behavior data to identify deviations from normal patterns?</label>
-                        <textarea name="analysisMethods" onChange={handleChange}></textarea>
-                    </div>
-
-                    {/* Baseline Behavior Establishment */}
-                    <h2>Baseline Behavior Establishment:</h2>
-                    <div className="form-section">
-                        <label>How are baseline behaviors for users or user groups established, and how are these baselines maintained and updated?</label>
-                        <textarea name="baselineEstablishment" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>What criteria or metrics are used to define normal versus anomalous behavior?</label>
-                        <textarea name="criteriaMetrics" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>Are there mechanisms in place to account for changes in user behavior due to legitimate reasons (e.g., role changes, seasonal variations)?</label>
-                        <textarea name="mechanismsForChanges" onChange={handleChange}></textarea>
-                    </div>
-
-                    {/* Anomaly Detection */}
-                    <h2>Anomaly Detection:</h2>
-                    <div className="form-section">
-                        <label>How does UBA identify deviations from established baseline behaviors, and what algorithms or techniques are used for anomaly detection?</label>
-                        <textarea name="anomalyDetection" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>What thresholds or criteria trigger alerts for anomalous behavior, and how are these thresholds set?</label>
-                        <textarea name="thresholdsForAlerts" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How are false positives and false negatives managed to minimize disruptions and ensure accurate detection?</label>
-                        <textarea name="falsePositivesHandling" onChange={handleChange}></textarea>
-                    </div>
-
-                    {/* Alerting and Response */}
-                    <h2>Alerting and Response:</h2>
-                    <div className="form-section">
-                        <label>How are alerts generated for detected anomalies, and what is the process for investigating and responding to these alerts?</label>
-                        <textarea name="alertingProcess" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>Are there predefined response protocols or escalation procedures for different types of anomalies detected by UBA?</label>
-                        <textarea name="responseProtocols" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How are alerts prioritized and managed to ensure timely and appropriate response to potential security incidents?</label>
-                        <textarea name="alertPrioritization" onChange={handleChange}></textarea>
-                    </div>
-
-                    {/* Integration with Other Security Systems */}
-                    <h2>Integration with Other Security Systems:</h2>
-                    <div className="form-section">
-                        <label>How is UBA integrated with other security systems, such as Security Information and Event Management (SIEM) solutions or Intrusion Detection Systems (IDS)?</label>
-                        <textarea name="ubaIntegration" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>Are there mechanisms in place to correlate UBA data with other security events or incidents for a comprehensive view of potential threats?</label>
-                        <textarea name="correlationMechanisms" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How is information from UBA used to enhance overall security posture and incident response capabilities?</label>
-                        <textarea name="ubaEnhancements" onChange={handleChange}></textarea>
-                    </div>
-
-                    {/* Privacy and Compliance */}
-                    <h2>Privacy and Compliance:</h2>
-                    <div className="form-section">
-                        <label>How does UBA ensure user privacy and comply with relevant regulations and policies (e.g., GDPR, CCPA)?</label>
-                        <textarea name="privacyCompliance" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>What measures are in place to anonymize or protect user data during collection and analysis?</label>
-                        <textarea name="dataAnonymization" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How are users informed about the monitoring of their behavior, and how are their consent and privacy rights managed?</label>
-                        <textarea name="userConsent" onChange={handleChange}></textarea>
-                    </div>
-
-                    {/* Effectiveness and Performance Evaluation */}
-                    <h2>Effectiveness and Performance Evaluation:</h2>
-                    <div className="form-section">
-                        <label>How is the effectiveness of UBA assessed, and what metrics or benchmarks are used to evaluate its performance?</label>
-                        <textarea name="performanceMetrics" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>Are there regular reviews or assessments of UBA systems to ensure they are functioning as expected and adapting to evolving threats?</label>
-                        <textarea name="regularReviews" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How are feedback and lessons learned from previous incidents incorporated into the UBA strategy to improve detection and response?</label>
-                        <textarea name="feedbackIncorporation" onChange={handleChange}></textarea>
-                    </div>
-
+                    <h2>User Behavior Analytics</h2>
+                    {[
+                        { name: "userActivityData", label: "What types of user activity data are collected and analyzed (e.g., login times, access patterns, application usage)?" },
+                        { name: "dataCollectionProcess", label: "How is user behavior data collected, and are there any privacy considerations or limitations in the data collection process?" },
+                        { name: "analysisMethods", label: "What methods are used to analyze user behavior data to identify deviations from normal patterns?" },
+                        { name: "baselineEstablishment", label: "How are baseline behaviors for users or user groups established, and how are these baselines maintained and updated?" },
+                        { name: "criteriaMetrics", label: "What criteria or metrics are used to define normal versus anomalous behavior?" },
+                        { name: "mechanismsForChanges", label: "Are there mechanisms in place to account for changes in user behavior due to legitimate reasons (e.g., role changes, seasonal variations)?" },
+                        { name: "anomalyDetection", label: "How does UBA identify deviations from established baseline behaviors, and what algorithms or techniques are used for anomaly detection?" },
+                        { name: "thresholdsForAlerts", label: "What thresholds or criteria trigger alerts for anomalous behavior, and how are these thresholds set?" },
+                        { name: "falsePositivesHandling", label: "How are false positives and false negatives managed to minimize disruptions and ensure accurate detection?" },
+                        { name: "alertingProcess", label: "How are alerts generated for detected anomalies, and what is the process for investigating and responding to these alerts?" },
+                        { name: "responseProtocols", label: "Are there predefined response protocols or escalation procedures for different types of anomalies detected by UBA?" },
+                        { name: "alertPrioritization", label: "How are alerts prioritized and managed to ensure timely and appropriate response to potential security incidents?" },
+                        { name: "ubaIntegration", label: "How is UBA integrated with other security systems, such as Security Information and Event Management (SIEM) solutions or Intrusion Detection Systems (IDS)?" },
+                        { name: "correlationMechanisms", label: "Are there mechanisms in place to correlate UBA data with other security events or incidents for a comprehensive view of potential threats?" },
+                        { name: "ubaEnhancements", label: "How is information from UBA used to enhance overall security posture and incident response capabilities?" },
+                        { name: "privacyCompliance", label: "How does UBA ensure user privacy and comply with relevant regulations and policies (e.g., GDPR, CCPA)?" },
+                        { name: "dataAnonymization", label: "What measures are in place to anonymize or protect user data during collection and analysis?" },
+                        { name: "userConsent", label: "How are users informed about the monitoring of their behavior, and how are their consent and privacy rights managed?" },
+                        { name: "performanceMetrics", label: "How is the effectiveness of UBA assessed, and what metrics or benchmarks are used to evaluate its performance?" },
+                        { name: "regularReviews", label: "Are there regular reviews or assessments of UBA systems to ensure they are functioning as expected and adapting to evolving threats?" },
+                        { name: "feedbackIncorporation", label: "How are feedback and lessons learned from previous incidents incorporated into the UBA strategy to improve detection and response?" },
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <textarea
+                                name={question.name}
+                                value={formData[question.name] || ''}
+                                onChange={handleChange}
+                                placeholder={question.label}
+                            />
+                        </div>
+                    ))}
                     <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: "red" }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
                 </form>
             </main>
         </div>

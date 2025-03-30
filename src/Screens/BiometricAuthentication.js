@@ -1,253 +1,177 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; 
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function BiometricAuthenticationPage() {
-  const navigate = useNavigate();  
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
-  const storage = getStorage();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadImage = httpsCallable(functions, 'uploadBiometricAuthenticationImage');
 
-  const [formData, setFormData] = useState({});
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
-  useEffect(() => {
-      if (!buildingId) {
-          alert('No building selected. Redirecting to Building Info...');
-          navigate('BuildingandAddress');
-      }
-  }, [buildingId, navigate]);
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('/BuildingandAddress');
+            return;
+        }
 
-  const handleChange = (e) => {
-      const { name, value } = e.target;
-      setFormData((prevData) => ({
-          ...prevData,
-          [name]: value,
-      }));
-  };
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
 
-  const handleImageChange = (e) => {
-      if (e.target.files[0]) {
-          setImage(e.target.files[0]);
-      }
-  };
+            try {
+                const formDocRef = doc(db, 'forms', 'Cybersecurity', 'Biometric Authentication', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
 
-  const handleBack = async () => {
-      if (formData && buildingId) {
-          try {
-              const buildingRef = doc(db, 'Buildings', buildingId);
-              const formsRef = collection(db, 'forms/Cybersecurity/Biometric Authentication');
-              await addDoc(formsRef, {
-                  building: buildingRef,
-                  formData: formData,
-              });
-              console.log('Form Data submitted successfully on back!');
-              alert('Form data saved before navigating back!');
-          } catch (error) {
-              console.error('Error saving form data:', error);
-              alert('Failed to save form data before navigating back. Some data may be lost.');
-          }
-      }
-      navigate(-1);
-  };
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-  const handleSubmit = async (e) => {
-      e.preventDefault();
-      if (!buildingId) {
-          alert('Building ID is missing. Please start the assessment from the correct page.');
-          return;
-      }
-      try {
-          const buildingRef = doc(db, 'Buildings', buildingId);
-          const formsRef = collection(db, 'forms/Cybersecurity/Biometric Authentication');
+        fetchFormData();
+    }, [buildingId, db, navigate]);
 
-          if (image) {
-              if (!image.type.match('image/*')) {
-                  setUploadError('Please select a valid image file (jpg, jpeg, png, etc.)');
-                  return;
-              }
-              if (image.size > 5 * 1024 * 1024) {
-                  setUploadError('Image file too large (Max 5MB)');
-                  return;
-              }
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
 
-              const storageRef = ref(storage, `biometricAuth_images/${Date.now()}_${image.name}`);
-              const uploadTask = uploadBytesResumable(storageRef, image);
+        try {
+            const formDocRef = doc(db, 'forms', 'Cybersecurity', 'Biometric Authentication', buildingId);
+            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
+            console.log("Form data saved to Firestore:", newFormData);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
 
-              uploadTask.on('state_changed',
-                  (snapshot) => {
-                      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                      setUploadProgress(progress);
-                  },
-                  (error) => {
-                      setUploadError(error);
-                  },
-                  async () => {
-                      const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                      setImageUrl(downloadURL);
-                      setFormData({ ...formData, imageUrl: downloadURL });
-                      setUploadError(null);
-                  }
-              );
-          }
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
 
-          await addDoc(formsRef, {
-              building: buildingRef,
-              formData: formData,
-          });
-          console.log('Form Data submitted successfully!');
-          alert('Form submitted successfully!');
-          navigate('/Form');
-      } catch (error) {
-          console.error('Error submitting form:', error);
-          alert('Failed to submit the form. Please try again.');
-      }
-  };
+    const handleBack = () => {
+        navigate(-1);
+    };
 
-  return (
-      <div className="form-page">
-          <header className="header">
-              <Navbar />
-              <button className="back-button" onClick={handleBack}>←</button>
-              <h1>Biometric Authentication Assessment</h1>
-              <img src={logo} alt="Logo" className="logo" />
-          </header>
-          <main className="form-container">
-              <form onSubmit={handleSubmit}>
-              <h2>4.3.2.2.2.1 Implementation and Coverage:</h2>
-<div className="form-section">
-  <label>What percentage of systems and applications within the organization utilize biometric authentication?</label>
-  <textarea name="biometricUtilization" onChange={handleChange}></textarea>
-</div>
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-<div className="form-section">
-  <label>Are biometric authentication methods deployed across all critical access points?</label>
-  <textarea name="criticalAccessPoints" onChange={handleChange}></textarea>
-</div>
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
 
-<div className="form-section">
-  <label>How is the adoption of biometric authentication monitored?</label>
-  <textarea name="adoptionMonitoring" onChange={handleChange}></textarea>
-</div>
+        if (imageData) {
+            try {
+                const uploadResult = await uploadImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
 
-{/* Security and Accuracy */}
-<h2>4.3.2.2.2.1.4 Security and Accuracy:</h2>
-<div className="form-section">
-  <label>How does the organization assess the accuracy and reliability of the biometric authentication methods used?</label>
-  <textarea name="accuracyAssessment" onChange={handleChange}></textarea>
-</div>
+        try {
+            const formDocRef = doc(db, 'forms', 'Cybersecurity', 'Biometric Authentication', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
 
-<div className="form-section">
-  <label>Are there any documented incidents of unauthorized access despite the use of biometric authentication?</label>
-  <textarea name="unauthorizedAccessIncidents" onChange={handleChange}></textarea>
-</div>
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
-<div className="form-section">
-  <label>How are biometric data and authentication processes protected from potential security threats?</label>
-  <textarea name="dataProtection" onChange={handleChange}></textarea>
-</div>
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
+    }
 
-{/* User Experience and Accessibility */}
-<h2>4.3.2.2.2.2 User Experience and Accessibility:</h2>
-<div className="form-section">
-  <label>How do users perceive the ease of use and convenience of the biometric authentication methods currently in place?</label>
-  <textarea name="userPerception" onChange={handleChange}></textarea>
-</div>
-
-<div className="form-section">
-  <label>Are there any reported challenges or issues faced by users when enrolling their biometric data?</label>
-  <textarea name="enrollmentChallenges" onChange={handleChange}></textarea>
-</div>
-
-<div className="form-section">
-  <label>What accommodations are made for users who may have difficulty with biometric authentication?</label>
-  <textarea name="userAccommodations" onChange={handleChange}></textarea>
-</div>
-
-{/* Privacy and Data Protection */}
-<h2>4.3.2.2.2.3 Privacy and Data Protection:</h2>
-<div className="form-section">
-  <label>How does the organization ensure the privacy and protection of biometric data collected from users?</label>
-  <textarea name="privacyProtection" onChange={handleChange}></textarea>
-</div>
-
-<div className="form-section">
-  <label>What measures are in place to secure biometric data from unauthorized access?</label>
-  <textarea name="unauthorizedAccessProtection" onChange={handleChange}></textarea>
-</div>
-
-<div className="form-section">
-  <label>Are there clear policies and procedures for handling biometric data?</label>
-  <textarea name="handlingPolicies" onChange={handleChange}></textarea>
-</div>
-
-{/* Backup and Recovery Options */}
-<h2>4.3.2.2.2.4 Backup and Recovery Options:</h2>
-<div className="form-section">
-  <label>What backup or recovery options are available if users are unable to use their biometric authentication method?</label>
-  <textarea name="backupOptions" onChange={handleChange}></textarea>
-</div>
-
-<div className="form-section">
-  <label>How does the organization handle scenarios where biometric authentication fails?</label>
-  <textarea name="failureScenarios" onChange={handleChange}></textarea>
-</div>
-
-<div className="form-section">
-  <label>Are there guidelines for securely managing and storing backup authentication methods?</label>
-  <textarea name="backupGuidelines" onChange={handleChange}></textarea>
-</div>
-
-{/* Integration and Compatibility */}
-<h2>4.3.2.2.2.5 Integration and Compatibility:</h2>
-<div className="form-section">
-  <label>How well does the biometric authentication system integrate with other security measures?</label>
-  <textarea name="systemIntegration" onChange={handleChange}></textarea>
-</div>
-
-<div className="form-section">
-  <label>Are there any compatibility issues with specific devices?</label>
-  <textarea name="compatibilityIssues" onChange={handleChange}></textarea>
-</div>
-
-<div className="form-section">
-  <label>Does the organization have plans to enhance or expand its biometric authentication capabilities?</label>
-  <textarea name="enhancementPlans" onChange={handleChange}></textarea>
-</div>
-
-{/* Policy and Compliance */}
-<h2>4.3.2.2.2.6 Policy and Compliance:</h2>
-<div className="form-section">
-  <label>Are there documented policies and guidelines outlining the use and management of biometric authentication?</label>
-  <textarea name="policyGuidelines" onChange={handleChange}></textarea>
-</div>
-
-<div className="form-section">
-  <label>How does the organization ensure compliance with biometric authentication policies?</label>
-  <textarea name="complianceProcess" onChange={handleChange}></textarea>
-</div>
-
-<div className="form-section">
-  <label>Are there regular audits or reviews to ensure that biometric authentication practices remain in line with industry standards?</label>
-  <textarea name="auditReviews" onChange={handleChange}></textarea>
-</div>
-                  <input type="file" accept="image/*" onChange={handleImageChange} />
-                  {uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-                  {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                  {uploadError && <p style={{ color: 'red' }}>{uploadError}</p>}
-                  <button type="submit">Submit</button>
-              </form>
-          </main>
-      </div>
-  );
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>Biometric Authentication Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>Biometric Authentication Assessment</h2>
+                    {[
+                        { name: "biometricUtilization", label: "What percentage of systems and applications within the organization utilize biometric authentication?" },
+                        { name: "criticalAccessPoints", label: "Are biometric authentication methods deployed across all critical access points?" },
+                        { name: "adoptionMonitoring", label: "How is the adoption of biometric authentication monitored?" },
+                        { name: "accuracyAssessment", label: "How does the organization assess the accuracy and reliability of the biometric authentication methods used?" },
+                        { name: "unauthorizedAccessIncidents", label: "Are there any documented incidents of unauthorized access despite the use of biometric authentication?" },
+                        { name: "dataProtection", label: "How are biometric data and authentication processes protected from potential security threats?" },
+                        { name: "userPerception", label: "How do users perceive the ease of use and convenience of the biometric authentication methods currently in place?" },
+                        { name: "enrollmentChallenges", label: "Are there any reported challenges or issues faced by users when enrolling their biometric data?" },
+                        { name: "userAccommodations", label: "What accommodations are made for users who may have difficulty with biometric authentication?" },
+                        { name: "privacyProtection", label: "How does the organization ensure the privacy and protection of biometric data collected from users?" },
+                        { name: "unauthorizedAccessProtection", label: "What measures are in place to secure biometric data from unauthorized access?" },
+                        { name: "handlingPolicies", label: "Are there clear policies and procedures for handling biometric data?" },
+                        { name: "backupOptions", label: "What backup or recovery options are available if users are unable to use their biometric authentication method?" },
+                        { name: "failureScenarios", label: "How does the organization handle scenarios where biometric authentication fails?" },
+                        { name: "backupGuidelines", label: "Are there guidelines for securely managing and storing backup authentication methods?" },
+                        { name: "systemIntegration", label: "How well does the biometric authentication system integrate with other security measures?" },
+                        { name: "compatibilityIssues", label: "Are there any compatibility issues with specific devices?" },
+                        { name: "enhancementPlans", label: "Does the organization have plans to enhance or expand its biometric authentication capabilities?" },
+                        { name: "policyGuidelines", label: "Are there documented policies and guidelines outlining the use and management of biometric authentication?" },
+                        { name: "complianceProcess", label: "How does the organization ensure compliance with biometric authentication policies?" },
+                        { name: "auditReviews", label: "Are there regular audits or reviews to ensure that biometric authentication practices remain in line with industry standards?" },
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <textarea
+                                name={question.name}
+                                value={formData[question.name] || ''}
+                                onChange={handleChange}
+                                placeholder={question.label}
+                            />
+                        </div>
+                    ))}
+                    <input type="file" onChange={handleImageChange} accept="image/*" />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default BiometricAuthenticationPage;

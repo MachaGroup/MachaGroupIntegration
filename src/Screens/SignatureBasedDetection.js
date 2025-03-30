@@ -1,64 +1,88 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
-import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
+import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function SignatureBasedDetectionPage() {
     const navigate = useNavigate();
-    const { buildingId } = useBuilding(); // Access and update buildingId from context
+    const { buildingId } = useBuilding();
     const db = getFirestore();
+    const functions = getFunctions();
+    const uploadImage = httpsCallable(functions, 'uploadSignatureBasedDetectionImage');
 
-    const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
 
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
+ 
 
     useEffect(() => {
-        if(!buildingId) {
-          alert('No builidng selected. Redirecting to Building Info...');
-          navigate('BuildingandAddress');
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
         }
-      }, [buildingId, navigate]);
 
-    
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null); // Clear previous errors
+
+            try {
+                const formDocRef = doc(db, 'forms','Cybersecurity','Signature-Based Detection', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({}); // Initialize if document doesn't exist
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            // Persist data to Firestore on every change
+            const formDocRef = doc(db, 'forms','Cybersecurity','Signature-Based Detection', buildingId);
+            await setDoc(formDocRef, { formData: newFormData }, { merge: true }); // Use merge to preserve existing fields
+            console.log("Form data saved to Firestore:", newFormData);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
     };
 
-    const handleBack = async () => {
-        if (formData && buildingId) { // Check if formData and buildingId exist
-          try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
-            const formsRef = collection(db, 'forms/Cybersecurity/Signature-Based Detection');
-            await addDoc(formsRef, {
-              building: buildingRef,
-              formData: formData,
-            });
-            console.log('Form Data submitted successfully on back!');
-            alert('Form data saved before navigating back!');
-          } catch (error) {
-            console.error('Error saving form data:', error);
-            alert('Failed to save form data before navigating back. Some data may be lost.');
-          }
-        }
-        navigate(-1);
-      };
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+
+    const handleBack = () => {
+        navigate(-1); // Just navigate back
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -68,26 +92,43 @@ function SignatureBasedDetectionPage() {
             return;
         }
 
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
-            const formsRef = collection(db, 'forms/Cybersecurity/Signature-Based Detection');
-            await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-            });
+        if (imageData) {
+            try {
+                const uploadResult = await uploadImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
 
+        try {
+            const formDocRef = doc(db, 'forms','Cybersecurity','Signature-Based Detection', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            console.log('Form data submitted successfully!');
             alert('Form submitted successfully!');
             navigate('/Form');
+
         } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Failed to submit the form. Please try again.');
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
         }
     };
 
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
+    }
+    
     return (
         <div className="form-page">
             <header className="header">
-            <Navbar />
+                <Navbar />
                 <button className="back-button" onClick={handleBack}>←</button>
                 <h1>Signature-Based Detection Assessment</h1>
                 <img src={logo} alt="Logo" className="logo" />
@@ -95,114 +136,64 @@ function SignatureBasedDetectionPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    {/* Signature Database Management */}
                     <h2>4.1.1.2.2.1 Signature Database Management:</h2>
-                    <div className="form-section">
-                        <label>How frequently is the signature database updated to include the latest known attack patterns and vulnerabilities?</label>
-                        <textarea name="databaseUpdateFrequency" onChange={handleChange}></textarea>
-                    </div>
+                    {[
+                        { name: "databaseUpdateFrequency", label: "How frequently is the signature database updated to include the latest known attack patterns and vulnerabilities?" },
+                        { name: "signatureSources", label: "What sources are used to gather new signatures for the IDS, and how is the credibility and reliability of these sources ensured?" },
+                        { name: "customSignatures", label: "Are there mechanisms in place to create custom signatures based on specific threats faced by the organization?" },
+                        { name: "detectionCoverage", label: "How comprehensive is the IDS in detecting a wide range of known attack patterns, including zero-day vulnerabilities and emerging threats?" },
+                        { name: "performanceBalance", label: "What measures are in place to balance detection accuracy with performance, ensuring the IDS does not overly tax network resources?" },
+                        { name: "coverageGaps", label: "Are there any gaps in signature coverage for specific types of attacks or network protocols, and how are these addressed?" },
+                        { name: "alertPrioritization", label: "How are alerts generated by signature-based detections prioritized, and what criteria determine the severity of an alert?" },
+                        { name: "responseProcedure", label: "What is the standard operating procedure for responding to alerts triggered by known attack patterns, and who is responsible for initiating the response?" },
+                        { name: "falsePositiveReduction", label: "Are there measures in place to reduce the occurrence of false positives, and how is the accuracy of alerts verified?" },
+                        { name: "integrationWithTools", label: "How well does the signature-based IDS integrate with other cybersecurity tools, such as SIEM (Security Information and Event Management) systems, firewalls, and endpoint protection solutions?" },
+                        { name: "scalability", label: "Can the IDS scale effectively with the network, accommodating increases in traffic and changes in network architecture without a loss of detection capability?" },
+                        { name: "encryptedTrafficHandling", label: "How is the IDS configured to handle encrypted traffic, ensuring visibility into potential threats without compromising data privacy?" },
+                        { name: "effectivenessTesting", label: "How regularly is the effectiveness of signature-based detection tested, and what methods (e.g., penetration testing, red teaming) are used to evaluate its capabilities?" },
+                        { name: "signatureRefinement", label: "Is there a process for reviewing and refining detection signatures based on feedback from incident investigations and threat intelligence updates?" },
+                        { name: "lessonsLearned", label: "How are lessons learned from past incidents and detected threats incorporated into the ongoing development and improvement of the signature database?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                {question.name === "customSignatures" || question.name === "scalability" || question.name === "signatureRefinement" ? (
+                                    <><>
+                                        <input
+                                            type="radio"
+                                            name={question.name}
+                                            value="Yes"
+                                            checked={formData[question.name] === "Yes"}
+                                            onChange={handleChange} /> Yes
+                                        <input
+                                            type="radio"
+                                            name={question.name}
+                                            value="No"
+                                            checked={formData[question.name] === "No"}
+                                            onChange={handleChange} /> No
 
-                    <div className="form-section">
-                        <label>What sources are used to gather new signatures for the IDS, and how is the credibility and reliability of these sources ensured?</label>
-                        <textarea name="signatureSources" onChange={handleChange}></textarea>
-                    </div>
-
-                    <div className="form-section">
-                        <label>Are there mechanisms in place to create custom signatures based on specific threats faced by the organization?</label>
-                        <div>
-                            <input type="radio" name="customSignatures" value="Yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="customSignatures" value="No" onChange={handleChange} /> No
+                                    </><div>
+                                            <input
+                                                type="text"
+                                                name={`${question.name}Comment`}
+                                                placeholder="Comments"
+                                                value={formData[`${question.name}Comment`] || ''}
+                                                onChange={handleChange} />
+                                        </div></>
+                                ) : (
+                                    <textarea
+                                        name={question.name}
+                                        value={formData[question.name] || ''}
+                                        onChange={handleChange}
+                                    />
+                                )}
+                            </div>
                         </div>
-                        <div>
-                            <input type="text" name="customSignaturesComment" placeholder="Comments" onChange={handleChange}/>
-                        </div>
-                    </div>
-
-                    {/* Detection Accuracy and Coverage */}
-                    <h2>4.1.1.2.2.2 Detection Accuracy and Coverage:</h2>
-                    <div className="form-section">
-                        <label>How comprehensive is the IDS in detecting a wide range of known attack patterns, including zero-day vulnerabilities and emerging threats?</label>
-                        <textarea name="detectionCoverage" onChange={handleChange}></textarea>
-                    </div>
-
-                    <div className="form-section">
-                        <label>What measures are in place to balance detection accuracy with performance, ensuring the IDS does not overly tax network resources?</label>
-                        <textarea name="performanceBalance" onChange={handleChange}></textarea>
-                    </div>
-
-                    <div className="form-section">
-                        <label>Are there any gaps in signature coverage for specific types of attacks or network protocols, and how are these addressed?</label>
-                        <textarea name="coverageGaps" onChange={handleChange}></textarea>
-                    </div>
-
-                    {/* Alerting and Incident Response */}
-                    <h2>4.1.1.2.2.3 Alerting and Incident Response:</h2>
-                    <div className="form-section">
-                        <label>How are alerts generated by signature-based detections prioritized, and what criteria determine the severity of an alert?</label>
-                        <textarea name="alertPrioritization" onChange={handleChange}></textarea>
-                    </div>
-
-                    <div className="form-section">
-                        <label>What is the standard operating procedure for responding to alerts triggered by known attack patterns, and who is responsible for initiating the response?</label>
-                        <textarea name="responseProcedure" onChange={handleChange}></textarea>
-                    </div>
-
-                    <div className="form-section">
-                        <label>Are there measures in place to reduce the occurrence of false positives, and how is the accuracy of alerts verified?</label>
-                        <textarea name="falsePositiveReduction" onChange={handleChange}></textarea>
-                    </div>
-
-                    {/* System Integration and Scalability */}
-                    <h2>4.1.1.2.2.4 System Integration and Scalability:</h2>
-                    <div className="form-section">
-                        <label>How well does the signature-based IDS integrate with other cybersecurity tools, such as SIEM (Security Information and Event Management) systems, firewalls, and endpoint protection solutions?</label>
-                        <textarea name="integrationWithTools" onChange={handleChange}></textarea>
-                    </div>
-
-                    <div className="form-section">
-                        <label>Can the IDS scale effectively with the network, accommodating increases in traffic and changes in network architecture without a loss of detection capability?</label>
-                        <div>
-                            <input type="radio" name="scalability" value="Yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="scalability" value="No" onChange={handleChange} /> No
-                        </div>
-                        <div>
-                            <input type="text" name="scalabilityComment" placeholder="Comments" onChange={handleChange}/>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>How is the IDS configured to handle encrypted traffic, ensuring visibility into potential threats without compromising data privacy?</label>
-                        <textarea name="encryptedTrafficHandling" onChange={handleChange}></textarea>
-                    </div>
-
-                    {/* Testing and Continuous Improvement */}
-                    <h2>4.1.1.2.2.5 Testing and Continuous Improvement:</h2>
-                    <div className="form-section">
-                        <label>How regularly is the effectiveness of signature-based detection tested, and what methods (e.g., penetration testing, red teaming) are used to evaluate its capabilities?</label>
-                        <textarea name="effectivenessTesting" onChange={handleChange}></textarea>
-                    </div>
-
-                    <div className="form-section">
-                        <label>Is there a process for reviewing and refining detection signatures based on feedback from incident investigations and threat intelligence updates?</label>
-                        <div>
-                            <input type="radio" name="signatureRefinement" value="Yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="signatureRefinement" value="No" onChange={handleChange} /> No
-                        </div>
-                        <div>
-                            <input type="text" name="signatureRefinementComment" placeholder="Comments" onChange={handleChange}/>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>How are lessons learned from past incidents and detected threats incorporated into the ongoing development and improvement of the signature database?</label>
-                        <textarea name="lessonsLearned" onChange={handleChange}></textarea>
-                    </div>
-
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
+                    ))}
+                    <input type="file" onChange={handleImageChange} accept="image/*" />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
                 </form>
             </main>
         </div>
