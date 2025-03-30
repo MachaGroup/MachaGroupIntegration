@@ -1,97 +1,131 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function PatchManagementPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadPatchManagementImage = httpsCallable(functions, 'uploadPatchManagementImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
+        }
 
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
-    }
-  }, [buildingId, navigate]);
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Function to handle back button
-    const handleBack = async () => {
-          if (formData && buildingId) { // Check if formData and buildingId exist
             try {
-              const buildingRef = doc(db, 'Buildings', buildingId);
-              const formsRef = collection(db, 'forms/Cybersecurity/Incident Response Patch Management');
-              await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-              });
-              console.log('Form Data submitted successfully on back!');
-              alert('Form data saved before navigating back!');
+                const formDocRef = doc(db, 'forms', 'Cybersecurity', 'Incident Response Patch Management', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
             } catch (error) {
-              console.error('Error saving form data:', error);
-              alert('Failed to save form data before navigating back. Some data may be lost.');
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
             }
-          }
-          navigate(-1);  // Navigates to the previous page
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Cybersecurity', 'Incident Response Patch Management', buildingId);
+            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true });
+            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
     };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadPatchManagementImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Cybersecurity', 'Incident Response Patch Management', buildingId);
+            await setDoc(formDocRef, { formData: { ...formData, building: buildingRef } }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
-
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Cybersecurity/Incident Response Patch Management');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
-  };
 
     return (
         <div className="form-page">
             <header className="header">
-            <Navbar />
+                <Navbar />
                 <button className="back-button" onClick={handleBack}>←</button>
                 <h1>Incident Response Patch Management</h1>
                 <img src={logo} alt="Logo" className="logo" />
@@ -99,181 +133,81 @@ function PatchManagementPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    {/* Patch Identification */}
-                    <h2>4.4.2.2.2.1 Patch Identification</h2>
-                    <div className="form-section">
-                        <label>How are security patches identified and prioritized for deployment?</label>
-                        <textarea name="patchIdentification" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>What sources are used to stay informed about available patches?</label>
-                        <textarea name="patchSources" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>Are there specific criteria for determining which patches are critical?</label>
-                        <div>
-                            <input type="radio" name="criticalPatchesCriteria" value="Yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="criticalPatchesCriteria" value="No" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="criticalPatchesCriteria" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
+                    <h2>Incident Response Patch Management</h2>
+                    {[
+                        { name: "patchIdentification", label: "How are security patches identified and prioritized for deployment?" },
+                        { name: "patchSources", label: "What sources are used to stay informed about available patches?" },
+                        { name: "criticalPatchesCriteria", label: "Are there specific criteria for determining which patches are critical?" },
+                        { name: "patchDeploymentProcedures", label: "What procedures are followed for deploying patches?" },
+                        { name: "minimalDisruption", label: "How is patch deployment managed to ensure minimal disruption?" },
+                        { name: "predefinedRolloutSteps", label: "Are there predefined steps for rolling out patches?" },
+                        { name: "patchTestingValidation", label: "What testing is conducted to validate that patches do not negatively impact system functionality?" },
+                        { name: "riskAssessmentMitigation", label: "How are potential risks assessed and mitigated before applying patches to live systems?" },
+                        { name: "patchVerification", label: "Are there procedures for verifying that patches have been successfully applied?" },
+                        { name: "patchDocumentationProcess", label: "How is the patch management process documented?" },
+                        { name: "patchHistoryTracking", label: "What information is included to track patch history and compliance?" },
+                        { name: "patchAuditUsage", label: "How is documentation used for auditing patch management?" },
+                        { name: "reportingMechanisms", label: "What reporting mechanisms are in place to track patch deployments?" },
+                        { name: "reportReview", label: "How are reports reviewed to identify gaps?" },
+                        { name: "reportingIssues", label: "Are there established procedures for reporting patch deployment issues?" },
+                        { name: "patchTools", label: "What tools are used to automate patching?" },
+                        { name: "toolsMaintenance", label: "How are tools maintained to ensure effectiveness?" },
+                        { name: "integrationRequirements", label: "Are there integration requirements with existing infrastructure?" },
+                        { name: "rollbackProcedures", label: "What rollback procedures are in place?" },
+                        { name: "rollbackDecision", label: "How is the decision made to roll back a patch?" },
+                        { name: "rollbackIssues", label: "How are rollback issues communicated?" },
+                        { name: "patchPolicy", label: "What policies govern the patch management process?" },
+                        { name: "policyCommunication", label: "How are policies communicated to stakeholders?" },
+                        { name: "policyReview", label: "Are policies periodically reviewed to ensure effectiveness?" },
+                        { name: "trainingOnPatch", label: "What training is provided on patch management?" },
+                        { name: "staffAwareness", label: "How is staff awareness of patch management importance ensured?" },
+                        { name: "refresherTraining", label: "Are there refresher training sessions for staff?" },
+                        { name: "incidentIntegration", label: "How is patch management integrated with incident response?" },
+                        { name: "incidentRecoveryRole", label: "What role does patch management play in incident recovery?" },
+                        { name: "quickPatchDeployment", label: "Are there protocols for quick patch deployment during incidents?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                {question.name === "patchIdentification" || question.name === "patchSources" || question.name === "patchDeploymentProcedures" || question.name === "minimalDisruption" || question.name === "patchTestingValidation" || question.name === "riskAssessmentMitigation" || question.name === "patchDocumentationProcess" || question.name === "patchHistoryTracking" || question.name === "patchAuditUsage" || question.name === "reportingMechanisms" || question.name === "reportReview" || question.name === "patchTools" || question.name === "toolsMaintenance" || question.name === "rollbackProcedures" || question.name === "rollbackDecision" || question.name === "rollbackIssues" || question.name === "patchPolicy" || question.name === "policyCommunication" || question.name === "policyReview" || question.name === "trainingOnPatch" || question.name === "staffAwareness" || question.name === "refresherTraining" || question.name === "incidentIntegration" || question.name === "incidentRecoveryRole" || question.name === "quickPatchDeployment" ? (
+                                    <textarea
+                                        name={question.name}
+                                        placeholder={question.label}
+                                        value={formData[question.name] || ''}
+                                        onChange={handleChange}
+                                    />
+                                ) : (
+                                    <>
+                                        <input
+                                            type="radio"
+                                            name={question.name}
+                                            value="Yes"
+                                            checked={formData[question.name] === "Yes"}
+                                            onChange={handleChange}
+                                        /> Yes
+                                        <input
+                                            type="radio"
+                                            name={question.name}
+                                            value="No"
+                                            checked={formData[question.name] === "No"}
+                                            onChange={handleChange}
+                                        /> No
+                                        <textarea
+                                            className='comment-box'
+                                            name={`${question.name}Comment`}
+                                            placeholder="Comment (Optional)"
+                                            value={formData[`${question.name}Comment`] || ''}
+                                            onChange={handleChange}
+                                        />
+                                    </>
+                                )}
+                            </div>
                         </div>
-                    </div>
-
-                    {/* Patch Deployment Process */}
-                    <h2>4.4.2.2.2.2 Patch Deployment Process</h2>
-                    <div className="form-section">
-                        <label>What procedures are followed for deploying patches?</label>
-                        <textarea name="patchDeploymentProcedures" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How is patch deployment managed to ensure minimal disruption?</label>
-                        <textarea name="minimalDisruption" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>Are there predefined steps for rolling out patches?</label>
-                        <div>
-                            <input type="radio" name="predefinedRolloutSteps" value="Yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="predefinedRolloutSteps" value="No" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="predefinedRolloutSteps" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    {/* Testing and Validation */}
-                    <h2>4.4.2.2.2.3 Testing and Validation</h2>
-                    <div className="form-section">
-                        <label>What testing is conducted to validate that patches do not negatively impact system functionality?</label>
-                        <textarea name="patchTestingValidation" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How are potential risks assessed and mitigated before applying patches to live systems?</label>
-                        <textarea name="riskAssessmentMitigation" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>Are there procedures for verifying that patches have been successfully applied?</label>
-                        <div>
-                            <input type="radio" name="patchVerification" value="Yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="patchVerification" value="No" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="patchVerification" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    {/* Patch Documentation */}
-                    <h2>4.4.2.2.2.4 Patch Documentation</h2>
-                    <div className="form-section">
-                        <label>How is the patch management process documented?</label>
-                        <textarea name="patchDocumentationProcess" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>What information is included to track patch history and compliance?</label>
-                        <textarea name="patchHistoryTracking" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How is documentation used for auditing patch management?</label>
-                        <textarea name="patchAuditUsage" onChange={handleChange}></textarea>
-                    </div>
-
-                    {/* Compliance and Reporting */}
-                    <h2>4.4.2.2.2.5 Compliance and Reporting</h2>
-                    <div className="form-section">
-                        <label>What reporting mechanisms are in place to track patch deployments?</label>
-                        <textarea name="reportingMechanisms" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How are reports reviewed to identify gaps?</label>
-                        <textarea name="reportReview" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>Are there established procedures for reporting patch deployment issues?</label>
-                        <div>
-                            <input type="radio" name="reportingIssues" value="Yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="reportingIssues" value="No" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="reportingIssues" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    {/* Patch Management Tools */}
-                    <h2>4.4.2.2.2.6 Patch Management Tools</h2>
-                    <div className="form-section">
-                        <label>What tools are used to automate patching?</label>
-                        <textarea name="patchTools" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How are tools maintained to ensure effectiveness?</label>
-                        <textarea name="toolsMaintenance" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>Are there integration requirements with existing infrastructure?</label>
-                        <div>
-                            <input type="radio" name="integrationRequirements" value="Yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="integrationRequirements" value="No" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="integrationRequirements" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    {/* Patch Rollback Procedures */}
-                    <h2>4.4.2.2.2.7 Patch Rollback Procedures</h2>
-                    <div className="form-section">
-                        <label>What rollback procedures are in place?</label>
-                        <textarea name="rollbackProcedures" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How is the decision made to roll back a patch?</label>
-                        <textarea name="rollbackDecision" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How are rollback issues communicated?</label>
-                        <textarea name="rollbackIssues" onChange={handleChange}></textarea>
-                    </div>
-
-                    {/* Patch Management Policy */}
-                    <h2>4.4.2.2.2.8 Patch Management Policy</h2>
-                    <div className="form-section">
-                        <label>What policies govern the patch management process?</label>
-                        <textarea name="patchPolicy" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How are policies communicated to stakeholders?</label>
-                        <textarea name="policyCommunication" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>Are policies periodically reviewed to ensure effectiveness?</label>
-                        <textarea name="policyReview" onChange={handleChange}></textarea>
-                    </div>
-
-                    {/* Training and Awareness */}
-                    <h2>4.4.2.2.2.9 Training and Awareness</h2>
-                    <div className="form-section">
-                        <label>What training is provided on patch management?</label>
-                        <textarea name="trainingOnPatch" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How is staff awareness of patch management importance ensured?</label>
-                        <textarea name="staffAwareness" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>Are there refresher training sessions for staff?</label>
-                        <textarea name="refresherTraining" onChange={handleChange}></textarea>
-                    </div>
-
-                    {/* Incident Response Integration */}
-                    <h2>4.4.2.2.2.10 Incident Response Integration</h2>
-                    <div className="form-section">
-                        <label>How is patch management integrated with incident response?</label>
-                        <textarea name="incidentIntegration" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>What role does patch management play in incident recovery?</label>
-                        <textarea name="incidentRecoveryRole" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>Are there protocols for quick patch deployment during incidents?</label>
-                        <textarea name="quickPatchDeployment" onChange={handleChange}></textarea>
-                    </div>
-
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
+                    ))}
+                    <input type="file" onChange={handleImageChange} accept="image/*" />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
                 </form>
             </main>
         </div>

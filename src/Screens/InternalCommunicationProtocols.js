@@ -1,151 +1,167 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function InternalCommunicationProtocolsFormPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding(); // Access buildingId from context
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadInternalCommunicationProtocolsImage = httpsCallable(functions, 'uploadInternalCommunicationProtocolsImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
+        }
 
-  useEffect(() => {
-      if (!buildingId) {
-          alert('No building selected. Redirecting to Building Info...');
-          navigate('/BuildingandAddress');
-      }
-  }, [buildingId, navigate]);
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-      const { name, value } = e.target;
-      setFormData((prevData) => ({
-          ...prevData,
-          [name]: value,
-      }));
-  };
+            try {
+                const formDocRef = doc(db, 'forms', 'Continuous Improvement - Safety and Security', 'Internal Communication Protocols', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
 
-  // Function to handle back button
-    const handleBack = async () => {
-                if (formData && buildingId) { // Check if formData and buildingId exist
-                  try {
-                    const buildingRef = doc(db, 'Buildings', buildingId);
-                    const formsRef = collection(db, 'forms/Continuous Improvement - Safety and Security/Internal Communication Protocols');
-                    await addDoc(formsRef, {
-                      building: buildingRef,
-                      formData: formData,
-                    });
-                    console.log('Form Data submitted successfully on back!');
-                    alert('Form data saved before navigating back!');
-                  } catch (error) {
-                    console.error('Error saving form data:', error);
-                    alert('Failed to save form data before navigating back. Some data may be lost.');
-                  }
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
                 }
-                navigate(-1);  // Navigates to the previous page
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Continuous Improvement - Safety and Security', 'Internal Communication Protocols', buildingId);
+            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true });
+            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
     };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
 
-    if (!buildingId) {
-        alert('Building ID is missing. Please start the assessment from the correct page.');
-        return;
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadInternalCommunicationProtocolsImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Continuous Improvement - Safety and Security', 'Internal Communication Protocols', buildingId);
+            await setDoc(formDocRef, { formData: { ...formData, building: buildingRef } }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId); 
-
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Continuous Improvement - Safety and Security/Internal Communication Protocols');
-      await addDoc(formsRef, {
-          building: buildingRef, // Reference to the building document
-          formData: formData, // Store the form data as a nested object
-      });
-
-      console.log('Form data submitted successfully!');
-      alert('Form submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-        console.error('Error submitting form:', error);
-        alert('Failed to submit the form. Please try again.');
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
-};
 
-  return (
-    <div className="form-page">
-        <header className="header">
-              <Navbar />
-          {/* Back Button */}
-          <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-          <h1>7.2.2.1.1. Internal Communication Protocols</h1>
-          <img src={logo} alt="Logo" className="logo" />
-        </header>
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>7.2.2.1.1. Internal Communication Protocols</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                {/* 7.2.2.1.1. Internal Communication Protocols */}
-                <h2>7.2.2.1.1. Internal Communication Protocols:</h2>
-                <div className="form-section">
-                    <label>What methods are used to communicate critical information to staff during a crisis (e.g., email, text alerts, PA system)?</label>
-                    <div>
-                        <input type="text" name="communicationMethods" placeholder="Describe the methods" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is the effectiveness of internal communication assessed during a crisis situation?</label>
-                    <div>
-                        <input type="text" name="internalCommunicationEffectiveness" placeholder="Describe how the effectiveness is assessed" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there designated spokespersons for internal communications, and how are they selected?</label>
-                    <div>
-                        <input type="text" name="internalCommunicationEffectiveness" placeholder="List the people and how they're selected" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is information about the crisis prioritized and disseminated to ensure all staff members are informed in a timely manner?</label>
-                    <div>
-                        <input type="text" name="prioritizedInformation" placeholder="Describe how it's prioritized and disseminated" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What training do staff members receive to prepare them for communicating effectively during a crisis?</label>
-                    <div>
-                        <input type="text" name="staffCommunicationTraining" placeholder="Describe the training" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <button type='submit'>Submit</button>
-
-            </form>
-        </main>
-
-    </div>
-
-  )
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>7.2.2.1.1. Internal Communication Protocols</h2>
+                    {[
+                        { name: "communicationMethods", label: "What methods are used to communicate critical information to staff during a crisis (e.g., email, text alerts, PA system)?" },
+                        { name: "internalCommunicationEffectiveness", label: "How is the effectiveness of internal communication assessed during a crisis situation?" },
+                        { name: "designatedSpokespersons", label: "Are there designated spokespersons for internal communications, and how are they selected?" },
+                        { name: "prioritizedInformation", label: "How is information about the crisis prioritized and disseminated to ensure all staff members are informed in a timely manner?" },
+                        { name: "staffCommunicationTraining", label: "What training do staff members receive to prepare them for communicating effectively during a crisis?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input
+                                    type="text"
+                                    name={question.name}
+                                    placeholder={question.label}
+                                    value={formData[question.name] || ''}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        </div>
+                    ))}
+                    <input type="file" onChange={handleImageChange} accept="image/*" />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default InternalCommunicationProtocolsFormPage;

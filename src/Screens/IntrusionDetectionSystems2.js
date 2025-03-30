@@ -1,64 +1,84 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
-import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
+import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function IntrusionDetectionSystems2Page() {
     const navigate = useNavigate();
-    const { buildingId } = useBuilding(); // Access and update buildingId from context
+    const { buildingId } = useBuilding();
     const db = getFirestore();
+    const functions = getFunctions();
+    const uploadIntrusionDetectionSystems2Image = httpsCallable(functions, 'uploadIntrusionDetectionSystems2Image');
 
-    const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
-
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
     useEffect(() => {
-      if(!buildingId) {
-        alert('No builidng selected. Redirecting to Building Info...');
-        navigate('BuildingandAddress');
-      }
-    }, [buildingId, navigate]);
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
+        }
 
-    
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+
+            try {
+                const formDocRef = doc(db, 'forms', 'Cybersecurity', 'Intrusion Detection System2', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Cybersecurity', 'Intrusion Detection System2', buildingId);
+            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true });
+            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
     };
 
-    // Function to handle back button
-    const handleBack = async () => {
-          if (formData && buildingId) { // Check if formData and buildingId exist
-            try {
-              const buildingRef = doc(db, 'Buildings', buildingId);
-              const formsRef = collection(db, 'forms/Cybersecurity/Intrusion Detection System2');
-              await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-              });
-              console.log('Form Data submitted successfully on back!');
-              alert('Form data saved before navigating back!');
-            } catch (error) {
-              console.error('Error saving form data:', error);
-              alert('Failed to save form data before navigating back. Some data may be lost.');
-            }
-          }
-          navigate(-1);  // Navigates to the previous page
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
     };
 
     const handleSubmit = async (e) => {
@@ -69,176 +89,119 @@ function IntrusionDetectionSystems2Page() {
             return;
         }
 
+        if (imageData) {
+            try {
+                const uploadResult = await uploadIntrusionDetectionSystems2Image({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
 
         try {
-          // Create a document reference to the building in the 'Buildings' collection
-          const buildingRef = doc(db, 'Buildings', buildingId); 
-
-          // Store the form data in the specified Firestore structure
-          const formsRef = collection(db, 'forms/Cybersecurity/Intrusion Detection System2');
-          await addDoc(formsRef, {
-              building: buildingRef, // Reference to the building document
-              formData: formData, // Store the form data as a nested object
-          });
-
-          console.log('Form data submitted successfully!');
-          alert('Form submitted successfully!');
-          navigate('/Form');
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Cybersecurity', 'Intrusion Detection System2', buildingId);
+            await setDoc(formDocRef, { formData: { ...formData, building: buildingRef } }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
         } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Failed to submit the form. Please try again.');
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
         }
     };
 
-  return (
-    <div className="form-page">
-      <header className="header">
-            <Navbar />
-        <button className="back-button" onClick={handleBack}>←</button>
-        <h1>Intrusion Detection Systems (IDS)</h1>
-        <img src={logo} alt="Logo" className="logo" />
-      </header>
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
-      <main className="form-container">
-        <form onSubmit={handleSubmit}>
-          {/* System Deployment and Configuration */}
-          <h2>System Deployment and Configuration:</h2>
-          <div className="form-section">
-            <label>How are IDS solutions deployed across the network (e.g., inline, passive, distributed) and what areas or segments do they cover?</label>
-            <textarea name="idsDeployment" onChange={handleChange}></textarea>
-          </div>
-          <div className="form-section">
-            <label>What are the key configuration settings for the IDS, and how are they tuned to match the organization’s security requirements?</label>
-            <textarea name="idsConfigSettings" onChange={handleChange}></textarea>
-          </div>
-          <div className="form-section">
-            <label>Are there any known limitations or blind spots in the IDS deployment that need to be addressed?</label>
-            <div>
-              <input type="radio" name="idsBlindSpots" value="Yes" onChange={handleChange} /> Yes
-              <input type="radio" name="idsBlindSpots" value="No" onChange={handleChange} /> No
-              <textarea className='comment-box' name="idsBlindSpots" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
+    }
 
-          {/* Detection Capabilities */}
-          <h2>Detection Capabilities:</h2>
-          <div className="form-section">
-            <label>What types of intrusions and attacks does the IDS aim to detect (e.g., network-based attacks, host-based attacks, zero-day exploits)?</label>
-            <textarea name="idsDetectionTypes" onChange={handleChange}></textarea>
-          </div>
-          <div className="form-section">
-            <label>How does the IDS differentiate between legitimate and malicious activities to minimize false positives and false negatives?</label>
-            <textarea name="idsFalsePositivesHandling" onChange={handleChange}></textarea>
-          </div>
-          <div className="form-section">
-            <label>Are there specific signatures, heuristics, or anomaly detection methods used to identify potential threats?</label>
-            <textarea name="idsDetectionMethods" onChange={handleChange}></textarea>
-          </div>
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>Intrusion Detection Systems (IDS)</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-          {/* Real-time Monitoring and Alerting */}
-          <h2>Real-time Monitoring and Alerting:</h2>
-          <div className="form-section">
-            <label>Does the IDS provide real-time monitoring of network and system activities to identify suspicious or malicious behavior?</label>
-            <div>
-              <input type="radio" name="realTimeMonitoring" value="Yes" onChange={handleChange} /> Yes
-              <input type="radio" name="realTimeMonitoring" value="No" onChange={handleChange} /> No
-              <textarea className='comment-box' name="realTimeMonitoring" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-          <div className="form-section">
-            <label>How are alerts generated and managed, and what processes are in place to ensure timely response to detected threats?</label>
-            <textarea name="idsAlertManagement" onChange={handleChange}></textarea>
-          </div>
-          <div className="form-section">
-            <label>What is the procedure for escalating alerts to the appropriate response teams or individuals?</label>
-            <textarea name="alertEscalationProcedure" onChange={handleChange}></textarea>
-          </div>
-
-          {/* Incident Response Integration */}
-          <h2>Incident Response Integration:</h2>
-          <div className="form-section">
-            <label>How is the IDS integrated with incident response processes and tools, such as SIEM systems or ticketing systems?</label>
-            <textarea name="idsIncidentIntegration" onChange={handleChange}></textarea>
-          </div>
-          <div className="form-section">
-            <label>Are there predefined incident response protocols for handling alerts and incidents detected by the IDS?</label>
-            <div>
-              <input type="radio" name="incidentProtocols" value="Yes" onChange={handleChange} /> Yes
-              <input type="radio" name="incidentProtocols" value="No" onChange={handleChange} /> No
-              <textarea className='comment-box' name="incidentProtocols" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-          <div className="form-section">
-            <label>How are the effectiveness and accuracy of the IDS in supporting incident response efforts evaluated?</label>
-            <textarea name="idsIncidentEffectiveness" onChange={handleChange}></textarea>
-          </div>
-
-          {/* Data Logging and Analysis */}
-          <h2>Data Logging and Analysis:</h2>
-          <div className="form-section">
-            <label>What types of data and logs are collected by the IDS, and how are they stored and managed?</label>
-            <textarea name="idsLogCollection" onChange={handleChange}></textarea>
-          </div>
-          <div className="form-section">
-            <label>How are IDS logs analyzed to identify trends, patterns, or recurring issues related to security incidents?</label>
-            <textarea name="idsLogAnalysis" onChange={handleChange}></textarea>
-          </div>
-          <div className="form-section">
-            <label>Are there tools or processes in place to correlate IDS data with other security logs or events?</label>
-            <div>
-              <input type="radio" name="logCorrelation" value="Yes" onChange={handleChange} /> Yes
-              <input type="radio" name="logCorrelation" value="No" onChange={handleChange} /> No
-              <textarea className='comment-box' name="logCorrelation" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* System Maintenance and Updates */}
-          <h2>System Maintenance and Updates:</h2>
-          <div className="form-section">
-            <label>What is the process for updating and maintaining IDS signatures, rules, and configurations to stay current with emerging threats?</label>
-            <textarea name="idsMaintenance" onChange={handleChange}></textarea>
-          </div>
-          <div className="form-section">
-            <label>How often are system updates and patches applied to the IDS, and how is the impact on system performance and security assessed?</label>
-            <textarea name="idsUpdatesFrequency" onChange={handleChange}></textarea>
-          </div>
-          <div className="form-section">
-            <label>Are there procedures for testing and validating updates to ensure they do not disrupt normal operations?</label>
-            <div>
-              <input type="radio" name="updateValidation" value="Yes" onChange={handleChange} /> Yes
-              <input type="radio" name="updateValidation" value="No" onChange={handleChange} /> No
-              <textarea className='comment-box' name="uploadValidation" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Performance and Effectiveness Evaluation */}
-          <h2>Performance and Effectiveness Evaluation:</h2>
-          <div className="form-section">
-            <label>How is the performance of the IDS monitored, and are there metrics or benchmarks used to assess its effectiveness?</label>
-            <textarea name="idsPerformanceMonitoring" onChange={handleChange}></textarea>
-          </div>
-          <div className="form-section">
-            <label>Are there periodic reviews or assessments conducted to evaluate the IDS’s ability to detect and respond to threats?</label>
-            <div>
-              <input type="radio" name="periodicAssessment" value="Yes" onChange={handleChange} /> Yes
-              <input type="radio" name="periodicAssessment" value="No" onChange={handleChange} /> No
-              <textarea className='comment-box' name="periodicAssessment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-          <div className="form-section">
-            <label>How are feedback and lessons learned from past incidents incorporated into the IDS configuration and deployment strategy?</label>
-            <textarea name="feedbackIncorporation" onChange={handleChange}></textarea>
-          </div>
-
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-        </form>
-      </main>
-    </div>
-  );
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>Intrusion Detection Systems (IDS)</h2>
+                    {[
+                        { name: "idsDeployment", label: "How are IDS solutions deployed across the network (e.g., inline, passive, distributed) and what areas or segments do they cover?" },
+                        { name: "idsConfigSettings", label: "What are the key configuration settings for the IDS, and how are they tuned to match the organization’s security requirements?" },
+                        { name: "idsBlindSpots", label: "Are there any known limitations or blind spots in the IDS deployment that need to be addressed?" },
+                        { name: "idsDetectionTypes", label: "What types of intrusions and attacks does the IDS aim to detect (e.g., network-based attacks, host-based attacks, zero-day exploits)?" },
+                        { name: "idsFalsePositivesHandling", label: "How does the IDS differentiate between legitimate and malicious activities to minimize false positives and false negatives?" },
+                        { name: "idsDetectionMethods", label: "Are there specific signatures, heuristics, or anomaly detection methods used to identify potential threats?" },
+                        { name: "realTimeMonitoring", label: "Does the IDS provide real-time monitoring of network and system activities to identify suspicious or malicious behavior?" },
+                        { name: "idsAlertManagement", label: "How are alerts generated and managed, and what processes are in place to ensure timely response to detected threats?" },
+                        { name: "alertEscalationProcedure", label: "What is the procedure for escalating alerts to the appropriate response teams or individuals?" },
+                        { name: "idsIncidentIntegration", label: "How is the IDS integrated with incident response processes and tools, such as SIEM systems or ticketing systems?" },
+                        { name: "incidentProtocols", label: "Are there predefined incident response protocols for handling alerts and incidents detected by the IDS?" },
+                        { name: "idsIncidentEffectiveness", label: "How are the effectiveness and accuracy of the IDS in supporting incident response efforts evaluated?" },
+                        { name: "idsLogCollection", label: "What types of data and logs are collected by the IDS, and how are they stored and managed?" },
+                        { name: "idsLogAnalysis", label: "How are IDS logs analyzed to identify trends, patterns, or recurring issues related to security incidents?" },
+                        { name: "logCorrelation", label: "Are there tools or processes in place to correlate IDS data with other security logs or events?" },
+                        { name: "idsMaintenance", label: "What is the process for updating and maintaining IDS signatures, rules, and configurations to stay current with emerging threats?" },
+                        { name: "idsUpdatesFrequency", label: "How often are system updates and patches applied to the IDS, and how is the impact on system performance and security assessed?" },
+                        { name: "updateValidation", label: "Are there procedures for testing and validating updates to ensure they do not disrupt normal operations?" },
+                        { name: "idsPerformanceMonitoring", label: "How is the performance of the IDS monitored, and are there metrics or benchmarks used to assess its effectiveness?" },
+                        { name: "periodicAssessment", label: "Are there periodic reviews or assessments conducted to evaluate the IDS’s ability to detect and respond to threats?" },
+                        { name: "feedbackIncorporation", label: "How are feedback and lessons learned from past incidents incorporated into the IDS configuration and deployment strategy?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                {question.name === "idsBlindSpots" || question.name === "realTimeMonitoring" || question.name === "incidentProtocols" || question.name === "logCorrelation" || question.name === "updateValidation" || question.name === "periodicAssessment" ? (
+                                    <>
+                                        <input
+                                            type="radio"
+                                            name={question.name}
+                                            value="Yes"
+                                            checked={formData[question.name] === "Yes"}
+                                            onChange={handleChange}
+                                        /> Yes
+                                        <input
+                                            type="radio"
+                                            name={question.name}
+                                            value="No"
+                                            checked={formData[question.name] === "No"}
+                                            onChange={handleChange}
+                                        /> No
+                                        <textarea
+                                            className='comment-box'
+                                            name={`${question.name}Comment`}
+                                            placeholder="Comment (Optional)"
+                                            value={formData[`${question.name}Comment`] || ''}
+                                            onChange={handleChange}
+                                        />
+                                    </>
+                                ) : (
+                                    <textarea
+                                        name={question.name}
+                                        value={formData[question.name] || ''}
+                                        onChange={handleChange}
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                    <input type="file" onChange={handleImageChange} accept="image/*" />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default IntrusionDetectionSystems2Page;

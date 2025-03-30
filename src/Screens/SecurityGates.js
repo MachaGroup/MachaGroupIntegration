@@ -56,7 +56,7 @@ function SecurityGatesPage() {
         const { name, value } = e.target;
         const newFormData = { ...formData, [name]: value };
         setFormData(newFormData);
-
+ 
         try {
             const buildingRef = doc(db, 'Buildings', buildingId); // Create buildingRef
             const formDocRef = doc(db, 'forms', 'Physical Security', 'Security Gates', buildingId);

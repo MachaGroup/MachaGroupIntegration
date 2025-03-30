@@ -1,319 +1,197 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function InfraredCamerasPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding(); // Access buildingId from context
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadInfraredCamerasImage = httpsCallable(functions, 'uploadInfraredCamerasImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
+        }
 
-  useEffect(() => {
-      if (!buildingId) {
-          alert('No building selected. Redirecting to Building Info...');
-          navigate('/BuildingandAddress');
-      }
-  }, [buildingId, navigate]);
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-      const { name, value } = e.target;
-      setFormData((prevData) => ({
-          ...prevData,
-          [name]: value,
-      }));
-  };
+            try {
+                const formDocRef = doc(db, 'forms', 'Physical Security', 'Infrared Cameras', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
 
-  // Function to handle back button
-      const handleBack = async () => {
-            if (formData && buildingId) { // Check if formData and buildingId exist
-              try {
-                const buildingRef = doc(db, 'Buildings', buildingId);
-                const formsRef = collection(db, 'forms/Physical Security/Infrared Cameras');
-                await addDoc(formsRef, {
-                  building: buildingRef,
-                  formData: formData,
-                });
-                console.log('Form Data submitted successfully on back!');
-                alert('Form data saved before navigating back!');
-              } catch (error) {
-                console.error('Error saving form data:', error);
-                alert('Failed to save form data before navigating back. Some data may be lost.');
-              }
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
             }
-            navigate(-1);  // Navigates to the previous page
-      };
+        };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+        fetchFormData();
+    }, [buildingId, db, navigate]);
 
-    if (!buildingId) {
-        alert('Building ID is missing. Please start the assessment from the correct page.');
-        return;
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Physical Security', 'Infrared Cameras', buildingId);
+            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true });
+            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadInfraredCamerasImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Physical Security', 'Infrared Cameras', buildingId);
+            await setDoc(formDocRef, { formData: { ...formData, building: buildingRef } }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId); 
-
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Physical Security/Infrared Cameras');
-      await addDoc(formsRef, {
-          building: buildingRef, // Reference to the building document
-          formData: formData, // Store the form data as a nested object
-      });
-
-      console.log('Form data submitted successfully!');
-      alert('Form submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-        console.error('Error submitting form:', error);
-        alert('Failed to submit the form. Please try again.');
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
-};
 
-  return (
-    <div className="form-page">
-      <header className="header">
-            <Navbar />
-        {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-        <h1>Infrared Cameras Assessment</h1>
-        <img src={logo} alt="Logo" className="logo" />
-      </header>
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>Infrared Cameras Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-      <main className="form-container">
-        <form onSubmit={handleSubmit}>
-          {/* Low-Light Performance */}
-          <h2>Low-Light Performance:</h2>
-          <div className="form-section">
-            <label>Do the infrared cameras effectively capture images in low-light or nighttime conditions?</label>
-            <div>
-              <input type="radio" name="lowLightPerformance" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="lowLightPerformance" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="lowlightPerformance" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are they equipped with infrared LEDs or other illumination technology to enhance visibility in darkness?</label>
-            <div>
-              <input type="radio" name="infraredLEDs" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="infraredLEDs" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="infraredLEDs" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are there adjustments or settings available to optimize camera performance in varying levels of low-light conditions?</label>
-            <div>
-              <input type="radio" name="lowLightAdjustments" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="lowLightAdjustments" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="lowLightAdjustments" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Image Quality and Resolution */}
-          <h2>Image Quality and Resolution:</h2>
-          <div className="form-section">
-            <label>Do the infrared cameras capture high-quality images with sufficient resolution for identification and analysis, even in low-light environments?</label>
-            <div>
-              <input type="radio" name="imageQuality" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="imageQuality" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="imageQuality" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are there adjustments or settings available to enhance image clarity and detail in low-light conditions?</label>
-            <div>
-              <input type="radio" name="imageClarity" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="imageClarity" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="imageClarity" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are images clear and detailed, allowing for easy identification of individuals and activities in low-light environments?</label>
-            <div>
-              <input type="radio" name="clearImages" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="clearImages" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="clearImages" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Integration with Surveillance Systems */}
-          <h2>Integration with Surveillance Systems:</h2>
-          <div className="form-section">
-            <label>Are the infrared cameras integrated with the overall surveillance system?</label>
-            <div>
-              <input type="radio" name="systemIntegration" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="systemIntegration" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="systemIntegration" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Do they communicate seamlessly with surveillance software and monitoring stations?</label>
-            <div>
-              <input type="radio" name="softwareCommunication" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="softwareCommunication" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="softwareCommunication" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Is there real-time monitoring and recording of camera feeds from areas with low-light conditions?</label>
-            <div>
-              <input type="radio" name="realTimeMonitoring" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="realTimeMonitoring" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="realTimeMonitoring" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Coverage and Monitoring */}
-          <h2>Coverage and Monitoring:</h2>
-          <div className="form-section">
-            <label>Do the infrared cameras cover the desired areas with low-light conditions, providing comprehensive surveillance coverage?</label>
-            <div>
-              <input type="radio" name="coverageAreas" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="coverageAreas" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="coverageAreas" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are they positioned strategically to monitor critical areas, such as dark corners, alleys, or building perimeters, effectively?</label>
-            <div>
-              <input type="radio" name="strategicPositioning" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="strategicPositioning" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="strategicPositioning" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are there any blind spots or areas where camera coverage is insufficient in low-light environments?</label>
-            <div>
-              <input type="radio" name="blindSpots" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="blindSpots" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="blindSpots" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Durability and Weather Resistance */}
-          <h2>Durability and Weather Resistance:</h2>
-          <div className="form-section">
-            <label>Are the infrared cameras designed to withstand outdoor environmental factors such as rain, humidity, and temperature fluctuations?</label>
-            <div>
-              <input type="radio" name="weatherResistance" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="weatherResistance" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="weatherResistance" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are they constructed from durable materials capable of withstanding harsh outdoor conditions?</label>
-            <div>
-              <input type="radio" name="durableMaterials" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="durableMaterials" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="durableMaterials" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Have the cameras undergone testing or certification to verify weatherproofing and durability?</label>
-            <div>
-              <input type="radio" name="weatherProofingCertification" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="weatherProofingCertification" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="weatherProofingCertification" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Remote Control and Management */}
-          <h2>Remote Control and Management:</h2>
-          <div className="form-section">
-            <label>Is there remote access and control functionality for the infrared cameras?</label>
-            <div>
-              <input type="radio" name="remoteAccess" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="remoteAccess" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="remoteAccess" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Can security personnel adjust camera angles, zoom levels, and other settings remotely as needed?</label>
-            <div>
-              <input type="radio" name="remoteAdjustments" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="remoteAdjustments" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="remoteAdjustments" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Is there secure authentication and encryption protocols in place to prevent unauthorized access to camera controls?</label>
-            <div>
-              <input type="radio" name="secureProtocols" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="secureProtocols" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="secureProtocols" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Maintenance and Upkeep */}
-          <h2>Maintenance and Upkeep:</h2>
-          <div className="form-section">
-            <label>Is there a regular maintenance schedule in place for the infrared cameras?</label>
-            <div>
-              <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="maintenanceSchedule" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are maintenance tasks, such as cleaning, inspection of camera lenses and housings, and testing of camera functionalities, performed according to schedule?</label>
-            <div>
-              <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="maintenanceTasks" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are there records documenting maintenance activities, repairs, and any issues identified during inspections?</label>
-            <div>
-              <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="maintenanceRecords" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-        </form>
-      </main>
-    </div>
-  );
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>Infrared Cameras Assessment</h2>
+                    {[
+                        { name: "lowLightPerformance", label: "Do the infrared cameras effectively capture images in low-light or nighttime conditions?" },
+                        { name: "infraredLEDs", label: "Are they equipped with infrared LEDs or other illumination technology to enhance visibility in darkness?" },
+                        { name: "lowLightAdjustments", label: "Are there adjustments or settings available to optimize camera performance in varying levels of low-light conditions?" },
+                        { name: "imageQuality", label: "Do the infrared cameras capture high-quality images with sufficient resolution for identification and analysis, even in low-light environments?" },
+                        { name: "imageClarity", label: "Are there adjustments or settings available to enhance image clarity and detail in low-light conditions?" },
+                        { name: "clearImages", label: "Are images clear and detailed, allowing for easy identification of individuals and activities in low-light environments?" },
+                        { name: "systemIntegration", label: "Are the infrared cameras integrated with the overall surveillance system?" },
+                        { name: "softwareCommunication", label: "Do they communicate seamlessly with surveillance software and monitoring stations?" },
+                        { name: "realTimeMonitoring", label: "Is there real-time monitoring and recording of camera feeds from areas with low-light conditions?" },
+                        { name: "coverageAreas", label: "Do the infrared cameras cover the desired areas with low-light conditions, providing comprehensive surveillance coverage?" },
+                        { name: "strategicPositioning", label: "Are they positioned strategically to monitor critical areas, such as dark corners, alleys, or building perimeters, effectively?" },
+                        { name: "blindSpots", label: "Are there any blind spots or areas where camera coverage is insufficient in low-light environments?" },
+                        { name: "weatherResistance", label: "Are the infrared cameras designed to withstand outdoor environmental factors such as rain, humidity, and temperature fluctuations?" },
+                        { name: "durableMaterials", label: "Are they constructed from durable materials capable of withstanding harsh outdoor conditions?" },
+                        { name: "weatherProofingCertification", label: "Have the cameras undergone testing or certification to verify weatherproofing and durability?" },
+                        { name: "remoteAccess", label: "Is there remote access and control functionality for the infrared cameras?" },
+                        { name: "remoteAdjustments", label: "Can security personnel adjust camera angles, zoom levels, and other settings remotely as needed?" },
+                        { name: "secureProtocols", label: "Is there secure authentication and encryption protocols in place to prevent unauthorized access to camera controls?" },
+                        { name: "maintenanceSchedule", label: "Is there a regular maintenance schedule in place for the infrared cameras?" },
+                        { name: "maintenanceTasks", label: "Are maintenance tasks, such as cleaning, inspection of camera lenses and housings, and testing of camera functionalities, performed according to schedule?" },
+                        { name: "maintenanceRecords", label: "Are there records documenting maintenance activities, repairs, and any issues identified during inspections?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input
+                                    type="radio"
+                                    name={question.name}
+                                    value="yes"
+                                    checked={formData[question.name] === "yes"}
+                                    onChange={handleChange}
+                                /> Yes
+                                <input
+                                    type="radio"
+                                    name={question.name}
+                                    value="no"
+                                    checked={formData[question.name] === "no"}
+                                    onChange={handleChange}
+                                /> No
+                                <textarea
+                                    className='comment-box'
+                                    name={`${question.name}Comment`}
+                                    placeholder="Comment (Optional)"
+                                    value={formData[`${question.name}Comment`] || ''}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        </div>
+                    ))}
+                    <input type="file" onChange={handleImageChange} accept="image/*" />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default InfraredCamerasPage;

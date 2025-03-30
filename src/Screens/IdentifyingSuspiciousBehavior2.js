@@ -1,155 +1,169 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function IdentifyingSuspiciousBehavior2Page() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadIdentifyingSuspiciousBehavior2Image = httpsCallable(functions, 'uploadIdentifyingSuspiciousBehavior2Image');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
+        }
 
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress'); 
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+
+            try {
+                const formDocRef = doc(db, 'forms', 'Continuous Improvement - Safety and Security', 'Identifying Suspicious Behavior 2', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Continuous Improvement - Safety and Security', 'Identifying Suspicious Behavior 2', buildingId);
+            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true });
+            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadIdentifyingSuspiciousBehavior2Image({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Continuous Improvement - Safety and Security', 'Identifying Suspicious Behavior 2', buildingId);
+            await setDoc(formDocRef, { formData: { ...formData, building: buildingRef } }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
-  }, [buildingId, navigate]);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Function to handle back button
-  const handleBack = async () => {
-           if (formData && buildingId) { // Check if formData and buildingId exist
-             try {
-               const buildingRef = doc(db, 'Buildings', buildingId);
-               const formsRef = collection(db, 'forms/Continuous Improvement - Safety and Security/Identifying Suspicious Behavior 2');
-               await addDoc(formsRef, {
-                 building: buildingRef,
-                 formData: formData,
-               });
-               console.log('Form Data submitted successfully on back!');
-               alert('Form data saved before navigating back!');
-             } catch (error) {
-               console.error('Error saving form data:', error);
-               alert('Failed to save form data before navigating back. Some data may be lost.');
-             }
-           }
-           navigate(-1);  // Navigates to the previous page
-  };
-  
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
+    return (
+        <div>
+            <div className="form-page">
+                <header className="header">
+                    <Navbar />
+                    <button className="back-button" onClick={handleBack}>←</button>
+                    <h1>7.2.3.2 Security Awareness Training</h1>
+                    <img src={logo} alt="Logo" className="logo" />
+                </header>
 
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Continuous Improvement - Safety and Security/Identifying Suspicious Behavior 2');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('Form Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
-    }
-  };
-
-
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>7.2.3.2 Security Awareness Training</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
-
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                
-                {/* Identifying Suspicious Behavior 2 */}
-                <h2> 7.2.3.2.1 Identifying Suspicious Behavior 2:</h2>
-                <div className="form-section">
-                  <label>What specific behaviors are staff trained to recognize as suspicious in the school environment?</label>
-                    <div>
-                      <input type="text" name="suspiciousBehavior" placeholder="Describe behaviors considered suspicious in the school" onChange={handleChange}/>
-                    </div>
-                  </div>
-
-                <div className="form-section">
-                  <label>How is the training for identifying suspicious behavior conducted (e.g., workshops, online modules)?</label>
-                  <div>
-                    <input type="text" name="suspiciousBehaviorTrainingMethod" placeholder="Describe methods for training to identify suspicious behavior" onChange={handleChange}/>
-                  </div>
-                </div>
-
-                <div className="form-section">
-                  <label>What resources or tools are provided to staff for reporting suspicious behavior?</label>
-                  <div>
-                    <input type="text" name="reportingResources" placeholder="Describe resources for reporting suspicious behavior" onChange={handleChange}/>
-                  </div>
-                </div>
-
-                <div className="form-section">
-                  <label>How often is the training on identifying suspicious behavior reviewed or updated to reflect current security concerns?</label>
-                  <div>
-                    <input type="text" name="suspiciousBehaviorTrainingReview" placeholder="Describe review/update frequency for suspicious behavior training" onChange={handleChange}/>
-                  </div>
-                </div>
-
-                <div className="form-section">
-                  <label>Are there real-life scenarios or examples included in the training to help staff better understand suspicious behavior?</label>
-                  <div>
-                    <input type="text" name="realLifeScenarios" placeholder="Describe inclusion of real-life scenarios in training" onChange={handleChange}/>
-                  </div>
-                </div>
-          
-                    {/* Submit Button */}
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-
-            </form>
-        </main>
-    </div>
-  )
+                <main className="form-container">
+                    <form onSubmit={handleSubmit}>
+                        <h2>7.2.3.2.1 Identifying Suspicious Behavior 2</h2>
+                        {[
+                            { name: "suspiciousBehavior", label: "What specific behaviors are staff trained to recognize as suspicious in the school environment?" },
+                            { name: "suspiciousBehaviorTrainingMethod", label: "How is the training for identifying suspicious behavior conducted (e.g., workshops, online modules)?" },
+                            { name: "reportingResources", label: "What resources or tools are provided to staff for reporting suspicious behavior?" },
+                            { name: "suspiciousBehaviorTrainingReview", label: "How often is the training on identifying suspicious behavior reviewed or updated to reflect current security concerns?" },
+                            { name: "realLifeScenarios", label: "Are there real-life scenarios or examples included in the training to help staff better understand suspicious behavior?" }
+                        ].map((question, index) => (
+                            <div key={index} className="form-section">
+                                <label>{question.label}</label>
+                                <div>
+                                    <input
+                                        type="text"
+                                        name={question.name}
+                                        placeholder={question.label}
+                                        value={formData[question.name] || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                        <input type="file" onChange={handleImageChange} accept="image/*" />
+                        {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                        {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                        <button type="submit">Submit</button>
+                    </form>
+                </main>
+            </div>
+        </div>
+    );
 }
 
 export default IdentifyingSuspiciousBehavior2Page;
