@@ -69,7 +69,7 @@ function ActiveShooterDrillsWithPolicePage() {
                     console.error("Error saving form data to Firestore:", error);
                     alert("Failed to save changes. Please check your connection and try again.");
                 }
-            }
+            };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];

@@ -52,8 +52,6 @@ function AccessControlKeypadsPage() {
         fetchFormData();
     }, [buildingId, db, navigate]);
 
-    
-
     const handleChange = async (e) => {
             const { name, value } = e.target;
             const newFormData = { ...formData, [name]: value };
