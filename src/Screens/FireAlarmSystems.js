@@ -1,66 +1,110 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+// Firestore imports aligned with the standard pattern
+import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
+// Firebase Functions imports
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
-import './FormQuestions.css';
-import logo from '../assets/MachaLogo.png'; // Adjust the path if necessary
-import Navbar from "./Navbar";
-/**/
+import './FormQuestions.css'; // Assuming same CSS file
+import logo from '../assets/MachaLogo.png'; // Assuming same logo
+import Navbar from "./Navbar"; // Assuming same Navbar
+
 function FireAlarmSystemsPage() {
     const navigate = useNavigate();
-    const { buildingId } = useBuilding(); // Access and update buildingId from context
+    const { buildingId } = useBuilding();
     const db = getFirestore();
+    const functions = getFunctions(); // Initialize Firebase Functions
+    // Define callable function with the requested naming convention
+    const uploadImage = httpsCallable(functions, 'uploadFireAlarmSystemsImage');
 
-    const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    // State aligned with the standard pattern
+    const [formData, setFormData] = useState({}); // Initialize as empty object
+    const [imageData, setImageData] = useState(null); // For base64 image data
+    const [imageUrl, setImageUrl] = useState(null); // For storing uploaded image URL
+    const [imageUploadError, setImageUploadError] = useState(null); // For image upload errors
+    const [loading, setLoading] = useState(true); // Loading state for initial fetch
+    const [loadError, setLoadError] = useState(null); // Error state for initial fetch
 
-
+    // useEffect for fetching data on load
     useEffect(() => {
-        if(!buildingId) {
-          alert('No builidng selected. Redirecting to Building Info...');
-          navigate('BuildingandAddress');
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('/BuildingandAddress'); // Ensure navigation path is correct
+            return;
         }
-      }, [buildingId, navigate]);
 
-    
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+            // Correct Firestore document path for this form
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Fire Alarm Systems', buildingId);
 
-    // Function to handle back button
-  const handleBack = async () => {
-          if (formData && buildingId) { // Check if formData and buildingId exist
             try {
-              const buildingRef = doc(db, 'Buildings', buildingId);
-              const formsRef = collection(db, 'forms/Emergency Preparedness/Fire Alarm Systems');
-              await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-              });
-              console.log('Form Data submitted successfully on back!');
-              alert('Form data saved before navigating back!');
+                const docSnapshot = await getDoc(formDocRef);
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                    setImageUrl(docSnapshot.data().formData?.imageUrl || null);
+                } else {
+                    setFormData({});
+                }
             } catch (error) {
-              console.error('Error saving form data:', error);
-              alert('Failed to save form data before navigating back. Some data may be lost.');
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
             }
-          }
-          navigate(-1);
         };
 
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    // handleChange saves data on every change
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        // Handle potential capitalization inconsistency in radio button values
+        const standardizedValue = (value === 'Yes' || value === 'No') ? value.toLowerCase() : value;
+        const newFormData = { ...formData, [name]: standardizedValue };
+        setFormData(newFormData);
+
+
+        if (!buildingId) {
+            console.error("Building ID is missing, cannot save data.");
+            return;
+        }
+
+        try {
+            // Correct Firestore document path
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Fire Alarm Systems', buildingId);
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            // Save data using setDoc with merge: true
+            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true });
+            console.log("Form data auto-saved:", { ...newFormData, building: buildingRef });
+        } catch (error) {
+            console.error("Error auto-saving form data:", error);
+            // Optionally show a non-blocking error to the user
+        }
+    };
+
+    // handleImageChange using FileReader
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImageData(reader.result);
+                setImageUrl(null);
+                setImageUploadError(null);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // handleBack now only navigates
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    // handleSubmit using Cloud Function for upload
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -69,260 +113,166 @@ function FireAlarmSystemsPage() {
             return;
         }
 
+        let finalImageUrl = formData.imageUrl || null;
+
+        // Upload new image if imageData exists
+        if (imageData) {
+             setImageUploadError(null);
+            try {
+                console.log("Uploading image...");
+                const uploadResult = await uploadImage({ imageData: imageData });
+                finalImageUrl = uploadResult.data.imageUrl;
+                setImageUrl(finalImageUrl);
+                console.log("Image uploaded successfully:", finalImageUrl);
+            } catch (error) {
+                console.error('Error uploading image via Cloud Function:', error);
+                setImageUploadError(error.message || "Failed to upload image.");
+                alert(`Image upload failed: ${error.message || "Unknown error"}`);
+                // return; // Optional: Stop submission on image upload failure
+            }
+        }
+
+        const finalFormData = { ...formData, imageUrl: finalImageUrl };
 
         try {
-            // Create a document reference to the building in the 'Buildings' collection
-            const buildingRef = doc(db, 'Buildings', buildingId); 
-
-            // Store the form data in the specified Firestore structure
-            const formsRef = collection(db, 'forms/Emergency Preparedness/Fire Alarm Systems');
-            await addDoc(formsRef, {
-                building: buildingRef, // Reference to the building document
-                formData: formData, // Store the form data as a nested object
-            });
+            // Correct Firestore document path
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Fire Alarm Systems', buildingId);
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            // Save final data using setDoc with merge: true
+            await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
 
             console.log('Form data submitted successfully!');
             alert('Form submitted successfully!');
             navigate('/Form');
         } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Failed to submit the form. Please try again.');
+            console.error("Error submitting final form data:", error);
+            alert("Failed to submit the form. Please check your connection and try again.");
         }
     };
 
+    // Loading and Error display
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
+    }
+
+    // Define questions, keeping original numbering in labels and specifying type
+    const questions = [
+        // Functionality and Reliability
+        { name: "alarmsInstalled", label: "2.2.1.1.3.1.1. Are the fire alarm systems installed throughout the premises to provide comprehensive coverage?", type: "radio" },
+        { name: "regularAlarmTesting", label: "2.2.1.1.3.1.2. Are alarm systems regularly tested to ensure they are functioning correctly and capable of detecting fires prompty?", type: "radio" },
+        { name: "malfunctions", label: "2.2.1.1.3.1.3. Is there a process in place to address any malfunctions or deficiencies indentified during testing promptly?", type: "radio" },
+        // Testing Schedule
+        { name: "testingSchedule", label: "2.2.1.1.3.2.1. Is there a schdule for testing fire alarm systems, including frquency and procudres?", type: "text" },
+        { name: "testingIntervals", label: "2.2.1.1.3.2.2. Are testing intervals established based on relevant regulations, industry standards, and manufacturer recommendations?", type: "radio" },
+        { name: "comprehensiveTesting", label: "2.2.1.1.3.2.3. Are tests conducted during both regular business hours and after hours to ensure all components of the system are thoroughly evaluated?", type: "radio" },
+        // Testing Procedures
+        { name: "standardized", label: "2.2.1.1.3.3.1. Are testing procedures standardized and followed consistently by trained personnel?", type: "radio" },
+        { name: "fireAlarmTesting", label: "2.2.1.1.3.3.2. Do tests include activation of alarm devices, testing of audible and visual alerts, and verification of signal transmission to monitoring stations?", type: "radio" }, // Corrected typo in name
+        { name: "testingProtocols", label: "2.2.1.1.3.3.3. Are there protocols in place for coordinating testing with building occupants, security personnel, and emergency responders to minimize disruptions?", type: "text" },
+        // Documentation and Records
+        { name: "alarmRecords", label: "2.2.1.1.3.4.1. Are records maintained for all fire alarm test, including dates, times, personnel involved, and results?", type: "radio" },
+        { name: "retainedRecords", label: "2.2.1.1.3.4.2. Are test records retained for the required duration and readily accessible for review by authorities or inspectors?", type: "radio" },
+        { name: "issueTracking", label: "2.2.1.1.3.4.3. Is there a system in place to track and follow up on any deficiencies or issues identified during testing?", type: "text" },
+        // Notification and Communication
+        { name: "notificationProcess", label: "2.2.1.1.3.5.1. Is there a process for notifying building occupants in advance of scheduled fire alarm tests?", type: "text" },
+        { name: "notificationChannels", label: "2.2.1.1.3.5.2. Are notifications provided thorugh appropriate channels, such as email, signage, or verbal announcements?", type: "radio" },
+        { name: "fireDepartmentCoordination", label: "2.2.1.1.3.5.3. Is there coordination with local fire departments or monitoring agencies to ensure they are aware of scheduled tests and can responds appropriately to any alarms?", type: "radio" },
+        // Emergency Response Integration
+        { name: "alarmIntegration", label: "2.2.1.1.3.6.1. Are fire alarm systems integrated into the overall emergency response plan for the premises?", type: "radio" },
+        { name: "evacuationCoordination", label: "2.2.1.1.3.6.2. Do alarm tests include coordination with evacuation drills and other repsonse actions to ensure a comprehensive evaluation of emergency preparedness?", type: "radio" },
+        { name: "trainedPersonnelResponse", label: "2.2.1.1.3.6.3. Are designated personnel trained to respond to alarm activations and follow established procedures for verifying alarms and initiating emergency response actions?", type: "radio" },
+        // System Maintenance and Upkeep
+        { name: "maintenanceSchedule", label: "2.2.1.1.3.7.1. Is there a maintenance schedule in place for inspecting, servicing, and maintaining fire alarm systems?", type: "radio" },
+        { name: "maintenanceActivities", label: "2.2.1.1.3.7.2. Are maintenance activities conducted by qualified technicians in compliance with manufacturer recommendations and industry standards?", type: "radio" },
+        { name: "maintenanceIssues", label: "2.2.1.1.3.7.3. Are deficiencies or issues identified during maintenance promptly addressed and documented, with corrective actions implemented as needed?", type: "radio" }
+    ];
+
+
     return (
-        <div className="form-page">
-            <header className="header">
-            <Navbar />
-                <button className="back-button" onClick={handleBack}>←</button>
-                <h1>Fire Alarms Systems</h1>
-                <img src={logo} alt="Logo" className="logo" />
-            </header>
+        <div> {/* Outer wrapper div */}
+            <div className="form-page">
+                <header className="header">
+                    <Navbar />
+                    <button className="back-button" onClick={handleBack}>←</button>
+                    <h1>Fire Alarm Systems Assessment</h1> {/* Simplified title */}
+                    <img src={logo} alt="Logo" className="logo" />
+                </header>
 
-            <main className="form-container">
-                <form onSubmit={handleSubmit}>
-                    <h2>2.2.1.1.3 Fire Alarm Systems (e.g., automated sliding gates)</h2>
+                <main className="form-container">
+                    <form onSubmit={handleSubmit}>
+                         {/* Optional: Add a general title if needed */}
+                         {/* <h2>Fire Alarm System Details</h2> */}
 
-                    {/* Functionality and Reliability */}
-                    <h2>2.2.1.1.3.1 Functionality and Reliability:</h2>
-                    <div className="form-section">
-                        <label>2.2.1.1.3.1.1. Are the fire alarm systems installed throughout the premises to provide comprehensive coverage?</label>
-                        <div>
-                            <input type="radio" name="alarmsInstalled" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="alarmsInstalled" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="alarmsInstalledComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
+                        {questions.map((question, index) => (
+                            <div key={index} className="form-section">
+                                <label htmlFor={question.name}>{question.label}</label> {/* Use label from question object */}
+
+                                {question.type === "radio" ? (
+                                    // Render Yes/No radio buttons + comment input
+                                    <>
+                                        <div>
+                                            <input
+                                                type="radio"
+                                                id={`${question.name}_yes`}
+                                                name={question.name}
+                                                value="yes" // Standardized value
+                                                checked={formData[question.name] === "yes"}
+                                                onChange={handleChange}
+                                            />
+                                             <label htmlFor={`${question.name}_yes`}> Yes</label>
+
+                                            <input
+                                                type="radio"
+                                                id={`${question.name}_no`}
+                                                name={question.name}
+                                                value="no" // Standardized value
+                                                checked={formData[question.name] === "no"}
+                                                onChange={handleChange}
+                                            />
+                                             <label htmlFor={`${question.name}_no`}> No</label>
+                                        </div>
+                                        <input
+                                            type="text"
+                                            id={`${question.name}Comment`}
+                                            name={`${question.name}Comment`}
+                                            placeholder="Additional comments (Optional)"
+                                            value={formData[`${question.name}Comment`] || ''}
+                                            onChange={handleChange}
+                                            className='comment-box'
+                                        />
+                                    </>
+                                ) : (
+                                    // Render single text input for text-based questions
+                                    <input
+                                        type="text"
+                                        id={question.name}
+                                        name={question.name}
+                                        value={formData[question.name] || ''}
+                                        onChange={handleChange}
+                                        placeholder="Enter details here" // Placeholder for text inputs
+                                        className='comment-box' // Reusing class, adjust if needed
+                                    />
+                                )}
+                            </div>
+                        ))}
+
+                        {/* File Input for Image Upload */}
+                        <div className="form-section">
+                            <label>Upload Image (Optional):</label>
+                             <input type="file" onChange={handleImageChange} accept="image/*" />
+                             {imageUrl && <img src={imageUrl} alt="Uploaded Fire Alarm Context" style={{ maxWidth: '200px', marginTop: '10px' }}/>}
+                             {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
                         </div>
-                    </div>
 
-                    <div className="form-section">
-                        <label>2.2.1.1.3.1.2. Are alarm systems regularly tested to ensure they are functioning correctly and capable of detecting fires prompty?</label>
-                        <div>
-                            <input type="radio" name="regularAlarmTesting" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="regularAlarmTesting" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="regularAlarmTestingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>2.2.1.1.3.1.3. Is there a process in place to address any malfunctions or deficiencies indentified during testing promptly?</label>
-                        <div>
-                            <input type="radio" name="malfunctions" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="malfunctions" value="No" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="malfunctionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    {/* Testing Schedule */}
-                    <h2>2.2.1.1.3.2 Testing Schedule:</h2>
-                    <div className="form-section">
-                        <label>2.2.1.1.3.2.1. Is there a schdule for testing fire alarm systems, including frquency and procudres?</label>
-                        <input
-                            type="text"
-                            name="testingSchedule"
-                            placeholder="Enter testing schedule"
-                            onChange={handleChange}
-                        />
-                    </div>
-
-                    <div className="form-section">
-                        <label>2.2.1.1.3.2.2. Are testing intervals established based on relevant regulations, industry standards, and manufacturer recommendations?</label>
-                        <div>
-                            <input type="radio" name="testingIntervals" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="testingIntervals" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="testingIntervalsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>2.2.1.1.3.2.3. Are tests conducted during both regular business hours and after hours to ensure all components of the system are thoroughly evaluated?</label>
-                        <div>
-                            <input type="radio" name="comprehensiveTesting" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="comprehensiveTesting" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="comprehensiveTestingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    {/* Testing Procedures */}
-                    <h2>2.2.1.1.3.3 Testing Procedures:</h2>
-                    <div className="form-section">
-                        <label>2.2.1.1.3.3.1. Are testing procedures standardized and followed consistently by trained personnel?</label>
-                        <div>
-                            <input type="radio" name="standardized" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="standardized" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="standardizedComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>2.2.1.1.3.3.2. Do tests include activation of alarm devices, testing of audible and visual alerts, and verification of signal transmission to monitoring stations?</label>
-                        <div>
-                            <input type="radio" name="fireAlarmTetsing" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="fireAlarmTetsing" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="fireAlarmTetsingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>2.2.1.1.3.3.3. Are there protocols in place for coordinating testing with building occupants, security personnel, and emergency responders to minimize disruptions?</label>
-                        <div>
-                        <input
-                            type="text"
-                            name="testingProtocols"
-                            placeholder="Enter the protocols"
-                            onChange={handleChange}
-                        />
-                        </div>
-                    </div>
-
-                    {/* Documentation and Regulations */}
-                    <h2>2.2.1.1.3.4 Documentation and Records:</h2>
-                    <div className="form-section">
-                        <label>2.2.1.1.3.4.1. Are records maintained for all fire alarm test, including dates, times, personnel involved, and results?</label>
-                        <div>
-                            <input type="radio" name="alarmRecords" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="alarmRecords" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="alarmRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>2.2.1.1.3.4.2. Are test records retained for the required duration and readily accessible for review by authorities or inspectors?</label>
-                        <div>
-                            <input type="radio" name="retainedRecords" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="retainedRecords" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="retainedRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>2.2.1.1.3.4.3. Is there a system in place to track and follow up on any deficiencies or issues identified during testing?</label>
-                        <div>
-                        <input
-                            type="text"
-                            name="issueTracking"
-                            placeholder="Enter tracking system issue"
-                            onChange={handleChange}
-                        />
-                        </div>
-                    </div>
-
-                    {/* Notification and Communication */}
-                    <h2>2.2.1.1.3.5 Notification and Communication:</h2>
-                    <div className="form-section">
-                        <label>2.2.1.1.3.5.1. Is there a process for notifying building occupants in advance of scheduled fire alarm tests?</label>
-                        <div>
-                        <input
-                            type="text"
-                            name="notificationProcess"
-                            placeholder="Enter notification process"
-                            onChange={handleChange}
-                        />
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>2.2.1.1.3.5.2. Are notifications provided thorugh appropriate channels, such as email, signage, or verbal announcements?</label>
-                        <div>
-                            <input type="radio" name="notificationChannels" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="notificationChannels" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="notificationChannelsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>2.2.1.1.3.5.3. Is there coordination with local fire departments or monitoring agencies to ensure they are aware of scheduled tests and can responds appropriately to any alarms?</label>
-                        <div>
-                            <input type="radio" name="fireDepartmentCoordination" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="fireDepartmentCoordination" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="fireDepartmentCoordinationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    {/* Emergency Response Integration */}
-                    <h2>2.2.1.1.3.6 Emergency Response Integration:</h2>
-                    <div className="form-section">
-                        <label>2.2.1.1.3.6.1. Are fire alarm systems integrated into the overall emergency response plan for the premises?</label>
-                        <div>
-                            <input type="radio" name="alarmIntegration" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="alarmIntegration" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="alarmIntegrationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>2.2.1.1.3.6.2. Do alarm tests include coordination with evacuation drills and other repsonse actions to ensure a comprehensive evaluation of emergency preparedness?</label>
-                        <div>
-                            <input type="radio" name="evacuationCoordination" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="evacuationCoordination" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="evacuationCoordinationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>2.2.1.1.3.6.3. Are designated personnel trained to respond to alarm activations and follow established procedures for verifying alarms and initiating emergency response actions?</label>
-                        <div>
-                            <input type="radio" name="trainedPersonnelResponse" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="trainedPersonnelResponse" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="trainedPersonnelResponseComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    {/* System Maintenance and Upkeep */}
-                    <h2>2.2.1.1.3.7 System Maintenance and Upkeep:</h2>
-                    <div className="form-section">
-                        <label>2.2.1.1.3.7.1. Is there a maintenance schedule in place for inspecting, servicing, and maintaining fire alarm systems?</label>
-                        <div>
-                            <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="maintenanceScheduleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>2.2.1.1.3.7.2. Are maintenance activities conducted by qualified technicians in compliance with manufacturer recommendations and industry standards?</label>
-                        <div>
-                            <input type="radio" name="maintenanceActivities" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="maintenanceActivities" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="maintenanceActivitiesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>2.2.1.1.3.7.3. Are deficiencies or issues identified during maintenance promptly addressed and documented, with corrective actions implemented as needed?</label>
-                        <div>
-                            <input type="radio" name="maintenanceIssues" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="maintenanceIssues" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="maintenanceIssuesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-                </form>
-            </main>
+                        {/* Submit Button */}
+                        <button type="submit">Submit Assessment</button>
+                    </form>
+                </main>
+            </div>
         </div>
     );
 }

@@ -1,325 +1,275 @@
-import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+// Firestore imports aligned with the standard pattern
+import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
+// Firebase Functions imports
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
-import './FormQuestions.css';
-import Navbar from "./Navbar";
-/**/
+import './FormQuestions.css'; // Assuming same CSS file
+import logo from '../assets/MachaLogo.png'; // Assuming same logo
+import Navbar from "./Navbar"; // Assuming same Navbar
+
 function FireExtinguisherLocationsFormPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions(); // Initialize Firebase Functions
+    // Define callable function with the requested naming convention
+    const uploadImage = httpsCallable(functions, 'uploadFireExtinguisherLocationsFormImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    // State aligned with the standard pattern
+    const [formData, setFormData] = useState({}); // Initialize as empty object
+    const [imageData, setImageData] = useState(null); // For base64 image data
+    const [imageUrl, setImageUrl] = useState(null); // For storing uploaded image URL
+    const [imageUploadError, setImageUploadError] = useState(null); // For image upload errors
+    const [loading, setLoading] = useState(true); // Loading state for initial fetch
+    const [loadError, setLoadError] = useState(null); // Error state for initial fetch
 
+    // useEffect for fetching data on load
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('/BuildingandAddress'); // Ensure navigation path is correct
+            return;
+        }
 
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
-    }
-  }, [buildingId, navigate]);
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+            // Correct Firestore document path for this form
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Fire Extinguisher Locations', buildingId);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Function to handle back button
-  const handleBack = async () => {
-          if (formData && buildingId) { // Check if formData and buildingId exist
             try {
-              const buildingRef = doc(db, 'Buildings', buildingId);
-              const formsRef = collection(db, 'forms/Emergency Preparedness/Fire Extinguisher Locations');
-              await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-              });
-              console.log('Form Data submitted successfully on back!');
-              alert('Form data saved before navigating back!');
+                const docSnapshot = await getDoc(formDocRef);
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                    setImageUrl(docSnapshot.data().formData?.imageUrl || null);
+                } else {
+                    setFormData({});
+                }
             } catch (error) {
-              console.error('Error saving form data:', error);
-              alert('Failed to save form data before navigating back. Some data may be lost.');
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
             }
-          }
-          navigate(-1);
         };
- 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    // handleChange saves data on every change
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        // Standardize radio button values
+        const standardizedValue = (value === 'yes' || value === 'no') ? value : value;
+        const newFormData = { ...formData, [name]: standardizedValue };
+        setFormData(newFormData);
+
+        if (!buildingId) {
+            console.error("Building ID is missing, cannot save data.");
+            return;
+        }
+
+        try {
+            // Correct Firestore document path
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Fire Extinguisher Locations', buildingId);
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            // Save data using setDoc with merge: true
+            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true });
+            console.log("Form data auto-saved:", { ...newFormData, building: buildingRef });
+        } catch (error) {
+            console.error("Error auto-saving form data:", error);
+            // Optionally show a non-blocking error to the user
+        }
+    };
+
+    // handleImageChange using FileReader
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImageData(reader.result);
+                setImageUrl(null);
+                setImageUploadError(null);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // handleBack now only navigates
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    // handleSubmit using Cloud Function for upload
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        let finalImageUrl = formData.imageUrl || null;
+
+        // Upload new image if imageData exists
+        if (imageData) {
+             setImageUploadError(null);
+            try {
+                console.log("Uploading image...");
+                const uploadResult = await uploadImage({ imageData: imageData });
+                finalImageUrl = uploadResult.data.imageUrl;
+                setImageUrl(finalImageUrl);
+                console.log("Image uploaded successfully:", finalImageUrl);
+            } catch (error) {
+                console.error('Error uploading image via Cloud Function:', error);
+                setImageUploadError(error.message || "Failed to upload image.");
+                alert(`Image upload failed: ${error.message || "Unknown error"}`);
+                // return; // Optional: Stop submission on image upload failure
+            }
+        }
+
+        // Correct typo 'buildling' to 'building' and prepare final data
+        const finalFormData = { ...formData, imageUrl: finalImageUrl };
+
+        try {
+            // Correct Firestore document path
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Fire Extinguisher Locations', buildingId);
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            // Save final data using setDoc with merge: true, ensure 'building' field is correct
+            await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
+
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error submitting final form data:", error);
+            alert("Failed to submit the form. Please check your connection and try again.");
+        }
+    };
+
+    // Loading and Error display
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
-
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Emergency Preparedness/Fire Extinguisher Locations');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
-  };
 
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-        <h1>Fire Extinguisher Locations Assessment</h1>
-        <img src={logo} alt="Logo" className="logo" />
-        </header>
+    // Define questions with standardized names and types
+    const questions = [
+        // Visibility and Accessibility
+        { name: "extinguishersAccessible", label: "Are fire extinguishers located in easily accessible locations throughout the premises?", type: "radio" },
+        { name: "placementDeterminedByHazards", label: "Have extinguisher placement been determined based on fire hazards, occupancy types, and relevant regulations or standards?", type: "radio" },
+        { name: "locationsClearlyMarked", label: "Are extinguisher locations clearly marked and visible to occupants, including visitors and employees?", type: "radio" },
+        { name: "extinguishersMountedAppropriately", label: "Are extinguishers mounted at appropriate heights and locations to facilitate quick retrieval in case of fire emergencies?", type: "radio" },
+        // Distribution and Coverage
+        { name: "strategicDistribution", label: "Are fire extinguishers distributed strategically to provide adequate coverage of all areas, including high-risk zones and confined spaces?", type: "radio" },
+        { name: "placementMeetsRegulations", label: "Have extinguisher placement been determined based on fire hazards, occupancy types, and relevant regulations or standards?", type: "radio" }, // Note: Similar to placementDeterminedByHazards
+        { name: "sufficientNumber", label: "Are there sufficient numbers of extinguishers available to meet the needs of the building size and occupancy load?", type: "radio" },
+        // Proper Mounting and Maintenance
+        { name: "securelyMounted", label: "Are fire extinguishers securely mounted on brackets or stands to prevent accidental displacement or damage?", type: "radio" },
+        { name: "regularlyInspected", label: "Are extinguishers inspected regularly to ensure they are in good working condition and free from damage or tampering?", type: "radio" },
+        { name: "maintenanceScheduleInPlace", label: "Is there a maintenance schedule in place for servicing extinguishers, including inspections, testing, and recharging as needed?", type: "radio" }, // Corrected typo
+        // Identification and Signage
+        { name: "clearlyLabeled", label: "Are fire extinguishers clearly labeled with appropriate signage indicating the type of extinguisher and its intended use?", type: "radio" },
+        { name: "locationsOnMaps", label: "Are extinguisher locations identified on building maps or evacuation plans, both in physical form and electronically if applicable?", type: "radio" },
+        { name: "occupantTrainingProvided", label: "Is there training provided to occupants on how to locate and use fire extinguishers effectively during emergencies?", type: "radio" },
+        // Training and Education
+        { name: "staffTrainedInUse", label: "Are staff members and occupants trained in the proper use of fire extinguishers as part of their fire safety training?", type: "radio" },
+        { name: "occupantsUnderstandLimitations", label: "Do occupants understand the types of fires that can be safely extinguished with portable extinguishers and when to evacuate instead?", type: "radio" },
+        { name: "drillsReinforceTraining", label: "Are regular fire drills conducted to reinforce training and familiarize occupants with fire extinguisher locations and procedures?", type: "radio" },
+        // Emergency Response Integration
+        { name: "integratedInEmergencyPlan", label: "Are fire extinguishers integrated into the overall emergency response plan for the premises?", type: "radio" },
+        { name: "useCoordinatedWithResponse", label: "Is there coordination between fire extinguisher use and other response actions such as evacuation, alarm activation, and contacting emergency services?", type: "radio" },
+        { name: "personnelTrainedToAssess", label: "Are designated personnel trained to assess fire situations and determine when it is safe and appropriate to use extinguishers before evacuation?", type: "radio" },
+        // Record Keeping and Documentation
+        { name: "recordKeepingSystemExists", label: "Is there a record keeping system in place to document the location, inspection dates, and maintenance history of fire extinguishers?", type: "radio" }, // Was composite
+        { name: "recordsMaintainedPerRegulations", label: "Are records maintained in compliance with relevant regulations and standards, and are they readily accessible for review by authorities or inspectors?", type: "radio" },
+        { name: "deficienciesAddressed", label: "Are deficiencies or issues identified during inspections promptly addressed and documented, with corrective actions implemented as needed?", type: "radio" }
+    ];
 
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                {/* 2.2.1.1.2 Visibility and Accessibility */}
-                <h2>Visibility and Accessibility:</h2>
-                <div className="form-section">
-                <label>Are fire extinguishers located in easily accessible locations throughout the premises?</label>
-                    <div>
-                        <input type="radio" name="fire extinguishers accessible" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="fire extinguishers accessible" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="fire extinguishers accessible-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
 
-                <div className="form-section">
-                <label>Have extinguisher placement been determined based on fire hazards, occupancy types, and relevant regulations or standards?</label>
-                    <div>
-                        <input type="radio" name="extinguisher placement" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="extinguisher placement" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="extinguisher placement-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+    return (
+        <div> {/* Outer wrapper div */}
+            <div className="form-page">
+                <header className="header">
+                    <Navbar />
+                    <button className="back-button" onClick={handleBack}>←</button>
+                    <h1>Fire Extinguisher Locations Assessment</h1>
+                    <img src={logo} alt="Logo" className="logo" />
+                </header>
 
-                <div className="form-section">
-                <label>Are extinguisher locations clearly marked and visible to occupants, including visitors and employees?</label>
-                    <div>
-                        <input type="radio" name="Visible extinguisher locations" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="Visible extinguisher locations" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="Visible extinguisher locations-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                <main className="form-container">
+                    <form onSubmit={handleSubmit}>
+                        {/* Render questions dynamically */}
+                         {questions.map((question, index) => (
+                             <div key={index} className="form-section">
+                                {/* Conditionally render section titles */}
+                                {index === 0 && <h2>Visibility and Accessibility:</h2>}
+                                {index === 4 && <h2>Distribution and Coverage:</h2>}
+                                {index === 7 && <h2>Proper Mounting and Maintenance:</h2>}
+                                {index === 10 && <h2>Identification and Signage:</h2>}
+                                {index === 13 && <h2>Training and Education:</h2>}
+                                {index === 16 && <h2>Emergency Response Integration:</h2>}
+                                {index === 19 && <h2>Record Keeping and Documentation:</h2>}
 
-                <div className="form-section">
-                <label>Are extinguishers mounted at appropriate heights and locations to facilitate quick retrieval in case of fire emergencies?</label>
-                    <div>
-                        <input type="radio" name="extinguishers heights locations" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="extinguishers heights locations" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="extinguishers heights locations-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                                <label htmlFor={question.name}>{question.label}</label>
 
-                <h2>Distribution and Coverage:</h2>
-                <div className="form-section">
-                <label>Are fire extinguishers distributed strategically to provide adequate coverage of all areas, including high-risk zones and confined spaces?</label>
-                    <div>
-                        <input type="radio" name="strategic extinguisher placement" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="strategic extinguisher placement" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="strategic extinguisher placement-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                                {/* Render Yes/No radio buttons + comment input for all questions */}
+                                <>
+                                    <div>
+                                        <input
+                                            type="radio"
+                                            id={`${question.name}_yes`}
+                                            name={question.name}
+                                            value="yes"
+                                            checked={formData[question.name] === "yes"}
+                                            onChange={handleChange}
+                                        />
+                                            <label htmlFor={`${question.name}_yes`}> Yes</label>
 
-                <div className="form-section">
-                <label>Have extinguisher placement been determined based on fire hazards, occupancy types, and relevant regulations or standards?</label>
-                    <div>
-                        <input type="radio" name="extinguisher placement regulation" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="extinguisher placement regulation" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="extinguisher placement regulation-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                                        <input
+                                            type="radio"
+                                            id={`${question.name}_no`}
+                                            name={question.name}
+                                            value="no"
+                                            checked={formData[question.name] === "no"}
+                                            onChange={handleChange}
+                                        />
+                                            <label htmlFor={`${question.name}_no`}> No</label>
+                                    </div>
+                                    <input
+                                        type="text" // Using input type="text" for comment consistency
+                                        id={`${question.name}Comment`} // Standard comment name
+                                        name={`${question.name}Comment`} // Standard comment name
+                                        placeholder="Additional comments (Optional)"
+                                        value={formData[`${question.name}Comment`] || ''}
+                                        onChange={handleChange}
+                                        className='comment-box'
+                                    />
+                                </>
+                            </div>
+                        ))}
 
-                <div className="form-section">
-                <label>Are there sufficient numbers of extinguishers available to meet the needs of the building size and occupancy load?</label>
-                    <div>
-                        <input type="radio" name="sufficient extinguishers number" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="sufficient extinguishers number" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="sufficient extinguishers number-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                        {/* File Input for Image Upload */}
+                        <div className="form-section">
+                            <label>Upload Image (Optional):</label>
+                             <input type="file" onChange={handleImageChange} accept="image/*" />
+                             {imageUrl && <img src={imageUrl} alt="Uploaded Extinguisher Location Context" style={{ maxWidth: '200px', marginTop: '10px' }}/>}
+                             {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                        </div>
 
-                <h2>Proper Mounting and Maintenance:</h2>
-                <div className="form-section">
-                <label>Are fire extinguishers securely mounted on brackets or stands to prevent accidental displacement or damage?</label>
-                    <div>
-                        <input type="radio" name="extinguisher securely mounted" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="extinguisher securely mounted" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="extinguisher securely mounted-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                <label>Are extinguishers inspected regularly to ensure they are in good working condition and free from damage or tampering?</label>
-                    <div>
-                        <input type="radio" name="regular extinguisher inspection" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="regular extinguisher inspection" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="regular extinguisher inspection-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                <label>Is there a maintenance schedule in place for servicing extinguishers, including inspections, testing, and recharging as needed?</label>
-                    <div>
-                        <input type="radio" name="regular extinguisher maintainance" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="regular extinguisher maintainance" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="regular extinguisher maintainance-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>Identification and Signage:</h2>
-                <div className="form-section">
-                <label>Are fire extinguishers clearly labeled with appropriate signage indicating the type of extinguisher and its intended use?</label>
-                    <div>
-                        <input type="radio" name="extinguisher clearly labeled" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="extinguisher clearly labeled" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="extinguisher clearly labeled-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                <label>Are extinguisher locations identified on building maps or evacuation plans, both in physical form and electronically if applicable?</label>
-                    <div>
-                        <input type="radio" name="extinguisher location identified" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="extinguisher location identified" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="extinguisher location identified-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                <label>Is there training provided to occupants on how to locate and use fire extinguishers effectively during emergencies?</label>
-                    <div>
-                        <input type="radio" name="occupant training" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="occupant training" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="occupant training-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>Training and Education:</h2>
-                <div className="form-section">
-                <label>Are staff members and occupants trained in the proper use of fire extinguishers as part of their fire safety training?</label>
-                    <div>
-                        <input type="radio" name="user training" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="user training" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="user training-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                <label>Do occupants understand the types of fires that can be safely extinguished with portable extinguishers and when to evacuate instead?</label>
-                    <div>
-                        <input type="radio" name="occupants fire understanding" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="occupants fire understanding" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="occupants fire understanding-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                <label>Are regular fire drills conducted to reinforce training and familiarize occupants with fire extinguisher locations and procedures?</label>
-                    <div>
-                        <input type="radio" name="regular fire drills" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="regular fire drills" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="regular fire drills-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>Emergency Response Integration:</h2>
-                <div className="form-section">
-                <label>Are fire extinguishers integrated into the overall emergency response plan for the premises?</label>
-                    <div>
-                        <input type="radio" name="fire extinguishers integration" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="fire extinguishers integration" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="fire extinguishers integration-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                <label>Is there coordination between fire extinguisher use and other response actions such as evacuation, alarm activation, and contacting emergency services?</label>
-                    <div>
-                        <input type="radio" name="extinguisher use coordination" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="extinguisher use coordination" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="extinguisher use coordination-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                <label>Are designated personnel trained to assess fire situations and determine when it is safe and appropriate to use extinguishers before evacuation?</label>
-                    <div>
-                        <input type="radio" name="designated trained personnel " value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="designated trained personnel " value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="designated trained personnel-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>Record Keeping and Documentation:</h2>
-                <div className="form-section">
-                <label>Is there a record keeping system in place to document the location, inspection dates, and maintenance history of fire extinguishers?</label>
-                    <div>
-                        <input type="radio" name="record keeping system" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="record keeping system" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="record keeping system-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                    <div>
-                        <input type="text" name="recordKeepingSystem" placeholder="Describe the system" />
-                    </div>
-                </div>
-
-                <div className="form-section">
-                <label>Are records maintained in compliance with relevant regulations and standards, and are they readily accessible for review by authorities or inspectors?</label>
-                    <div>
-                        <input type="radio" name="maintaining records" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="maintaining records" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="maintaining records-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                <label>Are deficiencies or issues identified during inspections promptly addressed and documented, with corrective actions implemented as needed?</label>
-                    <div>
-                        <input type="radio" name="issues identified" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="issues identified" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="issues identified-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                {/* Submit Button */}
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-
-            </form>
-        </main>
-    </div>
-  )
+                        {/* Submit Button */}
+                        <button type="submit">Submit Assessment</button>
+                    </form>
+                </main>
+            </div>
+        </div>
+    );
 }
 
 export default FireExtinguisherLocationsFormPage;
