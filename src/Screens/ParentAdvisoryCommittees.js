@@ -1,234 +1,244 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function ParentAdvisoryCommitteesFormPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding(); // Access buildingId from context
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadImage = httpsCallable(functions, 'uploadParentAdvisoryCommitteesFormPageImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('/BuildingandAddress');
+            return;
+        }
 
-  useEffect(() => {
-      if (!buildingId) {
-          alert('No building selected. Redirecting to Building Info...');
-          navigate('/BuildingandAddress');
-      }
-  }, [buildingId, navigate]);
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
+            try {
+                const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Parent Advisory Committees', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Parent Advisory Committees', buildingId);
+            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
+            console.log("Form data saved to Firestore:", newFormData);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start the assessment from the correct page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Parent Advisory Committees', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
-  };
-  const handleChange = (e) => {
-      const { name, value } = e.target;
-      setFormData((prevData) => ({
-          ...prevData,
-          [name]: value,
-      }));
-  };
 
-  // Function to handle back button
-  const handleBack = async () => {
-    if (formData && buildingId) { // Check if formData and buildingId exist
-      try {
-        const buildingRef = doc(db, 'Buildings', buildingId);
-        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Parent Advisory Committees');
-        await addDoc(formsRef, {
-          building: buildingRef,
-          formData: formData,
-        });
-        console.log('Form Data submitted successfully on back!');
-        alert('Form data saved before navigating back!');
-      } catch (error) {
-        console.error('Error saving form data:', error);
-        alert('Failed to save form data before navigating back. Some data may be lost.');
-      }
-    }
-    navigate(-1);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!buildingId) {
-        alert('Building ID is missing. Please start the assessment from the correct page.');
-        return;
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId); 
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>Parent Advisory Committees Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Personnel Training and Awareness/Parent Advisory Committees');
-      await addDoc(formsRef, {
-          building: buildingRef, // Reference to the building document
-          formData: formData, // Store the form data as a nested object
-      });
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>Committee Formation and Composition:</h2>
+                    {[
+                        { name: "committeeFormationAndComposition", label: "How are parent advisory committees established, structured, and maintained within the school or educational institution?" },
+                        { name: "selectionCriteriaForRepresentatives", label: "What criteria are used to select parent representatives for advisory committees, and how are they chosen to ensure diverse perspectives, expertise, and representation?" },
+                        { name: "committeeInclusiveness", label: "Are parent advisory committees inclusive and reflective of the demographics, backgrounds, and interests of the school community?" },
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            {question.name === "committeeInclusiveness" ? (
+                                <><div>
+                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-      console.log('Form data submitted successfully!');
-      alert('Form submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-        console.error('Error submitting form:', error);
-        alert('Failed to submit the form. Please try again.');
-    }
-};
+                            ) : (
+                                <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />
+                            )}
+                        </div>
+                    ))}
 
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Parent Advisory Committees Assessment</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
+                    <h2>Role and Scope of Advisory Committees:</h2>
+                    {[
+                        { name: "committeeRolesAndMandates", label: "What specific roles, responsibilities, and mandates are assigned to parent advisory committees, particularly regarding their involvement in emergency planning and safety initiatives?" },
+                        { name: "committeeContributionsToPlans", label: "How do advisory committees contribute to the development, review, and refinement of emergency plans, protocols, policies, or procedures within the school or educational institution?" },
+                        { name: "committeeEmpowerment", label: "Are advisory committees empowered to provide input, feedback, recommendations, or alternative perspectives on emergency preparedness and safety-related matters?" },
+                    ].map((question, index) => (
+                        <div key={index + 3} className="form-section">
+                            <label>{question.label}</label>
+                            {question.name === "committeeEmpowerment" ? (
+                                <><div>
+                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                {/* 3.3.1.1.3 Parent Advisory Committees */}
-                <h2>Committee Formation and Composition:</h2>
-                <div className="form-section">
-                    <label>How are parent advisory committees established, structured, and maintained within the school or educational institution?</label>
-                    <div>
-                        <input type="text" name="committeeFormationAndComposition" placeholder="Describe how it's established" onChange={handleChange}/>  
-                    </div>
-                </div>
+                            ) : (
+                                <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />
+                            )}
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>What criteria are used to select parent representatives for advisory committees, and how are they chosen to ensure diverse perspectives, expertise, and representation?</label>
-                    <div>
-                        <input type="text" name="selectionCriteriaForRepresentatives" placeholder="Describe the criteria" onChange={handleChange}/>  
-                    </div>
-                </div>
+                    <h2>Engagement and Communication:</h2>
+                    {[
+                        { name: "committeeEngagementWithLeadership", label: "How do parent advisory committees engage with school leadership, administrators, safety personnel, and other stakeholders to facilitate open communication, collaboration, and transparency?" },
+                        { name: "feedbackMechanismsForCommittees", label: "What mechanisms or channels are in place to solicit feedback, concerns, suggestions, or insights from parent advisory committees regarding emergency plans, safety measures, or school policies?" },
+                        { name: "committeeMeetingFrequency", label: "Are advisory committee meetings, forums, or discussions conducted regularly and inclusively to encourage participation, dialogue, and consensus-building among members?" },
+                    ].map((question, index) => (
+                        <div key={index + 6} className="form-section">
+                            <label>{question.label}</label>
+                            {question.name === "committeeMeetingFrequency" ? (
+                                <><div>
+                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-                <div className="form-section">
-                    <label>Are parent advisory committees inclusive and reflective of the demographics, backgrounds, and interests of the school community?</label>
-                    <div>
-                        <input type="radio" name="committeeInclusiveness" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="committeeInclusiveness" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="committeeInclusivenessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                            ) : (
+                                <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />
+                            )}
+                        </div>
+                    ))}
 
-                <h2>Role and Scope of Advisory Committees:</h2>
-                <div className="form-section">
-                    <label>What specific roles, responsibilities, and mandates are assigned to parent advisory committees, particularly regarding their involvement in emergency planning and safety initiatives?</label>
-                    <div>
-                        <input type="text" name="committeeRolesAndMandates" placeholder="Describe the roles/responsibilities/mandates" onChange={handleChange}/>  
-                    </div>
-                </div>
+                    <h2>Review and Evaluation:</h2>
+                    {[
+                        { name: "feedbackUtilizationBySchool", label: "How does the school administration or leadership utilize feedback and recommendations from parent advisory committees to inform decision-making, policy development, or improvements in emergency preparedness and safety?" },
+                        { name: "reviewAndRevisionProcess", label: "Is there a structured process or timeline for reviewing, revising, and updating emergency plans, protocols, or procedures based on input from advisory committees and other stakeholders?" },
+                        { name: "transparencyInOutcomes", label: "Are outcomes, actions, or changes resulting from advisory committee input communicated transparently and effectively to the school community to demonstrate accountability and responsiveness?" },
+                    ].map((question, index) => (
+                        <div key={index + 9} className="form-section">
+                            <label>{question.label}</label>
+                            {question.name === "transparencyInOutcomes" ? (
+                                <><div>
+                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-                <div className="form-section">
-                    <label>How do advisory committees contribute to the development, review, and refinement of emergency plans, protocols, policies, or procedures within the school or educational institution?</label>
-                    <div>
-                        <input type="text" name="committeeContributionsToPlans" placeholder="Describe how they contribute" onChange={handleChange}/>  
-                    </div>
-                </div>
+                            ) : (
+                                <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />
+                            )}
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>Are advisory committees empowered to provide input, feedback, recommendations, or alternative perspectives on emergency preparedness and safety-related matters?</label>
-                    <div>
-                        <input type="radio" name="committeeEmpowerment" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="committeeEmpowerment" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="committeeEmpowermentComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <h2>Capacity Building and Training:</h2>
+                    {[
+                        { name: "orientationAndTrainingForCommittees", label: "Are members of parent advisory committees provided with orientation, training, or resources to enhance their understanding of emergency planning principles, safety protocols, and relevant school policies?" },
+                        { name: "capacityBuildingSupport", label: "How does the school administration support the capacity building and professional development of advisory committee members to empower them as informed and effective contributors to safety initiatives?" },
+                        { name: "externalCollaborationOpportunities", label: "Are opportunities available for advisory committee members to collaborate with external experts, attend workshops or conferences, or participate in relevant training sessions to broaden their knowledge and expertise in emergency preparedness and safety?" },
+                    ].map((question, index) => (
+                        <div key={index + 12} className="form-section">
+                            <label>{question.label}</label>
+                            {question.name === "externalCollaborationOpportunities" ? (
+                                <><div>
+                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-                <h2>Engagement and Communication:</h2>
-                <div className="form-section">
-                    <label>How do parent advisory committees engage with school leadership, administrators, safety personnel, and other stakeholders to facilitate open communication, collaboration, and transparency?</label>
-                    <div>
-                        <input type="text" name="committeeEngagementWithLeadership" placeholder="Describe how they're engaging" onChange={handleChange}/>  
-                    </div>
-                </div>
+                            ) : (
+                                <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />
+                            )}
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>What mechanisms or channels are in place to solicit feedback, concerns, suggestions, or insights from parent advisory committees regarding emergency plans, safety measures, or school policies?</label>
-                    <div>
-                        <input type="text" name="feedbackMechanismsForCommittees" placeholder="Describe the mechanisms" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are advisory committee meetings, forums, or discussions conducted regularly and inclusively to encourage participation, dialogue, and consensus-building among members?</label>
-                    <div>
-                        <input type="radio" name="committeeMeetingFrequency" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="committeeMeetingFrequency" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="committeeMeetingFrequencyComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>Review and Evaluation:</h2>
-                <div className="form-section">
-                    <label>How does the school administration or leadership utilize feedback and recommendations from parent advisory committees to inform decision-making, policy development, or improvements in emergency preparedness and safety?</label>
-                    <div>
-                        <input type="text" name="feedbackUtilizationBySchool" placeholder="Describe how they use feedback" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Is there a structured process or timeline for reviewing, revising, and updating emergency plans, protocols, or procedures based on input from advisory committees and other stakeholders?</label>
-                    <div>
-                        <input type="text" name="reviewAndRevisionProcess" placeholder="Describe process/timeline" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are outcomes, actions, or changes resulting from advisory committee input communicated transparently and effectively to the school community to demonstrate accountability and responsiveness?</label>
-                    <div>
-                        <input type="radio" name="transparencyInOutcomes" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="transparencyInOutcomes" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="transparencyInOutcomesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>Capacity Building and Training:</h2>
-                <div className="form-section">
-                    <label>Are members of parent advisory committees provided with orientation, training, or resources to enhance their understanding of emergency planning principles, safety protocols, and relevant school policies?</label>
-                    <div>
-                        <input type="radio" name="orientationAndTrainingForCommittees" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="orientationAndTrainingForCommittees" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="orientationAndTrainingForCommitteesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How does the school administration support the capacity building and professional development of advisory committee members to empower them as informed and effective contributors to safety initiatives?</label>
-                    <div>
-                        <input type="text" name="capacityBuildingSupport" placeholder="Describe how they support the development" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are opportunities available for advisory committee members to collaborate with external experts, attend workshops or conferences, or participate in relevant training sessions to broaden their knowledge and expertise in emergency preparedness and safety?</label>
-                    <div>
-                        <input type="radio" name="externalCollaborationOpportunities" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="externalCollaborationOpportunities" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="externalCollaborationOpportunitiesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <button type='submit'>Submit</button>
-            </form>
-        </main>
-    </div>
-  )
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: "red" }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default ParentAdvisoryCommitteesFormPage;

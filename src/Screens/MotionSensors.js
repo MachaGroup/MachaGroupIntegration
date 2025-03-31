@@ -1,306 +1,263 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function MotionSensorsPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding(); // Access buildingId from context
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadImage = httpsCallable(functions, 'uploadMotionSensorsPageImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('/BuildingandAddress');
+            return;
+        }
 
-  useEffect(() => {
-      if (!buildingId) {
-          alert('No building selected. Redirecting to Building Info...');
-          navigate('/BuildingandAddress');
-      }
-  }, [buildingId, navigate]);
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
+            try {
+                const formDocRef = doc(db, 'forms', 'Physical Security', 'Motion Sensors', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Physical Security', 'Motion Sensors', buildingId);
+            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
+            console.log("Form data saved to Firestore:", newFormData);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start the assessment from the correct page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Physical Security', 'Motion Sensors', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
-  };
-  const handleChange = (e) => {
-      const { name, value } = e.target;
-      setFormData((prevData) => ({
-          ...prevData,
-          [name]: value,
-      }));
-  };
 
-  // Function to handle back button
-  const handleBack = async () => {
-    if (formData && buildingId) { // Check if formData and buildingId exist
-      try {
-        const buildingRef = doc(db, 'Buildings', buildingId);
-        const formsRef = collection(db, 'forms/Physical Security/Motion Sensors');
-        await addDoc(formsRef, {
-          building: buildingRef,
-          formData: formData,
-        });
-        console.log('Form Data submitted successfully on back!');
-        alert('Form data saved before navigating back!');
-      } catch (error) {
-        console.error('Error saving form data:', error);
-        alert('Failed to save form data before navigating back. Some data may be lost.');
-      }
-    }
-    navigate(-1);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!buildingId) {
-        alert('Building ID is missing. Please start the assessment from the correct page.');
-        return;
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId); 
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>Motion Sensors Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Physical Security/Motion Sensors');
-      await addDoc(formsRef, {
-          building: buildingRef, // Reference to the building document
-          formData: formData, // Store the form data as a nested object
-      });
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>Placement and Coverage:</h2>
+                    {[
+                        { name: "strategicPlacement", label: "Are the motion sensors strategically placed to detect unauthorized entry points?" },
+                        { name: "coverage", label: "Do they cover all potential entry points, such as doors, windows, and other vulnerable areas?" },
+                        { name: "blindSpots", label: "Are there any blind spots or areas where sensor coverage is insufficient?" },
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            {question.name === "blindSpots" ? (
+                                <input type="text" name={question.name} placeholder={question.label.split("?")[0] + "..."} value={formData[question.name] || ''} onChange={handleChange} />
+                            ) : (
+                                <><div>
+                              <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                              <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                            </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-      console.log('Form data submitted successfully!');
-      alert('Form submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-        console.error('Error submitting form:', error);
-        alert('Failed to submit the form. Please try again.');
-    }
-};
+                            )}
+                        </div>
+                    ))}
 
-  return (
-    <div className="form-page">
-      <header className="header">
-            <Navbar />
-        {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-        <h1>Motion Sensors Assessment</h1>
-        <img src={logo} alt="Logo" className="logo" />
-      </header>
+                    <h2>Detection Sensitivity:</h2>
+                    {[
+                        { name: "sensitivityLevel", label: "Are the motion sensors set to an appropriate sensitivity level to detect unauthorized movement effectively?" },
+                        { name: "falseAlarms", label: "Have adjustments been made to minimize false alarms caused by environmental factors such as pets, wildlife, or moving objects?" },
+                    ].map((question, index) => (
+                        <div key={index + 3} className="form-section">
+                            <label>{question.label}</label>
+                            {question.name === "falseAlarms" ? (
+                                <input type="text" name={question.name} placeholder={question.label.split("?")[0] + "..."} value={formData[question.name] || ''} onChange={handleChange} />
+                            ) : (
+                                <><div>
+                              <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                              <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                            </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-      <main className="form-container">
-        <form onSubmit={handleSubmit}>
-          {/* Placement and Coverage */}
-          <h2>Placement and Coverage:</h2>
-          <div className="form-section">
-            <label>Are the motion sensors strategically placed to detect unauthorized entry points?</label>
-            <div>
-              <input type="radio" name="strategicPlacement" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="strategicPlacement" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="strategicPlacementComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                            )}
+                        </div>
+                    ))}
 
-          <div className="form-section">
-            <label>Do they cover all potential entry points, such as doors, windows, and other vulnerable areas?</label>
-            <div>
-              <input type="radio" name="coverage" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="coverage" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="coverageComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    <h2>Response Time and Alarm Triggering:</h2>
+                    {[
+                        { name: "responseTime", label: "Do the motion sensors respond quickly to detected motion and trigger alarms promptly?" },
+                        { name: "differentiateMechanism", label: "Is there a mechanism in place to differentiate between normal activity and suspicious movements to minimize false alarms?" },
+                        { name: "alarmTransmission", label: "Are alarms transmitted to monitoring stations or security personnel in real-time for immediate response?" },
+                    ].map((question, index) => (
+                        <><div key={index + 5} className="form-section">
+                        <label>{question.label}</label>
+                        <div>
+                          <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                          <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                        </div>
+                      </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-          <div className="form-section">
-            <label>Are there any blind spots or areas where sensor coverage is insufficient?</label>
-            <div>
-              <input type="text" name="blindSpots" placeholder="Describe any blind spots" onChange={handleChange}/>
-            </div>
-          </div>
+                    ))}
 
-          {/* Detection Sensitivity */}
-          <h2>Detection Sensitivity:</h2>
-          <div className="form-section">
-            <label>Are the motion sensors set to an appropriate sensitivity level to detect unauthorized movement effectively?</label>
-            <div>
-              <input type="radio" name="sensitivityLevel" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="sensitivityLevel" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="sensitivityLevelComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    <h2>Integration with Alarm Systems:</h2>
+                    {[
+                        { name: "systemIntegration", label: "Are the motion sensors integrated with the overall intrusion alarm system?" },
+                        { name: "seamlessCommunication", label: "Do they communicate seamlessly with alarm control panels and monitoring stations?" },
+                        { name: "coordinationAlarmDevices", label: "Is there coordination between motion sensor activations and other alarm devices such as sirens, strobe lights, or notification systems?" },
+                    ].map((question, index) => (
+                        <><div key={index + 8} className="form-section">
+                        <label>{question.label}</label>
+                        <div>
+                          <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                          <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                        </div>
+                      </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-          <div className="form-section">
-            <label>Have adjustments been made to minimize false alarms caused by environmental factors such as pets, wildlife, or moving objects?</label>
-            <div>
-              <input type="text" name="falseAlarms" placeholder="Describe any adjustments made" onChange={handleChange}/>
-            </div>
-          </div>
+                    ))}
 
-          {/* Response Time and Alarm Triggering */}
-          <h2>Response Time and Alarm Triggering:</h2>
-          <div className="form-section">
-            <label>Do the motion sensors respond quickly to detected motion and trigger alarms promptly?</label>
-            <div>
-              <input type="radio" name="responseTime" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="responseTime" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="responseTimeComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    <h2>Remote Monitoring and Management:</h2>
+                    {[
+                        { name: "remoteAccess", label: "Is there remote access and monitoring functionality for the motion sensors?" },
+                        { name: "remoteAdjustments", label: "Can security personnel view sensor status, receive alerts, and adjust settings remotely as needed?" },
+                        { name: "secureAuthentication", label: "Is there secure authentication and encryption protocols in place to prevent unauthorized access to sensor controls?" },
+                    ].map((question, index) => (
+                        <><div key={index + 11} className="form-section">
+                        <label>{question.label}</label>
+                        <div>
+                          <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                          <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                        </div>
+                      </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-          <div className="form-section">
-            <label>Is there a mechanism in place to differentiate between normal activity and suspicious movements to minimize false alarms?</label>
-            <div>
-              <input type="radio" name="differentiateMechanism" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="differentiateMechanism" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="differentiateMechanismComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    ))}
 
-          <div className="form-section">
-            <label>Are alarms transmitted to monitoring stations or security personnel in real-time for immediate response?</label>
-            <div>
-              <input type="radio" name="alarmTransmission" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="alarmTransmission" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="alarmTransmissionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    <h2>Durability and Reliability:</h2>
+                    {[
+                        { name: "environmentDurability", label: "Are the motion sensors designed to withstand environmental factors such as temperature variations, moisture, and physical impact?" },
+                        { name: "materialDurability", label: "Are they constructed from durable materials capable of withstanding outdoor conditions if installed in exterior locations?" },
+                        { name: "sensorCertification", label: "Have the sensors undergone testing or certification to verify reliability and durability?" },
+                    ].map((question, index) => (
+                        <><div key={index + 14} className="form-section">
+                        <label>{question.label}</label>
+                        <div>
+                          <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                          <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                        </div>
+                      </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-          {/* Integration with Alarm Systems */}
-          <h2>Integration with Alarm Systems:</h2>
-          <div className="form-section">
-            <label>Are the motion sensors integrated with the overall intrusion alarm system?</label>
-            <div>
-              <input type="radio" name="systemIntegration" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="systemIntegration" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="systemIntegrationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    ))}
 
-          <div className="form-section">
-            <label>Do they communicate seamlessly with alarm control panels and monitoring stations?</label>
-            <div>
-              <input type="radio" name="seamlessCommunication" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="seamlessCommunication" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="seamlessCommunicationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    <h2>Maintenance and Upkeep:</h2>
+                    {[
+                        { name: "maintenanceSchedule", label: "Is there a regular maintenance schedule in place for the motion sensors?" },
+                        { name: "maintenanceTasks", label: "Are maintenance tasks, such as testing sensor functionality, replacing batteries, and cleaning sensor lenses, performed according to schedule?" },
+                        { name: "maintenanceRecords", label: "Are there records documenting maintenance activities, repairs, and any issues identified during inspections?" },
+                    ].map((question, index) => (
+                        <><div key={index + 17} className="form-section">
+                        <label>{question.label}</label>
+                        <div>
+                          <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                          <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                        </div>
+                      </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-          <div className="form-section">
-            <label>Is there coordination between motion sensor activations and other alarm devices such as sirens, strobe lights, or notification systems?</label>
-            <div>
-              <input type="radio" name="coordinationAlarmDevices" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="coordinationAlarmDevices" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="coordinationAlarmDevicesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    ))}
 
-          {/* Remote Monitoring and Management */}
-          <h2>Remote Monitoring and Management:</h2>
-          <div className="form-section">
-            <label>Is there remote access and monitoring functionality for the motion sensors?</label>
-            <div>
-              <input type="radio" name="remoteAccess" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="remoteAccess" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="remoteAccessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Can security personnel view sensor status, receive alerts, and adjust settings remotely as needed?</label>
-            <div>
-              <input type="radio" name="remoteAdjustments" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="remoteAdjustments" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="remoteAdjustmentsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Is there secure authentication and encryption protocols in place to prevent unauthorized access to sensor controls?</label>
-            <div>
-              <input type="radio" name="secureAuthentication" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="secureAuthentication" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="secureAuthenticationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Durability and Reliability */}
-          <h2>Durability and Reliability:</h2>
-          <div className="form-section">
-            <label>Are the motion sensors designed to withstand environmental factors such as temperature variations, moisture, and physical impact?</label>
-            <div>
-              <input type="radio" name="environmentDurability" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="environmentDurability" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="environmentDurabilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are they constructed from durable materials capable of withstanding outdoor conditions if installed in exterior locations?</label>
-            <div>
-              <input type="radio" name="materialDurability" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="materialDurability" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="materialDurabilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Have the sensors undergone testing or certification to verify reliability and durability?</label>
-            <div>
-              <input type="radio" name="sensorCertification" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="sensorCertification" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="sensorCertificationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Maintenance and Upkeep */}
-          <h2>Maintenance and Upkeep:</h2>
-          <div className="form-section">
-            <label>Is there a regular maintenance schedule in place for the motion sensors?</label>
-            <div>
-              <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="maintenanceScheduleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are maintenance tasks, such as testing sensor functionality, replacing batteries, and cleaning sensor lenses, performed according to schedule?</label>
-            <div>
-              <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="maintenanceTasksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are there records documenting maintenance activities, repairs, and any issues identified during inspections?</label>
-            <div>
-              <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="maintenanceRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-        </form>
-      </main>
-    </div>
-  );
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: "red" }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default MotionSensorsPage;
