@@ -14,14 +14,12 @@ function SecurityGatesPage() {
     const functions = getFunctions();
     const uploadImage = httpsCallable(functions, 'uploadSecurityGateImage');
 
-
     const [formData, setFormData] = useState({});
     const [imageData, setImageData] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
     const [imageUploadError, setImageUploadError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState(null);
- 
 
     useEffect(() => {
         if (!buildingId) {
@@ -32,7 +30,7 @@ function SecurityGatesPage() {
 
         const fetchFormData = async () => {
             setLoading(true);
-            setLoadError(null); // Clear previous errors
+            setLoadError(null);
 
             try {
                 const formDocRef = doc(db, 'forms', 'Physical Security', 'Security Gates', buildingId);
@@ -41,7 +39,7 @@ function SecurityGatesPage() {
                 if (docSnapshot.exists()) {
                     setFormData(docSnapshot.data().formData || {});
                 } else {
-                    setFormData({}); // Initialize if document doesn't exist
+                    setFormData({});
                 }
             } catch (error) {
                 console.error("Error fetching form data:", error);
@@ -58,12 +56,12 @@ function SecurityGatesPage() {
         const { name, value } = e.target;
         const newFormData = { ...formData, [name]: value };
         setFormData(newFormData);
-
+ 
         try {
-            // Persist data to Firestore on every change
+            const buildingRef = doc(db, 'Buildings', buildingId); // Create buildingRef
             const formDocRef = doc(db, 'forms', 'Physical Security', 'Security Gates', buildingId);
-            await setDoc(formDocRef, { formData: newFormData }, { merge: true }); // Use merge to preserve existing fields
-            console.log("Form data saved to Firestore:", newFormData);
+            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true }); // Use merge and add building
+            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
         } catch (error) {
             console.error("Error saving form data to Firestore:", error);
             alert("Failed to save changes. Please check your connection and try again.");
@@ -79,9 +77,8 @@ function SecurityGatesPage() {
         reader.readAsDataURL(file);
     };
 
-
     const handleBack = () => {
-        navigate(-1); // Just navigate back
+        navigate(-1);
     };
 
     const handleSubmit = async (e) => {
@@ -105,12 +102,12 @@ function SecurityGatesPage() {
         }
 
         try {
+            const buildingRef = doc(db, 'Buildings', buildingId); // Create buildingRef
             const formDocRef = doc(db, 'forms', 'Physical Security', 'Security Gates', buildingId);
-            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            await setDoc(formDocRef, { formData: { ...formData, building: buildingRef } }, { merge: true }); // Use merge and add building
             console.log('Form data submitted successfully!');
             alert('Form submitted successfully!');
             navigate('/Form');
-
         } catch (error) {
             console.error("Error saving form data to Firestore:", error);
             alert("Failed to save changes. Please check your connection and try again.");

@@ -151,7 +151,6 @@ function PastAssessments() {
             const data = doc.data();
             console.log(`Assessment Details found for ${doc.id}:`, data);
 
-            //  Use the provided category1 and category2 values
             const formName = category1 || 'N/A';
             const formType = category2 || 'N/A';
 
@@ -172,12 +171,14 @@ function PastAssessments() {
         setLoading(true);
         setError(null);
         setAssessments([]);
+
         if (!buildingId) {
             setLoading(false);
             return;
         }
 
         console.log("Selected Building ID:", buildingId);
+
         const buildingRef = doc(db, "Buildings", buildingId);
         console.log("Building Reference:", buildingRef);
 
@@ -204,13 +205,17 @@ function PastAssessments() {
             if (subCategories[category1]) {
                 for (const category2 of subCategories[category1]) {
                     const collectionRef = collection(db, `forms/${category1}/${category2}`);
-                    const q = query(collectionRef, where('building', '==', buildingRef));
-                    allPromises.push(getDocs(q));
+                    const q = query(collectionRef, where('formData.building', '==', buildingRef)); // Corrected Query
+                    const promise = getDocs(q);
+                    allPromises.push(promise);
+                    console.log("Promise Pushed:", promise);
                 }
             }
         }
+
         try {
             const snapshots = await Promise.all(allPromises);
+            console.log("Snapshots:", snapshots);
 
             let i = 0;
             for (const category1 of formCategories) {
@@ -218,24 +223,30 @@ function PastAssessments() {
                     for (const category2 of subCategories[category1]) {
                         const snapshot = snapshots[i];
                         snapshot.forEach(doc => {
+                            console.log("Document Data from Query:", doc.data());
+                            console.log("Building Reference from Document:", doc.data().formData.building);
                             allAssessments.push({
                                 doc: doc,
                                 category1: category1,
                                 category2: category2
                             });
-                        })
+                        });
                         i++;
                     }
                 }
             }
-            const assessmentDetails = await Promise.all(allAssessments.map(assessment => getAssessmentDetails(assessment.doc, assessment.category1, assessment.category2)));
-            setAssessments(assessmentDetails.map(detail => ({
-                ...detail,
-                category1: detail.formName, // Use formName as category1
-                category2: detail.formType  // Use formType as category2
-            })));
+            const assessmentDetails = await Promise.all(allAssessments.map(assessment => {
+                console.log("Mapping assessment:", assessment);
+                const details = getAssessmentDetails(assessment.doc, assessment.category1, assessment.category2);
+                console.log("Assessment details returned:", details);
+                return details;
+            }));
+
+            console.log("Assessment details before set state:", assessmentDetails);
+            setAssessments(assessmentDetails);
+            console.log("Assessment Details:", assessments);
         } catch (error) {
-            console.error("Error fetching assessments:", error)
+            console.error("Error fetching assessments:", error);
             setError("Error fetching assessments");
         } finally {
             setLoading(false);
@@ -265,6 +276,7 @@ function PastAssessments() {
     const handleBuildingChange = (event) => {
         const buildingId = event.target.value;
         setSelectedBuilding(buildingId);
+        console.log("Selected Building ID:", buildingId);
         fetchAssessments(buildingId);
     };
 
@@ -311,7 +323,7 @@ function PastAssessments() {
                 <ul className="assessments-ul">
                     {assessments.length > 0 ? (
                         assessments.map((assessment) => {
-                            console.log("Current Assessment:", assessment);
+                            console.log("Rendering assessment:", assessment);
                             return (
                                 <li key={assessment.id}>
                                     <h3>{assessment.formName || 'N/A'}</h3>

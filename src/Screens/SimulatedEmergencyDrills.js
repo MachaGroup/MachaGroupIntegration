@@ -58,12 +58,12 @@ function SimulatedEmergencyDrillsFormPage() {
         const { name, value } = e.target;
         const newFormData = { ...formData, [name]: value };
         setFormData(newFormData);
-
+ 
         try {
-            // Persist data to Firestore on every change
+            const buildingRef = doc(db, 'Buildings', buildingId); // Create buildingRef
             const formDocRef = doc(db, 'forms','Continuous Improvement - Safety and Security','Simulated Emergency Drills', buildingId);
-            await setDoc(formDocRef, { formData: newFormData }, { merge: true }); // Use merge to preserve existing fields
-            console.log("Form data saved to Firestore:", newFormData);
+            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true }); // Use merge and add building
+            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
         } catch (error) {
             console.error("Error saving form data to Firestore:", error);
             alert("Failed to save changes. Please check your connection and try again.");

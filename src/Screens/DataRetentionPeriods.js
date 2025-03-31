@@ -1,351 +1,210 @@
 import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-/**/
+import { getFunctions, httpsCallable } from "firebase/functions";
+
 function DataRetentionPeriodsFormPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadDataRetentionPeriodsFormPageImage = httpsCallable(functions, 'uploadDataRetentionPeriodsFormPageImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const storage = getStorage();
+    const [image, setImage] = useState(null);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [uploadError, setUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
-    }
-  }, [buildingId, navigate]);
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('/BuildingandAddress');
+        } else {
+            loadFormData();
+        }
+    }, [buildingId, navigate]);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+    const loadFormData = async () => {
+        setLoading(true);
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formsRef = collection(db, 'forms/Policy and Compliance/Data Retention Periods');
+            const q = query(formsRef, where('building', '==', buildingRef));
+            const querySnapshot = await getDocs(q);
 
-  // Function to handle back button
-  const handleBack = async () => {
-          if (formData && buildingId) { // Check if formData and buildingId exist
-            try {
-              const buildingRef = doc(db, 'Buildings', buildingId);
-              const formsRef = collection(db, 'forms/Policy and Compliance/Data Retention Periods');
-              await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-              });
-              console.log('Form Data submitted successfully on back!');
-              alert('Form data saved before navigating back!');
-            } catch (error) {
-              console.error('Error saving form data:', error);
-              alert('Failed to save form data before navigating back. Some data may be lost.');
+            if (!querySnapshot.empty) {
+                const docData = querySnapshot.docs[0].data().formData;
+                setFormData(docData);
             }
-          }
-          navigate(-1);
-        };
+        } catch (error) {
+            console.error('Error loading form data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+    const handleImageChange = (e) => {
+        if (e.target.files[0]) {
+            setImage(e.target.files[0]);
+        }
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+
+    const handleBack = async () => {
+        if (formData && buildingId) {
+            try {
+                const buildingRef = doc(db, 'Buildings', buildingId);
+                const formsRef = collection(db, 'forms/Policy and Compliance/Data Retention Periods');
+                const q = query(formsRef, where('building', '==', buildingRef));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    await addDoc(formsRef, {
+                        building: buildingRef,
+                        formData: formData,
+                    });
+                } else {
+                    const docId = querySnapshot.docs[0].id;
+                    const formDocRef = doc(db, 'forms/Policy and Compliance/Data Retention Periods', docId);
+                    await setDoc(formDocRef, {
+                        building: buildingRef,
+                        formData: formData,
+                    }, { merge: true });
+                }
+                console.log('Form Data submitted successfully on back!');
+                alert('Form data saved before navigating back!');
+            } catch (error) {
+                console.error('Error saving form data:', error);
+                alert('Failed to save form data before navigating back. Some data may be lost.');
+            }
+        }
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start the assessment from the correct page.');
+            return;
+        }
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formsRef = collection(db, 'forms/Policy and Compliance/Data Retention Periods');
+            const q = query(formsRef, where('building', '==', buildingRef));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                await addDoc(formsRef, {
+                    building: buildingRef,
+                    formData: formData,
+                });
+            } else {
+                const docId = querySnapshot.docs[0].id;
+                const formDocRef = doc(db, 'forms/Policy and Compliance/Data Retention Periods', docId);
+                await setDoc(formDocRef, {
+                    building: buildingRef,
+                    formData: formData,
+                }, { merge: true });
+            }
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            alert('Failed to submit the form. Please try again.');
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>5.1.2.1.2 Data Retention Periods Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Policy and Compliance/Data Retention Periods');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
-    }
-  };
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>5.1.2.1.2 Data Retention Periods</h2>
+                    {[
+                        { name: "retentionSchedules", label: "5.1.2.1.2.1. Retention Schedule Creation: How are data retention schedules created and maintained?", type: "text", securityGatesFormat: true },
+                        { name: "developingResponsibility", label: "5.1.2.1.2.2. Retention Schedule Creation: Who is responsible for developing and approving the data retention schedules?", type: "text", securityGatesFormat: true },
+                        { name: "retentionCriteria", label: "5.1.2.1.2.3. Retention Schedule Creation: What criteria are used to determine retention periods for different types of data?", type: "text", securityGatesFormat: true },
+                        { name: "complyingPeriods", label: "5.1.2.1.2.4. Compliance with Regulations: How does the organization ensure that data retention periods comply with relevant laws and regulations (e.g., GDPR, HIPAA)?", type: "text", securityGatesFormat: true },
+                        { name: "industryStandards", label: "5.1.2.1.2.5. Compliance with Regulations: Are there specific regulations or industry standards that influence data retention periods?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
+                        { name: "monitoredRequirements", label: "5.1.2.1.2.6. Compliance with Regulations: How is compliance with legal and regulatory retention requirements monitored?", type: "text", securityGatesFormat: true },
+                        { name: "classifiedPurposes", label: "5.1.2.1.2.7. Data Categories and Retention: How are different categories of data classified for retention purposes (e.g., personal data, financial records)?", type: "text", securityGatesFormat: true },
+                        { name: "standardPeriods", label: "5.1.2.1.2.8. Data Categories and Retention: What are the standard retention periods for each category of data?", type: "text", securityGatesFormat: true },
+                        { name: "specialConsiderations", label: "5.1.2.1.2.9. Data Categories and Retention: Are there exceptions or special considerations for certain types of data?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
+                        { name: "documentedPeriods", label: "5.1.2.1.2.10. Retention Period Documentation: How are data retention periods documented and communicated to relevant stakeholders?", type: "text", securityGatesFormat: true },
+                        { name: "centralizedRecord", label: "5.1.2.1.2.11. Retention Period Documentation: Is there a centralized record of all data retention schedules and policies?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
+                        { name: "requirementChanges", label: "5.1.2.1.2.12. Retention Period Documentation: How is documentation updated to reflect changes in retention requirements?", type: "text", securityGatesFormat: true },
+                        { name: "disposalProcedures", label: "5.1.2.1.2.13. Data Disposal Procedures: What procedures are in place for the disposal of data once retention periods have expired?", type: "text", securityGatesFormat: true },
+                        { name: "deletedData", label: "5.1.2.1.2.14. Data Disposal Procedures: How is data securely destroyed or deleted to prevent unauthorized access or recovery?", type: "text", securityGatesFormat: true },
+                        { name: "handlingGuidelines", label: "5.1.2.1.2.15. Data Disposal Procedures: Are there guidelines for handling physical versus electronic data disposal?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
+                        { name: "reviewedPeriods", label: "5.1.2.1.2.16. Periodic Reviews and Updates: How often are data retention periods reviewed and updated to ensure they remain current?", type: "text", securityGatesFormat: true },
+                        { name: "scheduleChanges", label: "5.1.2.1.2.17. Periodic Reviews and Updates: What process is followed to make changes to data retention schedules?", type: "text", securityGatesFormat: true },
+                        { name: "reviewingResponsibility", label: "5.1.2.1.2.18. Periodic Reviews and Updates: Who is responsible for conducting periodic reviews of data retention practices?", type: "text", securityGatesFormat: true },
+                        { name: "trainingPolicies", label: "5.1.2.1.2.19. Employee Training and Awareness: What training is provided to employees regarding data retention policies and procedures?", type: "text", securityGatesFormat: true },
+                        { name: "maintainedAwareness", label: "5.1.2.1.2.20. Employee Training and Awareness: How is awareness of data retention requirements maintained among staff?", type: "text", securityGatesFormat: true },
+                        { name: "employeeResources", label: "5.1.2.1.2.21. Employee Training and Awareness: Are there resources available to help employees understand and comply with retention schedules?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
+                        { name: "monitoredCompliance", label: "5.1.2.1.2.22. Monitoring and Auditing: How is compliance with data retention schedules monitored and enforced?", type: "text", securityGatesFormat: true },
+                        { name: "conductedAudits", label: "5.1.2.1.2.23. Monitoring and Auditing: Are there regular audits conducted to review adherence to retention policies?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
+                        { name: "noncomplianceAudits", label: "5.1.2.1.2.24. Monitoring and Auditing: What steps are taken to address any non-compliance identified during audits?", type: "text", securityGatesFormat: true },
+                        { name: "adjustedSchedules", label: "5.1.2.1.2.25. Retention for Legal Holds: How are data retention schedules adjusted in response to legal holds or investigations?", type: "text", securityGatesFormat: true },
+                        { name: "dataHolds", label: "5.1.2.1.2.26. Retention for Legal Holds: What procedures are in place to ensure that data subject to legal holds is not disposed of?", type: "text", securityGatesFormat: true },
+                        { name: "communicatedHolds", label: "5.1.2.1.2.27. Retention for Legal Holds: How are legal holds communicated and managed within the organization?", type: "text", securityGatesFormat: true },
+                        { name: "communicatedPolicies", label: "5.1.2.1.2.28. Data Retention Policy Communication: How are data retention policies communicated to all relevant stakeholders?", type: "text", securityGatesFormat: true },
+                        { name: "updatingProcedures", label: "5.1.2.1.2.29. Data Retention Policy Communication: Are there clear procedures for updating stakeholders on changes to retention schedules?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
+                        { name: "incorporatedFeedback", label: "5.1.2.1.2.30. Data Retention Policy Communication: How is feedback from stakeholders incorporated into data retention policy updates?", type: "text", securityGatesFormat: true },
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                {question.type === "text" && <input type="text" name={question.name} value={formData[question.name] || ''} placeholder={question.placeholder} onChange={handleChange} />}
+                                {question.type === "radio" && (
+                                    <div>
+                                        <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                        <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                        <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                                    </div>
+                                )}
+                                {question.securityGatesFormat && <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>}
+                            </div>
+                        </div>
+                    ))}
 
-
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>5.1.2.1.2 Data Retention Periods Assessment</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
-
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                {/* 5.1.2.1.2 Data Retention Periods */}
-                <h2>5.1.2.1.2.1 Retention Schedule Creation:</h2>
-                <div className="form-section">
-                    <label>How are data retention schedules created and maintained?</label>
-                    <div>
-                        <input type="text" name="retentionSchedules" placeholder="Describe how they're created and maintained" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Who is responsible for developing and approving the data retention schedules?</label>
-                    <div>
-                        <input type="text" name="developingResponsibility" placeholder="Who's responsible" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What criteria are used to determine retention periods for different types of data?</label>
-                    <div>
-                        <input type="text" name="retentionCriteria" placeholder="Describe the criteria" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.1.2.1.2.2 Compliance with Regulations:</h2>
-                <div className="form-section">
-                    <label>How does the organization ensure that data retention periods comply with relevant laws and regulations (e.g., GDPR, HIPAA)?</label>
-                    <div>
-                        <input type="text" name="complyingPeriods" placeholder="Describe how it's ensured" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there specific regulations or industry standards that influence data retention periods?</label>
-                    <div>
-                        <input type="radio" name="industryStandards" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="industryStandards" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="industryStandardsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is compliance with legal and regulatory retention requirements monitored?</label>
-                    <div>
-                        <input type="text" name="monitoredRequirements" placeholder="Describe how it's monitored" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.1.2.1.2.3 Data Categories and Retention:</h2>
-                <div className="form-section">
-                    <label>How are different categories of data classified for retention purposes (e.g., personal data, financial records)?</label>
-                    <div>
-                        <input type="text" name="classifiedPurposes" placeholder="Describe how it's classified" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What are the standard retention periods for each category of data?</label>
-                    <div>
-                        <input type="text" name="standardPeriods" placeholder="Describe the standard" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there exceptions or special considerations for certain types of data?</label>
-                    <div>
-                        <input type="radio" name="specialConsiderations" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="specialConsiderations" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="specialConsiderationsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>5.1.2.1.2.4 Retention Period Documentation:</h2>
-                <div className="form-section">
-                    <label>How are data retention periods documented and communicated to relevant stakeholders?</label>
-                    <div>
-                        <input type="text" name="documentedPeriods" placeholder="Describe how it's documented and communicated" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Is there a centralized record of all data retention schedules and policies?</label>
-                    <div>
-                        <input type="radio" name="centralizedRecord" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="centralizedRecord" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="centralizedRecordComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is documentation updated to reflect changes in retention requirements?</label>
-                    <div>
-                        <input type="text" name="requirementChanges" placeholder="Describe how it's updated" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.1.2.1.2.5 Data Disposal Procedures:</h2>
-                <div className="form-section">
-                    <label>What procedures are in place for the disposal of data once retention periods have expired?</label>
-                    <div>
-                        <input type="text" name="disposalProcedures" placeholder="Describe the procedures" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is data securely destroyed or deleted to prevent unauthorized access or recovery?</label>
-                    <div>
-                        <input type="text" name="deletedData" placeholder="Describe how it's destroyed" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there guidelines for handling physical versus electronic data disposal?</label>
-                    <div>
-                        <input type="radio" name="handlingGuidelines" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="handlingGuidelines" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="handlingGuidelinesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>5.1.2.1.2.6 Periodic Reviews and Updates:</h2>
-                <div className="form-section">
-                    <label>How often are data retention periods reviewed and updated to ensure they remain current?</label>
-                    <div>
-                        <input type="text" name="reviewedPeriods" placeholder="Describe how it's reviewed and updated" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What process is followed to make changes to data retention schedules?</label>
-                    <div>
-                        <input type="text" name="scheduleChanges" placeholder="Describe the process" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Who is responsible for conducting periodic reviews of data retention practices?</label>
-                    <div>
-                        <input type="text" name="reviewingResponsibility" placeholder="Who's responsible" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.1.2.1.2.7 Employee Training and Awareness:</h2>
-                <div className="form-section">
-                    <label>What training is provided to employees regarding data retention policies and procedures?</label>
-                    <div>
-                        <input type="text" name="trainingPolicies" placeholder="Describe the training" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is awareness of data retention requirements maintained among staff?</label>
-                    <div>
-                        <input type="text" name="maintainedAwareness" placeholder="Describe how it's maintained" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there resources available to help employees understand and comply with retention schedules?</label>
-                    <div>
-                        <input type="radio" name="employeeResources" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="employeeResources" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="employeeResourcesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>5.1.2.1.2.8 Monitoring and Auditing:</h2>
-                <div className="form-section">
-                    <label>How is compliance with data retention schedules monitored and enforced?</label>
-                    <div>
-                        <input type="text" name="monitoredCompliance" placeholder="Describe how it's monitored and enforced" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there regular audits conducted to review adherence to retention policies?</label>
-                    <div>
-                        <input type="radio" name="conductedAudits" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="conductedAudits" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="conductedAuditsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What steps are taken to address any non-compliance identified during audits?</label>
-                    <div>
-                        <input type="text" name="noncomplianceAudits" placeholder="Describe the steps" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.1.2.1.2.9 Retention for Legal Holds:</h2>
-                <div className="form-section">
-                    <label>How are data retention schedules adjusted in response to legal holds or investigations?</label>
-                    <div>
-                        <input type="text" name="adjustedSchedules" placeholder="Describe how it's adjusted" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What procedures are in place to ensure that data subject to legal holds is not disposed of?</label>
-                    <div>
-                        <input type="text" name="dataHolds" placeholder="Describe the procedures" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are legal holds communicated and managed within the organization?</label>
-                    <div>
-                        <input type="text" name="communicatedHolds" placeholder="Describe how it's communicated and managed" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.1.2.1.2.10 Data Retention Policy Communication:</h2>
-                <div className="form-section">
-                    <label>How are data retention policies communicated to all relevant stakeholders?</label>
-                    <div>
-                        <input type="text" name="communicatedPolicies" placeholder="Describe how it's communicated and managed" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there clear procedures for updating stakeholders on changes to retention schedules?</label>
-                    <div>
-                        <input type="radio" name="updatingProcedures" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="updatingProcedures" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="updatingProceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is feedback from stakeholders incorporated into data retention policy updates?</label>
-                    <div>
-                        <input type="text" name="incorporatedFeedback" placeholder="Describe how it's incorporated" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                {/* Submit Button */}
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-
-            </form>
-        </main>
-    </div>
-  )
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                    {uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default DataRetentionPeriodsFormPage;

@@ -58,14 +58,15 @@ function VehicleBarriersPage() {
     setFormData(newFormData);
 
     try {
-      const formDocRef = doc(db, 'forms', 'Physical Security', 'Vehicle Barrier', buildingId);
-      await setDoc(formDocRef, { formData: newFormData }, { merge: true });
-      console.log("Form data saved to Firestore:", newFormData);
+        const buildingRef = doc(db, 'Buildings', buildingId); // Create buildingRef
+        const formDocRef = doc(db, 'forms', 'Physical Security', 'Vehicle Barrier', buildingId);
+        await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true }); // Use merge and add building
+        console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
     } catch (error) {
-      console.error("Error saving form data to Firestore:", error);
-      alert("Failed to save changes. Please check your connection and try again.");
+        console.error("Error saving form data to Firestore:", error);
+        alert("Failed to save changes. Please check your connection and try again.");
     }
-  };
+};
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];

@@ -52,20 +52,23 @@ function BackToSchoolNightsPage() {
         fetchFormData();
     }, [buildingId, db, navigate]);
 
-    const handleChange = async (e) => {
-        const { name, value } = e.target;
-        const newFormData = { ...formData, [name]: value };
-        setFormData(newFormData);
+    
 
-        try {
-            const formDocRef = doc(db, 'forms', 'Community Partnership', 'Back-to-School Nights', buildingId);
-            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
-            console.log("Form data saved to Firestore:", newFormData);
-        } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
-        }
-    };
+    const handleChange = async (e) => {
+         const { name, value } = e.target;
+         const newFormData = { ...formData, [name]: value };
+         setFormData(newFormData);
+                 
+            try {
+                const buildingRef = doc(db, 'Buildings', buildingId); // Create buildingRef
+                const formDocRef = doc(db, 'forms', 'Community Partnership', 'Back-to-School Nights', buildingId);
+                await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true }); // Use merge and add building
+                console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
+            } catch (error) {
+                 console.error("Error saving form data to Firestore:", error);
+                  alert("Failed to save changes. Please check your connection and try again.");
+                        }
+                    };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];

@@ -56,11 +56,12 @@ function TornadoShelterLocationsFormPage() {
         const { name, value } = e.target;
         const newFormData = { ...formData, [name]: value };
         setFormData(newFormData);
-
+ 
         try {
+            const buildingRef = doc(db, 'Buildings', buildingId); // Create buildingRef
             const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Tornado Shelter Locations', buildingId);
-            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
-            console.log("Form data saved to Firestore:", newFormData);
+            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true }); // Use merge and add building
+            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
         } catch (error) {
             console.error("Error saving form data to Firestore:", error);
             alert("Failed to save changes. Please check your connection and try again.");

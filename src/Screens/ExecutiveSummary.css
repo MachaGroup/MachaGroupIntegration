@@ -1,0 +1,236 @@
+/* src/ExecutiveSummary.css */
+
+/* --- Global & Body --- */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; /* System fonts */
+    background-color: #f4f7f9; /* Light grey background for the page */
+    color: #333; /* Default text color */
+    line-height: 1.6;
+    margin: 0; /* Remove default body margin */
+  }
+  
+  /* --- Main Container --- */
+  .executive-summary-container {
+    max-width: 900px; /* Limit width for readability */
+    margin: 40px auto; /* Center the container with space top/bottom */
+    padding: 30px 40px; /* Generous padding inside */
+    background-color: #ffffff; /* White background for the form area */
+    border-radius: 8px; /* Slightly rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Subtle shadow for depth */
+    border: 1px solid #e0e0e0; /* Light border */
+  }
+  
+  /* --- Headings --- */
+  h1 {
+    text-align: center;
+    color: #2c3e50; /* Dark blue-grey heading color */
+    margin-bottom: 30px; /* Space below main title */
+    font-weight: 600;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 15px;
+  }
+  
+  h2 {
+    color: #34495e; /* Slightly lighter heading color */
+    border-bottom: 1px solid #ecf0f1; /* Light separator line */
+    padding-bottom: 8px;
+    margin-top: 35px; /* Space above section titles */
+    margin-bottom: 25px; /* Space below section titles */
+    font-weight: 500; /* Medium weight */
+    font-size: 1.5rem;
+  }
+  
+  /* --- Content Area for PDF Capture --- */
+  .report-content {
+    background-color: #ffffff; /* Ensure white background for PDF */
+    padding: 25px; /* Padding inside the capture area */
+    border: 1px solid #e9edf0; /* Optional: visualize capture area */
+    margin-bottom: 30px; /* Space before the export button */
+    border-radius: 6px; /* Rounded corners for the content block */
+  }
+  
+  /* --- Form Elements --- */
+  label {
+    display: block; /* Each label on its own line */
+    margin-bottom: 15px; /* Space below each label block */
+    font-weight: 600; /* Make labels stand out */
+    color: #555;
+    font-size: 0.95rem; /* Slightly smaller label text */
+  }
+  
+  input[type='text'],
+  input[type='date'],
+  input[type='number'],
+  textarea {
+    width: 100%; /* Inputs take full width of their container */
+    padding: 10px 12px; /* Comfortable padding inside inputs */
+    margin-top: 6px; /* Space between label and input */
+    border: 1px solid #ccc; /* Standard border */
+    border-radius: 5px; /* Slightly rounded input corners */
+    box-sizing: border-box; /* Include padding/border in width calculation */
+    font-size: 1rem; /* Standard input text size */
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Smooth focus transition */
+    background-color: #fdfdfd; /* Very light input background */
+  }
+  
+  /* Input Focus Styling */
+  input[type='text']:focus,
+  input[type='date']:focus,
+  input[type='number']:focus,
+  textarea:focus {
+    border-color: #007bff; /* Highlight border on focus (Bootstrap blue) */
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15); /* Subtle outer glow on focus */
+    outline: none; /* Remove default browser outline */
+  }
+  
+  textarea {
+    resize: vertical; /* Allow vertical resize only */
+    min-height: 100px; /* Sensible minimum height */
+  }
+  
+  /* --- Specific Layout Grids --- */
+  .form-grid,
+  .observations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid */
+    gap: 20px; /* Space between grid items */
+    margin-bottom: 20px; /* Space below the grid */
+  }
+  
+  /* --- Observations Specific --- */
+  fieldset {
+    border: 1px solid #dce4ec; /* Lighter border for fieldset */
+    border-radius: 6px;
+    padding: 20px 25px;
+    margin-bottom: 25px;
+    background-color: #f8f9fa; /* Slightly off-white background */
+  }
+  
+  legend {
+    font-weight: 600;
+    color: #34495e;
+    padding: 0 10px; /* Padding around the legend text */
+    font-size: 1.1rem;
+  }
+  
+  .observations-grid label {
+    /* Align label text and number input nicely */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0; /* Override default label margin within grid */
+  }
+  
+  .observations-grid input[type='number'] {
+    width: 100px; /* Smaller width for number inputs */
+    flex-shrink: 0; /* Prevent shrinking */
+  }
+  
+  /* --- Assessors Section --- */
+  .assessors-section {
+      margin-bottom: 20px; /* Space below the whole section */
+  }
+  
+  .assessors-section .assessor-item {
+    display: flex;
+    align-items: center; /* Vertically align items */
+    gap: 15px; /* Space between input and remove button */
+    margin-bottom: 12px; /* Space between assessor rows */
+  }
+  
+  .assessors-section label {
+    flex-grow: 1; /* Label takes up available space */
+    margin-bottom: 0; /* Remove default bottom margin */
+  }
+  
+  .assessors-section .assessor-item input[type='text'] {
+    /* Input doesn't need 100% width here, let flexbox manage */
+    width: auto;
+    flex-grow: 1; /* Input also takes available space */
+  }
+  
+  /* --- Buttons --- */
+  button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    text-transform: uppercase; /* Uppercase button text */
+    letter-spacing: 0.5px; /* Slight letter spacing */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  
+  button:hover {
+    opacity: 0.9; /* Slight fade on hover */
+    box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+  }
+  
+  button:active {
+    transform: translateY(1px); /* Subtle press effect */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  
+  .export-button {
+    background-color: #007bff; /* Primary blue */
+    color: white;
+    display: block; /* Full width */
+    width: 100%;
+    margin-top: 40px; /* More space above export button */
+    font-size: 1.1rem;
+    padding: 14px; /* Larger padding */
+  }
+  .export-button:hover { background-color: #0056b3; }
+  
+  .add-btn {
+    background-color: #28a745; /* Green */
+    color: white;
+    margin-top: 10px; /* Space above add button */
+  }
+  .add-btn:hover { background-color: #218838; }
+  
+  .remove-btn {
+    background-color: #dc3545; /* Red */
+    color: white;
+    padding: 6px 12px; /* Smaller padding */
+    font-size: 0.9rem;
+    text-transform: none; /* Normal case for 'Remove' */
+    letter-spacing: 0;
+    flex-shrink: 0; /* Prevent shrinking */
+  }
+  .remove-btn:hover { background-color: #c82333; }
+  
+  /* --- Print Styles (for PDF generation) --- */
+  @media print {
+    body {
+      background-color: #fff; /* Ensure white background */
+      -webkit-print-color-adjust: exact; /* Force background colors in Chrome/Safari */
+      print-color-adjust: exact; /* Standard */
+    }
+  
+    .executive-summary-container {
+      box-shadow: none;
+      border: none;
+      margin: 0;
+      padding: 0;
+      max-width: 100%;
+    }
+  
+    .export-button,
+    .add-btn,
+    .remove-btn {
+      display: none; /* Hide interactive buttons */
+    }
+  
+    /* Ensure content doesn't get cut off (may need adjustments based on content) */
+    .report-content {
+       border: none;
+       padding: 0;
+       margin-bottom: 0;
+    }
+  
+    /* Add any other elements you want to hide during print/PDF export */
+  }

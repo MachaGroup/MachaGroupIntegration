@@ -396,6 +396,7 @@ import PrivacyAndSecurity from './Screens/PrivacyAndSecurity';
 import PastAssessments from './Screens/PastAssessments';
 import AssessmentDetails from './Screens/AssessmentDetails'; // Create this component
 import AccessControlListsPage from './Screens/AccessControlLists';
+import ExecutiveSummary from './Screens/ExecutiveSummary'
 
 function App() {
   return (
@@ -894,7 +895,7 @@ function App() {
         <Route path='/privacy&security' element={<PrivacyAndSecurity />} />
         <Route path='PastAssessments' element={<PastAssessments />} />
         <Route path="/assessment/:assessmentId" element={<AssessmentDetails />} />
-
+        <Route path='/ExecutiveSummary' element={<ExecutiveSummary />} />
       </Routes>
     </Router>
    </BuildingProvider>

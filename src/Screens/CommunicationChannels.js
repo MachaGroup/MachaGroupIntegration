@@ -1,271 +1,268 @@
 import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
-/**/
 function CommunicationChannelsFormPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadCommunicationChannelsImage = httpsCallable(functions, 'uploadCommunicationChannelsImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
+        }
 
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
-    }
-  }, [buildingId, navigate]);
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-  
-  // Function to handle back button
-  const handleBack = async () => {
-          if (formData && buildingId) { // Check if formData and buildingId exist
             try {
-              const buildingRef = doc(db, 'Buildings', buildingId);
-              const formsRef = collection(db, 'forms/Emergency Preparedness/Two-way Radios');
-              await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-              });
-              console.log('Form Data submitted successfully on back!');
-              alert('Form data saved before navigating back!');
+                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Two-way Radios', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
             } catch (error) {
-              console.error('Error saving form data:', error);
-              alert('Failed to save form data before navigating back. Some data may be lost.');
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
             }
-          }
-          navigate(-1);
         };
- 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+   
+
+const handleChange = async (e) => {
+       const { name, value } = e.target;
+          const newFormData = { ...formData, [name]: value };
+                setFormData(newFormData);
+                                 
+                try {
+                const buildingRef = doc(db, 'Buildings', buildingId); // Create buildingRef
+                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Two-way Radios', buildingId);
+                    await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true }); // Use merge and add building
+                    console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
+                    } catch (error) {
+                      console.error("Error saving form data to Firestore:", error);
+                   alert("Failed to save changes. Please check your connection and try again.");
+                                        }
+                                    };  
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start the assessment from the correct page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadCommunicationChannelsImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Two-way Radios', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
-
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Emergency Preparedness/Two-way Radios');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
-  };
 
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Communication Channels Assessment</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>Communication Channels Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                {/* 2.4.2.1.2 Communication Channels */}
-                <h2>Designation of Communication Channels:</h2>
-                <div className="form-section">
-                    <label>Are specific communication channels designated for different types of communication needs, such as emergency communication, general staff communication, or coordination between departments?</label>
-                    <div>
-                        <input type="radio" name="designatedCommunicationChannels" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="designatedCommunicationChannels" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="designatedCommunicationChannelsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>Designation of Communication Channels:</h2>
+                    {[
+                        { name: "designatedCommunicationChannels", label: "Are specific communication channels designated for different types of communication needs, such as emergency communication, general staff communication, or coordination between departments?" },
+                        { name: "clearDelineation", label: "Is there a clear delineation of the purpose and usage guidelines for each communication channel?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
+                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
+                            </div>
+                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>Is there a clear delineation of the purpose and usage guidelines for each communication channel?</label>
-                    <div>
-                        <input type="radio" name="clearDelineation" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="clearDelineation" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="clearDelineationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <h2>Emergency Communication Frequency:</h2>
+                    {[
+                        { name: "reservedFrequency", label: "Is there a designated frequency or channel specifically reserved for emergency communication purposes?" },
+                        { name: "trainedStaffEmergency", label: "Are staff members trained on how to access and utilize the designated emergency communication channel during emergencies?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
+                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
+                            </div>
+                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                        </div>
+                    ))}
 
-                <h2>Emergency Communication Frequency:</h2>
-                <div className="form-section">
-                    <label>Is there a designated frequency or channel specifically reserved for emergency communication purposes?</label>
-                    <div>
-                        <input type="radio" name="reservedFrequency" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="reservedFrequency" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="reservedFrequencyComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <h2>Channel Management and Coordination:</h2>
+                    {[
+                        { name: "managingProtocol", label: "Is there a protocol for managing and coordinating communication channels to prevent interference and ensure clear communication during emergencies?" },
+                        { name: "reallocatingProcedures", label: "Are procedures established for reallocating or reassigning communication channels as needed to adapt to changing circumstances or address technical issues?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
+                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
+                            </div>
+                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>Are staff members trained on how to access and utilize the designated emergency communication channel during emergencies?</label>
-                    <div>
-                        <input type="radio" name="trainedStaff" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="trainedStaff" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="trainedStaffComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <h2>Compatibility with Equipment:</h2>
+                    {[
+                        { name: "compatibleChannels", label: "Are communication channels selected or configured to be compatible with the communication equipment used by staff members, such as two-way radios or mobile devices?" },
+                        { name: "compatibilityTesting", label: "Is there compatibility testing conducted to verify interoperability and functionality across different devices and communication channels?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
+                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
+                            </div>
+                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                        </div>
+                    ))}
 
-                <h2>Channel Management and Coordination:</h2>
-                <div className="form-section">
-                    <label>Is there a protocol for managing and coordinating communication channels to prevent interference and ensure clear communication during emergencies?</label>
-                    <div>
-                        <input type="radio" name="managingProtocol" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="managingProtocol" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="managingProtocolComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <h2>Redundancy and Contingency Planning:</h2>
+                    {[
+                        { name: "redundantCommunicationChannels", label: "Are redundant communication channels or backup options available to mitigate the risk of channel failure or disruption during emergencies?" },
+                        { name: "contingencyPlan", label: "Is there a contingency plan in place for switching to alternative communication channels if primary channels become unavailable or compromised?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
+                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
+                            </div>
+                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>Are procedures established for reallocating or reassigning communication channels as needed to adapt to changing circumstances or address technical issues?</label>
-                    <div>
-                        <input type="radio" name="reallocatingProcedures" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="reallocatingProcedures" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="reallocatingProceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <h2>Training and Familiarization:</h2>
+                    {[
+                        { name: "trainedStaffTraining", label: "Are staff members trained on how to access, select, and utilize communication channels effectively, particularly during emergencies?" },
+                        { name: "practiceSessions", label: "Are practice sessions or drills conducted to familiarize staff members with communication channel protocols and simulate emergency scenarios?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
+                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
+                            </div>
+                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                        </div>
+                    ))}
 
-                <h2>Compatibility with Equipment:</h2>
-                <div className="form-section">
-                    <label>Are communication channels selected or configured to be compatible with the communication equipment used by staff members, such as two-way radios or mobile devices?</label>
-                    <div>
-                        <input type="radio" name="compatibleChannels" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="compatibleChannels" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="compatibleChannelsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <h2>Integration with Emergency Plans:</h2>
+                    {[
+                        { name: "integratedCommunicationChannels", label: "Are designated communication channels integrated into broader emergency communication and response plans, ensuring alignment with overall emergency protocols?" },
+                        { name: "incorporatingChannelProcedures", label: "Are there designated procedures for incorporating communication channel usage into emergency drills, exercises, and simulations to assess effectiveness and identify areas for improvement?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
+                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
+                            </div>
+                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>Is there compatibility testing conducted to verify interoperability and functionality across different devices and communication channels?</label>
-                    <div>
-                        <input type="radio" name="compatiblilityTesting" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="compatiblilityTesting" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="compatiblilityTestingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <h2>Continuous Improvement:</h2>
+                    {[
+                        { name: "feedbackMechanisms", label: "Are feedback mechanisms in place to gather input from staff members regarding the usability, reliability, and effectiveness of communication channels during emergencies?" },
+                        { name: "enhancingRecommendations", label: "Are recommendations for enhancing communication channel protocols and infrastructure considered and implemented as part of ongoing improvement efforts?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
+                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
+                            </div>
+                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                        </div>
+                    ))}
 
-                <h2>Redundancy and Contingency Planning:</h2>
-                <div className="form-section">
-                    <label>Are redundant communication channels or backup options available to mitigate the risk of channel failure or disruption during emergencies?</label>
-                    <div>
-                        <input type="radio" name="redundantCommunicationChannels" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="redundantCommunicationChannels" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="redundantCommunicationChannelsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
 
-                <div className="form-section">
-                    <label>Is there a contingency plan in place for switching to alternative communication channels if primary channels become unavailable or compromised?</label>
-                    <div>
-                        <input type="radio" name="contingencyPlan" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="contingencyPlan" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="contingencyPlanComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>Training and Familiarization:</h2>
-                <div className="form-section">
-                    <label>Are staff members trained on how to access, select, and utilize communication channels effectively, particularly during emergencies?</label>
-                    <div>
-                        <input type="radio" name="trainedStaff" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="trainedStaff" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="trainedStaffComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are practice sessions or drills conducted to familiarize staff members with communication channel protocols and simulate emergency scenarios?</label>
-                    <div>
-                        <input type="radio" name="practiceSessions" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="practiceSessions" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="practiceSessionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>Integration with Emergency Plans:</h2>
-                <div className="form-section">
-                    <label>Are designated communication channels integrated into broader emergency communication and response plans, ensuring alignment with overall emergency protocols?</label>
-                    <div>
-                        <input type="radio" name="integratedCommunicationChannels" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="integratedCommunicationChannels" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="integratedCommunicationChannelsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there designated procedures for incorporating communication channel usage into emergency drills, exercises, and simulations to assess effectiveness and identify areas for improvement?</label>
-                    <div>
-                        <input type="radio" name="incorporatingChannelProcedures" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="incorporatingChannelProcedures" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="incorporatingChannelProceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>Continuous Improvement:</h2>
-                <div className="form-section">
-                    <label>Are feedback mechanisms in place to gather input from staff members regarding the usability, reliability, and effectiveness of communication channels during emergencies?</label>
-                    <div>
-                        <input type="radio" name="feedbackMechanisms" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="feedbackMechanisms" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="feedbackMechanismsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are recommendations for enhancing communication channel protocols and infrastructure considered and implemented as part of ongoing improvement efforts?</label>
-                    <div>
-                        <input type="radio" name="enhancingRecommendations" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="enhancingRecommendations" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="enhancingRecommendationsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                {/* Submit Button */}
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-
-            </form>
-        </main>
-    </div>
-
-  )
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default CommunicationChannelsFormPage;

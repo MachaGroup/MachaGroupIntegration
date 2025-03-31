@@ -1,97 +1,131 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function IsolationProceduresPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadIsolationProceduresImage = httpsCallable(functions, 'uploadIsolationProceduresImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
-
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
-    }
-  }, [buildingId, navigate]);
-
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Function to handle back button
-    const handleBack = async () => {
-        if (formData && buildingId) { // Check if formData and buildingId exist
-          try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
-            const formsRef = collection(db, 'forms/Cybersecurity/Isolation Procedures');
-            await addDoc(formsRef, {
-              building: buildingRef,
-              formData: formData,
-            });
-            console.log('Form Data submitted successfully on back!');
-            alert('Form data saved before navigating back!');
-          } catch (error) {
-            console.error('Error saving form data:', error);
-            alert('Failed to save form data before navigating back. Some data may be lost.');
-          }
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
         }
-        navigate(-1);  // Navigates to the previous page
+
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+
+            try {
+                const formDocRef = doc(db, 'forms', 'Cybersecurity', 'Isolation Procedures', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Cybersecurity', 'Isolation Procedures', buildingId);
+            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true });
+            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
     };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadIsolationProceduresImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Cybersecurity', 'Isolation Procedures', buildingId);
+            await setDoc(formDocRef, { formData: { ...formData, building: buildingRef } }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
-
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Cybersecurity/Isolation Procedures');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
-  };
 
     return (
         <div className="form-page">
             <header className="header">
-            <Navbar />
+                <Navbar />
                 <button className="back-button" onClick={handleBack}>←</button>
                 <h1>Isolation Procedures</h1>
                 <img src={logo} alt="Logo" className="logo" />
@@ -99,132 +133,71 @@ function IsolationProceduresPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    {/* Isolation Strategy */}
-                    <h2>4.4.2.2.1.1 Isolation Strategy</h2>
-                    <div className="form-section">
-                        <label>What criteria are used to determine which systems should be isolated during an incident?</label>
-                        <textarea name="isolationCriteria" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How are decisions made regarding the scope and extent of isolation?</label>
-                        <textarea name="isolationScope" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>Are there predefined protocols for isolating different types of systems?</label>
-                        <div>
-                            <input type="radio" name="predefinedProtocols" value="Yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="predefinedProtocols" value="No" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="predefinedProtocols" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
+                    <h2>Isolation Procedures</h2>
+                    {[
+                        { name: "isolationCriteria", label: "What criteria are used to determine which systems should be isolated during an incident?" },
+                        { name: "isolationScope", label: "How are decisions made regarding the scope and extent of isolation?" },
+                        { name: "predefinedProtocols", label: "Are there predefined protocols for isolating different types of systems?" },
+                        { name: "isolationMethods", label: "What methods or technologies are used to isolate affected systems?" },
+                        { name: "methodImplementation", label: "How are these methods implemented to ensure effective containment?" },
+                        { name: "automatedTools", label: "Are there automated tools to assist with isolation?" },
+                        { name: "communicationManagement", label: "How is communication managed during the isolation process?" },
+                        { name: "documentationProcedures", label: "What procedures ensure isolation actions are documented?" },
+                        { name: "reportingChannels", label: "Are there channels for reporting isolation status?" },
+                        { name: "isolationVerification", label: "How is it verified that systems have been successfully isolated?" },
+                        { name: "verificationMethods", label: "What methods test and confirm the effectiveness of isolation?" },
+                        { name: "isolationBenchmarks", label: "Are there benchmarks for successful isolation?" },
+                        { name: "impactAssessment", label: "How is the impact of isolation on business operations assessed?" },
+                        { name: "minimizingImpact", label: "What measures minimize impact on critical functions?" },
+                        { name: "contingencyPlans", label: "Are there contingency plans for operational issues caused by isolation?" },
+                        { name: "recoveryProcedures", label: "What procedures are followed for recovery and reconnection?" },
+                        { name: "integrityVerification", label: "How is system integrity verified before reconnection?" },
+                        { name: "reconnectionProtocols", label: "What protocols ensure reconnection does not reintroduce the threat?" },
+                        { name: "isolationDocumentation", label: "How are isolation actions documented?" },
+                        { name: "reportingRequirements", label: "What are the reporting requirements for the isolation process?" },
+                        { name: "futureImprovements", label: "How is documentation used to improve future isolation procedures?" }
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                {question.name === "predefinedProtocols" || question.name === "automatedTools" || question.name === "reportingChannels" || question.name === "contingencyPlans" ? (
+                                    <>
+                                        <input
+                                            type="radio"
+                                            name={question.name}
+                                            value="Yes"
+                                            checked={formData[question.name] === "Yes"}
+                                            onChange={handleChange}
+                                        /> Yes
+                                        <input
+                                            type="radio"
+                                            name={question.name}
+                                            value="No"
+                                            checked={formData[question.name] === "No"}
+                                            onChange={handleChange}
+                                        /> No
+                                        <textarea
+                                            className='comment-box'
+                                            name={`${question.name}Comment`}
+                                            placeholder="Comment (Optional)"
+                                            value={formData[`${question.name}Comment`] || ''}
+                                            onChange={handleChange}
+                                        />
+                                    </>
+                                ) : (
+                                    <textarea
+                                        name={question.name}
+                                        value={formData[question.name] || ''}
+                                        onChange={handleChange}
+                                    />
+                                )}
+                            </div>
                         </div>
-                    </div>
-
-                    {/* Isolation Methods */}
-                    <h2>4.4.2.2.1.2 Isolation Methods</h2>
-                    <div className="form-section">
-                        <label>What methods or technologies are used to isolate affected systems?</label>
-                        <textarea name="isolationMethods" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How are these methods implemented to ensure effective containment?</label>
-                        <textarea name="methodImplementation" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>Are there automated tools to assist with isolation?</label>
-                        <div>
-                            <input type="radio" name="automatedTools" value="Yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="automatedTools" value="No" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="automatedTools" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    {/* Communication During Isolation */}
-                    <h2>4.4.2.2.1.3 Communication During Isolation</h2>
-                    <div className="form-section">
-                        <label>How is communication managed during the isolation process?</label>
-                        <textarea name="communicationManagement" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>What procedures ensure isolation actions are documented?</label>
-                        <textarea name="documentationProcedures" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>Are there channels for reporting isolation status?</label>
-                        <div>
-                            <input type="radio" name="reportingChannels" value="Yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="reportingChannels" value="No" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="reportingChannels" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    {/* Isolation Verification */}
-                    <h2>4.4.2.2.1.4 Isolation Verification</h2>
-                    <div className="form-section">
-                        <label>How is it verified that systems have been successfully isolated?</label>
-                        <textarea name="isolationVerification" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>What methods test and confirm the effectiveness of isolation?</label>
-                        <textarea name="verificationMethods" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>Are there benchmarks for successful isolation?</label>
-                        <textarea name="isolationBenchmarks" onChange={handleChange}></textarea>
-                    </div>
-
-                    {/* Impact Assessment */}
-                    <h2>4.4.2.2.1.5 Impact Assessment</h2>
-                    <div className="form-section">
-                        <label>How is the impact of isolation on business operations assessed?</label>
-                        <textarea name="impactAssessment" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>What measures minimize impact on critical functions?</label>
-                        <textarea name="minimizingImpact" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>Are there contingency plans for operational issues caused by isolation?</label>
-                        <div>
-                            <input type="radio" name="contingencyPlans" value="Yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="contingencyPlans" value="No" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="contingencyPlans" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    {/* Recovery and Reconnection */}
-                    <h2>4.4.2.2.1.6 Recovery and Reconnection</h2>
-                    <div className="form-section">
-                        <label>What procedures are followed for recovery and reconnection?</label>
-                        <textarea name="recoveryProcedures" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How is system integrity verified before reconnection?</label>
-                        <textarea name="integrityVerification" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>What protocols ensure reconnection does not reintroduce the threat?</label>
-                        <textarea name="reconnectionProtocols" onChange={handleChange}></textarea>
-                    </div>
-
-                    {/* Documentation and Reporting */}
-                    <h2>4.4.2.2.1.7 Documentation and Reporting</h2>
-                    <div className="form-section">
-                        <label>How are isolation actions documented?</label>
-                        <textarea name="isolationDocumentation" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>What are the reporting requirements for the isolation process?</label>
-                        <textarea name="reportingRequirements" onChange={handleChange}></textarea>
-                    </div>
-                    <div className="form-section">
-                        <label>How is documentation used to improve future isolation procedures?</label>
-                        <textarea name="futureImprovements" onChange={handleChange}></textarea>
-                    </div>
-
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
+                    ))}
+                    <input type="file" onChange={handleImageChange} accept="image/*" />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
                 </form>
             </main>
         </div>
