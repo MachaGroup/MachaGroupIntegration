@@ -18,8 +18,6 @@ function AssessmentDetails() {
     const [error, setError] = useState(null);
     const db = getFirestore();
 
-<<<<<<< HEAD
-=======
     const questions = {
         "defineCriteria": "What criteria are used to define Access Control Lists (ACLs) within the firewall, and how are these criteria determined based on the organization's security policy?",
         "firewallUtilization": "How does the firewall utilize ACLs to differentiate between authorized and unauthorized network traffic, and what are the default settings for incoming and outgoing traffic?",
@@ -1497,7 +1495,6 @@ function AssessmentDetails() {
 
     }
 
->>>>>>> eb2f3a6a (adding changes)
     useEffect(() => {
         const fetchAssessmentAndBuilding = async () => {
             setLoading(true);

@@ -1,311 +1,267 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, getFunctions, httpsCallable } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
 
 function RovingPatrolsPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding(); // Access buildingId from context
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadImage = httpsCallable(functions, 'uploadRovingPatrolsImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
-  
-  useEffect(() => {
-      if (!buildingId) {
-          alert('No building selected. Redirecting to Building Info...');
-          navigate('/BuildingandAddress');
-      }
-  }, [buildingId, navigate]);
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
+        }
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+
+            try {
+                const formDocRef = doc(db, 'forms', 'Physical Security', 'Roving Patrols', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Physical Security', 'Roving Patrols', buildingId);
+            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true });
+            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Physical Security', 'Roving Patrols', buildingId);
+            await setDoc(formDocRef, { formData: { ...formData, building: buildingRef } }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
-  };
-  const handleChange = (e) => {
-      const { name, value } = e.target;
-      setFormData((prevData) => ({
-          ...prevData,
-          [name]: value,
-      }));
-  };
 
-  // Function to handle back button
-  const handleBack = async () => {
-    if (formData && buildingId) { // Check if formData and buildingId exist
-      try {
-        const buildingRef = doc(db, 'Buildings', buildingId);
-        const formsRef = collection(db, 'forms/Physical Security/Roving Patrols');
-        await addDoc(formsRef, {
-          building: buildingRef,
-          formData: formData,
-        });
-        console.log('Form Data submitted successfully on back!');
-        alert('Form data saved before navigating back!');
-      } catch (error) {
-        console.error('Error saving form data:', error);
-        alert('Failed to save form data before navigating back. Some data may be lost.');
-      }
-    }
-    navigate(-1);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!buildingId) {
-        alert('Building ID is missing. Please start the assessment from the correct page.');
-        return;
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId); 
+    return (
+        <div>
+            <div className="form-page">
+                <header className="header">
+                    <Navbar />
+                    <button className="back-button" onClick={handleBack}>←</button>
+                    <h1>Roving Patrols Assessment</h1>
+                    <img src={logo} alt="Logo" className="logo" />
+                </header>
 
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Physical Security/Roving Patrols');
-      await addDoc(formsRef, {
-          building: buildingRef, // Reference to the building document
-          formData: formData, // Store the form data as a nested object
-      });
+                <main className="form-container">
+                    <form onSubmit={handleSubmit}>
+                        <h2>Patrol Routes and Coverage:</h2>
+                        {[
+                            { name: "regularPatrols", label: "Are roving patrols conducted regularly throughout the premises, covering all critical areas and potential security vulnerabilities?" },
+                            { name: "wellDefinedRoutes", label: "Are patrol routes well-defined, ensuring comprehensive coverage of indoor and outdoor areas?" },
+                            { name: "specialAttentionAreas", label: "Are there any areas or zones that require special attention or increased patrol frequency?" },
+                        ].map((question, index) => (
+                            <div key={index} className="form-section">
+                                <label>{question.label}</label>
+                                {question.name !== "specialAttentionAreas" ? (
+                                    <><div>
+                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                              </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
 
-      console.log('Form data submitted successfully!');
-      alert('Form submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-        console.error('Error submitting form:', error);
-        alert('Failed to submit the form. Please try again.');
-    }
-};
+                                ) : (
+                                    <input type="text" name={question.name} placeholder="Describe any areas or zones" value={formData[question.name] || ''} onChange={handleChange} />
+                                )}
+                            </div>
+                        ))}
 
-  return (
-    <div className="form-page">
-      <header className="header">
-            <Navbar />
-        {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-        <h1>Roving Patrols Assessment</h1>
-        <img src={logo} alt="Logo" className="logo" />
-      </header>
+                        <h2>Frequency and Timing:</h2>
+                        {[
+                            { name: "patrolFrequency", label: "How often are roving patrols conducted, and at what intervals?" },
+                            { name: "randomIntervals", label: "Are patrols conducted at random intervals to deter predictability and enhance security effectiveness?" },
+                            { name: "additionalPatrols", label: "Are there additional patrols scheduled during high-risk periods or events?" },
+                        ].map((question, index) => (
+                            <div key={index} className="form-section">
+                                <label>{question.label}</label>
+                                {question.name === "patrolFrequency" ? (
+                                    <input type="text" name={question.name} placeholder="Enter patrol frequency and intervals" value={formData[question.name] || ''} onChange={handleChange} />
+                                ) : (
+                                    <><div>
+                                  <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                  <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
 
-      <main className="form-container">
-        <form onSubmit={handleSubmit}>
-          {/* Patrol Routes and Coverage */}
-          <h2>Patrol Routes and Coverage:</h2>
-          <div className="form-section">
-            <label>Are roving patrols conducted regularly throughout the premises, covering all critical areas and potential security vulnerabilities?</label>
-            <div>
-              <input type="radio" name="regularPatrols" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="regularPatrols" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="regularPatrolsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
+                                )}
+                            </div>
+                        ))}
+
+                        <h2>Observation and Vigilance:</h2>
+                        {[
+                            { name: "activeMonitoring", label: "Do roving patrol officers actively monitor the premises for signs of unauthorized access, suspicious behavior, or security breaches?" },
+                            { name: "threatResponse", label: "Are they trained to recognize and respond to potential threats, including unauthorized individuals or unusual activities?" },
+                            { name: "thoroughInspections", label: "Do patrol officers conduct thorough inspections of doors, windows, gates, and other access points during patrols?" },
+                        ].map((question, index) => (
+                            <><div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                              <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                              <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                            </div>
+                          </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
+
+                        ))}
+
+                        <h2>Response to Incidents:</h2>
+                        {[
+                            { name: "incidentResponse", label: "Are roving patrol officers equipped to respond promptly to security incidents, alarms, or emergencies encountered during patrols?" },
+                            { name: "emergencyProcedures", label: "Do they know how to initiate appropriate emergency response procedures and contact relevant authorities or response teams?" },
+                            { name: "coordinationWithGuards", label: "Is there a system in place to coordinate with stationed guards or other security personnel in case of incidents requiring additional support?" },
+                        ].map((question, index) => (
+                            <><div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                              <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                              <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                            </div>
+                          </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
+
+                        ))}
+
+                        <h2>Documentation and Reporting:</h2>
+                        {[
+                            { name: "detailedRecords", label: "Are patrol officers required to maintain detailed records of patrol activities, including patrol routes, observations, and incidents encountered?" },
+                            { name: "reportingProcess", label: "Is there a standardized reporting process for documenting security incidents, suspicious activities, or maintenance issues identified during patrols?" },
+                            { name: "reportReviews", label: "Are patrol reports reviewed regularly by security management to identify trends, areas for improvement, or security risks?" },
+                        ].map((question, index) => (
+                            <><div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                              <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                              <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                            </div>
+                          </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
+
+                        ))}
+
+                        <h2>Communication and Coordination:</h2>
+                        {[
+                            { name: "effectiveCommunication", label: "Is there effective communication between roving patrol officers and stationed guards, as well as with management and staff?" },
+                            { name: "communicationDevices", label: "Are patrol officers equipped with communication devices to report incidents, request assistance, or communicate with response teams?" },
+                            { name: "centralizedCommunication", label: "Is there a centralized communication system or protocol for relaying information and coordinating responses between patrol officers and other security personnel?" },
+                        ].map((question, index) => (
+                            <><div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                              <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                              <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                            </div>
+                          </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
+
+                        ))}
+
+                        <h2>Training and Preparedness:</h2>
+                        {[
+                            { name: "adequateTraining", label: "Are roving patrol officers adequately trained in security procedures, emergency response protocols, and effective patrol techniques?" },
+                            { name: "ongoingTraining", label: "Do they receive ongoing training to enhance their skills, knowledge, and awareness of security threats and emerging risks?" },
+                            { name: "situationHandling", label: "Are patrol officers prepared to handle various situations professionally and effectively, including confrontations, medical emergencies, or crisis situations?" },
+                        ].map((question, index) => (
+                            <><div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                              <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                              <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                            </div>
+                          </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
+
+                        ))}
+
+                        <input type="file" onChange={handleImageChange} accept="image/*" />
+                        {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                        {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                        <button type="submit">Submit</button>
+                    </form>
+                </main>
             </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are patrol routes well-defined, ensuring comprehensive coverage of indoor and outdoor areas?</label>
-            <div>
-              <input type="radio" name="wellDefinedRoutes" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="wellDefinedRoutes" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="wellDefinedRoutesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are there any areas or zones that require special attention or increased patrol frequency?</label>
-            <input type="text" name="specialAttentionAreas" placeholder="Describe any areas or zones" onChange={handleChange}/>
-          </div>
-
-          {/* Frequency and Timing */}
-          <h2>Frequency and Timing:</h2>
-          <div className="form-section">
-            <label>How often are roving patrols conducted, and at what intervals?</label>
-            <input type="text" name="patrolFrequency" placeholder="Enter patrol frequency and intervals" onChange={handleChange}/>
-          </div>
-
-          <div className="form-section">
-            <label>Are patrols conducted at random intervals to deter predictability and enhance security effectiveness?</label>
-            <div>
-              <input type="radio" name="randomIntervals" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="randomIntervals" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="randomIntervalsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are there additional patrols scheduled during high-risk periods or events?</label>
-            <div>
-              <input type="radio" name="additionalPatrols" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="additionalPatrols" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="additionalPatrolsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Observation and Vigilance */}
-          <h2>Observation and Vigilance:</h2>
-          <div className="form-section">
-            <label>Do roving patrol officers actively monitor the premises for signs of unauthorized access, suspicious behavior, or security breaches?</label>
-            <div>
-              <input type="radio" name="activeMonitoring" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="activeMonitoring" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="activeMonitoringComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are they trained to recognize and respond to potential threats, including unauthorized individuals or unusual activities?</label>
-            <div>
-              <input type="radio" name="threatResponse" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="threatResponse" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="threatResponseComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Do patrol officers conduct thorough inspections of doors, windows, gates, and other access points during patrols?</label>
-            <div>
-              <input type="radio" name="thoroughInspections" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="thoroughInspections" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="thoroughInspectionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Response to Incidents */}
-          <h2>Response to Incidents:</h2>
-          <div className="form-section">
-            <label>Are roving patrol officers equipped to respond promptly to security incidents, alarms, or emergencies encountered during patrols?</label>
-            <div>
-              <input type="radio" name="incidentResponse" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="incidentResponse" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="incidentResponseComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Do they know how to initiate appropriate emergency response procedures and contact relevant authorities or response teams?</label>
-            <div>
-              <input type="radio" name="emergencyProcedures" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="emergencyProcedures" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="emergencyProceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Is there a system in place to coordinate with stationed guards or other security personnel in case of incidents requiring additional support?</label>
-            <div>
-              <input type="radio" name="coordinationWithGuards" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="coordinationWithGuards" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="coordinationWithGuardsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Documentation and Reporting */}
-          <h2>Documentation and Reporting:</h2>
-          <div className="form-section">
-            <label>Are patrol officers required to maintain detailed records of patrol activities, including patrol routes, observations, and incidents encountered?</label>
-            <div>
-              <input type="radio" name="detailedRecords" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="detailedRecords" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="detailedRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Is there a standardized reporting process for documenting security incidents, suspicious activities, or maintenance issues identified during patrols?</label>
-            <div>
-              <input type="radio" name="reportingProcess" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="reportingProcess" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="reportingProcessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are patrol reports reviewed regularly by security management to identify trends, areas for improvement, or security risks?</label>
-            <div>
-              <input type="radio" name="reportReviews" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="reportReviews" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="reportReviewsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Communication and Coordination */}
-          <h2>Communication and Coordination:</h2>
-          <div className="form-section">
-            <label>Is there effective communication between roving patrol officers and stationed guards, as well as with management and staff?</label>
-            <div>
-              <input type="radio" name="effectiveCommunication" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="effectiveCommunication" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="effectiveCommunicationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are patrol officers equipped with communication devices to report incidents, request assistance, or communicate with response teams?</label>
-            <div>
-              <input type="radio" name="communicationDevices" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="communicationDevices" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="communicationDevicesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Is there a centralized communication system or protocol for relaying information and coordinating responses between patrol officers and other security personnel?</label>
-            <div>
-              <input type="radio" name="centralizedCommunication" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="centralizedCommunication" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="centralizedCommunicationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Training and Preparedness */}
-          <h2>Training and Preparedness:</h2>
-          <div className="form-section">
-            <label>Are roving patrol officers adequately trained in security procedures, emergency response protocols, and effective patrol techniques?</label>
-            <div>
-              <input type="radio" name="adequateTraining" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="adequateTraining" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="adequateTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Do they receive ongoing training to enhance their skills, knowledge, and awareness of security threats and emerging risks?</label>
-            <div>
-              <input type="radio" name="ongoingTraining" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="ongoingTraining" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="ongoingTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are patrol officers prepared to handle various situations professionally and effectively, including confrontations, medical emergencies, or crisis situations?</label>
-            <div>
-              <input type="radio" name="situationHandling" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="situationHandling" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="situationHandlingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-        </form>
-      </main>
-    </div>
-  );
+        </div>
+    );
 }
 
 export default RovingPatrolsPage;
