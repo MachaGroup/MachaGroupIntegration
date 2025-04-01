@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, doc, getDoc, setDoc, getFunctions, httpsCallable } from 'firebase/firestore';
+import { getFirestore, collection, doc, getDoc, setDoc, } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
+
 
 function PasswordSecurity2FormPage() {
     const navigate = useNavigate();
