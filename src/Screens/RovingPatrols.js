@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, doc, getDoc, setDoc, getFunctions, httpsCallable } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function RovingPatrolsPage() {
     const navigate = useNavigate();
