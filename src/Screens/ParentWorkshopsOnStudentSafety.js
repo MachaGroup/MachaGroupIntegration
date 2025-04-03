@@ -1,157 +1,171 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function ParentWorkshopsOnStudentSafetyPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadParentWorkshopsOnStudentSafetyImage = httpsCallable(functions, 'uploadParentWorkshopsOnStudentSafetyImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('/BuildingandAddress');
+            return;
+        }
 
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress'); 
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+
+            try {
+                const formDocRef = doc(db, 'forms', 'Community Partnership', 'Parent Workshops on Student Safety', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Community Partnership', 'Parent Workshops on Student Safety', buildingId);
+            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true });
+            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadParentWorkshopsOnStudentSafetyImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Community Partnership', 'Parent Workshops on Student Safety', buildingId);
+            await setDoc(formDocRef, { formData: { ...formData, building: buildingRef } }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
-  }, [buildingId, navigate]);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Function to handle back button
-  const handleBack = async () => {
-    if (formData && buildingId) { // Check if formData and buildingId exist
-      try {
-        const buildingRef = doc(db, 'Buildings', buildingId);
-        const formsRef = collection(db, 'forms/Community Partnership/Parent Workshops on Student Safety');
-        await addDoc(formsRef, {
-          building: buildingRef,
-          formData: formData,
-        });
-        console.log('Form Data submitted successfully on back!');
-        alert('Form data saved before navigating back!');
-      } catch (error) {
-        console.error('Error saving form data:', error);
-        alert('Failed to save form data before navigating back. Some data may be lost.');
-      }
-    }
-    navigate(-1);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
+    return (
+        <div>
+            <div className="form-page">
+                <header className="header">
+                    <Navbar />
+                    <button className="back-button" onClick={handleBack}>←</button>
+                    <h1>Parent Workshops on Student Safety</h1>
+                    <img src={logo} alt="Logo" className="logo" />
+                </header>
 
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Community Partnership/Parent Workshops on Student Safety');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('Form Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
-    }
-  };
+                <main className="form-container">
+                    <form onSubmit={handleSubmit}>
+                        <h2>6.3.1.1.2. Parent Workshops on Student Safety</h2>
+                        {[
+                            { name: "parentWorkshopsTopics", label: "What topics are covered in parent workshops focused on student safety?" },
+                            { name: "parentsParticipatingInWorkshops", label: "How are parents encouraged to participate in these workshops, and what methods are used to promote attendance?" },
+                            { name: "questionOpportunities", label: "Are there opportunities for parents to ask questions or share concerns during the workshops?" },
+                            { name: "workshopEvaluatedEffectiveness", label: "How is the effectiveness of these workshops evaluated in terms of improving parents' understanding of student safety?" },
+                            { name: "resourcesProvided", label: "What resources or materials are provided to parents during these workshops to help them implement safety measures at home?" }
+                        ].map((question, index) => (
+                            <><div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                              {question.name === "questionOpportunities" ? (
+                                <>
+                                  <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                  <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </>
+                              ) : (
+                                <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />
+                              )}
+                            </div>
+                          </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
 
-
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Parent Workshops on Student Safety</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
-
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                {/* Back-to-School Nights */}
-                <h2>6.3.1.1.2. Parent Workshops on Student Safety</h2>
-                <div className="form-section">
-                    <label>What topics are covered in parent workshops focused on student safety?</label>
-                    <div>
-                        <input type="text" name="parentWorkshopsTopics" placeholder="Describe the topics" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are parents encouraged to participate in these workshops, and what methods are used to promote attendance?</label>
-                    <div>
-                        <input type="text" name="parentsParticipatingInWorkshops" placeholder="Describe how they're encouraged and the methods" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there opportunities for parents to ask questions or share concerns during the workshops?</label>
-                    <div>
-                        <input type="radio" name="questionOpportunities" value="yes" onChange={handleChange} /> Yes
-                        <input type="radio" name="questionOpportunities" value="no" onChange={handleChange} /> No
-                        <textarea className='comment-box' name="questionOpportunitiesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is the effectiveness of these workshops evaluated in terms of improving parents' understanding of student safety?</label>
-                    <div>
-                        <input type="text" name="workshopEvaluatedEffectiveness" placeholder="Describe it's evaluated" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What resources or materials are provided to parents during these workshops to help them implement safety measures at home?</label>
-                    <div>
-                        <input type="text" name="resourcesProvided" placeholder="Describe the resources/materials" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                {/* Submit Button */}
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-
-            </form>
-        </main>
-    </div>
-
-  )
+                        ))}
+                        <input type="file" onChange={handleImageChange} accept="image/*" />
+                        {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                        {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                        <button type="submit">Submit</button>
+                    </form>
+                </main>
+            </div>
+        </div>
+    );
 }
 
 export default ParentWorkshopsOnStudentSafetyPage;

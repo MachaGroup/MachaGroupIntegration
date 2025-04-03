@@ -1,323 +1,264 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, doc, getDoc, setDoc, } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
+
 
 function PerimeterFencingPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding(); // Access buildingId from context
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadImage = httpsCallable(functions, 'uploadPerimeterFencingPageImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
-  useEffect(() => {
-      if (!buildingId) {
-          alert('No building selected. Redirecting to Building Info...');
-          navigate('/BuildingandAddress');
-      }
-  }, [buildingId, navigate]);
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('/BuildingandAddress');
+            return;
+        }
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+
+            try {
+                const formDocRef = doc(db, 'forms', 'Physical Security', 'Perimeter Fencing', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Physical Security', 'Perimeter Fencing', buildingId);
+            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true });
+            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Physical Security', 'Perimeter Fencing', buildingId);
+            await setDoc(formDocRef, { formData: { ...formData, building: buildingRef } }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
-  };
-  const handleChange = (e) => {
-      const { name, value } = e.target;
-      setFormData((prevData) => ({
-          ...prevData,
-          [name]: value,
-      }));
-  };
 
-  // Function to handle back button
-  const handleBack = async () => {
-    if (formData && buildingId) { // Check if formData and buildingId exist
-      try {
-        const buildingRef = doc(db, 'Buildings', buildingId);
-        const formsRef = collection(db, 'forms/Physical Security/Perimeter Fencing');
-        await addDoc(formsRef, {
-          building: buildingRef,
-          formData: formData,
-        });
-        console.log('Form Data submitted successfully on back!');
-        alert('Form data saved before navigating back!');
-      } catch (error) {
-        console.error('Error saving form data:', error);
-        alert('Failed to save form data before navigating back. Some data may be lost.');
-      }
-    }
-    navigate(-1);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!buildingId) {
-        alert('Building ID is missing. Please start the assessment from the correct page.');
-        return;
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId); 
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>1.1.2.1.1. Perimeter Fencing Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Physical Security/Perimeter Fencing');
-      await addDoc(formsRef, {
-          building: buildingRef, // Reference to the building document
-          formData: formData, // Store the form data as a nested object
-      });
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>Physical Integrity:</h2>
+                    {[
+                        { name: "structuralSoundness", label: "Is the perimeter fencing structurally sound and in good condition?" },
+                        { name: "fencingDamage", label: "Are there any signs of damage, corrosion, or deterioration in the fencing material?" },
+                        { name: "securePosts", label: "Are fence posts securely anchored, and are there any signs of leaning or instability?" },
+                        { name: "gapsBreaches", label: "Are there any gaps or breaches in the fencing that could compromise security?" },
+                    ].map((question, index) => (
+                        <><div key={index} className="form-section">
+                        <label>{question.label}</label>
+                        <div>
+                          <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                          <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                        </div>
+                      </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-      console.log('Form data submitted successfully!');
-      alert('Form submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-        console.error('Error submitting form:', error);
-        alert('Failed to submit the form. Please try again.');
-    }
-};
+                    ))}
 
-  return (
-    <div className="form-page">
-      <header className="header">
-            <Navbar />
-        {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-        <h1>1.1.2.1.1. Perimeter Fencing Assessment</h1>
-        <img src={logo} alt="Logo" className="logo" />
-      </header>
+                    <h2>Height and Coverage:</h2>
+                    {[
+                        { name: "fencingHeight", label: "Is the height of the perimeter fencing sufficient to deter unauthorized entry or climbing?" },
+                        { name: "fencingCoverage", label: "Does the fencing provide adequate coverage to secure the perimeter of the facility or property?" },
+                        { name: "additionalMeasures", label: "Are there additional measures in place to prevent access over or under the fencing, such as barbed wire or concrete barriers?" },
+                    ].map((question, index) => (
+                        <><div key={index} className="form-section">
+                        <label>{question.label}</label>
+                        <div>
+                          <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                          <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                        </div>
+                      </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-      <main className="form-container">
-        <form onSubmit={handleSubmit}>
-          {/* Physical Integrity */}
-          <h2>Physical Integrity:</h2>
-          <div className="form-section">
-            <label>Is the perimeter fencing structurally sound and in good condition?</label>
-            <div>
-              <input type="radio" name="structuralSoundness" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="structuralSoundness" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="structuralSoundnessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    ))}
 
-          <div className="form-section">
-            <label>Are there any signs of damage, corrosion, or deterioration in the fencing material?</label>
-            <div>
-              <input type="radio" name="fencingDamage" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="fencingDamage" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="fencingDamageComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    <h2>Access Control:</h2>
+                    {[
+                        { name: "securedAccessPoints", label: "Are access points in the perimeter fencing properly secured with gates or barriers?" },
+                        { name: "gatesEquipment", label: "Are gates equipped with locks, hinges, and latches to control access effectively?" },
+                        { name: "restrictedAccess", label: "Is access to the fenced area restricted to authorized personnel only, with proper authentication mechanisms in place?" },
+                    ].map((question, index) => (
+                        <><div key={index} className="form-section">
+                        <label>{question.label}</label>
+                        <div>
+                          <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                          <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                        </div>
+                      </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-          <div className="form-section">
-            <label>Are fence posts securely anchored, and are there any signs of leaning or instability?</label>
-            <div>
-              <input type="radio" name="securePosts" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="securePosts" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="securePostsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    ))}
 
-          <div className="form-section">
-            <label>Are there any gaps or breaches in the fencing that could compromise security?</label>
-            <div>
-              <input type="radio" name="gapsBreaches" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="gapsBreaches" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="gapsBreachesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    <h2>Visibility and Surveillance:</h2>
+                    {[
+                        { name: "visibility", label: "Does the perimeter fencing allow for clear visibility of the surrounding area, both from inside and outside the fenced area?" },
+                        { name: "blindSpots", label: "Are there measures in place to minimize blind spots or obscured views along the perimeter?" },
+                        { name: "strategicSurveillance", label: "Are surveillance cameras or other monitoring systems positioned strategically to monitor activity along the fencing?" },
+                    ].map((question, index) => (
+                        <><div key={index} className="form-section">
+                        <label>{question.label}</label>
+                        <div>
+                          <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                          <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                        </div>
+                      </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-          {/* Height and Coverage */}
-          <h2>Height and Coverage:</h2>
-          <div className="form-section">
-            <label>Is the height of the perimeter fencing sufficient to deter unauthorized entry or climbing?</label>
-            <div>
-              <input type="radio" name="fencingHeight" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="fencingHeight" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="fencingHeightComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    ))}
 
-          <div className="form-section">
-            <label>Does the fencing provide adequate coverage to secure the perimeter of the facility or property?</label>
-            <div>
-              <input type="radio" name="fencingCoverage" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="fencingCoverage" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="fencingCoverageComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    <h2>Durability and Maintenance:</h2>
+                    {[
+                        { name: "durableMaterials", label: "Is the perimeter fencing made from durable materials that can withstand environmental factors and wear over time?" },
+                        { name: "maintenanceInspection", label: "Are there regular maintenance and inspection procedures in place to address any issues with the fencing promptly?" },
+                        { name: "repairProvisions", label: "Are there provisions for repairing or replacing damaged sections of fencing as needed?" },
+                    ].map((question, index) => (
+                        <><div key={index} className="form-section">
+                        <label>{question.label}</label>
+                        <div>
+                          <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                          <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                        </div>
+                      </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-          <div className="form-section">
-            <label>Are there additional measures in place to prevent access over or under the fencing, such as barbed wire or concrete barriers?</label>
-            <div>
-              <input type="radio" name="additionalMeasures" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="additionalMeasures" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="additionalMeasuresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    ))}
 
-          {/* Access Control */}
-          <h2>Access Control:</h2>
-          <div className="form-section">
-            <label>Are access points in the perimeter fencing properly secured with gates or barriers?</label>
-            <div>
-              <input type="radio" name="securedAccessPoints" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="securedAccessPoints" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="securedAccessPointsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    <h2>Compliance with Regulations:</h2>
+                    {[
+                        { name: "regulatoryCompliance", label: "Does the perimeter fencing comply with relevant regulations, codes, and standards for security fencing?" },
+                        { name: "regulatoryRequirements", label: "Are there any specific requirements or guidelines for perimeter fencing outlined by regulatory authorities or industry associations?" },
+                        { name: "inspectionsCompliance", label: "Have inspections or assessments been conducted to verify compliance with applicable standards?" },
+                    ].map((question, index) => (
+                        <><div key={index} className="form-section">
+                        <label>{question.label}</label>
+                        {question.name === "regulatoryRequirements" ? (
+                          <input type="text" name={question.name} placeholder="Enter any regulatory requirements" onChange={handleChange} />
+                        ) : (
+                          <div>
+                            <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                            <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                          </div>
+                        )}
+                      </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-          <div className="form-section">
-            <label>Are gates equipped with locks, hinges, and latches to control access effectively?</label>
-            <div>
-              <input type="radio" name="gatesEquipment" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="gatesEquipment" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="gatesEquipmentComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    ))}
 
-          <div className="form-section">
-            <label>Is access to the fenced area restricted to authorized personnel only, with proper authentication mechanisms in place?</label>
-            <div>
-              <input type="radio" name="restrictedAccess" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="restrictedAccess" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="restrictedAccessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    <h2>Integration with Security Measures:</h2>
+                    {[
+                        { name: "integratedSecurityMeasures", label: "Is the perimeter fencing integrated with other security measures, such as surveillance cameras, lighting, or intrusion detection systems?" },
+                        { name: "securityEffectiveness", label: "Do these security measures complement the effectiveness of the fencing in deterring and detecting security threats?" },
+                        { name: "coordinationResponse", label: "Is there coordination between security personnel and monitoring systems to respond to perimeter breaches effectively?" },
+                    ].map((question, index) => (
+                        <><div key={index} className="form-section">
+                        <label>{question.label}</label>
+                        <div>
+                          <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                          <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                        </div>
+                      </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
 
-          {/* Visibility and Surveillance */}
-          <h2>Visibility and Surveillance:</h2>
-          <div className="form-section">
-            <label>Does the perimeter fencing allow for clear visibility of the surrounding area, both from inside and outside the fenced area?</label>
-            <div>
-              <input type="radio" name="visibility" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="visibility" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="visibilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
+                    ))}
 
-          <div className="form-section">
-            <label>Are there measures in place to minimize blind spots or obscured views along the perimeter?</label>
-            <div>
-              <input type="radio" name="blindSpots" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="blindSpots" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="blindSpotsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are surveillance cameras or other monitoring systems positioned strategically to monitor activity along the fencing?</label>
-            <div>
-              <input type="radio" name="strategicSurveillance" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="strategicSurveillance" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="strategicSurveillanceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Durability and Maintenance */}
-          <h2>Durability and Maintenance:</h2>
-          <div className="form-section">
-            <label>Is the perimeter fencing made from durable materials that can withstand environmental factors and wear over time?</label>
-            <div>
-              <input type="radio" name="durableMaterials" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="durableMaterials" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="durableMaterialsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are there regular maintenance and inspection procedures in place to address any issues with the fencing promptly?</label>
-            <div>
-              <input type="radio" name="maintenanceInspection" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="maintenanceInspection" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="maintenanceInspectionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are there provisions for repairing or replacing damaged sections of fencing as needed?</label>
-            <div>
-              <input type="radio" name="repairProvisions" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="repairProvisions" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="repairProvisionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Compliance with Regulations */}
-          <h2>Compliance with Regulations:</h2>
-          <div className="form-section">
-            <label>Does the perimeter fencing comply with relevant regulations, codes, and standards for security fencing?</label>
-            <div>
-              <input type="radio" name="regulatoryCompliance" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="regulatoryCompliance" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="regulatoryComplianceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Are there any specific requirements or guidelines for perimeter fencing outlined by regulatory authorities or industry associations?</label>
-            <input type="text" name="regulatoryRequirements" placeholder="Enter any regulatory requirements" onChange={handleChange}/>
-          </div>
-
-          <div className="form-section">
-            <label>Have inspections or assessments been conducted to verify compliance with applicable standards?</label>
-            <div>
-              <input type="radio" name="inspectionsCompliance" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="inspectionsCompliance" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="inspectionsComplianceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Integration with Security Measures */}
-          <h2>Integration with Security Measures:</h2>
-          <div className="form-section">
-            <label>Is the perimeter fencing integrated with other security measures, such as surveillance cameras, lighting, or intrusion detection systems?</label>
-            <div>
-              <input type="radio" name="integratedSecurityMeasures" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="integratedSecurityMeasures" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="integratedSecurityMeasuresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Do these security measures complement the effectiveness of the fencing in deterring and detecting security threats?</label>
-            <div>
-              <input type="radio" name="securityEffectiveness" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="securityEffectiveness" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="securityEffectivenessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <label>Is there coordination between security personnel and monitoring systems to respond to perimeter breaches effectively?</label>
-            <div>
-              <input type="radio" name="coordinationResponse" value="yes" onChange={handleChange}/> Yes
-              <input type="radio" name="coordinationResponse" value="no" onChange={handleChange}/> No
-              <textarea className='comment-box' name="coordinationResponseComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-        </form>
-      </main>
-    </div>
-  );
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default PerimeterFencingPage;

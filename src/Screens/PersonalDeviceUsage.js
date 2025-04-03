@@ -1,352 +1,342 @@
-import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
+import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function PersonalDeviceUsageFormPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadPersonalDeviceUsageFormPageImage = httpsCallable(functions, 'uploadPersonalDeviceUsageFormPageImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('BuildingandAddress');
+            return;
+        }
 
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+
+            try {
+                const formDocRef = doc(db, 'forms', 'Policy and Compliance', 'Personal Device Usage', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Policy and Compliance', 'Personal Device Usage', buildingId);
+            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true });
+            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadPersonalDeviceUsageFormPageImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Policy and Compliance', 'Personal Device Usage', buildingId);
+            await setDoc(formDocRef, { formData: { ...formData, building: buildingRef } }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
-  }, [buildingId, navigate]);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Function to handle back button
-  const handleBack = async () => {
-    if (formData && buildingId) { // Check if formData and buildingId exist
-      try {
-        const buildingRef = doc(db, 'Buildings', buildingId);
-        const formsRef = collection(db, 'forms/Policy and Compliance/Personal Device Usage');
-        await addDoc(formsRef, {
-          building: buildingRef,
-          formData: formData,
-        });
-        console.log('Form Data submitted successfully on back!');
-        alert('Form data saved before navigating back!');
-      } catch (error) {
-        console.error('Error saving form data:', error);
-        alert('Failed to save form data before navigating back. Some data may be lost.');
-      }
-    }
-    navigate(-1);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>5.1.1.1.2 Personal Device Usage Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Policy and Compliance/Personal Device Usage');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
-    }
-  };
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>5.1.1.1.2.1 Policy Scope and Guidelines:</h2>
+                    {[
+                        { name: "useGuidelines", label: "What guidelines are established for the use of personal devices (e.g., smartphones, tablets, laptops) on the network?" },
+                        { name: "securityRequirements", label: "Are there specific requirements for the type and security of personal devices that can connect to the network?" },
+                        { name: "usePolicy", label: "How does the policy define acceptable and unacceptable uses of personal devices within the organizational environment?" },
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            {question.name === "securityRequirements" ? (
+                                <><div>
+                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
 
+                            ) : (
+                                <div>
+                                    <input type="text" name={question.name} placeholder={question.label.includes("List the guidelines") ? "List the guidelines" : question.label.includes("Describe how it define uses") ? "Describe how it define uses" : "Describe the procedures"} value={formData[question.name] || ''} onChange={handleChange} />
+                                </div>
+                            )}
+                        </div>
+                    ))}
 
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>5.1.1.1.2 Personal Device Usage Assessment</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
+                    <h2>5.1.1.1.2.2 Device Registration and Management:</h2>
+                    {[
+                        { name: "registeringProcedures", label: "What procedures are in place for registering personal devices with the organization (e.g., device registration forms)?" },
+                        { name: "handledTracking", label: "How is the management and tracking of personal devices handled within the network?" },
+                        { name: "deviceProtocols", label: "Are there specific protocols for ensuring that personal devices meet the organization's security standards before being granted access?" },
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            {question.name === "deviceProtocols" ? (
+                                <><div>
+                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
 
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                {/* 5.1.1.1.2 Personal Device Usage */}
-                <h2>5.1.1.1.2.1 Policy Scope and Guidelines:</h2>
-                <div className="form-section">
-                    <label>What guidelines are established for the use of personal devices (e.g., smartphones, tablets, laptops) on the network?</label>
-                    <div>
-                        <input type="text" name="useGuidelines" placeholder="List the guidelines" onChange={handleChange} />  
-                    </div>
-                </div>
+                            ) : (
+                                <div>
+                                    <input type="text" name={question.name} placeholder={question.label.includes("Describe the procedures") ? "Describe the procedures" : "Describe how it's handled"} value={formData[question.name] || ''} onChange={handleChange} />
+                                </div>
+                            )}
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>Are there specific requirements for the type and security of personal devices that can connect to the network?</label>
-                    <div>
-                        <input type="radio" name="securityRequirements" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="securityRequirements" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="securityRequirementsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <h2>5.1.1.1.2.3 Security Measures:</h2>
+                    {[
+                        { name: "securityMeasures", label: "What security measures are required for personal devices to access the network (e.g., antivirus software, encryption)?" },
+                        { name: "securityUpdates", label: "How are security updates and patches managed for personal devices connecting to the network?" },
+                        { name: "passwordRequirements", label: "Are there specific requirements for personal devices regarding passwords or multi-factor authentication?" },
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            {question.name === "passwordRequirements" ? (
+                                <><div>
+                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
 
-                <div className="form-section">
-                    <label>How does the policy define acceptable and unacceptable uses of personal devices within the organizational environment?</label>
-                    <div>
-                        <input type="text" name="usePolicy" placeholder="Describe how it define uses" onChange={handleChange} />  
-                    </div>
-                </div>
+                            ) : (
+                                <div>
+                                    <input type="text" name={question.name} placeholder={question.label.includes("Describe the measures") ? "Describe the measures" : "Describe how they're managed"} value={formData[question.name] || ''} onChange={handleChange} />
+                                </div>
+                            )}
+                        </div>
+                    ))}
 
-                <h2>5.1.1.1.2.2 Device Registration and Management:</h2>
-                <div className="form-section">
-                    <label>What procedures are in place for registering personal devices with the organization (e.g., device registration forms)?</label>
-                    <div>
-                        <input type="text" name="registeringProcedures" placeholder="Describe the procedures" onChange={handleChange} />  
-                    </div>
-                </div>
+                    <h2>5.1.1.1.2.4 Network Access Controls:</h2>
+                    {[
+                        { name: "networkAccess", label: "How is network access controlled for personal devices (e.g., network segmentation, VPN requirements)?" },
+                        { name: "resourceRestrictions", label: "Are there restrictions on the types of network resources that personal devices can access?" },
+                        { name: "monitoringTools", label: "What monitoring tools are used to ensure that personal devices do not pose a security risk to the network?" },
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            {question.name === "resourceRestrictions" ? (
+                                <><div>
+                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
 
-                <div className="form-section">
-                    <label>How is the management and tracking of personal devices handled within the network?</label>
-                    <div>
-                        <input type="text" name="handledTracking" placeholder="Describe how it's handled" onChange={handleChange} />  
-                    </div>
-                </div>
+                            ) : (
+                                <div>
+                                    <input type="text" name={question.name} placeholder={question.label.includes("Describe how they're controlled") ? "Describe how they're controlled" : "Describe the tools"} value={formData[question.name] || ''} onChange={handleChange} />
+                                </div>
+                            )}
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>Are there specific protocols for ensuring that personal devices meet the organization's security standards before being granted access?</label>
-                    <div>
-                        <input type="radio" name="deviceProtocols" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="deviceProtocols" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="deviceProtocolsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <h2>5.1.1.1.2.5 User Responsibilities and Compliance:</h2>
+                    {[
+                        { name: "userResponsibilities", label: "What responsibilities do users have regarding the use of their personal devices (e.g., reporting lost or stolen devices)?" },
+                        { name: "compliancePolicy", label: "How is compliance with the personal device usage policy ensured and enforced?" },
+                        { name: "policyConsequences", label: "Are there clear consequences for non-compliance with the policy?" },
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            {question.name === "policyConsequences" ? (
+                                <><div>
+                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
 
-                <h2>5.1.1.1.2.3 Security Measures:</h2>
-                <div className="form-section">
-                    <label>What security measures are required for personal devices to access the network (e.g., antivirus software, encryption)?</label>
-                    <div>
-                        <input type="text" name="securityMeasures" placeholder="Describe the measures" onChange={handleChange} />  
-                    </div>
-                </div>
+                            ) : (
+                                <div>
+                                    <input type="text" name={question.name} placeholder={question.label.includes("Describe the responsibilities") ? "Describe the responsibilities" : "Describe how it's ensured and enforced"} value={formData[question.name] || ''} onChange={handleChange} />
+                                </div>
+                            )}
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>How are security updates and patches managed for personal devices connecting to the network?</label>
-                    <div>
-                        <input type="text" name="securityUpdates" placeholder="Describe how they're managed" onChange={handleChange} />  
-                    </div>
-                </div>
+                    <h2>5.1.1.1.2.6 Privacy and Data Protection:</h2>
+                    {[
+                        { name: "addressedPolicy", label: "How does the policy address the privacy of data on personal devices used within the organization?" },
+                        { name: "protectionMeasures", label: "What measures are taken to protect organizational data on personal devices (e.g., remote wipe capabilities)?" },
+                        { name: "balancedData", label: "How are user data and privacy balanced with security requirements?" },
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="text" name={question.name} placeholder={question.label.includes("Describe how does it address it") ? "Describe how does it address it" : question.label.includes("Describe the measures") ? "Describe the measures" : "Describe how it's balanced"} value={formData[question.name] || ''} onChange={handleChange} />
+                            </div>
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>Are there specific requirements for personal devices regarding passwords or multi-factor authentication?</label>
-                    <div>
-                        <input type="radio" name="passwordRequirements" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="passwordRequirements" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="passwordRequirementsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <h2>5.1.1.1.2.7 Policy Exceptions and Approvals:</h2>
+                    {[
+                        { name: "requestingExceptions", label: "What processes are in place for requesting exceptions to the personal device usage policy (e.g., special permissions for specific devices)?" },
+                        { name: "authorizedExceptions", label: "Who is authorized to review and approve exceptions to the policy?" },
+                        { name: "documentedProcedures", label: "Are there documented procedures for handling and documenting policy exceptions?" },
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            {question.name === "documentedProcedures" ? (
+                                <><div>
+                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
 
-                <h2>5.1.1.1.2.4 Network Access Controls:</h2>
-                <div className="form-section">
-                    <label>How is network access controlled for personal devices (e.g., network segmentation, VPN requirements)?</label>
-                    <div>
-                        <input type="text" name="networkAccess" placeholder="Describe how they're controlled" onChange={handleChange} />  
-                    </div>
-                </div>
+                            ) : (
+                                <div>
+                                    <input type="text" name={question.name} placeholder={question.label.includes("Describe the processes") ? "Describe the processes" : "List who's authorized"} value={formData[question.name] || ''} onChange={handleChange} />
+                                </div>
+                            )}
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>Are there restrictions on the types of network resources that personal devices can access?</label>
-                    <div>
-                        <input type="radio" name="resourceRestrictions" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="resourceRestrictions" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="resourceRestrictionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <h2>5.1.1.1.2.8 Incident Response and Management:</h2>
+                    {[
+                        { name: "securityIncident", label: "What steps are taken if a personal device is involved in a security incident (e.g., data breaches, malware infections)?" },
+                        { name: "managedIncidents", label: "How are incidents involving personal devices managed and documented?" },
+                        { name: "mitigatingRisks", label: "What procedures are followed for responding to and mitigating risks associated with compromised personal devices?" },
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="text" name={question.name} placeholder={question.label.includes("List the steps") ? "List the steps" : question.label.includes("Describe how they're managed and documented") ? "Describe how they're managed and documented" : "Describe the procedures"} value={formData[question.name] || ''} onChange={handleChange} />
+                            </div>
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>What monitoring tools are used to ensure that personal devices do not pose a security risk to the network?</label>
-                    <div>
-                        <input type="text" name="monitoringTools" placeholder="Describe the tools" onChange={handleChange} />  
-                    </div>
-                </div>
+                    <h2>5.1.1.1.2.9 Training and Awareness:</h2>
+                    {[
+                        { name: "trainingPrograms", label: "What training programs are provided to users regarding the safe use of personal devices on the network?" },
+                        { name: "userAwareness", label: "How is user awareness of personal device policies and security practices ensured?" },
+                        { name: "assistingUsers", label: "Are there resources available to assist users in understanding and complying with the personal device usage policy?" },
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            {question.name === "assistingUsers" ? (
+                                <><div>
+                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
 
-                <h2>5.1.1.1.2.5 User Responsibilities and Compliance:</h2>
-                <div className="form-section">
-                    <label>What responsibilities do users have regarding the use of their personal devices (e.g., reporting lost or stolen devices)?</label>
-                    <div>
-                        <input type="text" name="userResponsibilities" placeholder="Describe the responsibilities" onChange={handleChange} />  
-                    </div>
-                </div>
+                            ) : (
+                                <div>
+                                    <input type="text" name={question.name} placeholder={question.label.includes("Describe the programs") ? "Describe the programs" : "Describe how it's ensured"} value={formData[question.name] || ''} onChange={handleChange} />
+                                </div>
+                            )}
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>How is compliance with the personal device usage policy ensured and enforced?</label>
-                    <div>
-                        <input type="text" name="compliancePolicy" placeholder="Describe how it's ensured and enforced" onChange={handleChange} />  
-                    </div>
-                </div>
+                    <h2>5.1.1.1.2.10 Review and Updates:</h2>
+                    {[
+                        { name: "usagePolicy", label: "How frequently is the personal device usage policy reviewed and updated to address new risks and technological changes?" },
+                        { name: "reviewingPolicy", label: "Who is responsible for reviewing and revising the policy, and what criteria are used for updates?" },
+                        { name: "communicatedPolicy", label: "How are updates to the personal device usage policy communicated to users?" },
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input type="text" name={question.name} placeholder={question.label.includes("Describe how frequent") ? "Describe how frequent" : question.label.includes("List who's responsible") ? "List who's responsible" : "Describe how it's communicated"} value={formData[question.name] || ''} onChange={handleChange} />
+                            </div>
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>Are there clear consequences for non-compliance with the policy?</label>
-                    <div>
-                        <input type="radio" name="policyConsequences" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="policyConsequences" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="policyConsequencesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>5.1.1.1.2.6 Privacy and Data Protection:</h2>
-                <div className="form-section">
-                    <label>How does the policy address the privacy of data on personal devices used within the organization?</label>
-                    <div>
-                        <input type="text" name="addressedPolicy" placeholder="Describe how does it address it" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What measures are taken to protect organizational data on personal devices (e.g., remote wipe capabilities)?</label>
-                    <div>
-                        <input type="text" name="protectionMeasures" placeholder="Describe the measures" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are user data and privacy balanced with security requirements?</label>
-                    <div>
-                        <input type="text" name="balancedData" placeholder="Describe how it's balanced" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.1.1.1.2.7 Policy Exceptions and Approvals:</h2>
-                <div className="form-section">
-                    <label>What processes are in place for requesting exceptions to the personal device usage policy (e.g., special permissions for specific devices)?</label>
-                    <div>
-                        <input type="text" name="requestingExceptions" placeholder="Describe the processes" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Who is authorized to review and approve exceptions to the policy?</label>
-                    <div>
-                        <input type="text" name="authorizedExceptions" placeholder="List who's authorized" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there documented procedures for handling and documenting policy exceptions?</label>
-                    <div>
-                        <input type="radio" name="documentedProcedures" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="documentedProcedures" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="documentedProceduresComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>5.1.1.1.2.8 Incident Response and Management:</h2>
-                <div className="form-section">
-                    <label>What steps are taken if a personal device is involved in a security incident (e.g., data breaches, malware infections)?</label>
-                    <div>
-                        <input type="text" name="securityIncident" placeholder="List the steps" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are incidents involving personal devices managed and documented?</label>
-                    <div>
-                        <input type="text" name="managedIncidents" placeholder="Describe how they're managed and documented" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What procedures are followed for responding to and mitigating risks associated with compromised personal devices?</label>
-                    <div>
-                        <input type="text" name="mitigatingRisks" placeholder="Describe the procedures" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <h2>5.1.1.1.2.9 Training and Awareness:</h2>
-                <div className="form-section">
-                    <label>What training programs are provided to users regarding the safe use of personal devices on the network?</label>
-                    <div>
-                        <input type="text" name="trainingPrograms" placeholder="Describe the programs" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is user awareness of personal device policies and security practices ensured?</label>
-                    <div>
-                        <input type="text" name="userAwareness" placeholder="Describe how it's ensured" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there resources available to assist users in understanding and complying with the personal device usage policy?</label>
-                    <div>
-                        <input type="radio" name="assistingUsers" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="assistingUsers" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="assistingUsersComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>5.1.1.1.2.10 Review and Updates:</h2>
-                <div className="form-section">
-                    <label>How frequently is the personal device usage policy reviewed and updated to address new risks and technological changes?</label>
-                    <div>
-                        <input type="text" name="usagePolicy" placeholder="Describe how frequent" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Who is responsible for reviewing and revising the policy, and what criteria are used for updates?</label>
-                    <div>
-                        <input type="text" name="reviewingPolicy" placeholder="List who's responsible" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are updates to the personal device usage policy communicated to users?</label>
-                    <div>
-                        <input type="text" name="communicatedPolicy" placeholder="Describe how it's communicated" onChange={handleChange} />  
-                    </div>
-                </div>
-
-                {/* Submit Button */}
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-                
-            </form>
-        </main>
-    </div>
-  )
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: "red" }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default PersonalDeviceUsageFormPage;
