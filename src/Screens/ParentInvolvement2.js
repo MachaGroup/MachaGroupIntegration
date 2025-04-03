@@ -1,276 +1,249 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function ParentInvolvement2FormPage() {
-  const navigate = useNavigate();  // Initialize useNavigate hook for navigation
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    const functions = getFunctions();
+    const uploadImage = httpsCallable(functions, 'uploadParentInvolvement2FormPageImage');
 
-  const [formData, setFormData] = useState();
-  const storage = getStorage();
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('/BuildingandAddress');
+            return;
+        }
 
-  useEffect(() => {
-    if(!buildingId) {
-      alert('No builidng selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+
+            try {
+                const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Parent Involvement', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Parent Involvement', buildingId);
+            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
+            console.log("Form data saved to Firestore:", newFormData);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start the assessment from the correct page.');
+            return;
+        }
+
+        if (imageData) {
+            try {
+                const uploadResult = await uploadImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
+        try {
+            const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Parent Involvement', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
-  }, [buildingId, navigate]);
 
-  
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Function to handle back button
-  const handleBack = async () => {
-    if (formData && buildingId) { // Check if formData and buildingId exist
-      try {
-        const buildingRef = doc(db, 'Buildings', buildingId);
-        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Parent Involvement');
-        await addDoc(formsRef, {
-          building: buildingRef,
-          formData: formData,
-        });
-        console.log('Form Data submitted successfully on back!');
-        alert('Form data saved before navigating back!');
-      } catch (error) {
-        console.error('Error saving form data:', error);
-        alert('Failed to save form data before navigating back. Some data may be lost.');
-      }
-    }
-    navigate(-1);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if(!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
 
-    try {
-      // Create a document reference to the building in the 'Buildings' collection
-      const buildingRef = doc(db, 'Buildings', buildingId);
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>Parent Involvement Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-      // Store the form data in the specified Firestore structure
-      const formsRef = collection(db, 'forms/Personnel Training and Awareness/Parent Involvement');
-      await addDoc(formsRef, {
-        buildling: buildingRef,
-        formData: formData,
-      });
-      console.log('From Data submitted successfully!')
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
-    }
-  };
-  return (
-    <div className="form-page">
-        <header className="header">
-            <Navbar />
-            {/* Back Button */}
-        <button className="back-button" onClick={handleBack}>←</button> {/* Back button at the top */}
-            <h1>Parent Involvement Assessment</h1>
-            <img src={logo} alt="Logo" className="logo" />
-        </header>
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>Information Sessions:</h2>
+                    {[
+                        { name: "parentalCommunication", label: "How are parents informed about the emergency procedures and protocols established by the school or educational institution?" },
+                        { name: "parentWorkshops", label: "Are information sessions or workshops organized specifically to educate parents about emergency preparedness and response?", type: "radio" },
+                        { name: "sessionTopics", label: "What topics are covered during these information sessions, and how are they tailored to meet the informational needs and concerns of parents?" },
+                        { name: "parentEngagement", label: "Are opportunities provided for parents to ask questions, seek clarification, or express their opinions and feedback regarding emergency procedures?", type: "radio" },
+                    ].map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            {question.type === "radio" ? (
+                                <><div>
+                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
 
-        <main className="form-container">
-            <form onSubmit={handleSubmit}>
-                {/* 3.2.1.1.3 Parent Involvement */}
-                <h2>Information Sessions:</h2>
-                <div className="form-section">
-                    <label>How are parents informed about the emergency procedures and protocols established by the school or educational institution?</label>
-                    <div>
-                        <input type="text" name="parentalCommunication" placeholder="Describe how they're informed" onChange={handleChange}/>  
-                    </div>
-                </div>
+                            ) : (
+                                <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />
+                            )}
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>Are information sessions or workshops organized specifically to educate parents about emergency preparedness and response?</label>
-                    <div>
-                        <input type="radio" name="parentWorkshops" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="parentWorkshops" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="parentWorkshopsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <h2>Communication Channels:</h2>
+                    {[
+                        { name: "communicationChannels", label: "What communication channels are used to disseminate information about emergency procedures to parents?" },
+                        { name: "writtenCommunication", label: "Are newsletters, emails, or other forms of written communication regularly sent to parents to provide updates and reminders about emergency preparedness?", type: "radio" },
+                        { name: "onlineCommunication", label: "How are social media platforms or school websites utilized to share relevant information and resources with parents regarding emergency procedures?" },
+                        { name: "notificationSystems", label: "Are emergency notification systems in place to alert parents in real-time about critical incidents or urgent situations affecting the school community?" },
+                    ].map((question, index) => (
+                        <div key={index + 4} className="form-section">
+                            <label>{question.label}</label>
+                            {question.type === "radio" ? (
+                                <><div>
+                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
 
-                <div className="form-section">
-                    <label>What topics are covered during these information sessions, and how are they tailored to meet the informational needs and concerns of parents?</label>
-                    <div>
-                        <input type="text" name="sessionTopics" placeholder="Describe the topics" onChange={handleChange}/>  
-                    </div>
-                </div>
+                            ) : (
+                                <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />
+                            )}
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>Are opportunities provided for parents to ask questions, seek clarification, or express their opinions and feedback regarding emergency procedures?</label>
-                    <div>
-                        <input type="radio" name="parentEngagement" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="parentEngagement" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="parentEngagementComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <h2>Parent Education Resources:</h2>
+                    {[
+                        { name: "parentalResources", label: "Are educational materials or resources provided to parents to support their understanding of emergency procedures and their role in supporting their children's preparedness?", type: "radio" },
+                        { name: "resourceAvailability", label: "What types of resources are available to parents, such as pamphlets, handouts, or online guides, and how accessible are they?" },
+                        { name: "homeDiscussionGuidance", label: "Are parents encouraged to review and discuss emergency procedures with their children at home, and are guidance materials provided to facilitate these discussions?", type: "radio" },
+                        { name: "homeReinforcement", label: "How are parents encouraged to reinforce emergency preparedness concepts and skills learned at school within the home environment?" },
+                    ].map((question, index) => (
+                        <div key={index + 8} className="form-section">
+                            <label>{question.label}</label>
+                            {question.type === "radio" ? (
+                                <><div>
+                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
 
-                <h2>Communication Channels:</h2>
-                <div className="form-section">
-                    <label>What communication channels are used to disseminate information about emergency procedures to parents?</label>
-                    <div>
-                        <input type="text" name="communicationChannels" placeholder="Describe the channels" onChange={handleChange}/>  
-                    </div>
-                </div>
+                            ) : (
+                                <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />
+                            )}
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>Are newsletters, emails, or other forms of written communication regularly sent to parents to provide updates and reminders about emergency preparedness?</label>
-                    <div>
-                        <input type="radio" name="writtenCommunication" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="writtenCommunication" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="writtenCommunicationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                    <h2>Parent Feedback and Engagement:</h2>
+                    {[
+                        { name: "parentFeedback", label: "Are mechanisms in place to solicit feedback from parents regarding their understanding of emergency procedures and their perceived effectiveness?" },
+                        { name: "parentConcerns", label: "How are parent perspectives and concerns regarding emergency preparedness considered and addressed by school administrators and staff?" },
+                        { name: "parentInvolvement", label: "Are parents invited to participate in planning committees, advisory groups, or other forums focused on emergency preparedness and safety?", type: "radio" },
+                        { name: "ongoingCollaboration", label: "What measures are taken to foster ongoing engagement and collaboration between parents and school stakeholders in enhancing emergency preparedness efforts?" },
+                    ].map((question, index) => (
+                        <div key={index + 12} className="form-section">
+                            <label>{question.label}</label>
+                            {question.type === "radio" ? (
+                                <><div>
+                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
 
-                <div className="form-section">
-                    <label>How are social media platforms or school websites utilized to share relevant information and resources with parents regarding emergency procedures?</label>
-                    <div>
-                        <input type="text" name="onlineCommunication" placeholder="Describe how social media is utilized" onChange={handleChange}/>  
-                    </div>
-                </div>
+                            ) : (
+                                <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />
+                            )}
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>Are emergency notification systems in place to alert parents in real-time about critical incidents or urgent situations affecting the school community?</label>
-                    <div>
-                        <input type="text" name="notificationSystems" placeholder="Describe the systems" onChange={handleChange}/>  
-                    </div>
-                </div>
+                    <h2>Participation in Drills and Exercises:</h2>
+                    {[
+                        { name: "parentParticipation", label: "Are parents encouraged or invited to participate in emergency drills and exercises conducted by the school or educational institution?", type: "radio" },
+                        { name: "drillCommunication", label: "How are parents informed about upcoming drills and exercises, and what instructions or expectations are provided to them regarding their involvement?" },
+                        { name: "parentalObservation", label: "Are opportunities provided for parents to observe or volunteer during emergency drills to gain firsthand experience and understanding of school emergency procedures?", type: "radio" },
+                        { name: "feedbackMechanisms", label: "What feedback mechanisms are in place to gather input from parents about their observations and experiences during emergency drills?" },
+                    ].map((question, index) => (
+                        <div key={index + 16} className="form-section">
+                            <label>{question.label}</label>
+                            {question.type === "radio" ? (
+                                <><div>
+                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
+                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
+                                </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
 
-                <h2>Parent Education Resources:</h2>
-                <div className="form-section">
-                    <label>Are educational materials or resources provided to parents to support their understanding of emergency procedures and their role in supporting their children's preparedness?</label>
-                    <div>
-                        <input type="radio" name="parentalResources" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="parentalResources" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="parentalResourcesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
+                            ) : (
+                                <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />
+                            )}
+                        </div>
+                    ))}
 
-                <div className="form-section">
-                    <label>What types of resources are available to parents, such as pamphlets, handouts, or online guides, and how accessible are they?</label>
-                    <div>
-                        <input type="text" name="resourceAvailability" placeholder="List the resources" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are parents encouraged to review and discuss emergency procedures with their children at home, and are guidance materials provided to facilitate these discussions?</label>
-                    <div>
-                        <input type="radio" name="homeDiscussionGuidance" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="homeDiscussionGuidance" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="homeDiscussionGuidanceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are parents encouraged to reinforce emergency preparedness concepts and skills learned at school within the home environment?</label>
-                    <div>
-                        <input type="text" name="homeReinforcement" placeholder="Describe how are they encouraged" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <h2>Parent Feedback and Engagement:</h2>
-                <div className="form-section">
-                    <label>Are mechanisms in place to solicit feedback from parents regarding their understanding of emergency procedures and their perceived effectiveness?</label>
-                    <div>
-                        <input type="text" name="parentFeedback" placeholder="Describe the mechanisms" onChange={handleChange}/>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are parent perspectives and concerns regarding emergency preparedness considered and addressed by school administrators and staff?</label>
-                    <div>
-                        <input type="text" name="parentConcerns" placeholder="Describe how are they addressed" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are parents invited to participate in planning committees, advisory groups, or other forums focused on emergency preparedness and safety?</label>
-                    <div>
-                        <input type="radio" name="parentInvolvement" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="parentInvolvement" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="parentInvolvementComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What measures are taken to foster ongoing engagement and collaboration between parents and school stakeholders in enhancing emergency preparedness efforts?</label>
-                    <div>
-                        <input type="text" name="ongoingCollaboration" placeholder="Describe the measures" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <h2>Participation in Drills and Exercises:</h2>
-                <div className="form-section">
-                    <label>Are parents encouraged or invited to participate in emergency drills and exercises conducted by the school or educational institution?</label>
-                    <div>
-                        <input type="radio" name="parentParticipation" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="parentParticipation" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="parentParticipationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are parents informed about upcoming drills and exercises, and what instructions or expectations are provided to them regarding their involvement?</label>
-                    <div>
-                        <input type="text" name="drillCommunication" placeholder="Describe how they're informed" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are opportunities provided for parents to observe or volunteer during emergency drills to gain firsthand experience and understanding of school emergency procedures?</label>
-                    <div>
-                        <input type="radio" name="parentalObservation" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="parentalObservation" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="parentalObservationComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What feedback mechanisms are in place to gather input from parents about their observations and experiences during emergency drills?</label>
-                    <div>
-                        <input type="text" name="feedbackMechanisms" placeholder="Describe the mechanisms" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                {/* Submit Button */}
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-{uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-{imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-{uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-<button type="submit">Submit</button>
-            </form>
-        </main>
-    </div>
-  )
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
+                    {imageUploadError && <p style={{ color: "red" }}>{imageUploadError}</p>}
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default ParentInvolvement2FormPage;
