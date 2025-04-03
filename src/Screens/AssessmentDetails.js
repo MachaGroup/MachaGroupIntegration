@@ -18,8 +18,7 @@ function AssessmentDetails() {
     const [error, setError] = useState(null);
     const db = getFirestore();
 
-<<<<<<< HEAD
-=======
+
     const questions = {
         "defineCriteria": "What criteria are used to define Access Control Lists (ACLs) within the firewall, and how are these criteria determined based on the organization's security policy?",
         "firewallUtilization": "How does the firewall utilize ACLs to differentiate between authorized and unauthorized network traffic, and what are the default settings for incoming and outgoing traffic?",
@@ -1497,7 +1496,399 @@ function AssessmentDetails() {
 
     }
 
->>>>>>> eb2f3a6a (adding changes)
+    // ----- VERIFY AND COMPLETE THIS MAPPING OBJECT -----
+// Place this where getFormRoute can access it (e.g., AssessmentDetails.js or a utils file)
+
+const formRouteMap = {
+    // === Cybersecurity ===
+    "Access Control Lists": "/access-control-lists-form", // Specific suffix used in route
+    "Antivirus Software": "/antivirus-software",
+    "Device Encryption": "/device-encryption",
+    "Firewall Policies": "/firewall-policies",
+    "Incident Response Patch Management": "/incident-response-patch-management",
+    "Malware Removal Tools": "/malware-removal-tools",
+    "Network Anomaly Detection": "/network-anomaly-detection",
+    "Patch Management": "/patch-management",
+    "Security Information and Event Management": "/security-information-and-event-management",
+    "Firewall Configuration": "/firewall-configuration", // Added based on routes
+    "Intrusion Detection Systems": "/intrusiondetectionsystems", // Route uses no hyphen? CHECK App.js
+    "Antivirus and Malware Protection": "/antivirus-and-malware-protection", // Added based on routes
+    "File Encryption": "/file-encryption",
+    "Email Encryption": "/email-encryption",
+    "Backup Solutions": "/backupsolutions", // Route uses no hyphen? CHECK App.js
+    "Disaster Recovery Planning": "/disaster-recovery-planning",
+    "Phishing Simulation Training": "/phishing-simulation-training",
+    "Password Policies": "/password-policies",
+    "Multi-Factor Authentication": "/multi-factor-authentication",
+    "Event Logging and Monitoring": "/event-logging", // Route might just be /event-logging? CHECK App.js
+    "User Activity Monitoring": "/user-activity-monitoring",
+    "Response Team Formation": "/responseteamformation", // Route uses no hyphen? CHECK App.js
+    "Containment and Mitigation": "/containment-and-mitigation",
+    "Password Security": "/password-security",
+    "Security Policies and Procedures": "/security-policies-and-procedures",
+    "Incident Response Training": "/incident-response-training",
+    "Network Security": "/network-security", // Added based on routes
+    "Data Protection": "/data-protection", // Added based on routes
+    "User Awareness and Training": "/user-awareness", // Route uses /user-awareness? CHECK App.js
+    "Firewalls and Intrusion Detection": "/firewalls", // Route uses /firewalls? CHECK App.js
+    "Endpoint Security": "/endpoint-security",
+    "Data Backup and Recovery": "/databackupandrecovery", // Route uses no hyphen? CHECK App.js
+    "Phishing Awareness": "/phishing-awareness",
+    "Password Management": "/password-management",
+    "Incident Identification": "/incident-identification",
+    "Incident Response Planning": "/incident-response-planning",
+    "Full Disk Encryption": "/fulldiskencryption", // Added based on routes
+    "Secure Email Gateways": "/secureemailgateways", // Added based on routes
+    "File Level Encryption": "/filelevelencryption", // Path in App.js is "FileLevelEncryption"? Check case/hyphens
+    "End To End Encryption": "/endtoendencryption", // Path in App.js is "EndToEndEncryption"? Check case/hyphens
+    "Regular Backup Schedules": "/regularbackschedules", // Added based on routes
+    "Off-Site Backup Storage": "/offsitebackupstorage", // Added based on routes
+    "Backup Testing": "/backuptesting", // Added based on routes
+    "Continuity Of Operations": "/continuityofoperations", // Added based on routes
+    "Simulated Phishing Campaigns": "/simulatedphishingcampaigns", // Added based on routes
+    "Phishing Awareness Training": "/phishingawarenesstraining", // Added based on routes
+    "Incident Reporting": "/incidentreporting", // Added based on routes
+    "Contact Information": "/contactinformation", // Added based on routes
+    "Password Complexity Requirements": "/passwordcomplexityrequirements", // Added based on routes
+    "Password Expiration Policies": "/passwordexpirationpolicies", // Added based on routes
+    "Two Factor Authentication": "/twofactorauthentication", // Added based on routes
+    "Biometric Authentication": "/biometricauthentication", // Added based on routes
+    "Intrusion Detection Systems 2": "/intrusiondetectionsystems2", // Added based on routes (assuming name mapping)
+    "User Behavior Analytics": "/userbehavioranalytics", // Added based on routes
+    "Incident Response Team Roles And Responsibilities": "/incidentresponseteamrolesandresponsibilities", // Added based on routes
+    "Communication Channels And Protocols": "/communicationchannelsandprotocols", // Added based on routes
+    "Isolation Procedures": "/isolationprocedures", // Added based on routes
+    "Data Protection Impact Assessments": "/dataprotectionimpact", // Route uses /dataprotectionimpact? CHECK App.js
+    "Consent Management": "/consentmanagement", // Added based on routes
+    "Student Data Privacy Policies": "/studentdataprivacypolicies", // Added based on routes
+    "Data Breach Notification Procedures": "/databreachnotificationprocedures", // Added based on routes
+    "Signature Based Detection": "/signaturebaseddetection", // Added based on routes
+
+    // === Emergency Preparedness ===
+    "Classroom Lockdownm Protocols": "/classroom-lockdown-protocols", // Potential typo in key ("Lockdownm") - FIX in subCategories and map key if needed. Route assumed correct.
+    "Conflict Resolution": "/conflict-resolution",
+    "Disaster Drills": "/disaster-drills",
+    "Drill Scenerios": "/drill-scenarios", // Potential typo in key ("Scenerios") - FIX in subCategories and map key if needed. Route assumed correct.
+    "Earthquake Drills": "/earthquake-drills",
+    "Emergency Communication": "/emergency-communication", // Ensure this maps correctly if used elsewhere
+    "Evacuation Procedures": "/evacuation-procedures",
+    "Fire Alarm Systems": "/fire-alarm-systems",
+    "Fire Drill": "/fire-drill",
+    "Fire Extinguisher Locations": "/fire-extinguisher-locations", // Check path case/hyphens
+    "First Aid Response": "/first-aid-response",
+    "Law Enforcement Coordination": "/law-enforcement-coordination",
+    "Lockdown Communication Protocols": "/lockdown-communication-protocols",
+    "Severe Weather Monitoring": "/severe-weather-monitoring",
+    "Tornado Drills": "/tornado-drills",
+    "Tornado Shelter Locations": "/tornado-shelter-locations",
+    "Emergency Response Plan": "/emergency-response-plan", // Added based on routes
+    "Drills and Training": "/drills-and-training", // Added based on routes
+    "Communication Systems": "/communication-systems", // Added based on routes
+    "Alert Systems": "/alert-systems", // Added based on routes
+    "Communication Protocols": "/communication-protocols", // Added based on routes
+    "Fire Emergency Plans": "/fire-emergency-plan", // Route uses singular? CHECK App.js
+    "Lockdown Procedures": "/lockdown-procedures", // Added based on routes
+    "Natural Disaster Plans": "/natural-disaster-plans", // Added based on routes
+    "Natural Disaster Drills": "/natural-disaster-drills", // Added based on routes
+    "Lockdown Drills": "/lockdown-drills", // Added based on routes
+    "Public Address System": "/publicaddresssystem", // Route has no hyphens? CHECK App.js
+    "Text Email Alerts": "/textemailalerts", // Route has no hyphens? CHECK App.js
+    "Staff Communication": "/staff-communication", // Added based on routes
+    "Parent Communication": "/parent-communication", // Added based on routes
+    "Threat Recognition": "/threat-recognition", // Added based on routes
+    "Lockdown Signal Recognition": "/lockdown-signal-recognition", // Added based on routes
+    "Staff Roles And Responsibilities": "/staff-roles-and-responsibilities", // Added based on routes
+    "Debriefing And Feedback": "/debriefing-and-feedback", // Added based on routes
+    "Evacuation Routes Review": "/evacuation-routes-review", // Added based on routes
+    "Drill Frequency": "/drill-frequency", // Added based on routes
+    "Speaker Locations": "/speaker-locations", // Added based on routes
+    "Emergency Announcement Protocols": "/emergency-announcement-protocols", // Added based on routes
+    "Backup Power Systems": "/backup-power-systems", // Added based on routes
+    "Contact Information Database": "/contact-information-database", // Added based on routes
+    "Alert Activation Procedures": "/alert-activation-procedures", // Added based on routes
+    "Integration With Parent Communication": "/integration-with-parent-communication", // Route uses /intergration-...? CHECK App.js typo
+    "Two Way Radios": "/two-way-radios", // Added based on routes
+    "Emergency Communication Training": "/emergency-communication-training", // Added based on routes
+    "Communication Platforms": "/communication-platforms", // Added based on routes
+    "Parent Notification Procedures": "/parent-notification-procedures", // Added based on routes
+    "Communication Language": "/communication-language", // Added based on routes
+    "Emergency Response Training": "/emergency-response-training", // Added based on routes
+    "Emergency Procedures": "/emergency-procedures", // Added based on routes
+    "Fire Drills 2": "/fire-drills2", // Added based on routes (assuming name mapping)
+    "Lockdown Drills 3": "/lockdown-drills3", // Added based on routes (assuming name mapping)
+    "Emergency Preparedness Planning": "/emergency-preparedness-planning", // Added based on routes
+    "Emergency Response Plan Development": "/emergency-response-plan-development", // Added based on routes
+    "Incident Command Structure": "/incident-command-structure", // Route uses Strucutre? CHECK App.js typo
+    "Scenario Based Planning": "/scenario-based-planning", // Added based on routes
+    "Crisis Management Procedures": "/crisis-management-procedures", // Added based on routes
+    "Crisis Communication Plan": "/crisis-communication-plan", // Added based on routes
+    "Continuity Of Operations Plan": "/continuity-of-operations-plan", // Added based on routes
+    "Emergency Response Drills For Students": "/emergency-response-drills-for-students", // Added based on routes
+    "Communication Protocols 2": "/communication-protocols2", // Added based on routes
+    "Tabletop Exercises": "/tabletop-exercises", // Added based on routes
+    "Simulated Emergency Drills": "/simulated-emergency-drills", // Added based on routes
+    "Internal Communication Protocols": "/internal-communication-protocols", // Added based on routes
+    "External Communication Protocols": "/external-communication-protocols", // Added based on routes
+    "Critical Function Identification": "/critical-function-identification", // Added based on routes
+    "Backup Systems And Redundancies": "/backup-systems-and-redundancies", // Added based on routes
+
+    // === Personnel Training and Awareness ===
+    // Note: Many items here seem like sub-sub-categories based on PastAssessments.js structure.
+    // Assuming these map directly to routes for now - VERIFY THIS LOGIC.
+    "Acceptable Use Policy Training": "/acceptable-use-policy-training", // Route is /accpetable-...? CHECK App.js typo
+    "Active Shooter Response": "/active-shooter-response", // Route might be /active-shooter-reponse? CHECK App.js typo
+    "Anonymous Reporting Systems": "/anonymous-reporting-systems",
+    "Basic First Aid Techniques": "/basic-first-aid-techniques",
+    "CPR Certification": "/cpr-certification", // Route might be /CPR-certification? CHECK App.js case
+    "Curriculum Integration": "/curriculum-integration",
+    "Cyber Bullying": "/cyber-bullying", // Route might be /cyber-bullying? CHECK App.js case/hyphen
+    "Data Handling Guidelines": "/data-handling-guidelines",
+    "Data Protection": "/data-protection2", // Assuming this maps to the route with '2' - CHECK App.js
+    // "Emergency Communication": "/emergency-communication", // Already mapped? Need unique keys or context if route differs
+    "Emergency Contacts": "/emergency-contacts",
+    "Emergency Evacuation Procedures": "/emergency-evacuation-procedures", // Route might be /evacuation-procedures2? CHECK App.js
+    "Emergency Response Protocols": "/emergency-response-protocols", // Route might be /response-protocols2? CHECK App.js
+    "Emergency Shelters": "/emergency-shelters",
+    "Fire Department Collaboration": "/fire-department-collaboration",
+    "Fire Drills": "/fire-drills", // Route might be /fire-drills2? CHECK App.js
+    "First Aid CPR Training": "/first-aid", // Route uses /first-aid? CHECK App.js
+    "Healthcare Provider Engagement": "/healthcare-provider-engagement",
+    "Identifying Suspicious Behavior": "/identifying-suspicious-behavior", // Route might be /identifying-suspicious-behavior2? CHECK App.js
+    "Incident Reporting Procedures": "/incident-reporting-procedures",
+    "Internet Safety": "/internet-safety",
+    "Law Enforcement Partnerships": "/law-enforcement-partnerships", // Route might be /law-enforcement-partnership? CHECK App.js singular
+    "Lockdown Drills": "/lockdown-drills2", // Assuming this maps to the route with '2' - CHECK App.js
+    "Medical Facilities": "/medical-facilities",
+    "Parent Advisory Committees": "/parent-advisory-committees",
+    "Parent Involvement": "/parent-involvement", // Route might be /parent-involvement2? CHECK App.js
+    "Parent Volunteer Programs": "/parent-volunteer-programs",
+    "Parent-Teacher Associations": "/parent-teacher-associations", // Route might be /parent-teacher-associations2? CHECK App.js
+    "Password Security": "/password-security2", // Assuming this maps to the route with '2' - CHECK App.js
+    "Peer Support Networks": "/peer-support-networks",
+    "Phishing Awareness": "/phishing-awareness2", // Assuming this maps to the route with '2' - CHECK App.js
+    "Physical Bullying": "/physical-bullying",
+    "Post-Incident Support": "/post-incident-support",
+    "Recertification Schedule": "/recertification-schedule",
+    "Recognizing Security Breaches": "/recognizing-security-breaches",
+    "Recognizing Security Incidents": "/recognizing-security-incidents",
+    "Response Protocols": "/response-protocols2", // Assuming this maps to the route with '2' - CHECK App.js
+    "Role-PLaying Scenarios": "/role-playing-scenarios", // Potential typo in key ("PLaying") - FIX in subCategories and map key if needed.
+    "Safety Demonstrations": "/safety-demonstrations",
+    "Safety Workshop": "/safety-workshops", // Route uses plural? CHECK App.js
+    "Severe Weather Preparedness": "/severe-weather-preparedness",
+    "Stranger Danger Awareness": "/stranger-danger-awareness", // Route might be /stranger-danger-awareness2? CHECK App.js
+    "Student Handbook": "/student-handbooks", // Route uses plural? CHECK App.js
+    "Student Leadership": "/student-leadership",
+    "Training Materials": "/training-materials",
+    "Training Providers": "/training-providers",
+    "Trusted Adults": "/trusted-adults",
+    "Verbal Bullying": "/verbal-bullying",
+    "AED Training": "/aed-training", // Route might be /AED-training? CHECK App.js case
+    "Cybersecurity Training": "/cybersecurity-training", // Added based on routes
+    "First Aid Response": "/first-aid-response", // Added based on routes
+    "First Aid CPR Training 2": "/first-aid-cpr-training2", // Added based on routes (assuming name mapping)
+    "Safety And Security Training": "/safetyandsecuritytraining", // Added based on routes
+    "Fire Safety Training": "/firesafetytraining", // Added based on routes
+    "Evacuation Procedures Training": "/evacuationprocedurestraining", // Added based on routes
+    "Identifying Suspicious Behavior 2": "/identifyingsuspiciousbehavior2", // Added based on routes (assuming name mapping)
+    "Response To Security Threats": "/responsetosecuritythreats", // Added based on routes
+    "Stranger Danger Awareness 2": "/strangerdangerawareness2", // Added based on routes (assuming name mapping)
+    "Staff Training Programs": "/staff-training-programs", // Added based on routes
+    "Safety Procedures Training": "/safety-procedures-training", // Added based on routes
+    "Security Awareness Training 2": "/security-awareness-training2", // Added based on routes
+    "Student Safety Education": "/student-safety-education", // Added based on routes
+    "Personal Safety Education": "/personal-safety-education", // Added based on routes
+    "Strong Password Guidelines": "/strong-password-guidelines", // Added based on routes
+    "Multi Factor Authentication Awareness": "/multi-factor-authentication-awareness", // Added based on routes
+    "School Resource Officers": "/school-resource-officers", // Added based on routes
+    "Sro Roles And Responsibilities": "/sro-roles-and-responsibilities", // Added based on routes
+    "Sro Training And Certification": "/sro-training-and-certification", // Added based on routes
+    "Fire Prevention Programs": "/fire-prevention-programs", // Added based on routes
+    "Emergency Response Coordination": "/emergency-response-coordination", // Added based on routes
+    "Joint Training Exercises": "/joint-training-exercises", // Added based on routes
+    "Active Shooter Drills With Police": "/active-shooter-drills-with-police", // Added based on routes
+    "Emergency Response Training 2": "/emergency-response-training2", // Added based on routes
+    "Crisis Intervention Workshops": "/crisis-intervention-workshops", // Added based on routes
+    "Fire Safety Education For Students": "/fire-safety-education-for-students", // Added based on routes
+    "Fire Drills And Evacuation Planning": "/fire-drills-and-evacuation-planning", // Added based on routes
+    "Fire Department Access To School Facilities": "/fire-department-access-to-school-facilities", // Added based on routes
+    "Mutual Aid Agreements": "/mutual-aid-agreements", // Added based on routes
+    "Firefighter Training Sessions": "/firefighter-training-sessions", // Added based on routes
+
+    // === Physical Security ===
+    "Access Control Keypads": "/access-control-keypads",
+    "Access Control Software": "/access-control-software",
+    "Access Control Systems": "/access-control-systems",
+    "Biometric Scanners": "/biometric-scanners",
+    "Bullet Cameras": "/bullet-cameras",
+    "Card Readers": "/card-readers",
+    "Dome Cameras": "/dome-cameras",
+    "Door Alarms": "/door-alarms",
+    "Door Locks": "/door-locks",
+    "Fence Sensors": "/fence-sensors",
+    "Floodlights": "/floodlights",
+    "Front Desk Security": "/frontdesksecurity", // Route has no hyphens? CHECK App.js
+    "Gate Alarms": "/gate-alarms",
+    "Glass Break Sensors": "/glassbreaksensors", // Route has no hyphens? CHECK App.js
+    "Infrared Cameras": "/infrared-cameras",
+    "Motion Activated Lights": "/motionactivatedlights", // Route has no hyphens? CHECK App.js
+    "Motion Sensors": "/motionsensors", // Route has no hyphens? CHECK App.js
+    "PTZ Cameras": "/ptzcameras", // Route has no hyphens? CHECK App.js case
+    "Perimeter Fencing": "/perimeter-fencing",
+    "Razor Wire": "/razor-wire", // Route might be /RazorWire? CHECK App.js case
+    "Roving Patrols": "/roving-patrols", // Route might be /RovingPatrols? CHECK App.js case
+    "Security Gates": "/security-gates", // Route might be /SecurityGates? CHECK App.js case
+    "Stationed Guards": "/stationed-guards", // Route might be /StationedGuards? CHECK App.js case
+    "Turnstiles": "/turnstiles", // Route might be /Turnstiles? CHECK App.js case
+    "Vehicle Barrier": "/vehicle-barriers", // Route uses plural? CHECK App.js
+    "Visitor Check-In": "/visitor-checkin", // Route uses hyphen? CHECK App.js
+    "WeatherProof Cameras": "/weatherproof-cameras", // Route uses hyphen? Case? CHECK App.js
+    "Window Locks": "/window-locks", // Route might be /WindowLocks? CHECK App.js case
+    "Surveillance Systems": "/surveillance", // Route uses /Surveillance? CHECK App.js
+    "Security Personnel": "/security-personnel", // Added based on routes
+    "Access Points": "/accessp", // Route uses /AccessP? CHECK App.js case
+    "Building Security": "/buildings", // Route uses /BuildingS? CHECK App.js case
+    "Perimeter Security": "/perimeters", // Route uses /PerimeterS? CHECK App.js case
+    "CCTV Cameras": "/cctv", // Route uses /CCTV? CHECK App.js case
+    "Alarm Systems": "/alarms", // Route uses /AlarmS? CHECK App.js case
+    "On Site Security": "/onsite", // Route uses /OnSite? CHECK App.js case
+    "Main Entrance": "/maine", // Route uses /MainE? CHECK App.js case
+    "Secondary Entrances": "/secondaryentrances", // Added based on routes
+    "Fencing And Barriers": "/fencingandbarriers", // Added based on routes
+    "Locking Mechanisms": "/lockingmechanisms", // Added based on routes
+    "Lighting": "/lighting", // Added based on routes
+    "Indoor Cameras": "/indoorcameras", // Added based on routes
+    "Outdoor Cameras": "/outdoorcameras", // Added based on routes
+    "Intrusion Alarms": "/intrusionalarms", // Added based on routes
+    "Perimeter Alarms": "/perimeteralarms", // Added based on routes
+    "Security Guards": "/securityguards", // Added based on routes
+    "Reception Staff": "/receptionstaff", // Added based on routes
+    "On Site Guards": "/onsiteguards", // Added based on routes
+    "Keycard Access Systems": "/keycardaccesssystems", // Added based on routes
+    "Biometric Access Control Systems": "/biometricaccesscontrolsystems", // Added based on routes
+    "CCTV Camera Installation": "/cctvcamerainstallation", // Added based on routes
+    "Intrusion Detection Systems 3": "/intrusiondetectionsystems3", // Added based on routes (assuming name mapping)
+    "Perimeter Security Fencing": "/perimetersecurityfencing", // Added based on routes
+    "Physical Security Measures": "/physical-security-measures", // Added based on routes
+    "Access Control Systems 2": "/access-control-systems2", // Added based on routes (assuming name mapping)
+    "Surveillance Systems 2": "/surveillance-systems2", // Added based on routes (assuming name mapping)
+    "Physical Hazards Assessment": "/physical-hazards-assessment", // Added based on routes
+    "Environmental Hazards Assessment": "/enviromental-hazards-assessment", // Route uses enviromental? CHECK App.js typo
+    "Perimeter Security Evaluation": "/perimeter-security-evaluation", // Added based on routes
+    "Access Control Systems Assessment": "/access-control-systems-assessment", // Added based on routes
+
+    // === Policy and Compliance ===
+    "Access Restrictions": "/access-restrictions",
+    "Data Classification": "/data-classification",
+    "Data Minimization": "/dataminimization", // Route has no hyphens? CHECK App.js
+    "Data Retention Periods": "/dataretentionperiods", // Route has no hyphens? CHECK App.js
+    "Data Sharing Policies": "/data-sharing-policies",
+    "Personal Device Usage": "/personaldeviceusage", // Route has no hyphens? CHECK App.js
+    "Student Privacy Rights": "/studentprivacyrights", // Route has no hyphens? CHECK App.js
+    "Acceptable Use Policy": "/acceptable-use-policy", // Added based on routes
+    "Data Privacy Policy": "/data-privacy-policy", // Added based on routes
+    "Regulatory Compliance": "/regulatory-compliance", // Route uses /regulatory-comlpiance? CHECK App.js typo
+    "Periodic Reviews": "/periodic-reviews", // Added based on routes
+    "Revision Procedures": "/revision-procedures", // Added based on routes
+    "Internet Usage": "/internet-usage", // Added based on routes
+    "Data Handling": "/data-handling", // Added based on routes
+    "Data Collection And Retention": "/data-collection-and-retention", // Added based on routes
+    "Data Protection Measures": "/data-protection-measures", // Added based on routes
+    "FERPA Compliance": "/ferpa-compliance", // Route uses /FERPA-compliance? CHECK App.js case
+    "GDPR Compliance": "/gdpr-compliance", // Route uses /GDPR-compliance? CHECK App.js case
+    "Policy Evaluation Criteria": "/policy-evaluation-criteria", // Added based on routes
+    "Stakeholder Feedback": "/stakeholder-feedback", // Added based on routes
+    "Change Management Process": "/change-management-process", // Added based on routes
+    "Data Handling Guidelines": "/data-handling-guidelines", // Added based on routes
+    "Encryption Requirements": "/encryptionrequirements", // Added based on routes
+    "Data Access Controls": "/dataaccesscontrols", // Added based on routes
+    "Data Security Requirements": "/datasecurityrequirements", // Added based on routes
+    "Compliance With Regulations": "/compliancewithregulations", // Added based on routes
+    "Effectiveness In Addressing Security Risks": "/effectivenessinaddressingsecurityrisks", // Added based on routes
+    "Staff Input On Policy Impact": "/staffinputonpolicyimpact", // Added based on routes
+    "Policy Revision Approval Workflow": "/policyrevisionapprovalworkflow", // Added based on routes
+    "Documentation Of Policy Changes": "/documentationofpolicychanges", // Added based on routes
+
+    // === Community Partnership ===
+    // Note: This category had an empty subCategories array in PastAssessments.js
+    // Add mappings here if subcategories/routes exist. Example:
+    // "Some Community Subcategory": "/some-community-route",
+    "Parent Education Events": "/parent-education-events", // Added based on routes
+    "Parent Comm": "/parent-comm", // Added based on routes
+    "Collaboration With Local Agencies": "/collaboration-with-local-agencies", // Route uses /collaboration-with-local-agenices? CHECK App.js typo
+    "Access To Community Resources": "/access-to-community-resources", // Added based on routes
+    "Joint Community Events": "/joint-community-events", // Added based on routes
+    "Parent And Community Involvement": "/parent-and-community-involvement", // Added based on routes
+    "Parent Teacher Associations 2": "/parent-teacher-associations2", // Added based on routes (assuming name mapping)
+    "Family Engagement Events": "/family-engagement-events", // Added based on routes
+    "Volunteer Programs": "/volunteer-programs", // Added based on routes
+    "Community Outreach Programs": "/community-outreach-programs", // Added based on routes
+    "Community Engagement Surveys": "/community-engagement-surveys", // Added based on routes
+    "Back To School Nights": "/back-to-school-nights", // Added based on routes
+    "Parent Workshops On Student Safety": "/parent-workshops-on-student-safety", // Added based on routes
+    "Parent Teacher Conferences": "/parent-teacher-conferences", // Added based on routes
+    "Classroom Helpers": "/classroom-helpers", // Added based on routes
+    "Parent Chaperones For Field Trips": "/parent-chaperones-for-field-trips", // Added based on routes
+    "Fundraising Events": "/fundraising-events", // Added based on routes
+    "Feedback Collection From Community": "/feedback-collection-from-community", // Added based on routes
+    "Assessing Community Needs And Priorities": "/assessing-community-needs-and-priorities", // Added based on routes
+    "Planning Community Outreach Strategies": "/planning-community-outreach-strategies", // Added based on routes
+    "Communication Channels": "/communicationchannels", // Added based on routes
+
+    // === Continuous Improvement - Safety and Security ===
+    "Biometric Access Control Systems": "/biometric-access-control-systems", // Added based on routes
+    "Firewall Implementation": "/firewall-implementation", // Added based on routes
+    "Intrusion Prevention Systems": "/intrusion-prevention-systems", // Added based on routes
+    "Data Encryption Protocols": "/data-encryption-protocols", // Added based on routes
+    "Regular Data Backups": "/regular-data-backups", // Added based on routes
+    "Endpoint Security Solutions": "/endpoint-security-solutions", // Added based on routes
+    "Risk Assessment And Mitigation": "/risk-assessment-and-mitigation", // Added based on routes
+    "Safety Risk Assessment": "/safety-risk-assessment", // Added based on routes
+    "Hazard Identification": "/hazard-identification", // Added based on routes
+    "Risk Analysis": "/risk-analysis", // Added based on routes
+    "Security Threat Assessment": "/security-threat-assessment", // Added based on routes
+    "Threat Identification": "/threat-identification", // Added based on routes
+    "Security Vulnerability Assessment": "/security-vulnerability-assessment", // Added based on routes
+    "Security Infrastructure Enhancement": "/security-infrastructure-enhancement", // Added based on routes
+    "Cybersecurity Infrastructure": "/cybersecurity-infrastructure", // Added based on routes
+    "Network Security Measures": "/network-security-measures", // Added based on routes
+    "Data Protection Measures 2": "/data-protection-measures2", // Added based on routes (assuming name mapping)
+    "Vulnerability Assessment": "/vulnerability-assessment", // Added based on routes
+    "External Threats": "/external-threats", // Added based on routes
+    "Internal Threats": "/internal-threats", // Added based on routes
+    "Cybersecurity Vulnerability Assessment": "/cybersecurity-vulnerability-assessment", // Added based on routes
+
+     // === Other Routes Mentioned (might not be subcategories) ===
+     // These likely won't be used by getFormRoute unless they ARE subcategories
+     "Bullying Prevention": "/bullying-prevention", // Add if it's a subcategory
+     "Recognizing Bullying Behavior": "/recognizing-bullying-behavior", // Add if it's a subcategory
+     "Reporting Procedures": "/reporting-procedures", // Add if it's a subcategory
+     "Reporting Procedures 2": "/reporting-procedures2", // Add if it's a subcategory
+     "Crisis Intervention": "/crisis-intervention", // Add if it's a subcategory
+     "Phishing Simulation Exercises": "/phishingsimulationexercises", // Route uses /PhishingSimulationExercises? CHECK App.js case
+     "Privacy And Security": "/privacy&security", // Route uses /privacy&security? CHECK App.js special char
+
+
+};
+
+// ----- END OF MAPPING OBJECT -----
+
+// Make sure the getFormRoute function uses this map as shown previously:
+/*
+const getFormRoute = (category1, category2) => {
+    console.log(`getFormRoute called with: category1='${category1}', category2='${category2}'`);
+    const route = formRouteMap[category2]; // Lookup using subcategory name
+
+    if (route) {
+        console.log(`Route found for '${category2}': ${route}`);
+        return route;
+    } else {
+        console.warn(`No route found for category2: '${category2}'. Defaulting to '/'`);
+        return '/'; // Default fallback
+    }
+};
+*/
+
     useEffect(() => {
         const fetchAssessmentAndBuilding = async () => {
             setLoading(true);
@@ -1733,12 +2124,22 @@ function AssessmentDetails() {
     };
 
     const getFormRoute = (category1, category2) => {
-        if (category1 === "Cybersecurity" && category2 === "Access Control Lists") {
-            return `/access-control-lists-form`;
-        } else if (category1 === "AnotherCategory" && category2 === "AnotherSubcategory") {
-            return `/another-form`;
+        // Log inputs for debugging
+        console.log(`getFormRoute called with: category1='${category1}', category2='${category2}'`);
+    
+        // Use the category2 (subcategory name) as the key to look up the route
+        // Ensure the key lookup uses the EXACT string used in the formRouteMap keys
+        const route = formRouteMap[category2];
+    
+        if (route) {
+            console.log(`Route found for '${category2}': ${route}`);
+            return route; // Return the found route
+        } else {
+            // Handle cases where the subcategory doesn't have a mapped route
+            console.warn(`No route found for category2: '${category2}'. Defaulting to '/'`);
+            // You might want a specific "not found" route or error handling instead of '/'
+            return '/'; // Default fallback route
         }
-        return '/';
     };
 
     const handleEditClick = () => {
