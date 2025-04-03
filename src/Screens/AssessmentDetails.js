@@ -19,6 +19,577 @@ function AssessmentDetails() {
     const db = getFirestore();
 
     const questions = {
+        //Rest of A-F
+        "restrictedActivities": "What activities are restricted under the Acceptable Use Policy (AUP)?",
+        "deviceHandling": "How should employees handle personal device usage in the workplace (e.g., BYOD policies)?",
+        "violatingConsequences": "What are the consequences of violating the AUP?",
+        "violationReport": "How can employees report potential AUP violations or issues?",
+        "requiredCompletion": "When and how are employees required to complete AUP training?",
+        "operational": "Are the access control keypads operational and functioning as intended?",
+        "operationalComment": "Comment (Optional)",
+        "reliablyAuthenticate": "Do the keypads reliably authenticate users and grant access to restricted areas?",
+        "malfunction": "Are there any signs of malfunction or errors in card reader operations?",
+        "malfunctionComment": "Comment (Optional)",
+        "backupSystems": "Are there backup systems in place in case of power outages or malfunctions?",
+        "backupSystemsComment": "Comment (Optional)",
+        "secureCodes": "Are access codes used with the keypads sufficiently secure and resistant to unauthorized access or guessing?",
+        "instructions": "Are there instructions or guidelines available to users regarding proper card usage and access procedures?",
+        "changeCodes": "Is there a process for periodically changing access codes to enhance security?",
+        "integrated": "Are the access control keypads integrated with the overall access control system?",
+        "communicateSeamlessly": "Do they communicate seamlessly with access control software and databases?",
+        "realTimeMonitoring": "Is there real-time monitoring and recording of camera feeds from entrances?",
+        "realTimeMonitoringComment": "Comment (Optional)",
+        "accessRightsManaged": "Are access rights managed centrally and synchronized with the keypad system?",
+        "durableMaterials": "Are they constructed from durable materials capable of withstanding exposure to the elements and potential tampering attempts?",
+        "tamperAlarms": "Are there additional security features, such as tamper alarms or anti-tamper enclosures, to deter unauthorized access or vandalism?",
+        "testedReliability": "Have the keypads been tested for reliability and resistance to environmental factors such as moisture, temperature extremes, or physical wear?",
+        "accessible": "Are the access control keypads easily accessible and operable for authorized users?",
+        "clearInstructions": "Do they provide clear instructions for entering access codes and accessing restricted areas?",
+        "disabilityAccessibility": "Are there any accessibility features or considerations for individuals with disabilities?",
+        "maintenanceSchedule": "Is there a regular maintenance schedule in place for the fence sensors?",
+        "maintenanceScheduleComment": "Comment (Optional)",
+        "maintenanceTasks": "Are maintenance tasks, such as testing sensor functionality, replacing batteries, and inspecting sensor connections, performed according to schedule?",
+        "maintenanceTasksComment": "Comment (Optional)",
+        "maintenanceRecords": "Are there records documenting maintenance activities, repairs, and any issues identified during inspections?",
+        "maintenanceRecordsComment": "Comment (Optional)",
+        "userTraining": "Have users, such as security personnel, staff, and authorized cardholders, received training on how to use the card readers properly?",
+        "userTrainingComment": "Comment (Optional)",
+        "instructionsAvailable": "Are there instructions or guidelines available to users regarding proper access code usage and security protocols?",
+        "reportingProcess": "Is there a process for reporting malfunctions, damage, or security incidents related to the card readers?",
+        "reportingProcessComment": "Comment (Optional)",
+        "defineCriteria": "What criteria are used to define Access Control Lists (ACLs) within the firewall, and how are these criteria determined based on the organization's security policy?",
+        "firewallUtilization": "How does the firewall utilize ACLs to differentiate between authorized and unauthorized network traffic, and what are the default settings for incoming and outgoing traffic?",
+        "guidelinesProtocols": "Are there specific guidelines or protocols in place for creating and updating ACLs to ensure they are aligned with the latest security standards and organizational needs?",
+        "reviewFrequency": "How frequently are ACLs reviewed and updated to reflect changes in network architecture, user roles, or emerging security threats?",
+        "validationProcesses": "What processes are in place to test and validate the effectiveness of ACL configurations before they are implemented in a live environment?",
+        "automatedTools": "Are automated testing tools utilized to increase the frequency and reliability of backup testing?",
+        "trafficMonitoring": "How is the network traffic monitored to ensure ACLs are functioning as intended, and what metrics are used to evaluate their effectiveness?",
+        "regularAudits": "Are there regular audits conducted on ACLs to identify any misconfigurations, redundant rules, or outdated entries that could potentially expose the network to risk?",
+        "incidentDocumentation": "What documentation is required during an incident?",
+        "trainingPrograms": "Do training programs include practical exercises, simulations, or role-playing scenarios to familiarize staff members with communication procedures, protocols, and equipment operation under simulated emergency conditions?",
+        "documentationGuidelines": "Are there clear documentation and guidelines available for staff responsible for maintaining ACLs, and how is this information kept up-to-date?",
+        "promoteAwareness": "How is awareness about the importance of proper ACL management promoted across the organization, especially among those who have access to critical network resources?",
+        "adaptability": "Is it adaptable to changes in access control policies, personnel, and security protocols?",
+        "scalingStrategies": "Are there strategies in place to scale ACL configurations in larger, more complex network environments without compromising security or performance?",
+        "integrationSecurityMeasures": "How are ACLs integrated with other network security measures, such as intrusion detection systems (IDS) or security information and event management (SIEM) systems, to provide a comprehensive security posture?",
+        "comprehensiveFunctionality": "Does the access control software provide comprehensive functionality for managing access to secondary entrances?",
+        "centralManagement": "Are access rights managed centrally and synchronized with the card reader system?",
+        "authenticationMethods": "Does it support various authentication methods, such as card readers, biometric scanners, or PIN codes?",
+        "hardwareCompatibility": "Is the access control software compatible with a wide range of hardware devices, including card readers, biometric scanners, and electronic locks?",
+        "integrationInfrastructure": "Does it seamlessly integrate with existing security infrastructure, such as surveillance cameras and alarm systems?",
+        "encryptionSecurity": "Does the access control software employ robust encryption and security protocols to protect sensitive data and communication?",
+        "securePolicies": "Are access control policies and credentials securely stored and transmitted within the software?",
+        "multiFactorAuth": "Is there support for multi-factor authentication to enhance security?",
+        "scalability": "Can the access control software scale to accommodate the needs of your organization as it grows?",
+        "flexibility": "Does it offer flexibility in configuring access control rules and permissions based on organizational requirements?",
+        "userInterface": "Is the user interface intuitive and easy to navigate for administrators and end-users?",
+        "customization": "Are there features for customizing dashboards, reports, and access control workflows?",
+        "userDocumentation": "Does the software provide comprehensive user documentation and training resources?",
+        "compliance": "Do the card readers comply with relevant regulations, standards, and industry best practices?",
+        "testingCertification": "Have the sensors undergone testing or certification to verify reliability and durability?",
+        "supportSystem": "Is there a reliable support system in place for troubleshooting issues, resolving technical challenges, and providing software updates?",
+        "sla": "Are there maintenance agreements or service level agreements (SLAs) to ensure timely support and software updates?",
+        "disasterRecovery": "Are there regular backups and disaster recovery plans in place to protect access control data?",
+        "accessControlOperational": "Are the Access Control Systems operational and functioning as intended?",
+        "authAccurate": "Do the systems accurately authenticate and authorize individuals' access rights?",
+        "malfunctionSigns": "Are there any signs of malfunction or system errors that could compromise security?",
+        "authMechanisms": "What authentication mechanisms are used within the Access Control Systems (e.g., RFID cards, PIN codes, biometric scanners)?",
+        "mechanismsReliable": "Are these mechanisms reliable and secure for verifying individuals' identities?",
+        "multiFactor": "Is multi-factor authentication implemented to enhance security (e.g., combining a PIN code with a biometric scan)?",
+        "accessRights": "How are access rights assigned and managed within the Access Control Systems?",
+        "processDefined": "Is there a defined process for granting, modifying, or revoking access permissions based on individuals' roles and responsibilities?",
+        "accessReviewed": "Are access rights regularly reviewed and updated to align with organizational changes and security requirements?",
+        "systemsIntegrated": "Are the Access Control Systems integrated with other security systems, such as surveillance cameras, intrusion detection, or alarm systems?",
+        "integrationEnhance": "How does the integration enhance overall security and situational awareness within the facility?",
+        "integrationIssues": "Are there any compatibility issues or gaps in integration that need to be addressed?",
+        "monitoringSystem": "Is there a centralized monitoring system in place to oversee access control events and activities?",
+        "accessLogs": "Are access logs generated and maintained to track user activity, including successful and failed access attempts?",
+        "logsReview": "Is there a process for reviewing access logs and investigating any suspicious or unauthorized access incidents?",
+        "complianceRegs": "Do the Access Control Systems comply with relevant regulations, standards, and industry best practices (e.g., GDPR, HIPAA, ISO 27001)?",
+        "audits": "Have the systems undergone any audits or assessments to verify compliance with applicable standards?",
+        "instructionsGuidelines": "Are there instructions or guidelines available to users regarding proper access control procedures, password management, and security awareness?",
+        "prohibitedWebsites": "What types of websites or online content are explicitly prohibited by the Acceptable Use Policy (AUP) (e.g., adult content, gambling sites)?",
+        "definedRestrictions": "How are these restrictions defined and categorized within the policy?",
+        "clearGuidelines": "Are there clear guidelines on what constitutes prohibited websites or online activities?",
+        "enforcedRestrictions": "How are access restrictions enforced on the network (e.g., through web filters, firewalls)?",
+        "blockedAccess": "What tools or technologies are used to block access to prohibited websites?",
+        "frequentUpdates": "How frequently are backup systems updated to reflect the latest data and operational changes?",
+        "informedUsers": "How are users informed about the access restrictions and prohibited websites (e.g., through training, policy documents)?",
+        "notifiedUsers": "Are there mechanisms in place to notify users when they attempt to access a restricted site?",
+        "aupCompliance": "How is compliance with the AUP communicated to users to ensure they understand the restrictions?",
+        "requestingExceptions": "What procedures are in place for requesting exceptions to the access restrictions (e.g., for educational or research purposes)?",
+        "authorizedUser": "Who is authorized to review and approve requests for access to restricted websites?",
+        "handlingExpectations": "Are there documented processes for handling and documenting exceptions?",
+        "monitoredActivity": "How is user activity monitored to ensure compliance with access restrictions (e.g., logging, auditing)?",
+        "reportMethods": "What methods are used to track and report attempts to access prohibited websites?",
+        "addressedViolations": "How are violations of access restrictions addressed and managed?",
+        "reviewedPolicy": "How frequently is the Acceptable Use Policy reviewed and updated to reflect changes in technology and threats?",
+        "revisingPolicy": "Who is responsible for reviewing and revising the policy, and what criteria are used for updates?",
+        "communicatedUpdates": "How are updates regarding the crisis communicated to the community, and how frequently are these updates provided?",
+        "impactedRequirements": "What legal or regulatory requirements impact the development and enforcement of access restrictions (e.g., data protection laws)?",
+        "ensuredCompliance": "How does the policy ensure compliance with relevant laws and regulations regarding internet usage?",
+        "legalIssues": "Are there procedures for addressing legal or regulatory issues related to access restrictions?",
+        "assessedTraining": "How is the effectiveness of the training assessed and improved over time?",
+        "accessRestrictions": "Are there resources available for users to better understand the reasons for access restrictions?",
+        "violatingAccess": "What steps are taken when a user repeatedly attempts to access prohibited websites or violates access restrictions?",
+        "restrictionViolations": "How are incidents related to access restriction violations documented and managed?",
+        "disciplinaryActions": "What disciplinary actions are outlined in the policy for non-compliance?",
+        "collectedFeedback": "How is feedback collected from users regarding the effectiveness and impact of access restrictions?",
+        "relatedSuggestions": "Are there mechanisms for users to provide suggestions or report issues related to access restrictions?",
+        "improvementFeedback": "How is feedback used to make improvements to the Acceptable Use Policy and access restriction mechanisms?",
+        "collaborationObjectives": "What are the objectives and goals of conducting active shooter drills in collaboration with law enforcement?",
+        "frequentlyConductedDrills": "How frequently are active shooter drills conducted, and what factors determine the schedule?",
+        "staffRoles": "What roles do school staff and law enforcement play during these drills, and how are these roles communicated?",
+        "evaluatedDrillsOutcomes": "How are the outcomes and effectiveness of the active shooter drills evaluated after completion?",
+        "psychologicalImpacts": "What measures are in place to address psychological impacts on students and staff participating in these drills?",
+        "asrTrainingTopics": "What topics and skills are covered in active shooter response training programs, such as situational awareness, threat recognition, decision-making under stress, and survival tactics?",
+        "asrMaterialsAlignment": "Are training materials and resources based on recognized active shooter response protocols, guidelines, and recommendations from law enforcement agencies, security experts, or government agencies?",
+        "asrKeyConcepts": "How do active shooter response training programs address key concepts such as the 'Run, Hide, Fight' protocol, evacuation procedures, barricading techniques, and communication strategies during an active shooter incident?",
+        "asrScenarioSimulations": "To what extent do active shooter response training sessions incorporate scenario-based simulations, tabletop exercises, and live drills to prepare staff members for real-life emergencies?",
+        "asrScenarioPractice": "Are staff members provided with opportunities to practice response options, decision-making skills, and coordinated actions in simulated active shooter scenarios?",
+        "asrDrillConduction": "How are active shooter drills conducted to simulate various threat scenarios, test emergency communication systems, and evaluate staff readiness and response effectiveness?",
+        "asrCommunicationTraining": "How are staff members trained to communicate effectively with colleagues, students, and emergency responders during an active shooter incident?",
+        "asrCommunicationProtocols": "Are communication protocols established to relay critical information, issue alerts, and coordinate response efforts across different areas of the school campus?",
+        "asrExternalCommunication": "What mechanisms are in place to facilitate communication with law enforcement agencies, emergency dispatch centers, and other external stakeholders during an active shooter crisis?",
+        "asrDecisionTraining": "How are staff members trained to assess the situation, make rapid decisions, and implement appropriate response strategies based on the evolving threat environment during an active shooter incident?",
+        "asrDecisionFrameworks": "Are decision-making frameworks, decision trees, or decision support tools provided to guide staff members in determining the most effective course of action in different scenarios?",
+        "asrActionProvisions": "What provisions are in place to empower staff members to take decisive action to protect themselves and others, including options for evacuation, lockdown, sheltering, or countermeasures?",
+        "asrSupportResources": "What resources and support services are available to staff members following an active shooter incident, including psychological first aid, counseling, and debriefing sessions?",
+        "asrDebriefings": "Are post-incident debriefings conducted to review response actions, identify lessons learned, address concerns, and implement improvements to emergency preparedness plans and procedures?",
+        "asrFeedbackContribution": "How are staff members encouraged to share their experiences, provide feedback on training effectiveness, and contribute to the continuous improvement of active shooter response protocols?",
+        "informingParents": "How are parents informed about the purpose and schedule of Back-to-School Nights?",
+        "parentsAndTeachersConnecting": "What opportunities are provided for parents to connect with teachers and school staff during these events?",
+        "familyFeedback": "How is feedback from families collected after Back-to-School Nights to improve future events?",
+        "sharedResources": "Are there any specific resources or information shared with families during Back-to-School Nights to support student success?",
+        "installedBackupPowerSystem": "Is there a backup power system, such as an Uninterruptible Power Supply (UPS), installed to support the operation of the public address (PA) system during power outages or disruptions?",
+        "capicityOfSystem": "What is the capacity of the backup power system in terms of providing sufficient power to operate the PA system?",
+        "backup-system": "How long can the backup power system sustain the PA system in operation during a power outage or disruption before requiring recharge or replacement?",
+        "uninterruptedTransitions": "Is the backup power system seamlessly integrated with the PA system to ensure uninterrupted operation during transitions between primary and backup power sources?",
+        "automaticSwitchoverMechanisms": "Are there automatic switchover mechanisms in place to activate the backup power system in the event of a power failure without manual intervention?",
+        "regularTests": "Is the backup power system regularly tested to verify its functionality and performance, including its ability to support the PA system under simulated outage conditions?",
+        "routineMaintenanceActivities": "Are routine maintenance activities conducted on the backup power system to ensure reliability and readiness for use during emergencies?",
+        "mitigatingRisks": "Are redundant backup power systems or multiple layers of redundancy implemented to mitigate the risk of power failure affecting the PA system?",
+        "withstandingExternalThreats": "Are backup power systems designed to withstand environmental factors or external threats that could impact their reliability during emergencies?",
+        "notifiedAdministrators": "Are system administrators or operators notified when the backup power system is activated or when there are issues with its performance?",
+        "capableRemoteMonitoring": "Is there remote monitoring capability to track the status of the backup power system and receive alerts or notifications in real-time?",
+        "backupSystemIncludedInPlans": "Are backup power systems included in emergency preparedness plans and protocols, specifying their roles and procedures for activation during power-related emergencies?",
+        "trainedStaffMembers": "Are staff members trained on the use of backup power systems and familiar with protocols for managing power-related incidents affecting the PA system?",
+        "maintainingRecords": "Are records maintained to document the installation, testing, maintenance, and performance of backup power systems supporting the PA system?",
+        "maintainingRecordsComment": "Comment (Optional)",
+        "accessibleRecords": "Are records accessible for review, audit, and reporting purposes, including compliance assessments and performance evaluations?",
+        "systemsEnsuringDataIntegrity": "What types of backup systems are in place to ensure data integrity and availability during an emergency?",
+        "maintainingCriticalOperations": "How are redundancies established to maintain critical operations when primary systems fail?",
+        "validatingEffectiveness": "What procedures are followed to test and validate the effectiveness of backup systems and redundancies?",
+        "staffTraining": "Are staff members provided with training on the proper use, operation, and protocols for emergency communication devices and systems?",
+        "frequencyPreparedness": "How often are backup recovery drills conducted, and is the frequency sufficient to ensure preparedness and data integrity?",
+        "scheduledTimes": "Are there specific times of the year when testing is scheduled to align with organizational needs or periods of lower activity?",
+        "plannedUnplannedDrills": "Does the schedule for backup testing include both planned and unplanned drills to evaluate real-time response capabilities?",
+        "testingScenarios": "What types of scenarios are covered during backup testing to simulate various types of data loss events (e.g., cyberattacks, hardware failure, natural disasters)?",
+        "fullPartialRecovery": "Are both full-scale and partial recovery processes tested to ensure comprehensive preparedness?",
+        "complexScenarios": "How are complex scenarios, such as multi-site recoveries or cross-functional dependencies, incorporated into the testing process?",
+        "evaluationCriteria": "What criteria are used to evaluate the success or failure of a backup test, including recovery time objectives (RTOs) and recovery point objectives (RPOs)?",
+        "documentTestResults": "Are the results of each backup test thoroughly documented, including any issues encountered and the steps taken to resolve them?",
+        "lessonsLearned": "Are lessons learned from past emergencies used to improve communication procedures and response capabilities?",
+        "responsibilityRoles": "Who is responsible for initiating, overseeing, and evaluating backup tests within the organization?",
+        "definedRoles": "Are there clearly defined roles for each team member involved in the backup testing process, including IT staff, recovery coordinators, and external vendors?",
+        "responsibilityCommunication": "How are responsibilities assigned and communicated to ensure effective coordination during a backup test?",
+        "feedbackProcesses": "What processes are in place for stakeholders to provide feedback on the effectiveness of policies?",
+        "communicatingChanges": "How are changes to backup testing procedures or disaster recovery plans communicated to relevant stakeholders?",
+        "updateMechanisms": "Are there mechanisms to regularly review and update testing strategies based on new risks, technology changes, or organizational shifts?",
+        "planIntegration": "How does backup testing integrate with the overall disaster recovery plan, including coordination with other recovery strategies?",
+        "metricsKPIs": "Are there specific metrics or KPIs that link backup testing results with broader disaster recovery goals and objectives?",
+        "evaluatePlanEffectiveness": "How is the effectiveness of the entire disaster recovery plan evaluated through the lens of backup testing outcomes?",
+        "toolsUsed": "What tools or software are used to facilitate backup testing, and are they regularly updated to support the latest backup and recovery technologies?",
+        "toolConfiguration": "How are these tools configured to simulate realistic disaster scenarios and provide accurate results?",
+        "first-aid-comprehensiveness": "How comprehensively are basic first aid techniques covered in staff training programs?",
+        "training-modules-structure": "Are training modules structured to provide a balance of theoretical knowledge, practical skills demonstrations, and hands-on practice sessions?",
+        "first-aid-materials-coverage": "To what extent do training materials and resources address the application of basic first aid techniques in various emergency scenarios encountered in the school environment?",
+        "emergency-recognition-training": "Are staff members trained to recognize common signs and symptoms of medical emergencies and injuries that may require immediate first aid intervention?",
+        "first-aid-proficiency-assessment": "How are staff members assessed or evaluated to ensure proficiency in applying basic first aid techniques in simulated or real-life emergency situations?",
+        "skills-practice-opportunities": "What opportunities are provided for staff members to practice and demonstrate basic first aid techniques in simulated scenarios, role-playing exercises, or skills stations?",
+        "hands-on-props-usage": "Are hands-on practice sessions conducted using realistic training props, medical manikins, or simulated casualties to simulate various injury types and emergency scenarios?",
+        "instructor-guidance": "How are staff members guided and supported by certified instructors, facilitators, or subject matter experts during hands-on skills practice sessions?",
+        "skills-feedback": "Are staff members encouraged to actively participate in skills practice activities and receive constructive feedback on their performance?",
+        "learning-reinforcement-mechanisms": "What mechanisms are in place to reinforce learning and encourage ongoing skills development beyond initial training sessions?",
+        "first-aid-integration": "How are basic first aid techniques integrated into broader emergency response plans, procedures, and protocols?",
+        "life-threatening-priority-training": "Are staff members trained to recognize and prioritize life-threatening conditions and administer basic first aid interventions in accordance with established protocols and medical guidelines?",
+        "responder-coordination": "How do staff members coordinate and communicate with other responders, emergency services, or healthcare providers when providing basic first aid assistance during emergencies?",
+        "continuity-of-care-provisions": "What provisions are in place to ensure continuity of care and seamless transition of injured or ill individuals to higher levels of medical care?",
+        "first-aid-documentation-training": "Are staff members trained to document and report basic first aid interventions within the school's incident reporting system or medical logbook?",
+        "post-aid-management": "How are injured or ill individuals managed and monitored following basic first aid interventions?",
+        "care-transfer-procedures": "What procedures are in place to ensure continuity of care and facilitate patient transport or transfer to higher levels of medical care?",
+        "emotional-support-training": "Are staff members trained to provide emotional support, reassurance, and ongoing monitoring to individuals receiving basic first aid interventions?",
+        "follow-up-procedures": "How are follow-up procedures implemented to document incidents, assess outcomes, and provide post-incident debriefing or support?",
+        "community-resources-awareness": "Are staff members familiar with community resources and referral pathways for individuals requiring additional medical or psychological support beyond basic first aid?",
+        "aid-intervention-documentation": "How are basic first aid interventions documented, recorded, and reported within the school's incident reporting system or electronic health record system?",
+        "documentation-guidance": "What training or guidance is provided to staff members on the importance of timely and accurate documentation, confidentiality requirements, and legal considerations?",
+        "clear-documentation-training": "Are staff members trained to document patient assessments, treatments provided, and follow-up actions taken in a clear, concise, and objective manner?",
+        "record-analysis": "How are medical records or incident reports reviewed and analyzed to identify trends, evaluate response effectiveness, and inform continuous improvement efforts?",
+        "documentation-responsibility-awareness": "Are staff members aware of their responsibilities regarding incident reporting, documentation protocols, and data privacy regulations when documenting basic first aid treatments?",
+        "biometricDataTypes": "What types of biometric data are collected (e.g., fingerprints, facial recognition) for access control?",
+        "biometricDataProtection": "How is biometric data stored and protected to ensure privacy and compliance with regulations?",
+        "biometricErrors": "What procedures are in place for handling false rejections or errors in biometric access?",
+        "biometricEvaluation": "How frequently is the biometric access control system evaluated for accuracy and reliability?",
+        "alternativeAccess": "Are there alternative access methods available for individuals who cannot use the biometric system?",
+        "biometricUtilization": "What percentage of systems and applications within the organization utilize biometric authentication?",
+        "criticalAccessPoints": "Are biometric authentication methods deployed across all critical access points?",
+        "adoptionMonitoring": "How is the adoption of biometric authentication monitored?",
+        "accuracyAssessment": "How does the organization assess the accuracy and reliability of the biometric authentication methods used?",
+        "unauthorizedAccessIncidents": "Are there any documented incidents of unauthorized access despite the use of biometric authentication?",
+        "dataProtection": "How are biometric data and authentication processes protected from potential security threats?",
+        "userPerception": "How do users perceive the ease of use and convenience of the biometric authentication methods currently in place?",
+        "enrollmentChallenges": "Are there any reported challenges or issues faced by users when enrolling their biometric data?",
+        "userAccommodations": "What accommodations are made for users who may have difficulty with biometric authentication?",
+        "privacyProtection": "How does the organization ensure the privacy and protection of biometric data collected from users?",
+        "unauthorizedAccessProtection": "What measures are in place to secure biometric data from unauthorized access?",
+        "handlingPolicies": "Are there clear policies and procedures for handling biometric data?",
+        "backupOptions": "What backup or recovery options are available if users are unable to use their biometric authentication method?",
+        "failureScenarios": "How does the organization handle scenarios where biometric authentication fails?",
+        "backupGuidelines": "Are there guidelines for securely managing and storing backup authentication methods?",
+        "systemIntegration": "How are communication systems integrated with broader emergency response plans, incident command structures, and coordination efforts within the school environment?",
+        "compatibilityIssues": "Are there any compatibility issues with specific devices?",
+        "enhancementPlans": "Does the organization have plans to enhance or expand its biometric authentication capabilities?",
+        "policyGuidelines": "Are there documented policies and guidelines outlining the use and management of biometric authentication?",
+        "complianceProcess": "How does the organization ensure compliance with biometric authentication policies?",
+        "auditReviews": "Are there regular audits or reviews to ensure that biometric authentication practices remain in line with industry standards?",
+        "biometricScannersOpertaional": "Are the biometric scanners operational and functioning as intended?",
+        "biometricCapture": "Do the scanners accurately capture and authenticate biometric data (e.g., fingerprints)?",
+        "accessControlMethods": "How is access to the secondary entrances controlled using card readers?",
+        "biometricEnrollment": "Are individuals required to enroll their biometric data (e.g., fingerprints) for access?",
+        "restrictedAccess": "Is access restricted to individuals with valid proximity cards or authorized credentials?",
+        "updateRecords": "Is there a process in place to update or remove biometric records as needed (e.g., for personnel changes)?",
+        "integration": "Are the card readers integrated with the overall access control system?",
+        "communication": "Do they communicate seamlessly with access control software and databases?",
+        "monitoring": "Is there real-time monitoring and logging of access events captured by the card readers?",
+        "securityFeatures": "Are the card readers equipped with security features to prevent tampering or unauthorized access attempts?",
+        "antiSpoofing": "Do they employ anti-spoofing measures to detect fraudulent attempts to bypass authentication?",
+        "physicalSecurity": "Is there physical security measures in place to prevent unauthorized access to card reader components or wiring?",
+        "regulatoryRequirements": "Are there specific regulatory requirements that impact encryption practices, and how are they addressed?",
+        "strategicPlacement": "Are the fence sensors strategically placed along the perimeter to detect tampering or unauthorized access attempts?",
+        "coverageEntryPoints": "Do they cover all entry points and critical areas, such as doors, gates, or parking lots?",
+        "blindSpots": "Are there any blind spots or areas where camera coverage is insufficient?",
+        "secureMounting": "Are the bullet cameras securely mounted and installed to withstand outdoor conditions?",
+        "optimalAngles": "Are they positioned at optimal angles to capture clear and unobstructed views of entrances?",
+        "protectedWiring": "Are cables and wiring adequately protected from weather elements and tampering?",
+        "weatherProofing": "Are the bullet cameras designed to withstand outdoor environmental factors such as rain, humidity, and temperature fluctuations?",
+        "certification": "Have the cameras undergone testing or certification to verify weatherproofing and durability?",
+        "imageQuality": "Do the bullet cameras capture high-quality images with sufficient resolution for identification and analysis?",
+        "imageAdjustments": "Are there adjustments or settings available to optimize image quality based on lighting conditions outdoors?",
+        "clearImages": "Are images clear and detailed, allowing for easy identification of individuals and activities at entrances?",
+        "integratedSurveillance": "Are the bullet cameras integrated with the overall surveillance system?",
+        "seamlessCommunication": "Do they communicate seamlessly with alarm control panels and monitoring stations?",
+        "remoteAccess": "Is there remote access and control functionality for the bullet cameras?",
+        "remoteAdjustments": "Can security personnel view sensor status, receive alerts, and adjust settings remotely as needed?",
+        "secureAccess": "Is there secure authentication and encryption protocols in place to prevent unauthorized access to camera controls?",
+        "operationalCardReader": "Are the card readers operational and functioning as intended?",
+        "authentication": "Do the card readers accurately read and authenticate proximity cards or other access credentials?",
+        "issuedCards": "Are proximity cards issued to authorized personnel and visitors for access?",
+        "deactivationProcess": "Is there a process in place to deactivate lost or stolen proximity cards to prevent unauthorized access?",
+        "encryption": "Do they support encryption and secure communication protocols to protect access credentials?",
+        "cctvPlacementCriteria": "What criteria are used to determine the placement of CCTV cameras throughout the facility?",
+        "cctvMonitoring": "How is the footage from CCTV cameras monitored, and who is responsible for monitoring?",
+        "cctvRetention": "What is the retention period for recorded footage, and how is it securely stored?",
+        "cctvAccessPolicy": "Are there policies in place regarding the access and review of recorded footage by authorized personnel?",
+        "cctvSystemEvaluation": "How often is the CCTV system evaluated for effectiveness and updated as needed?",
+        "classroomHelpersTraining": "What training is provided to classroom helpers regarding student safety and emergency procedures?",
+        "screeningClassroomHelpers": "How are classroom helpers screened to ensure they are suitable for working with students?",
+        "maintainingASafeEnviroment": "In what ways do classroom helpers contribute to maintaining a safe and supportive environment in the classroom?",
+        "informingClassroomHelpers": "How are classroom helpers informed about the school\u2019s safety policies and reporting procedures?",
+        "feedbackMechanisms": "Are feedback mechanisms in place to solicit input from evacuees, shelter staff, volunteers, and other stakeholders to assess the quality, responsiveness, and satisfaction with emergency sheltering services?",
+        "feedbackMechanismsComment": "Comment (Optional)",
+        "classroomDoorsLocks": "Are classroom doors equipped with locks that can be securely engaged from the inside?",
+        "locksSafetyStandard": "Do locks meet safety standards and regulations for lockdown procedures?",
+        "lockOperational": "Are locks easy to operate and reliably secure, even under stress or pressure?",
+        "barricadingMechanism": "Are there barricading mechanisms available in classrooms to reinforce door security during lockdowns?",
+        "barricadingDeviceOperational": "Do barricading devices effectively prevent unauthorized entry and provide additional time for occupants to seek shelter or escape?",
+        "barricadingDeviceEfficiency": "Are barricading devices designed to be quickly deployed and easily removed by authorized personnel?",
+        "lockdownProcedureTraining": "Are staff members and students trained in lockdown procedures, including how to barricade doors effectively?",
+        "regularLockdownDrills": "Are drills conducted regularly to practice lockdown scenarios and ensure familiarity with procedures?",
+        "regularlyLockdownDebriefing": "Are debriefings held after drills to review performance, identify areas for improvement, and reinforce best practices?",
+        "lockdownCommunicationSystem": "Is there a communication system in place to alert occupants of lockdowns and provide instructions?",
+        "emergencyCommunicationDevices": "Are emergency communication devices accessible in classrooms for contacting authorities or requesting assistance?",
+        "designatedProtocol": "Is there a designated protocol for reporting suspicious activity or potential threats to school administrators or security personnel?",
+        "designatedSafeZones": "Are there designated safe zones or hiding places within classrooms where occupants can seek shelter during lockdowns?",
+        "strategicSafeZones": "Are these areas strategically located to provide cover and concealment from potential threats?",
+        "safeZonesVulnerabilities": "Have safe zones been assessed for potential vulnerabilities and reinforced as needed to enhance security?",
+        "personelCoordination": "Is there coordination between school personnel and local law enforcement agencies on lockdown procedures and response protocols?",
+        "lawEnforcementFamiliarity": "Are law enforcement agencies familiar with school layouts and lockdown plans to facilitate their response in the event of an emergency?",
+        "lawEnforcementReview": "Are there regular meetings or exercises conducted with law enforcement to review and refine lockdown procedures?",
+        "guardiansInformed": "Are parents and guardians informed of lockdown procedures and expectations for student safety?",
+        "guardiansCommunication": "Is there a communication plan in place for notifying parents and guardians of lockdown events and providing updates as needed?",
+        "availableSupportServices": "Are resources or support services available to assist families in coping with the emotional impact of lockdown situations?",
+        "designatedCommunicationChannels": "Are specific communication channels designated for different types of communication needs, such as emergency communication, general staff communication, or coordination between departments?",
+        "clearDelineation": "Is there a clear delineation of the purpose and usage guidelines for each communication channel?",
+        "reservedFrequency": "Is there a designated frequency or channel specifically reserved for emergency communication purposes?",
+        "trainedStaffEmergency": "Are staff members trained on how to access and utilize the designated emergency communication channel during emergencies?",
+        "managingProtocol": "Is there a protocol for managing and coordinating communication channels to prevent interference and ensure clear communication during emergencies?",
+        "reallocatingProcedures": "Are procedures established for reallocating or reassigning communication channels as needed to adapt to changing circumstances or address technical issues?",
+        "compatibleChannels": "Are communication channels selected or configured to be compatible with the communication equipment used by staff members, such as two-way radios or mobile devices?",
+        "compatibilityTesting": "Is there compatibility testing conducted to verify interoperability and functionality across different devices and communication channels?",
+        "redundantCommunicationChannels": "Are redundant communication channels or backup options available to mitigate the risk of channel failure or disruption during emergencies?",
+        "contingencyPlan": "Is there a contingency plan in place for switching to alternative communication channels if primary channels become unavailable or compromised?",
+        "trainedStaffTraining": "Are staff members trained on how to access, select, and utilize communication channels effectively, particularly during emergencies?",
+        "practiceSessions": "Are practice sessions or drills conducted to familiarize staff members with communication channel protocols and simulate emergency scenarios?",
+        "integratedCommunicationChannels": "Are designated communication channels integrated into broader emergency communication and response plans, ensuring alignment with overall emergency protocols?",
+        "incorporatingChannelProcedures": "Are there designated procedures for incorporating communication channel usage into emergency drills, exercises, and simulations to assess effectiveness and identify areas for improvement?",
+        "enhancingRecommendations": "Are recommendations for enhancing communication channel protocols and infrastructure considered and implemented as part of ongoing improvement efforts?",
+        "designatedChannels": "What communication channels are designated for incident response?",
+        "channelSecurity": "How are these channels selected to ensure they meet security and confidentiality requirements?",
+        "alternativeChannels": "Are there alternative channels identified in case primary ones become unavailable?",
+        "internalCommunicationProtocols": "What protocols are established for internal communication?",
+        "sensitiveInfoProtection": "How is sensitive information protected during communication?",
+        "communicationEscalation": "Are there predefined procedures for escalating communication?",
+        "incidentReporting": "How are incidents reported within the organization?",
+        "incidentReportContent": "What information is required in incident reports?",
+        "reportDocumentation": "How are reports documented and stored for compliance purposes?",
+        "externalCommunicationGuidelines": "What guidelines are in place for communicating with external parties?",
+        "externalCommunicationConsistency": "How is consistency maintained in external communications?",
+        "mediaManagementProtocols": "What protocols are followed to manage media inquiries?",
+        "responseCoordination": "How is coordination managed during an incident?",
+        "realTimeTools": "What tools facilitate real-time communication?",
+        "communicationResponsibilities": "How are communication responsibilities divided?",
+        "channelSecurityMeasures": "How are channels secured to prevent interception?",
+        "deviceProtection": "What measures protect communication devices?",
+        "communicationIntegrity": "How is the integrity of communication ensured?",
+        "trainingProtocols": "How is training provided on communication protocols?",
+        "communicationDrills": "Are regular drills conducted to practice communication?",
+        "drillFeedback": "How is feedback from drills used to refine practices?",
+        "channelEvaluation": "How are communication channels evaluated post-incident?",
+        "communicationChallengesFeedback": "What feedback is collected regarding communication challenges?",
+        "communicationLessonsLearned": "How are lessons learned from communication incidents incorporated?",
+        "recordMaintenance": "How are communication records maintained?",
+        "recordAnalysis": "What procedures are in place for analyzing communication records?",
+        "Regular Drill Schedule": "Are lockdown drills scheduled regularly to ensure all occupants are familiar with lockdown procedures?",
+        "Drill Timing Variability": "Are drills conducted at different times of the day to account for varying occupancy levels and staff shifts?",
+        "Initiation Protocol": "Is there a protocol for initiating lockdown drills, including how and when occupants are notified?",
+        "Notification Methods Testing": "Are notification methods tested during drills to ensure timely dissemination of lockdown alerts?",
+        "Absent Individuals System": "Is there a system in place to account for individuals who may not be present during scheduled drills?",
+        "Scenario Planning": "Are lockdown drill scenarios carefully planned and communicated to participants in advance?",
+        "Simulated Threat Scenarios": "Do scenarios include simulated intruder situations, as well as other potential threats that may require a lockdown response?",
+        "Realistic Scenario Design": "Are scenarios designed to be realistic while considering the safety and well-being of participants?",
+        "Procedure Communication": "Are lockdown procedures clearly defined and communicated to all occupants?",
+        "Occupant Specific Actions": "Do drills include specific actions to be taken by occupants, such as securing doors, barricading entry points, and seeking shelter in safe areas?",
+        "Scenario Simulation Variety": "Are drills conducted to simulate different scenarios, such as intruders in various locations or multiple threats simultaneously?",
+        "Coordination Protocol": "Is there a protocol for communication and coordination between occupants, staff members, and security personnel during lockdown drills?",
+        "Communication Systems Test": "Are communication systems, such as two-way radios or intercoms, tested during drills to facilitate coordination efforts?",
+        "Designated Coordinators": "Are there designated individuals responsible for coordinating responses and providing updates during lockdown drills?",
+        "Occupant Accountability Process": "Is there a process for accounting for all occupants during lockdown drills?",
+        "Accountability Roles Assigned": "Are staff members assigned roles and responsibilities to assist with accountability and monitoring efforts?",
+        "Participants Feedback Collection": "Is feedback gathered from participants after drills to identify any issues or concerns with procedures?",
+        "Effectiveness Evaluation": "Is there a mechanism for evaluating the effectiveness of lockdown drills and identifying areas for improvement?",
+        "Debriefing Sessions": "Are debriefing sessions held after drills to review performance and discuss lessons learned?",
+        "Implementation of Recommendations": "Are recommendations from drill evaluations implemented to enhance lockdown preparedness and response procedures?",
+        "effectivenessMeasurement": "How is the effectiveness of current policies in mitigating security risks measured?",
+        "successMetrics": "What metrics or indicators are used to evaluate the success of security policies?",
+        "incidentReviewFrequency": "How often are security incidents reviewed to inform policy updates and improvements?",
+        "lessonsLearnedIntegration": "How are lessons learned from security incidents integrated into policy revisions?",
+        "standardizedMessageTemplates": "Are standardized message templates developed for various types of emergencies, such as lockdowns, evacuations, severe weather, or medical emergencies?",
+        "essentialInfo": "Do these templates include essential information, such as the nature of the emergency, specific actions to take, and any additional instructions or precautions?",
+        "scriptedEmergencyAnnouncements": "Are emergency announcements scripted to convey information in a clear, concise, and easily understandable manner?",
+        "scriptsAvoidingConfusion": "Do scripts avoid technical jargon or ambiguous language that could cause confusion or misunderstanding during emergencies?",
+        "appropriateAnnouncements": "Are announcements tailored to the intended audience, considering factors such as age, language proficiency, and cognitive ability?",
+        "structuredScriptedMessages": "Do scripted messages follow a structured format that includes key elements such as the type of emergency, location or affected area, recommended actions, and any follow-up instructions?",
+        "messagesProvidingGuidance": "Are messages designed to provide actionable guidance to occupants, helping them make informed decisions and respond effectively to the emergency situation?",
+        "reviewedScripts": "Are emergency announcement scripts reviewed and approved by appropriate authorities, such as safety officers, emergency management personnel, or legal advisors?",
+        "ensuringConsistency": "Is there a process for ensuring consistency and accuracy in scripted messages, including periodic updates to reflect changes in procedures, regulations, or best practices?",
+        "trainedIndividuals": "Are individuals responsible for delivering emergency announcements trained on the use of scripted messages and communication protocols?",
+        "deliveringMessagesResources": "Are operators provided with resources, such as cue cards or reference guides, to assist them in delivering scripted messages accurately and confidently?",
+        "adaptableScriptedMessages": "Are scripted messages adaptable to accommodate variations in emergency scenarios, such as the scale, severity, or duration of the event?",
+        "FlexibilityInTemplates": "Is there flexibility built into message templates to allow for real-time updates or modifications based on evolving circumstances or new information?",
+        "evaluatedEffectiveness": "Are scripted messages evaluated for their effectiveness in conveying critical information and guiding appropriate responses during drills and actual emergencies?",
+        "solicitedFeedback": "Is feedback solicited from occupants and stakeholders to assess the clarity, comprehensibility, and usefulness of scripted messages?",
+        "recommendationsRefineMessages": "Are recommendations from evaluations used to refine scripted messages and improve their efficacy in future emergency situations?",
+        "dedicatedCommunicationSystems": "Are there dedicated communication systems in place for alerting authorities during emergencies?",
+        "multipleChannels": "Do these systems include multiple channels such as telephone, radio, email, and text messaging?",
+        "efficientCommunicationSystems": "Are communication systems capable of reaching relevant authorities quickly and efficiently?",
+        "emergencyContactLists": "Have emergency contact lists been established for relevant authorities, including local law enforcement, fire department, and medical services?",
+        "updatedContactDetails": "Are contact details regularly updated to ensure accuracy and reliability?",
+        "designatedPoc": "Is there a designated point of contact responsible for initiating communication with authorities during emergencies?",
+        "notifyAuthorities": "Are there clear protocols in place for when and how to notify authorities during different types of emergencies?",
+        "staffRolesAndResponsibilities": "Do staff members understand their roles and responsibilities in initiating communication with authorities?",
+        "chainOfCommand": "Is there a hierarchy or chain of command to follow for escalating emergency notifications as needed?",
+        "chainOfCommandComment": "Comment (Optional)",
+        "alertingAuthorities": "Is the process for alerting authorities designed to be swift and efficient, minimizing response times?",
+        "communicationSystemsTest": "Are communication systems tested regularly to ensure they are functioning properly and can deliver alerts promptly?",
+        "mitigatingCommunicationFailures": "Are there redundancies or backup systems in place to mitigate communication failures during emergencies?",
+        "provideDetailedInformation": "Are staff members trained to provide accurate and detailed information when alerting authorities?",
+        "conveyEssentialDetail": "Do they know how to convey essential details such as the nature of the emergency, location, number of individuals affected, and any immediate hazards?",
+        "informationVerification": "Is there a mechanism for verifying information before it is communicated to authorities to prevent misinformation or confusion?",
+        "establishCommunicationProtocolsl": "Is there coordination and collaboration with authorities to establish communication protocols and ensure a rapid response to emergencies?",
+        "facilitateCommunication": "Have contact points and procedures been established to facilitate communication between the organization and responding agencies?",
+        "refineEmergencyCommunication": "Are there regular meetings or exercises conducted with authorities to review and refine emergency communication processes?",
+        "emergencyCommunicationProcedures": "Are emergency communication procedures documented in written policies or protocols?",
+        "reviewingAndEvaluating": "Is there a process for reviewing and evaluating the effectiveness of emergency communication during drills or actual incidents?",
+        "communicationDevices": "What communication devices and tools are provided to staff members for emergency communication purposes, such as two-way radios, mobile phones, intercom systems, or panic alarms?",
+        "deviceSelectionCriteria": "Are communication devices selected based on their reliability, range, durability, and compatibility with existing infrastructure to ensure effective communication capabilities during emergencies?",
+        "deviceMaintenance": "How are communication devices maintained, tested, and periodically inspected to verify functionality, battery life, signal strength, and readiness for use in emergency situations?",
+        "communicationProtocols": "Are standardized communication protocols and procedures established to facilitate clear, concise, and efficient communication among staff members, emergency responders, and relevant stakeholders during emergencies?",
+        "communicationChannels": "What channels are utilized for communicating with parents and guardians during a crisis (e.g., phone calls, emails, social media)?",
+        "protocolAdherence": "What measures are in place to ensure adherence to communication protocols, minimize radio interference, avoid channel congestion, and prioritize emergency traffic during critical incidents?",
+        "communicationProficiency": "How are staff members assessed for proficiency in emergency communication skills, such as effective radio etiquette, message clarity, active listening, and situational awareness during training exercises and drills?",
+        "protocolAlignment": "Are communication protocols aligned with incident management protocols, resource allocation procedures, and decision-making frameworks to support effective coordination, information sharing, and situational awareness during emergencies?",
+        "externalCollaboration": "What mechanisms are in place to facilitate communication and collaboration with external agencies, such as emergency dispatch centers, law enforcement agencies, fire departments, or medical response teams, during emergency incidents?",
+        "redundancyMeasures": "Are redundancy measures and backup communication systems implemented to mitigate the risk of communication failures, network disruptions, or equipment malfunctions during emergencies?",
+        "backupCommunication": "How are redundant communication channels, alternative communication methods, or backup power sources utilized to ensure continuity of communication and information flow in the event of primary system failures or infrastructure damage?",
+        "communicationResilience": "What provisions are in place to maintain communication resilience, restore functionality, and adapt communication strategies to changing conditions or evolving threats during prolonged emergency incidents?",
+        "Training Programs Exist": "Are formal training programs established to provide staff members with the necessary knowledge and skills for effective emergency communication?",
+        "Training Content Scope": "Do training programs encompass various aspects of emergency communication, including procedures, protocols, equipment operation, and communication strategies?",
+        "EmergencyCommunicationTrainingSessions": "How frequently are emergency communication training sessions conducted for staff members?",
+        "Training Schedule Set": "Is there a schedule or calendar for recurring training sessions, and are sessions held at regular intervals throughout the year?",
+        "Drills Included": "Do emergency communication training programs incorporate practical exercises, drills, or simulations to simulate real-world emergency scenarios?",
+        "Drill Effectiveness": "Are communication drills designed to assess staff members' ability to effectively communicate critical information, follow established protocols, and coordinate response efforts?",
+        "Scenario Variety": "Are training scenarios diversified to cover a wide range of emergency situations, including natural disasters, security incidents, medical emergencies, and other relevant scenarios?",
+        "Scenario Complexity": "Do scenarios vary in complexity and severity to challenge staff members and enhance their preparedness for different types of emergencies?",
+        "Role-Specific Focus": "Are training sessions tailored to address the specific communication needs and responsibilities of different staff roles or departments?",
+        "Role Preparedness": "Are staff members trained on their roles and responsibilities in initiating, receiving, and relaying emergency communication messages during various emergency scenarios?",
+        "Feedback Provided": "Are feedback mechanisms incorporated into training sessions to provide staff members with constructive feedback on their performance during communication drills?",
+        "Debrief Sessions": "Are debriefing sessions conducted after drills to review strengths, areas for improvement, and lessons learned, with recommendations for enhancement discussed and documented?",
+        "Plan Integration": "Are emergency communication training programs aligned with broader emergency preparedness and response plans and protocols?",
+        "Plan Reinforcement": "Are training scenarios and exercises designed to reinforce and validate emergency communication procedures outlined in emergency plans?",
+        "Training Records": "Are records maintained to document staff participation in emergency communication training sessions, including attendance, training materials used, and performance evaluations?",
+        "Records Accessible": "Are training records accessible for review, audit, and reporting purposes, including compliance assessments and performance evaluations?",
+        "contactInfoCollection": "How does the school or educational institution collect, manage, and update emergency contact information for students and their families?",
+        "contactInfoSystems": "What systems, databases, or platforms are utilized to maintain accurate and up-to-date contact details, including phone numbers, email addresses, and alternative emergency contacts?",
+        "contactInfoVerification": "Are parents provided with opportunities and mechanisms to review, verify, and update their contact information regularly, such as through online portals, forms, or designated communication channels?",
+        "emergencyProtocols": "What protocols or procedures are in place to initiate and facilitate communication with parents in the event of emergencies, incidents, or critical situations occurring at the school?",
+        "contactListAccess": "How are emergency contact lists accessed, activated, or utilized by school staff, administrators, or safety personnel to notify parents of safety alerts, school closures, or other urgent messages?",
+        "identityVerification": "How does the school verify the identity and authority of individuals contacting or requesting information about students during emergency situations or crises?",
+        "authenticationProcedures": "Are procedures established to authenticate the identity of parents, guardians, or authorized emergency contacts before disclosing sensitive information or providing updates regarding student safety or well-being?",
+        "privacyMeasures": "What measures are implemented to protect the privacy, confidentiality, and security of student and parent information during emergency communications and interactions?",
+        "accessibilityInclusivity": "How does the school ensure that emergency contact information and communication methods are accessible and inclusive to all parents, regardless of language, literacy, or technological proficiency?",
+        "disabilityAccommodations": "Are accommodations provided for parents with disabilities, communication barriers, or unique needs to ensure they receive timely and relevant emergency notifications and updates?",
+        "outreachSupportServices": "What outreach efforts or support services are available to assist parents in updating or verifying their contact information, especially those facing challenges or limitations in accessing school resources?",
+        "feedbackUtilization": "How does the school utilize feedback from parents to identify areas for improvement, address communication gaps, or enhance the effectiveness of emergency contact procedures?",
+        "parentParticipation": "Are opportunities provided for parents to participate in collaborative discussions, focus groups, or surveys aimed at evaluating and refining emergency communication strategies and practices?",
+        "evacuationProceduresDevelopment": "How are evacuation procedures developed, documented, and communicated to staff members, students, and visitors within the school community?",
+        "evacuationPlanAssessment": "Are evacuation plans based on thorough assessments of building layouts, occupancy characteristics, fire protection systems, and potential hazards to ensure safe and efficient evacuation routes and assembly areas?",
+        "evacuationPlanConsiderations": "What considerations are given to factors such as building occupancy, accessibility requirements, special needs populations, and coordination with local emergency responders in the development of evacuation plans?",
+        "floorPlansVisibility": "Are floor plans and evacuation routes prominently displayed, clearly marked, and readily accessible in key locations throughout the school premises?",
+        "evacuationMapDetails": "Do evacuation maps include detailed floor layouts, exit locations, primary and secondary evacuation routes, assembly areas, and designated muster points for accountability and headcount purposes?",
+        "evacuationRoutesCustomization": "How are evacuation routes tailored to different areas of the school campus, such as classrooms, offices, gymnasiums, auditoriums, laboratories, or specialized facilities, to accommodate varying occupant loads and mobility considerations?",
+        "staffTrainingEvacuation": "How are staff members trained on evacuation procedures, route navigation, assembly area assignments, and roles and responsibilities during evacuation drills and real emergencies?",
+        "evacuationTrainingFrequency": "Are evacuation training sessions conducted regularly to familiarize staff members with evacuation routes, exit procedures, emergency equipment locations, and communication protocols?",
+        "staffReadinessMeasures": "What measures are in place to ensure staff members are equipped with the knowledge, skills, and confidence to lead and assist occupants during evacuations and account for individuals with special needs or mobility challenges?",
+        "drillFrequencyCriteria": "How frequently are evacuation drills conducted, and what criteria are used to assess the effectiveness, realism, and compliance of drill exercises with established evacuation procedures?",
+        "drillScenarioCustomization": "Are evacuation drills tailored to simulate different scenarios, challenges, and contingencies to test the responsiveness, coordination, and decision-making capabilities of staff members and occupants?",
+        "drillOutcomeEvaluation": "How are evacuation drill outcomes evaluated, debriefed, and used to identify areas for improvement, reinforce best practices, and enhance the overall readiness and resilience of the school community?",
+        "evacuationIntegration": "How are evacuation procedures integrated into broader emergency response plans, protocols, and coordination efforts within the school environment?",
+        "evacuationSynchronization": "Are evacuation procedures synchronized with other emergency response actions, such as lockdowns, sheltering, medical response, or reunification processes, to ensure a comprehensive and coordinated approach to emergency management?",
+        "evacuationCommunicationMechanisms": "What mechanisms are in place to communicate evacuation orders, monitor evacuation progress, and coordinate with external agencies, such as fire departments, law enforcement, or emergency management authorities, during evacuation operations?",
+        "protocolDevelopmentDescription": "How are emergency response protocols developed, and are they based on recognized standards, best practices, or regulatory requirements?",
+        "specificEmergencyTypes": "Are response protocols tailored to address specific types of emergencies or threats commonly faced by the organization?",
+        "protocolConsiderations": "What considerations are taken into account when determining the appropriate actions and procedures to include in response protocols?",
+        "protocolReview": "Are response protocols reviewed and updated periodically to reflect changes in organizational needs, emerging threats, or lessons learned from incidents?",
+        "immediateActions": "What immediate actions are outlined in the response protocols for various types of emergencies (e.g., evacuation, shelter-in-place, medical emergencies)?",
+        "initialResponseTraining": "Are staff members trained on the specific steps to take during the initial moments of an emergency, such as alerting others, assessing the situation, and taking protective measures?",
+        "protocolCommunication": "How are response protocols communicated to staff members to ensure they are aware of and understand their roles and responsibilities?",
+        "initiatorTeams": "Are there designated individuals or teams responsible for initiating immediate actions in different areas or departments of the organization?",
+        "externalCoordination": "How are response protocols coordinated with external emergency services (e.g., fire department, law enforcement) to facilitate a timely and effective response?",
+        "communicationProcedures": "What communication procedures are included in the response protocols for disseminating information and instructions during emergencies?",
+        "notificationChannelsDetails": "Are there established communication channels and protocols for notifying staff members, occupants, and relevant stakeholders about emergency situations?",
+        "communicationSystems": "How are communication systems and technologies utilized to ensure rapid and reliable dissemination of critical information?",
+        "backupMethods": "Are backup communication methods or redundancy measures in place to address potential failures or disruptions in primary communication channels?",
+        "communicationTraining": "How are staff members trained on effective communication practices during emergencies, such as using clear and concise language, active listening, and relaying accurate information?",
+        "decisionAuthority": "How is decision-making authority delineated within the response protocols, and are there clear lines of authority and accountability during emergency situations?",
+        "decisionFrameworkTraining": "Are staff members trained on the decision-making framework outlined in the response protocols, including when to escalate issues or seek additional support?",
+        "empowermentMechanisms": "What mechanisms are in place to empower staff members to make informed decisions and take appropriate actions based on the situational context and available information?",
+        "delegationDetails": "Are there protocols for delegating decision-making authority to designated individuals or teams in the event of leadership absence or incapacitation?",
+        "decisionDocumentation": "How are decisions documented and communicated within the organization to ensure transparency and accountability?",
+        "trainingMethods": "How are staff members trained on the response protocols, and what methods or formats are used to deliver training (e.g., classroom sessions, practical exercises)?",
+        "scenarioDrills": "Are scenario-based drills conducted to simulate emergency situations and allow staff members to practice implementing response protocols in a realistic setting?",
+        "drillFrequency": "How often are training sessions and drills conducted to reinforce response protocols and maintain readiness among staff members?",
+        "debriefingSessions": "Are debriefing sessions held after training exercises to review performance, identify areas for improvement, and incorporate lessons learned into future training activities?",
+        "retentionMeasures": "What measures are in place to ensure that staff members retain knowledge and skills related to response protocols over time, including refresher training and ongoing reinforcement?",
+        "protocolDocumentation": "How are response protocols documented and disseminated to ensure accessibility and consistency across the organization?",
+        "reviewDetails": "Are response protocols regularly reviewed and evaluated to assess their effectiveness, identify gaps or weaknesses, and make necessary revisions?",
+        "performanceMetrics": "What metrics or indicators are used to measure the performance and outcomes of response protocols during actual emergencies or drills?",
+        "postIncidentAnalyses": "Are post-incident analyses conducted to evaluate the implementation of response protocols, identify opportunities for improvement, and inform revisions?",
+        "lessonsLearnedSharing": "How are lessons learned from response protocols shared within the organization to enhance preparedness and resilience against future emergencies?",
+        "emergencyScenarios": "What specific emergency scenarios are included in the response training exercises?",
+        "trainingAddressingNeeds": "How is the training tailored to address the unique needs of the school environment?",
+        "trainerQualifications": "What qualifications or certifications do the trainers have to conduct emergency response training?",
+        "updatedEmergencyResponseTraining": "How often is the emergency response training updated or revised to incorporate new protocols or lessons learned?",
+        "shelterAgreements": "Are there agreements or partnerships established with local emergency shelters to provide assistance in the event of community-wide emergencies, disasters, or evacuations?",
+        "shelterIdentificationCriteria": "How are emergency shelters identified, selected, and vetted as suitable resources for providing temporary housing, support services, and basic necessities to individuals or families affected by emergencies or disasters?",
+        "shelterAccessibilityCriteria": "What criteria are considered when assessing the accessibility, capacity, and readiness of emergency shelters to accommodate diverse populations, including individuals with disabilities, medical needs, or language barriers?",
+        "emergencyCoordination": "How do schools coordinate with local emergency management agencies, government entities, or nonprofit organizations to incorporate emergency sheltering plans into broader community preparedness efforts?",
+        "emergencyDrills": "Are joint tabletop exercises, drills, or simulations conducted periodically to test the effectiveness of emergency sheltering protocols, logistics, and communication procedures between schools and community partners?",
+        "communicationCoordinationMechanisms": "What mechanisms are in place to ensure ongoing communication, coordination, and mutual aid agreements between schools, emergency shelters, and other stakeholders involved in emergency response and recovery operations?",
+        "resourceAllocationMechanisms": "How are resources allocated and mobilized to support emergency sheltering operations, including staffing, supplies, equipment, and facilities management?",
+        "contingencyPlans": "Are contingency plans developed to address potential challenges or gaps in resources, such as shortages of shelter space, specialized medical equipment, or essential supplies during prolonged emergencies or mass evacuations?",
+        "shelterSupportServices": "What support services or accommodations are available at emergency shelters to meet the diverse needs of evacuees, including access to food, water, sanitation facilities, medical care, mental health support, and social services?",
+        "communityShelterInformation": "How are community members informed about the availability, location, and operational status of emergency shelters during emergencies or disasters?",
+        "shelterAwarenessOutreach": "Are outreach efforts conducted to raise awareness, provide guidance, and encourage individuals and families to make informed decisions about seeking shelter, evacuation, or other protective actions in response to imminent threats or hazards?",
+        "shelterInclusivityStrategies": "What strategies are employed to promote inclusivity, cultural competence, and accessibility in emergency sheltering services to ensure equitable access and support for vulnerable populations?",
+        "shelterEffectivenessEvaluation": "How is the effectiveness of emergency sheltering operations evaluated, monitored, and reviewed after incidents or exercises to identify lessons learned, best practices, and areas for improvement?",
+        "shelterImprovementActions": "What steps are taken to incorporate feedback, address identified challenges, and enhance the resilience, efficiency, and effectiveness of emergency sheltering systems within the community?",
+        "encryptionStandards": "What encryption standards or algorithms are required for protecting sensitive data (e.g., AES-256, RSA)?",
+        "selectedStandards": "How are encryption standards selected and updated to address emerging security threats?",
+        "documentedStandards": "Are encryption standards documented and communicated to relevant stakeholders?",
+        "sensitiveData": "What criteria are used to define what constitutes sensitive data within the organization?",
+        "reviewedClassifications": "How frequently are data classifications reviewed and updated?",
+        "encryptionTools": "What methods or tools are used to apply encryption to sensitive data (e.g., software, hardware)?",
+        "integratedEnryption": "How is encryption integrated into data storage, transmission, and processing systems?",
+        "consistentPractices": "Are encryption practices consistent across different types of sensitive data and systems?",
+        "managingKeys": "What procedures are in place for generating, distributing, storing, and managing encryption keys?",
+        "accessProtected": "How are encryption keys protected from unauthorized access or compromise?",
+        "expirationProcesses": "What processes are followed for key rotation, expiration, and revocation?",
+        "complyingRegulations": "How does the organization's encryption approach comply with relevant regulations and standards (e.g., GDPR, HIPAA)?",
+        "complianceRegulations": "What measures are in place to ensure ongoing compliance with encryption-related regulations?",
+        "securingData": "What encryption protocols are used for securing data transmitted over networks (e.g., TLS, HTTPS)?",
+        "dataIntegrity": "How is the integrity and confidentiality of data in transit ensured through encryption?",
+        "effectivenessValidation": "Are there policies and procedures for validating the effectiveness of encryption for data in transit?",
+        "storedMedia": "How is sensitive data encrypted when stored on physical media, such as hard drives and backup tapes?",
+        "encryptionTechniques": "What encryption techniques are used for cloud storage and other remote data repositories?",
+        "protectingData": "Are there safeguards to protect encrypted data from unauthorized access or physical theft?",
+        "authorizedPersonnel": "What access controls are in place to ensure that only authorized personnel can manage and use encryption keys?",
+        "reviewedPermissions": "How are access permissions reviewed and updated to reflect changes in personnel or roles?",
+        "monitoringMechanisms": "Are there logging and monitoring mechanisms to track access to encryption keys and sensitive data?",
+        "encryptionMeasures": "How is the effectiveness of encryption measures tested and validated?",
+        "regularAssessments": "Are there regular security assessments or audits to evaluate the implementation of encryption?",
+        "identifiedVulnerabilities": "What processes are in place to address any vulnerabilities or issues identified during testing?",
+        "employeeTraining": "What training is provided to employees regarding encryption practices and data protection?",
+        "awarenessRequirements": "How is awareness of encryption requirements and best practices maintained among staff?",
+        "employeeResources": "Are there resources or guidelines available to assist employees in understanding and implementing encryption?",
+        "endpointSecurityTypes": "What types of endpoint security solutions are currently implemented (e.g., antivirus, anti-malware, encryption)?",
+        "endpointSecurityConfiguration": "How are endpoint security solutions configured to ensure they are effective against evolving threats?",
+        "endpointSecurityMonitoring": "What processes are in place for monitoring and managing endpoint security alerts and incidents?",
+        "endpointSecurityUpdates": "How often are endpoint security solutions updated or patched to protect against new vulnerabilities?",
+        "endpointSecurityTraining": "What training or resources are provided to staff regarding the importance of endpoint security and safe practices?",
+        "reviewedEvacuationRoutes": "How often are evacuation routes reviewed and updated within the facility?",
+        "Regular Interval": "Are reviews conducted at regular intervals to ensure that evacuation routes remain current and effective?",
+        "Schedule Procedure": "Is there a schedule or procedure in place for conducting routine reviews of evacuation routes?",
+        "structuredProcess": "Is there a structured process for reviewing evacuation routes, including designated personnel responsible for conducting reviews?",
+        "Comprehensive Coverage": "Are reviews comprehensive, covering all areas of the facility, including primary and alternative evacuation routes?",
+        "Obstacle Assessment": "Do reviews include assessments of signage, lighting, obstacles, and other factors that may impact the usability of evacuation routes?",
+        "Regulation Compliance": "Are evacuation routes reviewed to ensure compliance with relevant regulations, codes, and standards, such as building codes and fire safety regulations?",
+        "Knowledgeable Reviewers": "Are reviews conducted by individuals knowledgeable about regulatory requirements and best practices for evacuation route design and signage?",
+        "Disability Access": "Are evacuation routes reviewed to ensure accessibility for individuals with disabilities or mobility limitations?",
+        "Occupant Provisions": "Are there provisions in place to accommodate the needs of all occupants, including those who may require assistance during evacuations?",
+        "Sign Inspection": "Are evacuation route signs inspected as part of the review process to ensure they are clear, visible, and properly positioned?",
+        "Sign Updates": "Are signs updated or replaced as needed to maintain legibility and compliance with standards?",
+        "Wayfinding Review": "Are wayfinding aids, such as floor plans or maps, reviewed to ensure they accurately depict evacuation routes and assembly areas?",
+        "Plan Alignment": "Are evacuation routes reviewed in conjunction with broader emergency response plans to ensure alignment and consistency?",
+        "Response Integration": "Do reviews consider how evacuation routes integrate with other emergency preparedness and response measures, such as sheltering procedures and communication protocols?",
+        "Outcome Records": "Are records maintained to document the outcomes of evacuation route reviews, including any identified issues, recommended changes, and actions taken?",
+        "Accessible Records": "Are review records accessible to relevant stakeholders for reference and follow-up?",
+        "Trend Tracking": "Are review findings used to track trends, monitor compliance, and inform future updates to evacuation routes and emergency plans?",
+        "sharingInformationToMedia": "How is information shared with the media to ensure accurate reporting during a crisis situation?",
+        "protectingStudents": "What guidelines are in place to protect student and staff privacy when communicating externally during a crisis?",
+        "managingExternalCommunicationsResponsibility": "Who is responsible for managing external communications, and what training or resources do they have to handle media inquiries effectively?",
+        "fullCoverage": "Do they cover the entire perimeter, including all fence lines and potential entry points?",
+        "coverageSufficient": "Is sensor coverage sufficient across the entire fence line?",
+        "sensitivityLevel": "Are the fence sensors set to an appropriate sensitivity level to detect tampering, such as cutting, climbing, or lifting of the fence?",
+        "falseAlarmAdjustments": "Have adjustments been made to minimize false alarms caused by environmental factors such as wind, vegetation, or wildlife?",
+        "quickResponse": "Do the fence sensors respond quickly to detected tampering and trigger alarms promptly?",
+        "differentiationMechanism": "Is there a mechanism in place to differentiate between normal activities (e.g., wind-induced movements) and suspicious behaviors to minimize false alarms?",
+        "realTimeTransmission": "Are alarms transmitted to monitoring stations or security personnel in real-time for immediate response?",
+        "integratedAlarmSystem": "Are the fence sensors integrated with the overall perimeter alarm system?",
+        "coordinationWithOtherDevices": "Is there coordination between fence sensor activations and other alarm devices such as sirens, strobe lights, or notification systems?",
+        "remoteMonitoring": "Is there remote access and monitoring functionality for the fence sensors?",
+        "secureProtocols": "Is there secure authentication and encryption protocols in place to prevent unauthorized access to sensor controls?",
+        "durableDesign": "Are the fence sensors designed to withstand outdoor environmental factors such as temperature variations, moisture, and physical impact?",
+        ////////////
         "defineCriteria": "What criteria are used to define Access Control Lists (ACLs) within the firewall, and how are these criteria determined based on the organization's security policy?",
         "firewallUtilization": "How does the firewall utilize ACLs to differentiate between authorized and unauthorized network traffic, and what are the default settings for incoming and outgoing traffic?",
         "guidelinesProtocols": "Are there specific guidelines or protocols in place for creating and updating ACLs to ensure they are aligned with the latest security standards and organizational needs?",
@@ -37,6 +608,396 @@ function AssessmentDetails() {
         "guidelinesProtocolsComment": "Guidelines Protocols Comment",
         "automatedToolsComment": "Automated Tools Comment",
         "regularAuditsComment": "Regular Audits Comment",
+        //GateAlarms.js below
+        "installedOnAllGates": "Are the gate alarms installed on all entry gates, including vehicle and pedestrian gates?", 
+        "coverageAllOpenings": "Do they cover all gate openings and potential access points?",
+        "noCoverageGates": "Are there any gates or entry points without alarm coverage?",
+        "sensorType": "What type of sensors are used for gate alarms (e.g., magnetic switches, contact sensors)?",
+        "sensorActivation": "Are the sensors activated when the gate is opened, closed, or both?",
+        "delayMechanism": "Is there a delay mechanism in place to allow authorized personnel to disarm the alarm before it triggers?",
+        "quickResponse": "Do the gate alarms respond quickly when triggered by unauthorized access attempts?",
+        "audibleVisualAlarm": "Is there a loud audible alarm or visual indication (e.g., flashing lights) to alert occupants and deter intruders?",
+        "realTimeResponse": "Are alarms transmitted to monitoring stations or security personnel in real-time for immediate response?",
+        "integratedWithPerimeterSystem": "Are the gate alarms integrated with the overall perimeter alarm system?",
+        "seamlessCommunication": "Do they communicate seamlessly with alarm control panels and monitoring stations?", 
+        "coordinationWithDevices": "Is there coordination between gate alarm activations and other alarm devices such as sirens, strobe lights, or notification systems?",
+        "remoteMonitoring": "Is there remote access and monitoring functionality for the gate alarms?", 
+        "remoteAccessAcknowledge": "Can security personnel view alarm status, receive alerts, and acknowledge alarms remotely as needed?", 
+        "secureProtocols": "Is there secure authentication and encryption protocols in place to prevent unauthorized access to alarm controls?", 
+        "durability": "Are the gate alarms designed to withstand frequent use and potential tampering attempts?",
+        "outdoorDurability": "Are they constructed from durable materials capable of withstanding outdoor conditions?",
+        "testingCertification": "Have the alarms undergone testing or certification to verify reliability and durability?",
+        "maintenanceSchedule": "Is there a regular maintenance schedule in place for the gate alarms?",
+        "maintenanceTasks": "Are maintenance tasks, such as testing alarm functionality, replacing batteries, and inspecting sensor connections, performed according to schedule?",
+        "maintenanceRecords": "Are there records documenting maintenance activities, repairs, and any issues identified during inspections?",
+        //GlassbreakSensors.js below
+        "strategicPlacement": "Are the glass break sensors strategically placed to detect forced entry through windows or glass doors?",
+        "vulnerableSurfaces": "Do they cover all vulnerable glass surfaces, including windows, glass doors, and glass panels?",
+        "blindSpots": "Are there any blind spots or areas where sensor coverage is insufficient?",
+        "sensitivityLevel": "Are the glass break sensors set to an appropriate sensitivity level to detect the sound frequency associated with breaking glass?",
+        "falseAlarmAdjustments": "Have adjustments been made to minimize false alarms caused by ambient noise or non-threatening vibrations?",
+        "quickResponse": "Do the glass break sensors respond quickly to the sound of breaking glass and trigger alarms promptly?",
+        "falseAlarmMechanism": "Is there a mechanism in place to differentiate between normal sounds and the specific sound signature of breaking glass to minimize false alarms?", 
+        "realTimeAlarms": "Are alarms transmitted to monitoring stations or security personnel in real-time for immediate response?",
+        "integratedWithAlarm": "Are the glass break sensors integrated with the overall intrusion alarm system?",
+        "communicationSeamless": "Do they communicate seamlessly with alarm control panels and monitoring stations?",
+        "coordinationWithDevices": "Is there coordination between glass break sensor activations and other alarm devices such as sirens, strobe lights, or notification systems?",
+        "remoteAccess": "Is there remote access and monitoring functionality for the glass break sensors?",
+        "remoteManagement": "Can security personnel view sensor status, receive alerts, and adjust settings remotely as needed?",
+        "secureAuthentication": "Is there secure authentication and encryption protocols in place to prevent unauthorized access to sensor controls?",
+        "durability": "Are the glass break sensors designed to withstand environmental factors such as temperature variations, moisture, and physical impact?",
+        "constructionMaterials": "Are they constructed from durable materials capable of withstanding indoor and outdoor conditions?", 
+        "reliabilityCertification": "Have the sensors undergone testing or certification to verify reliability and durability?", 
+        "maintenanceSchedule": "Is there a regular maintenance schedule in place for the glass break sensors?", 
+        "maintenanceTasks": "Are maintenance tasks, such as testing sensor functionality, replacing batteries, and cleaning sensor components, performed according to schedule?",
+        "maintenanceRecords": "Are there records documenting maintenance activities, repairs, and any issues identified during inspections?", 
+        //HealthcareProviderEngagement.js below
+        "collaborativeObjectives": "What are the primary objectives and focus areas of collaboration between the school or educational institution and healthcare providers in the community?",
+        "jointProgramsExamples": "Can you provide examples of specific programs, initiatives, or projects jointly undertaken by the school and healthcare providers to promote health and wellness, address medical needs, or enhance emergency medical response within the school community?",
+        "partnershipAlignment": "How is the partnership with healthcare providers aligned with broader school health goals, emergency preparedness efforts, or community health promotion initiatives?", 
+        "medicalResponseCoordination": "How do healthcare providers coordinate with the school administration and designated medical personnel to support medical response efforts during emergencies, incidents, or health-related crises on campus?",
+        "medicalProtocols": "Are protocols established for accessing medical expertise, resources, or support services from healthcare providers in the event of medical emergencies, injuries, or illness occurring within the school community?",
+        "healthcareProviderRole": "What role do healthcare providers play in providing guidance, training, or medical oversight to school staff, administrators, or designated responders regarding medical response procedures and protocols?",
+        "healthEducationContribution": "How do healthcare providers contribute to health education and outreach efforts within the school community, including students, staff, and families?",
+        "resourcesProvidedHealth": "What resources, materials, or presentations does the healthcare community provide to educate students about health promotion, disease prevention, or general wellness practices?", 
+        "interactiveLearning": "Are collaborative activities organized to engage students in interactive learning experiences, workshops, or health screenings conducted by healthcare professionals?",
+        "healthcareIntegration": "How are healthcare services integrated into the broader support systems and resources available to students within the school setting?",
+        "accessMechanisms": "Are mechanisms in place to facilitate access to healthcare services, referrals, or follow-up care for students in need of medical attention or specialized treatment?", 
+        "continuityOfCareStrategies": "What strategies are employed to promote continuity of care, communication, and collaboration between school-based health services and external healthcare providers?", 
+        "communityHealthEngagement": "How do healthcare providers engage with the broader school community, including parents, caregivers, and local residents, to promote health literacy, healthy lifestyles, and preventive healthcare practices?",
+        "communityHealthEvents": "Are community health fairs, wellness events, or educational workshops organized jointly by the school and healthcare providers to raise awareness about health-related issues and resources available in the community?", 
+        "healthDisparitiesEfforts": "What efforts are made to address health disparities, cultural competence, or social determinants of health within the school community through collaborative partnerships with healthcare providers?",
+        //IdentifyingSuspiciousBehavior.js below
+        "recognizing-suspicious-behavior": "Are staff members trained to recognize and identify indicators of suspicious behavior, unusual activity, or potential threats within the school environment?",
+        "warning-sign-training": "What specific behaviors or actions are emphasized during training as potential warning signs of security concerns, such as aggression, hostility, erratic movements, or attempts to conceal weapons or contraband?",
+        "maintaining-vigilance": "How are staff members educated on the importance of maintaining vigilance, situational awareness, and proactive observation to detect and report suspicious incidents promptly?",
+        "reporting-procedures": "Are clear reporting procedures established and communicated to staff members for documenting and reporting observations of suspicious behavior or security-related concerns?",
+        "response-training": "How are staff members trained to initiate timely and appropriate responses, such as notifying school administrators, security personnel, or law enforcement authorities, when encountering suspicious individuals or activities?",
+        "confidentiality-measures": "What measures are in place to ensure confidentiality, anonymity, and protection from retaliation for staff members who report security-related incidents or raise concerns about potential threats?",
+        "collaborating-with-colleagues": "How are staff members encouraged to communicate and collaborate with colleagues, security personnel, and other stakeholders to share information, insights, and observations related to security threats or suspicious behavior?",
+        "information-sharing": "Are mechanisms in place to facilitate information sharing, debriefings, or post-incident discussions among staff members to analyze and learn from past experiences, identify emerging trends, and enhance threat recognition capabilities?",
+        "threat-assessment-protocols": "What protocols are followed to coordinate threat assessment efforts, validate reported concerns, and determine appropriate follow-up actions or interventions based on the severity and credibility of identified threats?",
+        "training-exercises": "Are staff members provided with scenario-based training exercises, simulations, or case studies to practice identifying and responding to various types of security threats or suspicious situations?",
+        "simulate-realistic-scenarios": "How do scenario-based training sessions simulate realistic scenarios, challenge decision-making abilities, and test staff members' capacity to assess threats, evaluate risks, and implement appropriate security measures?",
+        "evaluating-performance": "What feedback mechanisms are utilized to evaluate staff members' performance during scenario-based training exercises, reinforce key concepts, and address areas for improvement in threat recognition and response skills?",
+        "recognizing-potential-biases": "Are staff members trained to recognize potential biases, stereotypes, or cultural factors that may influence their perceptions of suspicious behavior or threat indicators?",
+        "cultural-sensitivity-programs": "How do training programs promote cultural sensitivity, inclusivity, and equity in threat assessment practices, ensuring that staff members avoid making assumptions based on race, ethnicity, religion, or other personal characteristics?",
+        "open-dialogue-strategies": "What strategies are implemented to foster open dialogue, mutual respect, and trust among staff members, students, and community members, enhancing the effectiveness of threat recognition efforts and promoting a safe and supportive school environment for all?",
+        //IdentifyingSuspiciousBehavior2.js below
+        "suspiciousBehavior": "What specific behaviors are staff trained to recognize as suspicious in the school environment?",
+        "suspiciousBehaviorTrainingMethod": "How is the training for identifying suspicious behavior conducted (e.g., workshops, online modules)?",
+        "reportingResources": "What resources or tools are provided to staff for reporting suspicious behavior?",
+        "suspiciousBehaviorTrainingReview": "How often is the training on identifying suspicious behavior reviewed or updated to reflect current security concerns?",
+        "realLifeScenarios": "Are there real-life scenarios or examples included in the training to help staff better understand suspicious behavior?",
+        //IncidentReporting.js Below
+        "reportingChannels": "What channels are available for employees to report suspicious emails or potential phishing attempts (e.g., email, dedicated reporting tool, phone line)?",
+        "accessibleReporting": "Are these reporting mechanisms easily accessible and user-friendly for all employees, regardless of their technical expertise?",
+        "reportingProcessClarity": "Is there a clear process outlined for what information employees should include when reporting suspicious emails?",
+        "regularTraining": "Are employees regularly trained on how to recognize suspicious emails and the importance of promptly reporting them?",
+        "reportingReminders": "How often are employees reminded of the reporting procedures, and is there ongoing communication to reinforce these practices?",
+        "caseStudies": "Are there examples or case studies used in training to illustrate successful reporting and its impact on preventing security breaches?",
+        "incidentHandlingProcess": "What is the process for handling reports of suspicious emails once they are submitted? Who is responsible for investigating these reports?",
+        "incidentResponseTime": "How quickly are reported incidents reviewed and addressed by the security team, and is this turnaround time communicated to employees?",
+        "employeeFeedback": "Is there feedback provided to employees who report suspicious emails, such as acknowledgment of the report and information on any actions taken?",
+        "effectivenessMetrics": "How is the effectiveness of the incident reporting process measured (e.g., number of reports, accuracy of reports, prevention of phishing attacks)?",
+        "reviewAuditProcess": "Are there regular reviews or audits of the reporting process to identify areas for improvement and ensure it remains effective?",
+        "encourageReporting": "How does the organization encourage employees to report incidents without fear of reprisal or judgment?",
+        "integrationWithSecurity": "How is the incident reporting process integrated with other security measures, such as threat intelligence sharing and security incident response?",
+        "escalationProtocols": "Are there established protocols for escalating reported incidents to higher-level security teams or external authorities if needed?",
+        "useOfIncidentData": "How does the organization use data from reported incidents to enhance overall cybersecurity strategies and awareness efforts?",
+        "reportingCulture": "Are there initiatives in place to promote a culture of proactive reporting and cybersecurity vigilance among employees?",
+        "recognitionForReporting": "Does the organization recognize or reward employees for identifying and reporting potential security threats?",
+        "emphasisOnReporting": "How is the importance of incident reporting emphasized within the organization's overall cybersecurity training and awareness programs?",
+        "automatedSystems": "Are there automated systems in place to assist in the reporting and initial analysis of suspicious emails (e.g., phishing detection tools)?",
+        "techStreamliningReporting": "How does technology aid in streamlining the reporting process and reducing the burden on employees?",
+        "futureTechEnhancements": "Are there plans to enhance reporting capabilities with new technologies or integrations to improve detection and response times?",
+        "communicationStrategy": "Is there a clear communication strategy to inform employees about the outcomes of their reports and the importance of their role in cybersecurity?",
+        "employeeFeedbackOnProcess": "Are there opportunities for employees to provide feedback on the reporting process and suggest improvements?",
+        "transparencyInReporting": "How does the organization ensure transparency in its handling of reported incidents, while maintaining necessary confidentiality and security?",
+        //IncidentReportingProcedures.js below
+        "incidentReportingSteps": "What are the steps for reporting a security incident (e.g., whom to contact, what information to provide)?",
+        "incidentReportingTimeframes": "Are there specific timeframes for reporting incidents, and what are the consequences of delayed reporting?",
+        "incidentReportingChannels": "What channels are available for reporting (e.g., hotline, email, incident management system)?",
+        "incidentReportingAnonymity": "How is anonymity handled in the reporting process, if an employee prefers to remain anonymous?",
+        "incidentReportingFollowUp": "What follow-up actions can employees expect after reporting an incident (e.g., investigation, status updates)?",
+        //IncidentResponsePatchManagement.js below
+        "patchIdentification": "How are security patches identified and prioritized for deployment?",
+        "patchSources": "What sources are used to stay informed about available patches?",
+        "criticalPatchesCriteria": "Are there specific criteria for determining which patches are critical?",
+        "patchDeploymentProcedures": "What procedures are followed for deploying patches?",
+        "minimalDisruption": "How is patch deployment managed to ensure minimal disruption?",
+        "predefinedRolloutSteps": "Are there predefined steps for rolling out patches?",
+        "patchTestingValidation": "What testing is conducted to validate that patches do not negatively impact system functionality?",
+        "riskAssessmentMitigation": "How are potential risks assessed and mitigated before applying patches to live systems?",
+        "patchVerification": "Are there procedures for verifying that patches have been successfully applied?",
+        "patchDocumentationProcess": "How is the patch management process documented?",
+        "patchHistoryTracking": "What information is included to track patch history and compliance?",
+        "patchAuditUsage": "How is documentation used for auditing patch management?",
+        "reportingMechanisms": "What reporting mechanisms are in place to track patch deployments?",
+        "reportReview": "How are reports reviewed to identify gaps?",
+        "reportingIssues": "Are there established procedures for reporting patch deployment issues?",
+        "patchTools": "What tools are used to automate patching?",
+        "toolsMaintenance": "How are tools maintained to ensure effectiveness?",
+        "integrationRequirements": "Are there integration requirements with existing infrastructure?",
+        "rollbackProcedures": "What rollback procedures are in place?",
+        "rollbackDecision": "How is the decision made to roll back a patch?",
+        "rollbackIssues": "How are rollback issues communicated?",
+        "patchPolicy": "What policies govern the patch management process?",
+        "policyCommunication": "How are policies communicated to stakeholders?",
+        "policyReview": "Are policies periodically reviewed to ensure effectiveness?",
+        "trainingOnPatch": "What training is provided on patch management?",
+        "staffAwareness": "How is staff awareness of patch management importance ensured?",
+        "refresherTraining": "Are there refresher training sessions for staff?",
+        "incidentIntegration": "How is patch management integrated with incident response?",
+        "incidentRecoveryRole": "What role does patch management play in incident recovery?",
+        "quickPatchDeployment": "Are there protocols for quick patch deployment during incidents?",
+        //IncidentresponseTeamRolesAndResponsibilities.js below
+        "roleDefinition": "What specific roles are defined within the incident response team (e.g., Incident Commander, Lead Analyst, Communications Coordinator)?",
+        "roleAssignment": "How are these roles determined and assigned based on the team's expertise and the organization's needs?",
+        "clearRoleDescriptions": "Are there clear descriptions of responsibilities for each role to ensure effective incident management?",
+        "trainingRequirements": "What training or certification requirements are established for each role within the incident response team?",
+        "ongoingTraining": "How is ongoing training provided to keep team members updated on the latest incident response practices and technologies?",
+        "periodicEvaluations": "Are there periodic evaluations or drills to assess the team's preparedness and proficiency in their roles?",
+        "incidentProcedures": "What procedures are outlined for each role during different phases of an incident (e.g., detection, containment, eradication, recovery)?",
+        "roleCoordination": "How are roles coordinated to ensure a seamless response, including communication and decision-making processes?",
+        "predefinedChecklists": "Are there predefined checklists or guidelines to assist team members in fulfilling their responsibilities during an incident?",
+        "communicationManagement": "How is communication managed among team members during an incident, and what tools or systems are used (e.g., secure messaging platforms)?",
+        "coordinationProtocols": "What protocols are in place to ensure effective coordination between roles and timely information sharing?",
+        "externalCommunications": "How are external communications handled, including interactions with stakeholders, regulatory bodies, or the public?",
+        "roleFlexibility": "How is flexibility incorporated into role assignments to accommodate different types or scales of incidents (e.g., overlapping roles or additional resources)?",
+        "backupPersonnel": "Are there backup or alternate personnel designated for key roles to ensure continuity if primary members are unavailable?",
+        "roleAdaptation": "How is role adaptation managed in response to evolving incident dynamics or changes in the organization's structure?",
+        "roleTools": "What tools, resources, or access privileges are assigned to each role to facilitate their responsibilities during an incident?",
+        "softwareHardware": "Are there specific software or hardware resources required for different roles (e.g., forensic tools, communication equipment)?",
+        "toolsAccessManagement": "How is access to these tools and resources managed and secured to support effective incident response?",
+        "roleEvaluation": "How are the roles and responsibilities of the incident response team evaluated after an incident (e.g., debriefings, performance reviews)?",
+        "feedbackMechanisms": "What feedback mechanisms are in place to gather insights from team members and improve role definitions and procedures?",
+        "lessonsLearned": "How are lessons learned from past incidents used to refine role assignments and enhance the overall effectiveness of the response team?",
+        //InfraredCameras.js below
+        "lowLightPerformance": "Do the infrared cameras effectively capture images in low-light or nighttime conditions?",
+        "infraredLEDs": "Are they equipped with infrared LEDs or other illumination technology to enhance visibility in darkness?",
+        "lowLightAdjustments": "Are there adjustments or settings available to optimize camera performance in varying levels of low-light conditions?",
+        "imageQuality": "Do the infrared cameras capture high-quality images with sufficient resolution for identification and analysis, even in low-light environments?",
+        "imageClarity": "Are there adjustments or settings available to enhance image clarity and detail in low-light conditions?",
+        "clearImages": "Are images clear and detailed, allowing for easy identification of individuals and activities in low-light environments?",
+        "systemIntegration": "Are the infrared cameras integrated with the overall surveillance system?",
+        "softwareCommunication": "Do they communicate seamlessly with surveillance software and monitoring stations?",
+        "realTimeMonitoring": "Is there real-time monitoring and recording of camera feeds from areas with low-light conditions?",
+        "coverageAreas": "Do the infrared cameras cover the desired areas with low-light conditions, providing comprehensive surveillance coverage?",
+        "strategicPositioning": "Are they positioned strategically to monitor critical areas, such as dark corners, alleys, or building perimeters, effectively?",
+        "blindSpots": "Are there any blind spots or areas where camera coverage is insufficient in low-light environments?",
+        "weatherResistance": "Are the infrared cameras designed to withstand outdoor environmental factors such as rain, humidity, and temperature fluctuations?",
+        "durableMaterials": "Are they constructed from durable materials capable of withstanding harsh outdoor conditions?",
+        "weatherProofingCertification": "Have the cameras undergone testing or certification to verify weatherproofing and durability?",
+        "remoteAccess": "Is there remote access and control functionality for the infrared cameras?",
+        "remoteAdjustments": "Can security personnel adjust camera angles, zoom levels, and other settings remotely as needed?",
+        "secureProtocols": "Is there secure authentication and encryption protocols in place to prevent unauthorized access to camera controls?",
+        "maintenanceSchedule": "Is there a regular maintenance schedule in place for the infrared cameras?",
+        "maintenanceTasks": "Are maintenance tasks, such as cleaning, inspection of camera lenses and housings, and testing of camera functionalities, performed according to schedule?",
+        "maintenanceRecords": "Are there records documenting maintenance activities, repairs, and any issues identified during inspections?",
+        //IntegrationWithParentCommunication.js below
+        "integratingMechanism": "Is there a mechanism in place to integrate text/email alerts with parent communication systems to facilitate automatic notifications during emergencies?",
+        "connectingAlertSystem": "Are there established protocols or interfaces for connecting the alerting system with parent communication platforms or databases?",
+        "automaticNotificationConfigurations": "Are automatic notification configurations set up to ensure that parent contact information is automatically included in text/email alerts during emergencies?",
+        "syncingContactDetails": "Are procedures established for syncing or updating parent contact details between the alerting system and parent communication databases?",
+        "optInOptOutAlerts": "Are parents provided with opportunities to opt in or opt out of receiving text/email alerts, and are their preferences documented and respected?",
+        "obtainingConsent": "Is there a process for obtaining consent from parents for the inclusion of their contact information in emergency notifications?",
+        "implementingSafeguardMeasures": "Are appropriate measures implemented to safeguard the security and privacy of parent contact information stored or transmitted through the alerting system?",
+        "integrationMechanisms": "Do integration mechanisms comply with relevant privacy regulations and organizational policies governing the handling of sensitive data?",
+        "facilitatingCoordination": "Are communication protocols established to facilitate coordination between school authorities and parents during emergency situations?",
+        "communicationWithParents": "Is there a designated method or channel for communicating with parents, providing updates, and addressing concerns or inquiries?",
+        "informingParentsIntegration": "Are parents informed about the integration of text/email alerts with parent communication systems and the procedures for receiving emergency notifications?",
+        "helpingParentsResources": "Are resources or educational materials provided to help parents understand how to opt in or opt out of receiving alerts and how to update their contact information?",
+        "effectivenessMechanismsFeedback": "Are feedback mechanisms in place to solicit input from parents regarding the effectiveness and usefulness of text/email alerts during emergencies?",
+        "evaluatingParentFeedback": "Is parent feedback used to evaluate and improve the integration of alerting systems with parent communication platforms over time?",
+        "testingIntegrationMechanisms": "Are integration mechanisms tested and verified periodically to ensure that parent contact information is accurately included in text/email alerts and that notifications are delivered as intended?",
+        "testingScenarios": "Are test scenarios conducted to simulate emergency situations and assess the reliability and responsiveness of the integrated alerting system?",
+        //InternalCommunicationProtocols.js below
+        "communicationMethods": "What methods are used to communicate critical information to staff during a crisis (e.g., email, text alerts, PA system)?",
+        "internalCommunicationEffectiveness": "How is the effectiveness of internal communication assessed during a crisis situation?",
+        "designatedSpokespersons": "Are there designated spokespersons for internal communications, and how are they selected?",
+        "prioritizedInformation": "How is information about the crisis prioritized and disseminated to ensure all staff members are informed in a timely manner?",
+        "staffCommunicationTraining": "What training do staff members receive to prepare them for communicating effectively during a crisis?",
+        //InternetSafety.js below
+        "internetSafetyEducation": "How are students educated about the potential risks and dangers associated with internet use, including exposure to inappropriate content, online predators, cyberbullying, identity theft, and phishing scams?",
+        "internetSafetyCurriculumTopics": "Can you describe the topics covered in the internet safety curriculum, such as privacy settings, safe browsing habits, recognizing and reporting online threats, and responsible social media use, and how these concepts are presented to students in an age-appropriate manner?",
+        "strategiesForSafeOnlinePractices": "What strategies are taught to students to promote safe online practices, including the importance of creating strong, unique passwords, avoiding sharing personal information or photos with strangers, and being cautious when clicking on links or downloading files from unknown sources?",
+        "encouragingCriticalEvaluationOnline": "How are students encouraged to critically evaluate online information for accuracy, credibility, and potential biases, and what tools or resources are provided to help them fact-check sources, identify misinformation, and navigate digital media literacy challenges?",
+        "cyberbullyingCurriculum": "How does the curriculum address the topic of cyberbullying, including defining what constitutes cyberbullying behavior, its impact on victims, and strategies for preventing and responding to cyberbullying incidents?",
+        "teachingEmpathyAndDigitalCitizenship": "Are students taught empathy, respect, and digital citizenship skills to foster positive online behavior and promote a culture of kindness, inclusivity, and accountability in digital spaces?",
+        "cyberbullyingSupportMechanisms": "What support mechanisms are in place to assist students who experience cyberbullying, including reporting mechanisms, access to counseling or mental health services, and strategies for seeking help from trusted adults or peers?",
+        "parentalInvolvementInInternetSafety": "How are parents or guardians involved in reinforcing internet safety lessons at home, and what resources or guidance materials are provided to support parents in discussing online safety topics with their children?",
+        "parentEducationEventsWorkshops": "Can you describe any parent education events, workshops, or resources offered by the school to promote collaboration between educators and families in fostering a safe and responsible online environment for students?",
+        "communicationWithParentsOnInternetSafety": "How does the school communicate with parents about internet safety initiatives, including updates on curriculum content, online tools and resources, and recommendations for monitoring and supervising children's online activities outside of school hours?",
+        //IntrusionDetectionSystems2.js below
+        "idsDeployment": "How are IDS solutions deployed across the network (e.g., inline, passive, distributed) and what areas or segments do they cover?",
+        "idsConfigSettings": "What are the key configuration settings for the IDS, and how are they tuned to match the organization’s security requirements?",
+        "idsBlindSpots": "Are there any known limitations or blind spots in the IDS deployment that need to be addressed?",
+        "idsDetectionTypes": "What types of intrusions and attacks does the IDS aim to detect (e.g., network-based attacks, host-based attacks, zero-day exploits)?",
+        "idsFalsePositivesHandling": "How does the IDS differentiate between legitimate and malicious activities to minimize false positives and false negatives?",
+        "idsDetectionMethods": "Are there specific signatures, heuristics, or anomaly detection methods used to identify potential threats?",
+        "realTimeMonitoring": "Does the IDS provide real-time monitoring of network and system activities to identify suspicious or malicious behavior?",
+        "idsAlertManagement": "How are alerts generated and managed, and what processes are in place to ensure timely response to detected threats?",
+        "alertEscalationProcedure": "What is the procedure for escalating alerts to the appropriate response teams or individuals?",
+        "idsIncidentIntegration": "How is the IDS integrated with incident response processes and tools, such as SIEM systems or ticketing systems?",
+        "incidentProtocols": "Are there predefined incident response protocols for handling alerts and incidents detected by the IDS?",
+        "idsIncidentEffectiveness": "How are the effectiveness and accuracy of the IDS in supporting incident response efforts evaluated?",
+        "idsLogCollection": "What types of data and logs are collected by the IDS, and how are they stored and managed?",
+        "idsLogAnalysis": "How are IDS logs analyzed to identify trends, patterns, or recurring issues related to security incidents?",
+        "logCorrelation": "Are there tools or processes in place to correlate IDS data with other security logs or events?",
+        "idsMaintenance": "What is the process for updating and maintaining IDS signatures, rules, and configurations to stay current with emerging threats?",
+        "idsUpdatesFrequency": "How often are system updates and patches applied to the IDS, and how is the impact on system performance and security assessed?",
+        "updateValidation": "Are there procedures for testing and validating updates to ensure they do not disrupt normal operations?",
+        "idsPerformanceMonitoring": "How is the performance of the IDS monitored, and are there metrics or benchmarks used to assess its effectiveness?",
+        "periodicAssessment": "Are there periodic reviews or assessments conducted to evaluate the IDS’s ability to detect and respond to threats?",
+        "feedbackIncorporation": "How are feedback and lessons learned from past incidents incorporated into the IDS configuration and deployment strategy?",
+        //IntrusionDetectionSystems3.js below
+        "intrusionSystemTypes": "What types of intrusion detection systems are currently in place (e.g., motion sensors, glass break detectors)?",
+        "intrusionAlertCommunication": "How are alerts generated and communicated when a potential intrusion is detected?",
+        "intrusionResponseProtocol": "What protocols are followed in response to alerts from the intrusion detection system?",
+        "intrusionSystemTesting": "How often are the intrusion detection systems tested for functionality and reliability?",
+        "incidentReview": "Are there regular reviews of incidents detected by the system to assess security effectiveness and improve procedures?",
+        //IntrusionPreventionSystems.js below
+        "ipsSelectionCriteria": "What criteria are used to select and implement intrusion prevention systems (IPS) within the network?",
+        "ipsTesting": "How are the IPS configurations tested to ensure effectiveness against various types of attacks?",
+        "ipsUpdateMethods": "What methods are in place to regularly update the IPS with new threat signatures or rules?",
+        "ipsAlertResponse": "How does the organization monitor and respond to alerts generated by the IPS?",
+        "ipsTraining": "What training is provided to staff on the capabilities and limitations of the IPS to ensure proper usage?",
+        //IsolationProcedures.js below
+        "isolationCriteria": "What criteria are used to determine which systems should be isolated during an incident?",
+        "isolationScope": "How are decisions made regarding the scope and extent of isolation?",
+        "predefinedProtocols": "Are there predefined protocols for isolating different types of systems?",
+        "isolationMethods": "What methods or technologies are used to isolate affected systems?",
+        "methodImplementation": "How are these methods implemented to ensure effective containment?",
+        "automatedTools": "Are there automated tools to assist with isolation?",
+        "communicationManagement": "How is communication managed during the isolation process?",
+        "documentationProcedures": "What procedures ensure isolation actions are documented?",
+        "reportingChannels": "Are there channels for reporting isolation status?",
+        "isolationVerification": "How is it verified that systems have been successfully isolated?",
+        "verificationMethods": "What methods test and confirm the effectiveness of isolation?",
+        "isolationBenchmarks": "Are there benchmarks for successful isolation?",
+        "impactAssessment": "How is the impact of isolation on business operations assessed?",
+        "minimizingImpact": "What measures minimize impact on critical functions?",
+        "contingencyPlans": "Are there contingency plans for operational issues caused by isolation?",
+        "recoveryProcedures": "What procedures are followed for recovery and reconnection?",
+        "integrityVerification": "How is system integrity verified before reconnection?",
+        "reconnectionProtocols": "What protocols ensure reconnection does not reintroduce the threat?",
+        "isolationDocumentation": "How are isolation actions documented?",
+        "reportingRequirements": "What are the reporting requirements for the isolation process?",
+        "futureImprovements": "How is documentation used to improve future isolation procedures?",
+        //KeycardAccessSystems.js below
+        "keycardCriteria": "What criteria are used to determine who is issued keycards for access to school facilities?",
+        "keycardMonitoring": "How is the keycard access system monitored for unauthorized access attempts?",
+        "keycardDeactivation": "What procedures are in place for deactivating keycards when an employee leaves the school or changes roles?",
+        "keycardReview": "How frequently is the keycard access system reviewed for effectiveness and potential vulnerabilities?",
+        "keycardContingency": "Are there contingency plans for situations where keycards fail or are lost, and how are these communicated to staff?",
+        //LawEnforcementCoordination.js below
+        "facilityLawCommunicationChannels": "Are there established communication channels between the facility and local law enforcement agencies?",
+        "Facility-LawPOCs": "Are there designated points of contact within the facility and law enforcement for emergency coordination?",
+        "communicationProtocolsAccessible": "Are communication protocols documented and readily accessible to relevant personnel?",
+        "emergencyNotifyProtocol": "Is there a protocol in place for notifying law enforcement agencies in the event of emergencies?",
+        "lawContactMethods": "Are there predefined methods for contacting law enforcement, such as phone calls, emails, or dedicated emergency lines?",
+        "StaffLawComTraining": "Are staff members trained on when and how to initiate contact with law enforcement and what information to provide?",
+        "ResponseTimeDefined": "Are response time expectations clearly defined and communicated to law enforcement agencies?",
+        "ResponseTimeBenchmarks": "Have response time benchmarks been established based on the facility's location, size, and potential risks?",
+        "ResponseTimeTracking": "Is there a mechanism for tracking and evaluating law enforcement response times during emergencies?",
+        "CollabPlanningMeetings": "Are there regular meetings or exercises conducted with law enforcement agencies to review emergency response plans and coordination procedures?",
+        "TabletopExercises": "Do tabletop exercises or simulations involve law enforcement agencies to test coordination and communication during various emergency scenarios?",
+        "ExerciseFeedbackUsage": "Are feedback and lessons learned from joint exercises used to improve coordination and response capabilities?",
+        "informationSharingProtocol": "Is there a protocol for sharing relevant information with law enforcement agencies during emergencies?",
+        "InfoSharingTraining": "Are staff members trained to provide accurate and timely information to law enforcement responders?",
+        "secureInformationSharing": "Is there a secure method for sharing sensitive or confidential information with law enforcement agencies, if necessary?",
+        "MutualAidExistence": "Does the facility have mutual aid agreements or partnerships with neighboring law enforcement agencies?",
+        "MutualAidReview": "Are mutual aid agreements documented and reviewed periodically to ensure they align with current needs and resources?",
+        "mutualAidActivation": "Is there a process for activating mutual aid support from other agencies during large-scale emergencies or resource-intensive incidents?",
+        "PostIncidentDebriefs": "Are debriefing sessions conducted after emergency incidents to review the effectiveness of law enforcement coordination and response?",
+        "LawEnforcementInvolvement": "Are representatives from law enforcement agencies involved in post-incident debriefings to provide feedback and insights?",
+        "DebriefingRecommendations": "Are recommendations from debriefing sessions implemented to improve coordination and response procedures for future incidents?",
+        //LawEnforcementPartnership.js below
+        "partnershipEstablishment": "How is the partnership between the school or educational institution and local law enforcement agencies established, formalized, and maintained?",
+        "partnershipGoals": "What specific goals, objectives, or areas of collaboration are outlined in the partnership agreement or memorandum of understanding (MOU) between the school and law enforcement?",
+        "rolesResponsibilities": "Are roles, responsibilities, and expectations clearly defined for both parties regarding their respective contributions to enhancing school safety, emergency preparedness, and response efforts?",
+        "trainingFrequency": "How frequently do school staff, administrators, and law enforcement personnel participate in joint training exercises, drills, or simulations to prepare for various emergency scenarios?",
+        "trainingActivities": "What types of training activities are conducted collaboratively, such as active shooter drills, tabletop exercises, or scenario-based simulations, to improve coordination and communication between school and law enforcement personnel?",
+        "trainingTailoring": "Are training sessions tailored to address specific needs, challenges, or vulnerabilities identified through risk assessments, security audits, or incident debriefs?",
+        "communicationMethods": "How do school administrators and law enforcement agencies communicate and share information regarding potential threats, safety concerns, or suspicious activities identified within the school community?",
+        "reportingProtocols": "Are protocols established for reporting, documenting, and responding to security incidents, behavioral indicators, or other warning signs that may pose a risk to school safety?",
+        "privacyMeasures": "What measures are in place to protect the privacy, confidentiality, and legal rights of students and staff while facilitating information sharing and collaboration between the school and law enforcement?",
+        "resourcesSupport": "What resources, support services, or technical assistance are provided by law enforcement agencies to augment school safety initiatives, emergency response capabilities, or crime prevention efforts?",
+        "securityPersonnelTraining": "Are school security personnel, administrators, or designated staff members trained to interface with law enforcement during emergencies, incidents, or law enforcement interventions on campus?",
+        "collaborationStrategies": "How does the school administration collaborate with law enforcement agencies to leverage community policing strategies, crime prevention programs, or outreach initiatives aimed at enhancing school security and fostering positive relationships with students and families?",
+        "effectivenessEvaluation": "How is the effectiveness of the partnership with local law enforcement agencies evaluated, monitored, and assessed over time?",
+        "feedbackMechanisms": "Are mechanisms in place to solicit feedback from school stakeholders, law enforcement personnel, and community members regarding the impact, strengths, and areas for improvement in the collaboration between the school and law enforcement?",
+        "partnershipRefinement": "What strategies or measures are implemented to address challenges, adapt to changing circumstances, and refine partnership approaches based on lessons learned, best practices, or emerging trends in school safety and security?",
+        //LikelihoodAndImpactAssessment.js below
+        "conductedLikelihoodAssessment": "Has a Likelihood and Impact  assessment been conducted? If so, when was it last performed?",
+        "determiningSafetyRisks": "What criteria are used to determine the likelihood of various safety risks occurring at the school?",
+        "evaluatedIdentifiedRisks": "How is the potential impact of identified risks evaluated in terms of severity and consequences for students and staff?",
+        "considering-reports": "Are historical data and incident reports considered in the assessment of likelihood and impact?",
+        "frequentUpdates": "How frequently is the likelihood and impact assessment updated to reflect new information or changes in circumstances?",
+        "communicationMethods": "What methods are used to communicate the findings of the likelihood and impact assessment to stakeholders, including parents and staff?",
+        //LockdownCommunicationProtocols.js below
+        "dedicatedCommunicationSystemsText": "Are there dedicated communication systems in place to alert authorities and relevant personnel during emergencies?",
+        "variousChannels": "Do these systems include various channels such as silent alarms, intercoms, emergency call boxes, or mobile alerts?",
+        "regularTestedCommunicationSystems": "Are communication systems tested regularly to ensure they are functional and reliable?",
+        "silentAlarmSystemsInstalled": "Are silent alarm systems installed throughout the premises to discreetly signal emergencies without alerting potential threats?",
+        "activatingSilentAlarms": "Do silent alarms activate without audible alerts to avoid escalating situations or causing panic among occupants?",
+        "recognizingSilentAlarmTrainingText": "Are designated personnel trained to recognize and respond to silent alarm activations promptly?",
+        "activatingSilentAlarmsProtocolsText": "Are there established protocols for activating silent alarms in different emergency scenarios, such as intruders, medical emergencies, or security breaches?",
+        "activatingSilentAlarmTraining": "Are staff members trained on when and how to activate silent alarms and the appropriate response procedures to follow?",
+        "centralizedMonitoringSystemText": "Is there a centralized monitoring system to receive and respond to silent alarm activations?",
+        "monitoringSilentAlarms": "Are designated personnel or security teams tasked with monitoring silent alarms and coordinating response efforts?",
+        "verifyingAlarmActivationsProcess": "Is there a process for verifying alarm activations and escalating responses as needed based on the severity of the situation?",
+        "integratedSilentAlarms": "Are silent alarms integrated into the overall emergency response plan for the premises?",
+        "alarmsTriggeringResponseActions": "Do alarm activations trigger appropriate response actions such as lockdowns, evacuations, or notifications to law enforcement?",
+        "silentAlarmSystemsCooedination": "Is there coordination between silent alarm systems and other security measures to ensure a comprehensive and effective emergency response?",
+        "purposeAndFunctionTraining": "Are staff members and occupants trained in the purpose and function of silent alarms as part of their emergency preparedness training?",
+        "trainingPrograms": "Do training programs include scenarios and simulations to practice activating silent alarms and responding to alarm activations?",
+        "effectivenessDrills": "Are there regular drills or exercises conducted to evaluate the effectiveness of silent alarm systems and response procedures?",
+        "maintainingRecords": "Are records maintained for all silent alarm activations, including dates, times, locations, and responses?",
+        "reviewingRecords": "Are alarm activation records reviewed regularly to identify trends, areas for improvement, and opportunities for further training or intervention?",
+        "identifyingDeficiencies": "Are deficiencies or issues identified during alarm testing or response drills addressed promptly, with corrective actions implemented as needed?",
+        //LockdownDrills2.js below
+        "lockdownEducation": "How are students educated on the purpose and importance of lockdown drills, including the concept of sheltering in place and securing classrooms or designated safe areas during a perceived threat or security incident?",
+        "lockdownInstructions": "Are students provided with clear and concise instructions on the specific actions to take during a lockdown, such as moving away from doors and windows, remaining silent, and following teacher or staff directives to maintain safety and minimize visibility to potential threats?",
+        "signalRecognition": "Are students trained to recognize the signals or announcements that initiate a lockdown, such as coded alerts, audible alarms, visual cues, or digital notifications, and to differentiate them from other routine announcements or drills?",
+        "responsePreparation": "How are students prepared to respond quickly and decisively to lockdown signals, including the importance of taking immediate shelter, staying out of sight, and remaining quiet to avoid drawing attention to their location?",
+        "classroomFortification": "What strategies are employed to instruct students on fortifying their classroom or shelter area during a lockdown, such as locking doors, barricading entry points, closing blinds or curtains, and turning off lights or electronic devices to minimize visibility and enhance security?",
+        "resourceUtilization": "How are students encouraged to utilize available resources and improvised tools, such as heavy furniture, bookshelves, or classroom supplies, to reinforce doorways, create physical barriers, or shield themselves from potential threats while awaiting further instructions or assistance?",
+        "communicationBriefing": "How are students briefed on the importance of communication and cooperation during a lockdown, including the need to remain calm, follow teacher or staff directives, and assist classmates who may require support or reassurance during a stressful situation?",
+        "activityReporting": "Are students encouraged to report any suspicious activity, unusual noises, or signs of danger discreetly to designated adults or authorities, using predetermined signals or communication methods to convey information without compromising their safety or alerting potential intruders?",
+        "debriefingParticipation": "Are students given the opportunity to participate in debriefing sessions or discussions following lockdown drills, allowing them to share their observations, experiences, and feedback on the effectiveness of lockdown procedures and protocols?",
+        "studentInput": "How are student perspectives and insights from lockdown drills incorporated into ongoing safety planning, risk assessments, and emergency preparedness efforts, informing revisions or enhancements to lockdown procedures, communication protocols, or staff training initiatives?",
+        "concernsAddressed": "What measures are in place to address any concerns, questions, or misconceptions raised by students during post-drill debriefings, ensuring that all participants feel supported, informed, and prepared to respond confidently in the event of a real lockdown situation?",
+        //LockdownDrills3.js below
+        "lockdownDrillFrequency": "How frequently are lockdown drills conducted in the school?",
+        "lockdownProcedures": "What are the specific procedures students and staff must follow during a lockdown drill?",
+        "lockdownDrillEvaluation": "How are the outcomes of lockdown drills evaluated, and what changes are made based on that evaluation?",
+        "lockdownCommunication": "How does the school communicate the lockdown procedures to students, especially new students or those with special needs?",
+        "lockdownDrillFeedback": "Are there mechanisms in place for students and parents to provide feedback on the effectiveness of the lockdown drills?",
+        //LockdownSignalRecognition.js below
+        "Signal Training": "Are occupants trained to recognize the specific signals or alerts used to indicate a lockdown drill?",
+        "Distinct Alerts": "Are these signals clearly distinct from other emergency signals or alarms used within the facility?",
+        "standardizedMethod": "Is there a standardized method for signaling the start and end of lockdown drills to minimize confusion?",
+        "Protocol Established": "Are communication protocols established to inform occupants and staff members about upcoming lockdown drills?",
+        "Advance Notice": "Do these protocols include advance notice of drill schedules and procedures to prevent misunderstandings?",
+        "multiChannelSystem": "Is there a system in place for disseminating information about drill signals through multiple channels, such as emails, announcements, or signage?",
+        "Distinguish Signals": "Are occupants and staff members educated on the importance of distinguishing between drill signals and real threats?",
+        "Training Materials": "Are training materials provided to clarify the differences in response actions between drills and actual emergencies?",
+        "Drill Practice": "Are drills used as opportunities to reinforce signal recognition skills and practice appropriate responses?",
+        "Realistic Scenarios": "Are efforts made to simulate realistic scenarios during lockdown drills, including the use of authentic signals and procedures?",
+        "Mimic Challenges": "Are drills designed to mimic the conditions and challenges that occupants may encounter during real lockdown situations?",
+        "lockdownFeedbackMechanisms": "Are feedback mechanisms in place to assess the effectiveness of drill simulations in promoting signal recognition?",
+        "Feedback Gathered": "Is feedback gathered from occupants and staff members after each lockdown drill to assess signal recognition performance?",
+        "Debrief Sessions": "Are debriefing sessions conducted to discuss any confusion or errors in identifying drill signals and provide corrective guidance?",
+        "Feedback Improvements": "Are recommendations from feedback and evaluations used to improve signal recognition training and procedures?",
+        "Varying Conditions": "Are lockdown drills conducted under varying conditions to test occupants' ability to recognize signals in different contexts?",
+        "Unexpected Challenges": "Are drills designed to challenge occupants with unexpected changes or complexities to assess their adaptability and response capabilities?",
+        "Procedure Deviations": "Are deviations from standard drill procedures introduced occasionally to gauge occupants' alertness and readiness?",
+        "Drill Records": "Are records maintained to document the execution and outcomes of lockdown drills, including observations related to signal recognition?",
+        "Periodic Review": "Are drill records reviewed periodically to identify trends or recurring issues in signal recognition performance?",
+        "Corrective Actions": "Are corrective actions implemented based on review findings to address deficiencies and enhance signal recognition effectiveness?",
+
         //MalwareRemovalTools.js below
         "detectionEffectiveness": "How effective are the malware removal tools at detecting various types of malware, including viruses, Trojans, worms, ransomware, and spyware?",
         "quarantineProcess": "What is the process for quarantining suspicious files, and does the tool allow for manual quarantine overrides or adjustments?",
@@ -1495,6 +2456,399 @@ function AssessmentDetails() {
 
     }
 
+    // ----- VERIFY AND COMPLETE THIS MAPPING OBJECT -----
+// Place this where getFormRoute can access it (e.g., AssessmentDetails.js or a utils file)
+
+const formRouteMap = {
+    // === Cybersecurity ===
+    "Access Control Lists": "/access-control-lists-form", // Specific suffix used in route
+    "Antivirus Software": "/antivirus-software",
+    "Device Encryption": "/device-encryption",
+    "Firewall Policies": "/firewall-policies",
+    "Incident Response Patch Management": "/incident-response-patch-management",
+    "Malware Removal Tools": "/malware-removal-tools",
+    "Network Anomaly Detection": "/network-anomaly-detection",
+    "Patch Management": "/patch-management",
+    "Security Information and Event Management": "/security-information-and-event-management",
+    "Firewall Configuration": "/firewall-configuration", // Added based on routes
+    "Intrusion Detection Systems": "/intrusiondetectionsystems", // Route uses no hyphen? CHECK App.js
+    "Antivirus and Malware Protection": "/antivirus-and-malware-protection", // Added based on routes
+    "File Encryption": "/file-encryption",
+    "Email Encryption": "/email-encryption",
+    "Backup Solutions": "/backupsolutions", // Route uses no hyphen? CHECK App.js
+    "Disaster Recovery Planning": "/disaster-recovery-planning",
+    "Phishing Simulation Training": "/phishing-simulation-training",
+    "Password Policies": "/password-policies",
+    "Multi-Factor Authentication": "/multi-factor-authentication",
+    "Event Logging and Monitoring": "/event-logging", // Route might just be /event-logging? CHECK App.js
+    "User Activity Monitoring": "/user-activity-monitoring",
+    "Response Team Formation": "/responseteamformation", // Route uses no hyphen? CHECK App.js
+    "Containment and Mitigation": "/containment-and-mitigation",
+    "Password Security": "/password-security",
+    "Security Policies and Procedures": "/security-policies-and-procedures",
+    "Incident Response Training": "/incident-response-training",
+    "Network Security": "/network-security", // Added based on routes
+    "Data Protection": "/data-protection", // Added based on routes
+    "User Awareness and Training": "/user-awareness", // Route uses /user-awareness? CHECK App.js
+    "Firewalls and Intrusion Detection": "/firewalls", // Route uses /firewalls? CHECK App.js
+    "Endpoint Security": "/endpoint-security",
+    "Data Backup and Recovery": "/databackupandrecovery", // Route uses no hyphen? CHECK App.js
+    "Phishing Awareness": "/phishing-awareness",
+    "Password Management": "/password-management",
+    "Incident Identification": "/incident-identification",
+    "Incident Response Planning": "/incident-response-planning",
+    "Full Disk Encryption": "/fulldiskencryption", // Added based on routes
+    "Secure Email Gateways": "/secureemailgateways", // Added based on routes
+    "File Level Encryption": "/filelevelencryption", // Path in App.js is "FileLevelEncryption"? Check case/hyphens
+    "End To End Encryption": "/endtoendencryption", // Path in App.js is "EndToEndEncryption"? Check case/hyphens
+    "Regular Backup Schedules": "/regularbackschedules", // Added based on routes
+    "Off-Site Backup Storage": "/offsitebackupstorage", // Added based on routes
+    "Backup Testing": "/backuptesting", // Added based on routes
+    "Continuity Of Operations": "/continuityofoperations", // Added based on routes
+    "Simulated Phishing Campaigns": "/simulatedphishingcampaigns", // Added based on routes
+    "Phishing Awareness Training": "/phishingawarenesstraining", // Added based on routes
+    "Incident Reporting": "/incidentreporting", // Added based on routes
+    "Contact Information": "/contactinformation", // Added based on routes
+    "Password Complexity Requirements": "/passwordcomplexityrequirements", // Added based on routes
+    "Password Expiration Policies": "/passwordexpirationpolicies", // Added based on routes
+    "Two Factor Authentication": "/twofactorauthentication", // Added based on routes
+    "Biometric Authentication": "/biometricauthentication", // Added based on routes
+    "Intrusion Detection Systems 2": "/intrusiondetectionsystems2", // Added based on routes (assuming name mapping)
+    "User Behavior Analytics": "/userbehavioranalytics", // Added based on routes
+    "Incident Response Team Roles And Responsibilities": "/incidentresponseteamrolesandresponsibilities", // Added based on routes
+    "Communication Channels And Protocols": "/communicationchannelsandprotocols", // Added based on routes
+    "Isolation Procedures": "/isolationprocedures", // Added based on routes
+    "Data Protection Impact Assessments": "/dataprotectionimpact", // Route uses /dataprotectionimpact? CHECK App.js
+    "Consent Management": "/consentmanagement", // Added based on routes
+    "Student Data Privacy Policies": "/studentdataprivacypolicies", // Added based on routes
+    "Data Breach Notification Procedures": "/databreachnotificationprocedures", // Added based on routes
+    "Signature Based Detection": "/signaturebaseddetection", // Added based on routes
+
+    // === Emergency Preparedness ===
+    "Classroom Lockdownm Protocols": "/classroom-lockdown-protocols", // Potential typo in key ("Lockdownm") - FIX in subCategories and map key if needed. Route assumed correct.
+    "Conflict Resolution": "/conflict-resolution",
+    "Disaster Drills": "/disaster-drills",
+    "Drill Scenerios": "/drill-scenarios", // Potential typo in key ("Scenerios") - FIX in subCategories and map key if needed. Route assumed correct.
+    "Earthquake Drills": "/earthquake-drills",
+    "Emergency Communication": "/emergency-communication", // Ensure this maps correctly if used elsewhere
+    "Evacuation Procedures": "/evacuation-procedures",
+    "Fire Alarm Systems": "/fire-alarm-systems",
+    "Fire Drill": "/fire-drill",
+    "Fire Extinguisher Locations": "/fire-extinguisher-locations", // Check path case/hyphens
+    "First Aid Response": "/first-aid-response",
+    "Law Enforcement Coordination": "/law-enforcement-coordination",
+    "Lockdown Communication Protocols": "/lockdown-communication-protocols",
+    "Severe Weather Monitoring": "/severe-weather-monitoring",
+    "Tornado Drills": "/tornado-drills",
+    "Tornado Shelter Locations": "/tornado-shelter-locations",
+    "Emergency Response Plan": "/emergency-response-plan", // Added based on routes
+    "Drills and Training": "/drills-and-training", // Added based on routes
+    "Communication Systems": "/communication-systems", // Added based on routes
+    "Alert Systems": "/alert-systems", // Added based on routes
+    "Communication Protocols": "/communication-protocols", // Added based on routes
+    "Fire Emergency Plans": "/fire-emergency-plan", // Route uses singular? CHECK App.js
+    "Lockdown Procedures": "/lockdown-procedures", // Added based on routes
+    "Natural Disaster Plans": "/natural-disaster-plans", // Added based on routes
+    "Natural Disaster Drills": "/natural-disaster-drills", // Added based on routes
+    "Lockdown Drills": "/lockdown-drills", // Added based on routes
+    "Public Address System": "/publicaddresssystem", // Route has no hyphens? CHECK App.js
+    "Text Email Alerts": "/textemailalerts", // Route has no hyphens? CHECK App.js
+    "Staff Communication": "/staff-communication", // Added based on routes
+    "Parent Communication": "/parent-communication", // Added based on routes
+    "Threat Recognition": "/threat-recognition", // Added based on routes
+    "Lockdown Signal Recognition": "/lockdown-signal-recognition", // Added based on routes
+    "Staff Roles And Responsibilities": "/staff-roles-and-responsibilities", // Added based on routes
+    "Debriefing And Feedback": "/debriefing-and-feedback", // Added based on routes
+    "Evacuation Routes Review": "/evacuation-routes-review", // Added based on routes
+    "Drill Frequency": "/drill-frequency", // Added based on routes
+    "Speaker Locations": "/speaker-locations", // Added based on routes
+    "Emergency Announcement Protocols": "/emergency-announcement-protocols", // Added based on routes
+    "Backup Power Systems": "/backup-power-systems", // Added based on routes
+    "Contact Information Database": "/contact-information-database", // Added based on routes
+    "Alert Activation Procedures": "/alert-activation-procedures", // Added based on routes
+    "Integration With Parent Communication": "/integration-with-parent-communication", // Route uses /intergration-...? CHECK App.js typo
+    "Two Way Radios": "/two-way-radios", // Added based on routes
+    "Emergency Communication Training": "/emergency-communication-training", // Added based on routes
+    "Communication Platforms": "/communication-platforms", // Added based on routes
+    "Parent Notification Procedures": "/parent-notification-procedures", // Added based on routes
+    "Communication Language": "/communication-language", // Added based on routes
+    "Emergency Response Training": "/emergency-response-training", // Added based on routes
+    "Emergency Procedures": "/emergency-procedures", // Added based on routes
+    "Fire Drills 2": "/fire-drills2", // Added based on routes (assuming name mapping)
+    "Lockdown Drills 3": "/lockdown-drills3", // Added based on routes (assuming name mapping)
+    "Emergency Preparedness Planning": "/emergency-preparedness-planning", // Added based on routes
+    "Emergency Response Plan Development": "/emergency-response-plan-development", // Added based on routes
+    "Incident Command Structure": "/incident-command-structure", // Route uses Strucutre? CHECK App.js typo
+    "Scenario Based Planning": "/scenario-based-planning", // Added based on routes
+    "Crisis Management Procedures": "/crisis-management-procedures", // Added based on routes
+    "Crisis Communication Plan": "/crisis-communication-plan", // Added based on routes
+    "Continuity Of Operations Plan": "/continuity-of-operations-plan", // Added based on routes
+    "Emergency Response Drills For Students": "/emergency-response-drills-for-students", // Added based on routes
+    "Communication Protocols 2": "/communication-protocols2", // Added based on routes
+    "Tabletop Exercises": "/tabletop-exercises", // Added based on routes
+    "Simulated Emergency Drills": "/simulated-emergency-drills", // Added based on routes
+    "Internal Communication Protocols": "/internal-communication-protocols", // Added based on routes
+    "External Communication Protocols": "/external-communication-protocols", // Added based on routes
+    "Critical Function Identification": "/critical-function-identification", // Added based on routes
+    "Backup Systems And Redundancies": "/backup-systems-and-redundancies", // Added based on routes
+
+    // === Personnel Training and Awareness ===
+    // Note: Many items here seem like sub-sub-categories based on PastAssessments.js structure.
+    // Assuming these map directly to routes for now - VERIFY THIS LOGIC.
+    "Acceptable Use Policy Training": "/acceptable-use-policy-training", // Route is /accpetable-...? CHECK App.js typo
+    "Active Shooter Response": "/active-shooter-response", // Route might be /active-shooter-reponse? CHECK App.js typo
+    "Anonymous Reporting Systems": "/anonymous-reporting-systems",
+    "Basic First Aid Techniques": "/basic-first-aid-techniques",
+    "CPR Certification": "/cpr-certification", // Route might be /CPR-certification? CHECK App.js case
+    "Curriculum Integration": "/curriculum-integration",
+    "Cyber Bullying": "/cyber-bullying", // Route might be /cyber-bullying? CHECK App.js case/hyphen
+    "Data Handling Guidelines": "/data-handling-guidelines",
+    "Data Protection": "/data-protection2", // Assuming this maps to the route with '2' - CHECK App.js
+    // "Emergency Communication": "/emergency-communication", // Already mapped? Need unique keys or context if route differs
+    "Emergency Contacts": "/emergency-contacts",
+    "Emergency Evacuation Procedures": "/emergency-evacuation-procedures", // Route might be /evacuation-procedures2? CHECK App.js
+    "Emergency Response Protocols": "/emergency-response-protocols", // Route might be /response-protocols2? CHECK App.js
+    "Emergency Shelters": "/emergency-shelters",
+    "Fire Department Collaboration": "/fire-department-collaboration",
+    "Fire Drills": "/fire-drills", // Route might be /fire-drills2? CHECK App.js
+    "First Aid CPR Training": "/first-aid", // Route uses /first-aid? CHECK App.js
+    "Healthcare Provider Engagement": "/healthcare-provider-engagement",
+    "Identifying Suspicious Behavior": "/identifying-suspicious-behavior", // Route might be /identifying-suspicious-behavior2? CHECK App.js
+    "Incident Reporting Procedures": "/incident-reporting-procedures",
+    "Internet Safety": "/internet-safety",
+    "Law Enforcement Partnerships": "/law-enforcement-partnerships", // Route might be /law-enforcement-partnership? CHECK App.js singular
+    "Lockdown Drills": "/lockdown-drills2", // Assuming this maps to the route with '2' - CHECK App.js
+    "Medical Facilities": "/medical-facilities",
+    "Parent Advisory Committees": "/parent-advisory-committees",
+    "Parent Involvement": "/parent-involvement", // Route might be /parent-involvement2? CHECK App.js
+    "Parent Volunteer Programs": "/parent-volunteer-programs",
+    "Parent-Teacher Associations": "/parent-teacher-associations", // Route might be /parent-teacher-associations2? CHECK App.js
+    "Password Security": "/password-security2", // Assuming this maps to the route with '2' - CHECK App.js
+    "Peer Support Networks": "/peer-support-networks",
+    "Phishing Awareness": "/phishing-awareness2", // Assuming this maps to the route with '2' - CHECK App.js
+    "Physical Bullying": "/physical-bullying",
+    "Post-Incident Support": "/post-incident-support",
+    "Recertification Schedule": "/recertification-schedule",
+    "Recognizing Security Breaches": "/recognizing-security-breaches",
+    "Recognizing Security Incidents": "/recognizing-security-incidents",
+    "Response Protocols": "/response-protocols2", // Assuming this maps to the route with '2' - CHECK App.js
+    "Role-PLaying Scenarios": "/role-playing-scenarios", // Potential typo in key ("PLaying") - FIX in subCategories and map key if needed.
+    "Safety Demonstrations": "/safety-demonstrations",
+    "Safety Workshop": "/safety-workshops", // Route uses plural? CHECK App.js
+    "Severe Weather Preparedness": "/severe-weather-preparedness",
+    "Stranger Danger Awareness": "/stranger-danger-awareness", // Route might be /stranger-danger-awareness2? CHECK App.js
+    "Student Handbook": "/student-handbooks", // Route uses plural? CHECK App.js
+    "Student Leadership": "/student-leadership",
+    "Training Materials": "/training-materials",
+    "Training Providers": "/training-providers",
+    "Trusted Adults": "/trusted-adults",
+    "Verbal Bullying": "/verbal-bullying",
+    "AED Training": "/aed-training", // Route might be /AED-training? CHECK App.js case
+    "Cybersecurity Training": "/cybersecurity-training", // Added based on routes
+    "First Aid Response": "/first-aid-response", // Added based on routes
+    "First Aid CPR Training 2": "/first-aid-cpr-training2", // Added based on routes (assuming name mapping)
+    "Safety And Security Training": "/safetyandsecuritytraining", // Added based on routes
+    "Fire Safety Training": "/firesafetytraining", // Added based on routes
+    "Evacuation Procedures Training": "/evacuationprocedurestraining", // Added based on routes
+    "Identifying Suspicious Behavior 2": "/identifyingsuspiciousbehavior2", // Added based on routes (assuming name mapping)
+    "Response To Security Threats": "/responsetosecuritythreats", // Added based on routes
+    "Stranger Danger Awareness 2": "/strangerdangerawareness2", // Added based on routes (assuming name mapping)
+    "Staff Training Programs": "/staff-training-programs", // Added based on routes
+    "Safety Procedures Training": "/safety-procedures-training", // Added based on routes
+    "Security Awareness Training 2": "/security-awareness-training2", // Added based on routes
+    "Student Safety Education": "/student-safety-education", // Added based on routes
+    "Personal Safety Education": "/personal-safety-education", // Added based on routes
+    "Strong Password Guidelines": "/strong-password-guidelines", // Added based on routes
+    "Multi Factor Authentication Awareness": "/multi-factor-authentication-awareness", // Added based on routes
+    "School Resource Officers": "/school-resource-officers", // Added based on routes
+    "Sro Roles And Responsibilities": "/sro-roles-and-responsibilities", // Added based on routes
+    "Sro Training And Certification": "/sro-training-and-certification", // Added based on routes
+    "Fire Prevention Programs": "/fire-prevention-programs", // Added based on routes
+    "Emergency Response Coordination": "/emergency-response-coordination", // Added based on routes
+    "Joint Training Exercises": "/joint-training-exercises", // Added based on routes
+    "Active Shooter Drills With Police": "/active-shooter-drills-with-police", // Added based on routes
+    "Emergency Response Training 2": "/emergency-response-training2", // Added based on routes
+    "Crisis Intervention Workshops": "/crisis-intervention-workshops", // Added based on routes
+    "Fire Safety Education For Students": "/fire-safety-education-for-students", // Added based on routes
+    "Fire Drills And Evacuation Planning": "/fire-drills-and-evacuation-planning", // Added based on routes
+    "Fire Department Access To School Facilities": "/fire-department-access-to-school-facilities", // Added based on routes
+    "Mutual Aid Agreements": "/mutual-aid-agreements", // Added based on routes
+    "Firefighter Training Sessions": "/firefighter-training-sessions", // Added based on routes
+
+    // === Physical Security ===
+    "Access Control Keypads": "/access-control-keypads",
+    "Access Control Software": "/access-control-software",
+    "Access Control Systems": "/access-control-systems",
+    "Biometric Scanners": "/biometric-scanners",
+    "Bullet Cameras": "/bullet-cameras",
+    "Card Readers": "/card-readers",
+    "Dome Cameras": "/dome-cameras",
+    "Door Alarms": "/door-alarms",
+    "Door Locks": "/door-locks",
+    "Fence Sensors": "/fence-sensors",
+    "Floodlights": "/floodlights",
+    "Front Desk Security": "/frontdesksecurity", // Route has no hyphens? CHECK App.js
+    "Gate Alarms": "/gate-alarms",
+    "Glass Break Sensors": "/glassbreaksensors", // Route has no hyphens? CHECK App.js
+    "Infrared Cameras": "/infrared-cameras",
+    "Motion Activated Lights": "/motionactivatedlights", // Route has no hyphens? CHECK App.js
+    "Motion Sensors": "/motionsensors", // Route has no hyphens? CHECK App.js
+    "PTZ Cameras": "/ptzcameras", // Route has no hyphens? CHECK App.js case
+    "Perimeter Fencing": "/perimeter-fencing",
+    "Razor Wire": "/razor-wire", // Route might be /RazorWire? CHECK App.js case
+    "Roving Patrols": "/roving-patrols", // Route might be /RovingPatrols? CHECK App.js case
+    "Security Gates": "/security-gates", // Route might be /SecurityGates? CHECK App.js case
+    "Stationed Guards": "/stationed-guards", // Route might be /StationedGuards? CHECK App.js case
+    "Turnstiles": "/turnstiles", // Route might be /Turnstiles? CHECK App.js case
+    "Vehicle Barrier": "/vehicle-barriers", // Route uses plural? CHECK App.js
+    "Visitor Check-In": "/visitor-checkin", // Route uses hyphen? CHECK App.js
+    "WeatherProof Cameras": "/weatherproof-cameras", // Route uses hyphen? Case? CHECK App.js
+    "Window Locks": "/window-locks", // Route might be /WindowLocks? CHECK App.js case
+    "Surveillance Systems": "/surveillance", // Route uses /Surveillance? CHECK App.js
+    "Security Personnel": "/security-personnel", // Added based on routes
+    "Access Points": "/accessp", // Route uses /AccessP? CHECK App.js case
+    "Building Security": "/buildings", // Route uses /BuildingS? CHECK App.js case
+    "Perimeter Security": "/perimeters", // Route uses /PerimeterS? CHECK App.js case
+    "CCTV Cameras": "/cctv", // Route uses /CCTV? CHECK App.js case
+    "Alarm Systems": "/alarms", // Route uses /AlarmS? CHECK App.js case
+    "On Site Security": "/onsite", // Route uses /OnSite? CHECK App.js case
+    "Main Entrance": "/maine", // Route uses /MainE? CHECK App.js case
+    "Secondary Entrances": "/secondaryentrances", // Added based on routes
+    "Fencing And Barriers": "/fencingandbarriers", // Added based on routes
+    "Locking Mechanisms": "/lockingmechanisms", // Added based on routes
+    "Lighting": "/lighting", // Added based on routes
+    "Indoor Cameras": "/indoorcameras", // Added based on routes
+    "Outdoor Cameras": "/outdoorcameras", // Added based on routes
+    "Intrusion Alarms": "/intrusionalarms", // Added based on routes
+    "Perimeter Alarms": "/perimeteralarms", // Added based on routes
+    "Security Guards": "/securityguards", // Added based on routes
+    "Reception Staff": "/receptionstaff", // Added based on routes
+    "On Site Guards": "/onsiteguards", // Added based on routes
+    "Keycard Access Systems": "/keycardaccesssystems", // Added based on routes
+    "Biometric Access Control Systems": "/biometricaccesscontrolsystems", // Added based on routes
+    "CCTV Camera Installation": "/cctvcamerainstallation", // Added based on routes
+    "Intrusion Detection Systems 3": "/intrusiondetectionsystems3", // Added based on routes (assuming name mapping)
+    "Perimeter Security Fencing": "/perimetersecurityfencing", // Added based on routes
+    "Physical Security Measures": "/physical-security-measures", // Added based on routes
+    "Access Control Systems 2": "/access-control-systems2", // Added based on routes (assuming name mapping)
+    "Surveillance Systems 2": "/surveillance-systems2", // Added based on routes (assuming name mapping)
+    "Physical Hazards Assessment": "/physical-hazards-assessment", // Added based on routes
+    "Environmental Hazards Assessment": "/enviromental-hazards-assessment", // Route uses enviromental? CHECK App.js typo
+    "Perimeter Security Evaluation": "/perimeter-security-evaluation", // Added based on routes
+    "Access Control Systems Assessment": "/access-control-systems-assessment", // Added based on routes
+
+    // === Policy and Compliance ===
+    "Access Restrictions": "/access-restrictions",
+    "Data Classification": "/data-classification",
+    "Data Minimization": "/dataminimization", // Route has no hyphens? CHECK App.js
+    "Data Retention Periods": "/dataretentionperiods", // Route has no hyphens? CHECK App.js
+    "Data Sharing Policies": "/data-sharing-policies",
+    "Personal Device Usage": "/personaldeviceusage", // Route has no hyphens? CHECK App.js
+    "Student Privacy Rights": "/studentprivacyrights", // Route has no hyphens? CHECK App.js
+    "Acceptable Use Policy": "/acceptable-use-policy", // Added based on routes
+    "Data Privacy Policy": "/data-privacy-policy", // Added based on routes
+    "Regulatory Compliance": "/regulatory-compliance", // Route uses /regulatory-comlpiance? CHECK App.js typo
+    "Periodic Reviews": "/periodic-reviews", // Added based on routes
+    "Revision Procedures": "/revision-procedures", // Added based on routes
+    "Internet Usage": "/internet-usage", // Added based on routes
+    "Data Handling": "/data-handling", // Added based on routes
+    "Data Collection And Retention": "/data-collection-and-retention", // Added based on routes
+    "Data Protection Measures": "/data-protection-measures", // Added based on routes
+    "FERPA Compliance": "/ferpa-compliance", // Route uses /FERPA-compliance? CHECK App.js case
+    "GDPR Compliance": "/gdpr-compliance", // Route uses /GDPR-compliance? CHECK App.js case
+    "Policy Evaluation Criteria": "/policy-evaluation-criteria", // Added based on routes
+    "Stakeholder Feedback": "/stakeholder-feedback", // Added based on routes
+    "Change Management Process": "/change-management-process", // Added based on routes
+    "Data Handling Guidelines": "/data-handling-guidelines", // Added based on routes
+    "Encryption Requirements": "/encryptionrequirements", // Added based on routes
+    "Data Access Controls": "/dataaccesscontrols", // Added based on routes
+    "Data Security Requirements": "/datasecurityrequirements", // Added based on routes
+    "Compliance With Regulations": "/compliancewithregulations", // Added based on routes
+    "Effectiveness In Addressing Security Risks": "/effectivenessinaddressingsecurityrisks", // Added based on routes
+    "Staff Input On Policy Impact": "/staffinputonpolicyimpact", // Added based on routes
+    "Policy Revision Approval Workflow": "/policyrevisionapprovalworkflow", // Added based on routes
+    "Documentation Of Policy Changes": "/documentationofpolicychanges", // Added based on routes
+
+    // === Community Partnership ===
+    // Note: This category had an empty subCategories array in PastAssessments.js
+    // Add mappings here if subcategories/routes exist. Example:
+    // "Some Community Subcategory": "/some-community-route",
+    "Parent Education Events": "/parent-education-events", // Added based on routes
+    "Parent Comm": "/parent-comm", // Added based on routes
+    "Collaboration With Local Agencies": "/collaboration-with-local-agencies", // Route uses /collaboration-with-local-agenices? CHECK App.js typo
+    "Access To Community Resources": "/access-to-community-resources", // Added based on routes
+    "Joint Community Events": "/joint-community-events", // Added based on routes
+    "Parent And Community Involvement": "/parent-and-community-involvement", // Added based on routes
+    "Parent Teacher Associations 2": "/parent-teacher-associations2", // Added based on routes (assuming name mapping)
+    "Family Engagement Events": "/family-engagement-events", // Added based on routes
+    "Volunteer Programs": "/volunteer-programs", // Added based on routes
+    "Community Outreach Programs": "/community-outreach-programs", // Added based on routes
+    "Community Engagement Surveys": "/community-engagement-surveys", // Added based on routes
+    "Back To School Nights": "/back-to-school-nights", // Added based on routes
+    "Parent Workshops On Student Safety": "/parent-workshops-on-student-safety", // Added based on routes
+    "Parent Teacher Conferences": "/parent-teacher-conferences", // Added based on routes
+    "Classroom Helpers": "/classroom-helpers", // Added based on routes
+    "Parent Chaperones For Field Trips": "/parent-chaperones-for-field-trips", // Added based on routes
+    "Fundraising Events": "/fundraising-events", // Added based on routes
+    "Feedback Collection From Community": "/feedback-collection-from-community", // Added based on routes
+    "Assessing Community Needs And Priorities": "/assessing-community-needs-and-priorities", // Added based on routes
+    "Planning Community Outreach Strategies": "/planning-community-outreach-strategies", // Added based on routes
+    "Communication Channels": "/communicationchannels", // Added based on routes
+
+    // === Continuous Improvement - Safety and Security ===
+    "Biometric Access Control Systems": "/biometric-access-control-systems", // Added based on routes
+    "Firewall Implementation": "/firewall-implementation", // Added based on routes
+    "Intrusion Prevention Systems": "/intrusion-prevention-systems", // Added based on routes
+    "Data Encryption Protocols": "/data-encryption-protocols", // Added based on routes
+    "Regular Data Backups": "/regular-data-backups", // Added based on routes
+    "Endpoint Security Solutions": "/endpoint-security-solutions", // Added based on routes
+    "Risk Assessment And Mitigation": "/risk-assessment-and-mitigation", // Added based on routes
+    "Safety Risk Assessment": "/safety-risk-assessment", // Added based on routes
+    "Hazard Identification": "/hazard-identification", // Added based on routes
+    "Risk Analysis": "/risk-analysis", // Added based on routes
+    "Security Threat Assessment": "/security-threat-assessment", // Added based on routes
+    "Threat Identification": "/threat-identification", // Added based on routes
+    "Security Vulnerability Assessment": "/security-vulnerability-assessment", // Added based on routes
+    "Security Infrastructure Enhancement": "/security-infrastructure-enhancement", // Added based on routes
+    "Cybersecurity Infrastructure": "/cybersecurity-infrastructure", // Added based on routes
+    "Network Security Measures": "/network-security-measures", // Added based on routes
+    "Data Protection Measures 2": "/data-protection-measures2", // Added based on routes (assuming name mapping)
+    "Vulnerability Assessment": "/vulnerability-assessment", // Added based on routes
+    "External Threats": "/external-threats", // Added based on routes
+    "Internal Threats": "/internal-threats", // Added based on routes
+    "Cybersecurity Vulnerability Assessment": "/cybersecurity-vulnerability-assessment", // Added based on routes
+
+     // === Other Routes Mentioned (might not be subcategories) ===
+     // These likely won't be used by getFormRoute unless they ARE subcategories
+     "Bullying Prevention": "/bullying-prevention", // Add if it's a subcategory
+     "Recognizing Bullying Behavior": "/recognizing-bullying-behavior", // Add if it's a subcategory
+     "Reporting Procedures": "/reporting-procedures", // Add if it's a subcategory
+     "Reporting Procedures 2": "/reporting-procedures2", // Add if it's a subcategory
+     "Crisis Intervention": "/crisis-intervention", // Add if it's a subcategory
+     "Phishing Simulation Exercises": "/phishingsimulationexercises", // Route uses /PhishingSimulationExercises? CHECK App.js case
+     "Privacy And Security": "/privacy&security", // Route uses /privacy&security? CHECK App.js special char
+
+
+};
+
+// ----- END OF MAPPING OBJECT -----
+
+// Make sure the getFormRoute function uses this map as shown previously:
+/*
+const getFormRoute = (category1, category2) => {
+    console.log(`getFormRoute called with: category1='${category1}', category2='${category2}'`);
+    const route = formRouteMap[category2]; // Lookup using subcategory name
+
+    if (route) {
+        console.log(`Route found for '${category2}': ${route}`);
+        return route;
+    } else {
+        console.warn(`No route found for category2: '${category2}'. Defaulting to '/'`);
+        return '/'; // Default fallback
+    }
+};
+*/
+
     useEffect(() => {
         const fetchAssessmentAndBuilding = async () => {
             setLoading(true);
@@ -1730,12 +3084,22 @@ function AssessmentDetails() {
     };
 
     const getFormRoute = (category1, category2) => {
-        if (category1 === "Cybersecurity" && category2 === "Access Control Lists") {
-            return `/access-control-lists-form`;
-        } else if (category1 === "AnotherCategory" && category2 === "AnotherSubcategory") {
-            return `/another-form`;
+        // Log inputs for debugging
+        console.log(`getFormRoute called with: category1='${category1}', category2='${category2}'`);
+    
+        // Use the category2 (subcategory name) as the key to look up the route
+        // Ensure the key lookup uses the EXACT string used in the formRouteMap keys
+        const route = formRouteMap[category2];
+    
+        if (route) {
+            console.log(`Route found for '${category2}': ${route}`);
+            return route; // Return the found route
+        } else {
+            // Handle cases where the subcategory doesn't have a mapped route
+            console.warn(`No route found for category2: '${category2}'. Defaulting to '/'`);
+            // You might want a specific "not found" route or error handling instead of '/'
+            return '/'; // Default fallback route
         }
-        return '/';
     };
 
     const handleEditClick = () => {
