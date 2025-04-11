@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
@@ -56,11 +56,11 @@ function LikelihoodAndImpactAssessmentFormPage() {
         const { name, value } = e.target;
         const newFormData = { ...formData, [name]: value };
         setFormData(newFormData);
-
+    
         try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
+            const buildingRef = doc(db, 'Buildings', buildingId); // Create buildingRef
             const formDocRef = doc(db, 'forms', 'Continuous Improvement - Safety and Security', 'Likelihood and Impact Assessment', buildingId);
-            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true });
+            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true }); // Use merge and add building
             console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
         } catch (error) {
             console.error("Error saving form data to Firestore:", error);
@@ -135,18 +135,18 @@ function LikelihoodAndImpactAssessmentFormPage() {
                 <form onSubmit={handleSubmit}>
                     <h2>7.1.1.2.1. Likelihood and Impact Assessment</h2>
                     {[
-                        { name: "conductedLikelihoodAssessment", label: "Has a Likelihood and Impact  assessment been conducted? If so, when was it last performed?" },
+                        { name: "conductedLikelihoodAssessment", label: "Has a Likelihood and Impact assessment been conducted? If so, when was it last performed?" },
                         { name: "determiningSafetyRisks", label: "What criteria are used to determine the likelihood of various safety risks occurring at the school?" },
                         { name: "evaluatedIdentifiedRisks", label: "How is the potential impact of identified risks evaluated in terms of severity and consequences for students and staff?" },
-                        { name: "considering-reports", label: "Are historical data and incident reports considered in the assessment of likelihood and impact?" },
-                        { name: "frequentUpdates", label: "How frequently is the likelihood and impact assessment updated to reflect new information or changes in circumstances?" },
-                        { name: "communicationMethods", label: "What methods are used to communicate the findings of the likelihood and impact assessment to stakeholders, including parents and staff?" }
+                        { name: "historicalDataConsidered", label: "Are historical data and incident reports considered in the assessment of likelihood and impact?" },
+                        { name: "assessmentUpdatedFrequency", label: "How frequently is the likelihood and impact assessment updated to reflect new information or changes in circumstances?" },
+                        { name: "communicationMethodsStakeholders", label: "What methods are used to communicate the findings of the likelihood and impact assessment to stakeholders, including parents and staff?" }
                     ].map((question, index) => (
                         <div key={index} className="form-section">
                             <label>{question.label}</label>
-                            <div>
-                                {question.name === "considering-reports" ? (
-                                    <>
+                            {question.name === "historicalDataConsidered" ? (
+                                <>
+                                    <div>
                                         <input
                                             type="radio"
                                             name={question.name}
@@ -161,24 +161,24 @@ function LikelihoodAndImpactAssessmentFormPage() {
                                             checked={formData[question.name] === "no"}
                                             onChange={handleChange}
                                         /> No
-                                        <textarea
-                                            className='comment-box'
-                                            name={`${question.name}Comment`}
-                                            placeholder="Comment (Optional)"
-                                            value={formData[`${question.name}Comment`] || ''}
-                                            onChange={handleChange}
-                                        />
-                                    </>
-                                ) : (
+                                    </div>
                                     <input
                                         type="text"
-                                        name={question.name}
-                                        placeholder={question.label}
-                                        value={formData[question.name] || ''}
+                                        name={`${question.name}Comment`}
+                                        placeholder="Additional comments"
+                                        value={formData[`${question.name}Comment`] || ''}
                                         onChange={handleChange}
                                     />
-                                )}
-                            </div>
+                                </>
+                            ) : (
+                                <input
+                                    type="text"
+                                    name={question.name}
+                                    placeholder={question.label}
+                                    value={formData[question.name] || ''}
+                                    onChange={handleChange}
+                                />
+                            )}
                         </div>
                     ))}
                     <input type="file" onChange={handleImageChange} accept="image/*" />

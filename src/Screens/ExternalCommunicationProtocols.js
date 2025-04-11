@@ -150,7 +150,9 @@ function ExternalCommunicationProtocolsFormPage() {
                                     value={formData[question.name] || ''}
                                     onChange={handleChange}
                                 />
-                                <input
+                            </div>
+                            <div>
+                            <input
                                     type="text"
                                     name={`${question.name}Comment`}
                                     placeholder="Additional comments"

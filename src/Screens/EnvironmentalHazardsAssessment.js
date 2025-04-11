@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
@@ -12,7 +12,7 @@ function EnvironmentalHazardsAssessmentFormPage() {
     const { buildingId } = useBuilding();
     const db = getFirestore();
     const functions = getFunctions();
-    const uploadImage = httpsCallable(functions, 'uploadEnvironmentalHazardsAssessmentFormImage');
+    const uploadEnvironmentalHazardsAssessmentFormImage = httpsCallable(functions, 'uploadEnvironmentalHazardsAssessmentFormImage');
 
     const [formData, setFormData] = useState({});
     const [imageData, setImageData] = useState(null);
@@ -38,6 +38,7 @@ function EnvironmentalHazardsAssessmentFormPage() {
 
                 if (docSnapshot.exists()) {
                     setFormData(docSnapshot.data().formData || {});
+                    setImageUrl(docSnapshot.data().imageUrl || null);
                 } else {
                     setFormData({});
                 }
@@ -58,8 +59,9 @@ function EnvironmentalHazardsAssessmentFormPage() {
         setFormData(newFormData);
 
         try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
             const formDocRef = doc(db, 'forms', 'Continuous Improvement - Safety and Security', 'Enviromental Hazards Assessment', buildingId);
-            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
+            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true });
             console.log("Form data saved to Firestore:", newFormData);
         } catch (error) {
             console.error("Error saving form data to Firestore:", error);
@@ -67,7 +69,7 @@ function EnvironmentalHazardsAssessmentFormPage() {
         }
     };
 
-    const handleImageChange = (e) => {
+    const handleImageChange = async (e) => {
         const file = e.target.files[0];
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -90,7 +92,7 @@ function EnvironmentalHazardsAssessmentFormPage() {
 
         if (imageData) {
             try {
-                const uploadResult = await uploadImage({ imageData: imageData });
+                const uploadResult = await uploadEnvironmentalHazardsAssessmentFormImage({ imageData: imageData });
                 setImageUrl(uploadResult.data.imageUrl);
                 setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
                 setImageUploadError(null);
@@ -101,14 +103,15 @@ function EnvironmentalHazardsAssessmentFormPage() {
         }
 
         try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
             const formDocRef = doc(db, 'forms', 'Continuous Improvement - Safety and Security', 'Enviromental Hazards Assessment', buildingId);
-            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            await setDoc(formDocRef, { formData: { ...formData, building: buildingRef }, imageUrl: imageUrl, updatedAt: serverTimestamp() }, { merge: true });
             console.log('Form data submitted successfully!');
             alert('Form submitted successfully!');
             navigate('/Form');
         } catch (error) {
             console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+            alert('Failed to submit the form. Please try again.');
         }
     };
 
@@ -133,25 +136,46 @@ function EnvironmentalHazardsAssessmentFormPage() {
                 <form onSubmit={handleSubmit}>
                     <h2>7.1.1.1.2. Environmental Hazards Assessment:</h2>
                     {[
-                        { name: "conductedEnviromentalHazardsAssessment", label: "Has an Environmental Hazards assessment been conducted? If so, when was it last performed?", type: "text" },
-                        { name: "identifyingEnviromentalHazards", label: "What criteria are used to identify potential environmental hazards in the school's vicinity?", type: "text" },
-                        { name: "oftenConductingEnviromentalHazards", label: "How often is the assessment of environmental hazards conducted at the school?", type: "text" },
-                        { name: "known-enviromental-hazards", label: "Are there any known environmental hazards present in the school's vicinity, such as chemical spills or pollution sources?", type: "radio" },
-                        { name: "addressingIdentifiedEnviromentalHazards", label: "What protocols are in place to address identified environmental hazards, and how are they communicated to the school community?", type: "text" },
+                        { name: "conductedEnviromentalHazardsAssessment", label: "Has an Environmental Hazards assessment been conducted? If so, when was it last performed?" },
+                        { name: "identifyingEnviromentalHazards", label: "What criteria are used to identify potential environmental hazards in the school's vicinity?" },
+                        { name: "oftenConductingEnviromentalHazards", label: "How often is the assessment of environmental hazards conducted at the school?" },
+                        { name: "known-enviromental-hazards", label: "Are there any known environmental hazards present in the school's vicinity, such as chemical spills or pollution sources?" },
+                        { name: "addressingIdentifiedEnviromentalHazards", label: "What protocols are in place to address identified environmental hazards, and how are they communicated to the school community?" },
                     ].map((question, index) => (
                         <div key={index} className="form-section">
                             <label>{question.label}</label>
                             <div>
-                                {question.type === "text" ? (
-                                    <input type="text" name={question.name} value={formData[question.name] || ''} onChange={handleChange} />
-                                ) : question.type === "radio" ? (
-                                    <>
-                                        <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
-                                        <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
-                                        <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} />
-                                    </>
+                                {question.name === "known-enviromental-hazards" ? (
+                                    <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}> {/* Added alignItems: 'center' for potential vertical alignment */}
+                                        <div style={{ display: 'flex', alignItems: 'center' }}> {/* Container for Yes/No */}
+                                            <input
+                                                type="radio"
+                                                name={question.name}
+                                                value="yes"
+                                                checked={formData[question.name] === "yes"}
+                                                onChange={handleChange} /> Yes
+                                            <input
+                                                type="radio"
+                                                name={question.name}
+                                                value="no"
+                                                checked={formData[question.name] === "no"}
+                                                onChange={handleChange} /> No
+                                        </div>
+                                        <div>
+                                            <input
+                                                type="text"
+                                                name={`${question.name}Comment`}
+                                                placeholder="Comments"
+                                                value={formData[`${question.name}Comment`] || ''}
+                                                onChange={handleChange} />
+                                        </div>
+                                    </div>
                                 ) : (
-                                    <input type="text" name={question.name} value={formData[question.name] || ''} onChange={handleChange} />
+                                    <textarea
+                                        name={question.name}
+                                        value={formData[question.name] || ''}
+                                        onChange={handleChange}
+                                    />
                                 )}
                             </div>
                         </div>
