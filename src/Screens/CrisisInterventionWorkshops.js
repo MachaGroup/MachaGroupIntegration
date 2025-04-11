@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc, getDocs, query, where, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
@@ -16,83 +15,69 @@ function CrisisInterventionWorkshopsPage() {
     const uploadCrisisInterventionWorkshopsPageImage = httpsCallable(functions, 'uploadCrisisInterventionWorkshopsPageImage');
 
     const [formData, setFormData] = useState({});
-    const storage = getStorage();
-    const [image, setImage] = useState(null);
-    const [uploadProgress, setUploadProgress] = useState(0);
+    const [imageData, setImageData] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
-    const [uploadError, setUploadError] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
     useEffect(() => {
         if (!buildingId) {
             alert('No building selected. Redirecting to Building Info...');
             navigate('/BuildingandAddress');
-        } else {
-            loadFormData();
+            return;
         }
-    }, [buildingId, navigate]);
 
-    const loadFormData = async () => {
-        setLoading(true);
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
-            const formsRef = collection(db, 'forms/Community Partnership/Crisis Intervention Workshops');
-            const q = query(formsRef, where('building', '==', buildingRef));
-            const querySnapshot = await getDocs(q);
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
 
-            if (!querySnapshot.empty) {
-                const docData = querySnapshot.docs[0].data().formData;
-                setFormData(docData);
+            try {
+                const formDocRef = doc(db, 'forms', 'Community Partnership', 'Crisis Intervention Workshops', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    setFormData(docSnapshot.data().formData || {});
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
             }
-        } catch (error) {
-            console.error('Error loading form data:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
 
     const handleImageChange = (e) => {
-        if (e.target.files[0]) {
-            setImage(e.target.files[0]);
-        }
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result);
+        };
+        reader.readAsDataURL(file);
     };
 
-    const handleChange = (e) => {
+    const handleChange = async (e) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Community Partnership', 'Crisis Intervention Workshops', buildingId);
+            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true });
+            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+        }
     };
 
-    const handleBack = async () => {
-        if (formData && buildingId) {
-            try {
-                const buildingRef = doc(db, 'Buildings', buildingId);
-                const formsRef = collection(db, 'forms/Community Partnership/Crisis Intervention Workshops');
-                const q = query(formsRef, where('building', '==', buildingRef));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    await addDoc(formsRef, {
-                        building: buildingRef,
-                        formData: formData,
-                    });
-                } else {
-                    const docId = querySnapshot.docs[0].id;
-                    const formDocRef = doc(db, 'forms/Community Partnership/Crisis Intervention Workshops', docId);
-                    await setDoc(formDocRef, {
-                        building: buildingRef,
-                        formData: formData,
-                    }, { merge: true });
-                }
-                console.log('Form Data submitted successfully on back!');
-                alert('Form data saved before navigating back!');
-            } catch (error) {
-                console.error('Error saving form data:', error);
-                alert('Failed to save form data before navigating back. Some data may be lost.');
-            }
-        }
+    const handleBack = () => {
         navigate(-1);
     };
 
@@ -104,25 +89,22 @@ function CrisisInterventionWorkshopsPage() {
             return;
         }
 
+        if (imageData) {
+            try {
+                const uploadResult = await uploadCrisisInterventionWorkshopsPageImage({ imageData: imageData });
+                setImageUrl(uploadResult.data.imageUrl);
+                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                setImageUploadError(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(error.message);
+            }
+        }
+
         try {
             const buildingRef = doc(db, 'Buildings', buildingId);
-            const formsRef = collection(db, 'forms/Community Partnership/Crisis Intervention Workshops');
-            const q = query(formsRef, where('building', '==', buildingRef));
-            const querySnapshot = await getDocs(q);
-
-            if (querySnapshot.empty) {
-                await addDoc(formsRef, {
-                    building: buildingRef,
-                    formData: formData,
-                });
-            } else {
-                const docId = querySnapshot.docs[0].id;
-                const formDocRef = doc(db, 'forms/Community Partnership/Crisis Intervention Workshops', docId);
-                await setDoc(formDocRef, {
-                    building: buildingRef,
-                    formData: formData,
-                }, { merge: true });
-            }
+            const formDocRef = doc(db, 'forms', 'Community Partnership', 'Crisis Intervention Workshops', buildingId);
+            await setDoc(formDocRef, { formData: formData }, { merge: true });
             console.log('Form data submitted successfully!');
             alert('Form submitted successfully!');
             navigate('/Form');
@@ -134,6 +116,10 @@ function CrisisInterventionWorkshopsPage() {
 
     if (loading) {
         return <div>Loading...</div>;
+    }
+
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
 
     return (
@@ -149,37 +135,47 @@ function CrisisInterventionWorkshopsPage() {
                 <form onSubmit={handleSubmit}>
                     <h2>6.1.2.1.3. Crisis Intervention Workshops</h2>
                     {[
-                        { name: "workshopTopics", label: "What topics are covered in the crisis intervention workshops to prepare staff for various emergency situations?", type: "text", securityGatesFormat: true },
-                        { name: "leadingWorkshops", label: "Who leads the workshops, and what qualifications or experience do they have in crisis intervention?", type: "text", securityGatesFormat: true },
-                        { name: "assessingParticipants", label: "How are participants assessed to ensure they understand and can apply the techniques learned during the workshops?", type: "text", securityGatesFormat: true },
-                        { name: "follow-up-sessions", label: "Are there follow-up sessions or refresher courses to reinforce the skills learned in the workshops?", type: "radio", options: ["Yes", "No"], securityGatesFormat: true },
-                        { name: "collectingFeedback", label: "How is feedback from participants collected to improve future workshops and address any gaps in training?", type: "text", securityGatesFormat: true },
+                        { name: "workshopTopics", label: "What topics are covered in the crisis intervention workshops to prepare staff for various emergency situations?" },
+                        { name: "leadingWorkshops", label: "Who leads the workshops, and what qualifications or experience do they have in crisis intervention?" },
+                        { name: "assessingParticipants", label: "How are participants assessed to ensure they understand and can apply the techniques learned during the workshops?" },
+                        { name: "followUpSessions", label: "Are there follow-up sessions or refresher courses to reinforce the skills learned in the workshops?", type: "radio", options: ["Yes", "No"] },
+                        { name: "collectingFeedback", label: "How is feedback from participants collected to improve future workshops and address any gaps in training?" },
                     ].map((question, index) => (
                         <div key={index} className="form-section">
                             <label>{question.label}</label>
-                            <div>
-                                {question.type === "text" && <input type="text" name={question.name} value={formData[question.name] || ''} placeholder={question.placeholder} onChange={handleChange} />}
-                                {question.options && question.options.map((option) => (
-                                    <React.Fragment key={option}>
-                                        <input
-                                            type="radio"
-                                            name={question.name}
-                                            value={option}
-                                            checked={formData[question.name] === option}
-                                            onChange={handleChange}
-                                        />
-                                        {option}
-                                    </React.Fragment>
-                                ))}
-                                {question.securityGatesFormat && <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>}
-                            </div>
+                            {question.type === "radio" ? (
+                                <><div>
+                                    {question.options.map((option) => (
+                                        <React.Fragment key={option}>
+                                            <input
+                                                type="radio"
+                                                name={question.name}
+                                                value={option}
+                                                checked={formData[question.name] === option}
+                                                onChange={handleChange} />
+                                            {option}
+                                        </React.Fragment>
+                                    ))}
+
+                                </div><input
+                                        type="text"
+                                        name={`${question.name}Comment`}
+                                        placeholder="Comments"
+                                        value={formData[`${question.name}Comment`] || ''}
+                                        onChange={handleChange} /></>
+                            ) : (
+                                <textarea
+                                    name={question.name}
+                                    value={formData[question.name] || ''}
+                                    onChange={handleChange}
+                                    placeholder={question.label}
+                                />
+                            )}
                         </div>
                     ))}
-
                     <input type="file" accept="image/*" onChange={handleImageChange} />
-                    {uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
                     {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                    {uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
+                    {imageUploadError && <p style={{ color: "red" }}>{imageUploadError}</p>}
                     <button type="submit">Submit</button>
                 </form>
             </main>
