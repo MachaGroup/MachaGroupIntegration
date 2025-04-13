@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
+// Updated Firestore imports for simpler get/set pattern
+import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+// Removed unused Storage imports and complex query imports
 import { getFunctions, httpsCallable } from "firebase/functions";
 
 function DeviceEncryptionPage() {
@@ -13,198 +14,240 @@ function DeviceEncryptionPage() {
     const { buildingId } = useBuilding();
     const db = getFirestore();
     const functions = getFunctions();
-    const uploadDeviceEncryptionPageImage = httpsCallable(functions, 'uploadDeviceEncryptionPageImage');
+    // Renamed variable, kept function name string as it matches the rule
+    const uploadImage = httpsCallable(functions, 'uploadDeviceEncryptionPageImage');
 
     const [formData, setFormData] = useState({});
-    const storage = getStorage();
-    const [image, setImage] = useState(null);
-    const [uploadProgress, setUploadProgress] = useState(0);
+    // Adapted image state
+    const [imageData, setImageData] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
-    const [uploadError, setUploadError] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    // Added loading/error state
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null); // Added loadError state
+
+    // Simplified Firestore document path
+    const formDocPath = 'forms/Cybersecurity/Device Encryption'; // Path structure
 
     useEffect(() => {
         if (!buildingId) {
             alert('No building selected. Redirecting to Building Info...');
-            navigate('/BuildingandAddress');
-        } else {
-            loadFormData();
+            navigate('/BuildingandAddress'); // Adjust route as needed
+            return;
         }
-    }, [buildingId, navigate]);
 
-    const loadFormData = async () => {
-        setLoading(true);
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
-            const formsRef = collection(db, 'forms/Cybersecurity/Device Encryption');
-            const q = query(formsRef, where('building', '==', buildingRef));
-            const querySnapshot = await getDocs(q);
+        // Integrated fetch logic directly, using getDoc
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+            setImageUrl(null);
 
-            if (!querySnapshot.empty) {
-                const docData = querySnapshot.docs[0].data().formData;
-                setFormData(docData);
+            try {
+                const formDocRef = doc(db, formDocPath, buildingId); // Direct doc reference
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    const data = docSnapshot.data();
+                    setFormData(data.formData || {});
+                    if (data.formData && data.formData.imageUrl) {
+                       setImageUrl(data.formData.imageUrl);
+                    }
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
             }
-        } catch (error) {
-            console.error('Error loading form data:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+        };
 
-    const handleImageChange = (e) => {
-        if (e.target.files[0]) {
-            setImage(e.target.files[0]);
-        }
-    };
+        fetchFormData();
+    }, [buildingId, db, navigate, formDocPath]); // Added formDocPath dependency
 
-    const handleChange = (e) => {
+    // handleChange with auto-saving
+    const handleChange = async (e) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
 
-    const handleBack = async () => {
-        if (formData && buildingId) {
+        if (buildingId) {
             try {
                 const buildingRef = doc(db, 'Buildings', buildingId);
-                const formsRef = collection(db, 'forms/Cybersecurity/Device Encryption');
-                const q = query(formsRef, where('building', '==', buildingRef));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    await addDoc(formsRef, {
-                        building: buildingRef,
-                        formData: formData,
-                    });
-                } else {
-                    const docId = querySnapshot.docs[0].id;
-                    const formDocRef = doc(db, 'forms/Cybersecurity/Device Encryption', docId);
-                    await setDoc(formDocRef, {
-                        building: buildingRef,
-                        formData: formData,
-                    }, { merge: true });
-                }
-                console.log('Form Data submitted successfully on back!');
-                alert('Form data saved before navigating back!');
+                const formDocRef = doc(db, formDocPath, buildingId);
+                await setDoc(formDocRef, {
+                    formData: { ...newFormData, building: buildingRef, imageUrl: imageUrl } // Persist current imageUrl
+                }, { merge: true });
+                console.log("Form data auto-saved:", { ...newFormData, building: buildingRef, imageUrl: imageUrl });
             } catch (error) {
-                console.error('Error saving form data:', error);
-                alert('Failed to save form data before navigating back. Some data may be lost.');
+                console.error("Error auto-saving form data:", error);
+                // Handle error silently or alert user
             }
         }
+    };
+
+    // handleImageChange using FileReader
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImageData(reader.result);
+                setImageUrl(null);
+                setImageUploadError(null);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setImageData(null);
+        }
+    };
+
+    // handleBack simplified
+    const handleBack = () => {
         navigate(-1);
     };
 
+    // handleSubmit using httpsCallable for image and setDoc for data
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!buildingId) {
-            alert('Building ID is missing. Please start from the Building Information page.');
+            alert('Building ID is missing. Cannot submit.');
             return;
         }
 
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
-            const formsRef = collection(db, 'forms/Cybersecurity/Device Encryption');
-            const q = query(formsRef, where('building', '==', buildingRef));
-            const querySnapshot = await getDocs(q);
+        let finalImageUrl = imageUrl;
 
-            if (querySnapshot.empty) {
-                await addDoc(formsRef, {
-                    building: buildingRef,
-                    formData: formData,
-                });
-            } else {
-                const docId = querySnapshot.docs[0].id;
-                const formDocRef = doc(db, 'forms/Cybersecurity/Device Encryption', docId);
-                await setDoc(formDocRef, {
-                    building: buildingRef,
-                    formData: formData,
-                }, { merge: true });
+        if (imageData) {
+            setLoading(true);
+            setImageUploadError(null);
+            try {
+                // Pass relevant identifiers to the Cloud Function if needed
+                const uploadResult = await uploadImage({ imageData: imageData, buildingId: buildingId, formType: 'DeviceEncryption' });
+                finalImageUrl = uploadResult.data.imageUrl;
+                setImageUrl(finalImageUrl);
+                console.log('Image uploaded successfully:', finalImageUrl);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(`Image upload failed: ${error.message}. Please try again.`);
+                setLoading(false);
+                return;
+            } finally {
+                setLoading(false);
             }
+        }
+
+        try {
+            setLoading(true);
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, formDocPath, buildingId);
+            const finalFormData = { ...formData, imageUrl: finalImageUrl, building: buildingRef };
+            await setDoc(formDocRef, { formData: finalFormData }, { merge: true });
 
             console.log('Form data submitted successfully!');
             alert('Form submitted successfully!');
-            navigate('/Form');
+            navigate('/Form'); // Adjust route as needed
         } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Failed to submit the form. Please try again.');
+            console.error("Error submitting final form data:", error);
+            alert("Failed to submit form. Please check your connection and try again.");
+            setLoading(false);
         }
     };
 
-    if (loading) {
+    if (loading && !formData) { // Show loading only initially or during submission
         return <div>Loading...</div>;
     }
 
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
+    }
+
+    // Consolidated questions array
+    const questions = [
+        // Section 4.1.2.2.2.1 Encryption Standards and Protocols
+        { name: "algorithmsMeetStandards", label: "Are specific encryption algorithms and protocols (e.g., AES-256) used to secure data on laptops, and do they meet industry standards?" },
+        { name: "policiesDictateStandards", label: "Are there specific policies dictating the minimum encryption standards for different data types on laptops?" },
+        { name: "keysManagedSecurely", label: "Are encryption keys managed, stored, and rotated securely to prevent compromise?" },
+        // Section 4.1.2.2.2.2 Implementation and Coverage
+        { name: "encryptionAutoEnabled", label: "Is encryption automatically enabled on all laptops (vs. manual activation)?" },
+        { name: "allStorageEncrypted", label: "Are all storage devices, including external/USB drives, encrypted by default?" },
+        { name: "uniformEncryptionProcess", label: "Are processes in place to ensure encryption is uniformly applied across all devices (new and reissued)?" },
+        // Section 4.1.2.2.2.3 User Awareness and Training
+        { name: "usersTrainedOnEncryption", label: "Are users trained on the importance of encryption and how to verify it?" },
+        { name: "usersInformedBestPractices", label: "Are users informed about best practices for handling encrypted devices (e.g., strong passwords, avoiding unauthorized software)?" },
+        { name: "periodicRefreshersProvided", label: "Are periodic refreshers or updates provided for ongoing user compliance and awareness?" },
+        // Section 4.1.2.2.2.4 Compliance and Monitoring
+        { name: "complianceMonitoredEnforced", label: "Is compliance with device encryption policies monitored and enforced?" },
+        { name: "auditToolsUsed", label: "Are tools or systems used to regularly audit devices for correct encryption functioning?" },
+        { name: "nonComplianceStepsDefined", label: "Are steps defined for handling non-compliant devices or disabled encryption?" },
+        // Section 4.1.2.2.2.5 Data Recovery and Contingency Planning
+        { name: "dataRecoveryProceduresExist", label: "Are procedures in place for data recovery from lost or damaged encrypted devices?" },
+        { name: "secureDecommissioningHandled", label: "Is encryption handled securely during device decommissioning/repurposing to prevent data access?" },
+        { name: "contingencyPlansForAccess", label: "Are there contingency plans to access encrypted data if users lose passwords/keys?" },
+    ];
+
+
     return (
-        <div className="form-page">
-            <header className="header">
-                <Navbar />
-                <button className="back-button" onClick={handleBack}>←</button>
-                <h1>Device Encryption Assessment</h1>
-                <img src={logo} alt="Logo" className="logo" />
-            </header>
+        <div>
+            <div className="form-page">
+                <header className="header">
+                    <Navbar />
+                    <button className="back-button" onClick={handleBack}>←</button>
+                    <h1>Device Encryption Assessment</h1>
+                    <img src={logo} alt="Logo" className="logo" />
+                </header>
 
-            <main className="form-container">
-                <form onSubmit={handleSubmit}>
-                    <h2>4.1.2.2.2.1 Encryption Standards and Protocols:</h2>
-                    {[
-                        { name: "encryptionAlgorithms", label: "4.1.2.2.2.1. Encryption Standards and Protocols: What encryption algorithms and protocols are used to secure data on laptops, and do they meet industry standards (e.g., AES-256)?", type: "text", securityGatesFormat: true },
-                        { name: "encryptionPolicies", label: "4.1.2.2.2.1. Encryption Standards and Protocols: Are there specific policies that dictate the minimum encryption standards required for different types of data stored on laptops?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "keyManagement", label: "4.1.2.2.2.1. Encryption Standards and Protocols: How are encryption keys managed, stored, and rotated to ensure they remain secure and uncompromised?", type: "text", securityGatesFormat: true },
-                    ]}
-
-                    <h2>4.1.2.2.2.2 Implementation and Coverage:</h2>
-                    {[
-                        { name: "automaticEncryption", label: "4.1.2.2.2.2. Implementation and Coverage: Is encryption automatically enabled on all laptops, or does it require manual activation by the user?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "defaultEncryption", label: "4.1.2.2.2.2. Implementation and Coverage: Are all storage devices on the laptops, including external drives and USB devices, encrypted by default?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "encryptionProcesses", label: "4.1.2.2.2.2. Implementation and Coverage: What processes are in place to ensure that encryption is uniformly applied across all devices, including new and reissued laptops?", type: "text", securityGatesFormat: true },
-                    ]}
-
-                    <h2>4.1.2.2.2.3 User Awareness and Training:</h2>
-                    {[
-                        { name: "userTraining", label: "4.1.2.2.2.3. User Awareness and Training: Are users trained on the importance of device encryption and instructed on how to verify that their devices are properly encrypted?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "userBestPractices", label: "4.1.2.2.2.3. User Awareness and Training: How are users informed about best practices for handling encrypted devices, such as maintaining strong passwords and avoiding unauthorized software installations?", type: "text", securityGatesFormat: true },
-                        { name: "userRefreshers", label: "4.1.2.2.2.3. User Awareness and Training: Are there periodic refreshers or updates provided to ensure ongoing user compliance and awareness regarding encryption policies?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                    ]}
-
-                    <h2>4.1.2.2.2.4 Compliance and Monitoring:</h2>
-                    {[
-                        { name: "complianceMonitoring", label: "4.1.2.2.2.4. Compliance and Monitoring: How is compliance with device encryption policies monitored and enforced across the organization?", type: "text", securityGatesFormat: true },
-                        { name: "auditTools", label: "4.1.2.2.2.4. Compliance and Monitoring: Are there tools or systems in place to regularly audit devices to confirm that encryption is enabled and functioning correctly?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "nonComplianceSteps", label: "4.1.2.2.2.4. Compliance and Monitoring: What steps are taken if a device is found to be non-compliant or if encryption is accidentally or deliberately disabled?", type: "text", securityGatesFormat: true },
-                    ]}
-
-                    <h2>4.1.2.2.2.5 Data Recovery and Contingency Planning:</h2>
-                    {[
-                        { name: "dataRecoveryProcedures", label: "4.1.2.2.2.5. Data Recovery and Contingency Planning: What procedures are in place for data recovery in the event of a lost or damaged device that is encrypted?", type: "text", securityGatesFormat: true },
-                        { name: "decommissionedDevices", label: "4.1.2.2.2.5. Data Recovery and Contingency Planning: How does the organization handle encryption in cases where devices are decommissioned or repurposed to ensure that sensitive data is not accessible?", type: "text", securityGatesFormat: true },
-                        { name: "contingencyPlans", label: "4.1.2.2.2.5. Data Recovery and Contingency Planning: Are there contingency plans to access encrypted data in cases where users forget their passwords or lose access to encryption keys?", type: "text", securityGatesFormat: true },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.type === "text" && <input type="text" name={question.name} value={formData[question.name] || ''} placeholder={question.placeholder} onChange={handleChange} />}
-                                {question.type === "radio" && (
-                                    <div>
-                                        <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
-                                        <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
-                                        <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                                    </div>
-                                )}
-                                {question.securityGatesFormat && <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>}
+                <main className="form-container">
+                    <form onSubmit={handleSubmit}>
+                        {/* Single title for the form section */}
+                        <h2>Device Encryption Questions</h2>
+                        {questions.map((question, index) => (
+                             // Standard rendering block from securitygates
+                            <div key={index} className="form-section">
+                                <label>{question.label}</label>
+                                <div>
+                                    <input
+                                        type="radio"
+                                        name={question.name}
+                                        value="yes"
+                                        checked={formData[question.name] === "yes"}
+                                        onChange={handleChange}
+                                    /> Yes
+                                    <input
+                                        type="radio"
+                                        name={question.name}
+                                        value="no"
+                                        checked={formData[question.name] === "no"}
+                                        onChange={handleChange}
+                                    /> No
+                                </div>
+                                <input
+                                    type="text"
+                                    name={`${question.name}Comment`}
+                                    placeholder="Additional comments"
+                                    value={formData[`${question.name}Comment`] || ''}
+                                    onChange={handleChange}
+                                    className="comment-box"
+                                />
                             </div>
-                        </div>
-                    ))}
+                        ))}
 
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                    {uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                    {uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-                    <button type="submit">Submit</button>
-                </form>
-            </main>
+                        {/* Image Upload Section */}
+                        <div className="form-section">
+                            <label>Upload Supporting Image (Optional):</label>
+                            <input type="file" onChange={handleImageChange} accept="image/*" />
+                             {imageUrl && !imageData && <img src={imageUrl} alt="Current" style={{maxWidth: '200px', marginTop: '10px'}}/>}
+                             {imageData && <img src={imageData} alt="Preview" style={{maxWidth: '200px', marginTop: '10px'}}/>}
+                            {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                        </div>
+
+                        <button type="submit" disabled={loading}>
+                            {loading ? 'Submitting...' : 'Submit'}
+                        </button>
+                    </form>
+                </main>
+            </div>
         </div>
     );
 }

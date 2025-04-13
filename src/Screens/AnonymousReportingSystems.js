@@ -1,262 +1,252 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+// Updated imports for Firestore get/set and Cloud Functions
+import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+// Added Firebase Functions imports, removed Storage imports
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function AnonymousReportingSystemsFormPage() {
-  const navigate = useNavigate();
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
-  const storage = getStorage(); // Initialize Firebase Storage
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    // Initialize Firebase Functions
+    const functions = getFunctions();
+    // Define the httpsCallable function according to the naming convention
+    const uploadImage = httpsCallable(functions, 'uploadAnonymousReportingSystemsFormPageImage');
 
-  const [formData, setFormData] = useState({});
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    // Standardized state variables
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
-  useEffect(() => {
-    if (!buildingId) {
-      alert('No building selected. Redirecting to Building Info...');
-      navigate('BuildingandAddress');
+    // Define Firestore path
+    const formDocPath = 'forms/Personnel Training and Awareness/Anonymous Reporting Systems';
+
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('/BuildingandAddress'); // Adjust route if needed
+            return;
+        }
+
+        // Fetch existing form data
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+            setImageUrl(null);
+
+            try {
+                const formDocRef = doc(db, formDocPath, buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    const data = docSnapshot.data();
+                    setFormData(data.formData || {});
+                    if (data.formData && data.formData.imageUrl) {
+                        setImageUrl(data.formData.imageUrl);
+                    }
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate, formDocPath]);
+
+    // Standard handleChange with auto-save
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        if (buildingId) {
+            try {
+                const buildingRef = doc(db, 'Buildings', buildingId);
+                const formDocRef = doc(db, formDocPath, buildingId);
+                await setDoc(formDocRef, {
+                    formData: { ...newFormData, building: buildingRef, imageUrl: imageUrl }
+                }, { merge: true });
+                console.log("Form data auto-saved:", { ...newFormData, building: buildingRef, imageUrl: imageUrl });
+            } catch (error) {
+                console.error("Error auto-saving form data:", error);
+                // Handle error appropriately
+            }
+        }
+    };
+
+    // Standard handleImageChange using FileReader
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImageData(reader.result);
+                setImageUrl(null);
+                setImageUploadError(null);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setImageData(null);
+        }
+    };
+
+    // Standard handleBack
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    // Standard handleSubmit using httpsCallable and setDoc
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Cannot submit.');
+            return;
+        }
+
+        let finalImageUrl = imageUrl;
+
+        if (imageData) {
+            setLoading(true);
+            setImageUploadError(null);
+            try {
+                const uploadResult = await uploadImage({ imageData: imageData, buildingId: buildingId, formType: 'AnonymousReportingSystems' });
+                finalImageUrl = uploadResult.data.imageUrl;
+                setImageUrl(finalImageUrl);
+                console.log('Image uploaded successfully:', finalImageUrl);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setImageUploadError(`Image upload failed: ${error.message}. Please try again.`);
+                setLoading(false);
+                return;
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        try {
+            setLoading(true);
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, formDocPath, buildingId);
+            const finalFormData = { ...formData, imageUrl: finalImageUrl, building: buildingRef };
+            await setDoc(formDocRef, { formData: finalFormData }, { merge: true });
+
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            navigate('/Form'); // Adjust final navigation route
+        } catch (error) {
+            console.error("Error submitting final form data:", error);
+            alert("Failed to submit form. Please check your connection and try again.");
+            setLoading(false);
+        }
+    };
+
+     // Conditional Loading/Error display
+    if (loading && !Object.keys(formData).length) {
+        return <div>Loading...</div>;
     }
-  }, [buildingId, navigate]);
 
-  const handleChange = (e) => {
-    const { name, type, checked, value } = e.target;
-
-    if (type === 'radio') {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: checked ? value : '',
-      }));
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
-    }
-  };
-
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-
-  const handleBack = async () => {
-    if (formData && buildingId) {
-      try {
-        const buildingRef = doc(db, 'Buildings', buildingId);
-        const formsRef = collection(db, 'forms/Personnel Training and Awareness/Anonymous Reporting Systems');
-        await addDoc(formsRef, {
-          building: buildingRef,
-          formData: formData,
-        });
-        console.log('Form Data submitted successfully on back!');
-        alert('Form data saved before navigating back!');
-      } catch (error) {
-        console.error('Error saving form data:', error);
-        alert('Failed to save form data before navigating back. Some data may be lost.');
-      }
-    }
-    navigate(-1);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
 
-    try {
-      const buildingRef = doc(db, 'Buildings', buildingId);
-      const formsRef = collection(db, 'forms/Personnel Training and Awareness/Anonymous Reporting Systems');
+    // Consolidated questions array
+    const questions = [
+        // Accessibility and Utilization
+        { name: "diverseChannelsProvided", label: "Are diverse channels provided for anonymous reporting, ensuring all students feel comfortable?" },
+        { name: "awarenessStrategiesEmployed", label: "Are strategies employed to promote awareness and encourage regular use of the system among students, staff, and parents?" },
+        { name: "channelEffectivenessAssessed", label: "Is the effectiveness of reporting channels assessed, with adjustments made based on feedback/usage?" },
+        { name: "provisionsForAccessBarriers", label: "Are provisions in place to accommodate individuals facing access barriers (e.g., language, disabilities)?" },
+        // Confidentiality and Trust
+        { name: "anonymityEnsuredProtected", label: "Is the anonymity of reporters ensured, with measures to protect their identity?" },
+        { name: "protocolsAddressConfidentialityConcerns", label: "Are protocols in place to address concerns about potential breaches or misuse of the system?" },
+        { name: "trustMaintainedReinforced", label: "Is trust in the system maintained/reinforced, especially regarding anonymity vs. accountability concerns?" },
+        { name: "feedbackMechanismsRespectAnonymity", label: "Are there mechanisms for providing feedback/updates to anonymous reporters while respecting anonymity?" },
+        // Response and Follow-Up
+        { name: "reviewInvestigationProcedures", label: "Are procedures in place for reviewing/investigating reports and communicating findings?" },
+        { name: "reportsPrioritizedTimelyResponse", label: "Are reports prioritized (severity, urgency) with mechanisms for timely responses?" },
+        { name: "followUpActionsTakenInformed", label: "Are follow-up actions taken, and are reporters kept informed about outcomes?" },
+        { name: "ongoingDialoguePossible", label: "Are there opportunities for ongoing dialogue with anonymous reporters if needed?" },
+        // Data Analysis and Trend Identification
+        { name: "dataAnalyzedForTrends", label: "Is data from anonymous reports analyzed to identify trends/patterns related to bullying?" },
+        { name: "insightsSharedInformDecision", label: "Are insights/findings shared with stakeholders to inform decision-making/resource allocation?" },
+        { name: "systemEffectivenessReviewed", label: "Are there regular reviews/assessments of the reporting system's effectiveness based on data?" },
+        { name: "findingsIncorporatedPrevention", label: "Are findings incorporated into broader efforts to prevent/address bullying?" },
+    ];
 
-      if (image) {
-        const storageRef = ref(storage, `anonymousReporting_images/${Date.now()}_${image.name}`);
-        const uploadTask = uploadBytesResumable(storageRef, image);
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>Anonymous Reporting Systems Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-        uploadTask.on('state_changed',
-          (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            setUploadProgress(progress);
-          },
-          (error) => {
-            setUploadError(error);
-          },
-          () => {
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-              setImageUrl(downloadURL);
-              setFormData({ ...formData, imageUrl: downloadURL });
-              setUploadError(null);
-            });
-          }
-        );
-      }
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    {/* Single heading */}
+                    <h2>Anonymous Reporting Systems Questions</h2>
+                    {questions.map((question, index) => (
+                        // Standard question block rendering
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input
+                                    type="radio"
+                                    name={question.name}
+                                    value="yes"
+                                    checked={formData[question.name] === "yes"}
+                                    onChange={handleChange}
+                                /> Yes
+                                <input
+                                    type="radio"
+                                    name={question.name}
+                                    value="no"
+                                    checked={formData[question.name] === "no"}
+                                    onChange={handleChange}
+                                /> No
+                            </div>
+                            <input
+                                type="text"
+                                name={`${question.name}Comment`}
+                                placeholder="Additional comments"
+                                value={formData[`${question.name}Comment`] || ''}
+                                onChange={handleChange}
+                                className="comment-box"
+                            />
+                        </div>
+                    ))}
 
-      await addDoc(formsRef, {
-        building: buildingRef,
-        formData: formData,
-      });
-      console.log('Form Data submitted successfully!');
-      alert('Form Submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
-    }
-  };
-
-  return (
-    <div className="form-page">
-      <header className="header">
-        <Navbar />
-        <button className="back-button" onClick={handleBack}>←</button>
-        <h1>Anonymous Reporting Systems Assessment</h1>
-        <img src={logo} alt="Logo" className="logo" />
-      </header>
-
-      <main className="form-container">
-        <form onSubmit={handleSubmit}>
-          {/* 3.4.2.2.2 Anonymous Reporting Systems */}
-          <h2>Accessibility and Utilization:</h2>
-          <div className="form-section">
-            <label>How diverse are the channels provided for anonymous reporting, and what efforts are made to ensure that all students feel comfortable using them?</label>
-            <div>
-              <input type="text" name="diverseChannels" placeholder="Describe how diverse are they" onChange={handleChange} />
-            </div>
-          </div>
-          {/* ...rest of your form questions... */}
-          <div className="form-section">
-                    <label>What strategies are employed to promote awareness and encourage regular utilization of the anonymous reporting system among students, staff, and parents?</label>
-                    <div>
-                        <input type="text" name="awarenessStrategies" placeholder="Describe the strategies" onChange={handleChange}/>  
+                    {/* Image Upload Section */}
+                    <div className="form-section">
+                        <label>Upload Supporting Image (Optional):</label>
+                        <input type="file" onChange={handleImageChange} accept="image/*" />
+                        {imageUrl && !imageData && <img src={imageUrl} alt="Current" style={{maxWidth: '200px', marginTop: '10px'}}/>}
+                        {imageData && <img src={imageData} alt="Preview" style={{maxWidth: '200px', marginTop: '10px'}}/>}
+                        {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
                     </div>
-                </div>
 
-                <div className="form-section">
-                    <label>How is the effectiveness of different reporting channels assessed, and are adjustments made based on feedback or usage patterns?</label>
-                    <div>
-                        <input type="text" name="channelEffectiveness" placeholder="Describe how the effectiveness is assessed" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there provisions in place to accommodate individuals who may face barriers to accessing traditional reporting channels, such as language barriers or disabilities?</label>
-                    <div>
-                        <input type="radio" name="accessProvisions" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="accessProvisions" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="accessProvisionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>Confidentiality and Trust:</h2>
-                <div className="form-section">
-                    <label>How is the anonymity of individuals who submit reports ensured, and what measures are taken to protect their identities from being disclosed?</label>
-                    <div>
-                        <input type="text" name="anonymityEnsurance" placeholder="Describe how it's ensured" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What protocols are in place to address concerns about potential breaches of confidentiality or misuse of the anonymous reporting system?</label>
-                    <div>
-                        <input type="text" name="confidentialityProtocols" placeholder="Describe the protocols" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How is trust in the anonymous reporting system maintained or reinforced among students, staff, and parents, particularly in cases where anonymity may be perceived as a barrier to accountability?</label>
-                    <div>
-                        <input type="text" name="trustMaintenance" placeholder="Describe how it's maintained" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there mechanisms for providing feedback or updates to individuals who submit anonymous reports, while still respecting their anonymity?</label>
-                    <div>
-                        <input type="text" name="feedbackMechanisms" placeholder="Describe the mechanisms" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <h2>Response and Follow-Up:</h2>
-                <div className="form-section">
-                    <label>What procedures are in place for reviewing and investigating reports submitted through the anonymous reporting system, and how are findings communicated to relevant stakeholders?</label>
-                    <div>
-                        <input type="text" name="reviewProcedures" placeholder="Describe the procedures" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are reports prioritized based on severity, urgency, or other factors, and what mechanisms exist for ensuring timely responses?</label>
-                    <div>
-                        <input type="text" name="reportPrioritization" placeholder="Describe how they're prioritized" onChange={handleChange}/>  
-                    </div>
-                </div>
-                /**/
-                <div className="form-section">
-                    <label>What follow-up actions are taken in response to anonymous reports, and how are individuals who submit reports kept informed about the outcomes of their submissions?</label>
-                    <div>
-                        <input type="text" name="followUpActions" placeholder="Describe the follow-up actions" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there opportunities for ongoing dialogue or engagement with individuals who submit anonymous reports, to gather additional information or clarify details as needed?</label>
-                    <div>
-                        <input type="radio" name="ongoingDialogue" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="ongoingDialogue" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="ongoingDialogueComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <h2>Data Analysis and Trend Identification:</h2>
-                <div className="form-section">
-                    <label>How is data collected from anonymous reports analyzed to identify trends, patterns, or emerging issues related to bullying incidents?</label>
-                    <div>
-                        <input type="text" name="dataAnalysis" placeholder="Describe how the data is analyzed" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>What mechanisms are in place for sharing insights or findings from data analysis with relevant stakeholders, and how are these used to inform decision-making or resource allocation?</label>
-                    <div>
-                        <input type="text" name="insightSharing" placeholder="Describe the mechanisms" onChange={handleChange}/>  
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>Are there regular reviews or assessments of the effectiveness of the anonymous reporting system, based on data trends or other indicators?</label>
-                    <div>
-                        <input type="radio" name="systemReviews" value="yes" onChange={handleChange}/> Yes
-                        <input type="radio" name="systemReviews" value="no" onChange={handleChange}/> No
-                        <textarea className='comment-box' name="systemReviewsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                    </div>
-                </div>
-
-                <div className="form-section">
-                    <label>How are findings from data analysis incorporated into broader efforts to prevent and address bullying behavior within the school community?</label>
-                    <div>
-                        <input type="text" name="findingsIncorporation" placeholder="Describe how they're incorporated" onChange={handleChange}/>  
-                    </div>
-                </div>
-          {/* Image Upload */}
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-          {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-          {uploadError && <p style={{ color: 'red' }}>{uploadError.message}</p>}
-
-          <button type="submit">Submit</button>
-        </form>
-      </main>
-    </div>
-  )
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Submitting...' : 'Submit'}
+                    </button>
+                </form>
+            </main>
+        </div>
+    );
 }
 
 export default AnonymousReportingSystemsFormPage;

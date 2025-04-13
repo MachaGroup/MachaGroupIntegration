@@ -13,6 +13,7 @@ function PatchManagementPage() {
     const { buildingId } = useBuilding();
     const db = getFirestore();
     const functions = getFunctions();
+    // Variable name and function name string already match the desired pattern
     const uploadImage = httpsCallable(functions, 'uploadPatchManagementPageImage');
 
     const [formData, setFormData] = useState({});
@@ -22,23 +23,33 @@ function PatchManagementPage() {
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState(null);
 
+    // Consistent Firestore path definition
+    const formDocPath = 'forms/Cybersecurity/Patch Management';
+
     useEffect(() => {
         if (!buildingId) {
             alert('No building selected. Redirecting to Building Info...');
-            navigate('/BuildingandAddress');
+            navigate('/BuildingandAddress'); // Adjust if route differs
             return;
         }
 
         const fetchFormData = async () => {
             setLoading(true);
             setLoadError(null);
+            setImageUrl(null); // Reset image URL on load
 
             try {
-                const formDocRef = doc(db, 'forms', 'Cybersecurity', 'Patch Management', buildingId);
+                // Use direct doc path with buildingId
+                const formDocRef = doc(db, formDocPath, buildingId);
                 const docSnapshot = await getDoc(formDocRef);
 
                 if (docSnapshot.exists()) {
-                    setFormData(docSnapshot.data().formData || {});
+                    const data = docSnapshot.data();
+                    setFormData(data.formData || {});
+                     // Load existing image URL
+                    if (data.formData && data.formData.imageUrl) {
+                       setImageUrl(data.formData.imageUrl);
+                    }
                 } else {
                     setFormData({});
                 }
@@ -51,37 +62,53 @@ function PatchManagementPage() {
         };
 
         fetchFormData();
-    }, [buildingId, db, navigate]);
+    }, [buildingId, db, navigate, formDocPath]); // Added formDocPath dependency
 
+    // handleChange with auto-save
     const handleChange = async (e) => {
         const { name, value } = e.target;
         const newFormData = { ...formData, [name]: value };
         setFormData(newFormData);
- 
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId); // Create buildingRef
-            const formDocRef = doc(db, 'forms', 'Cybersecurity', 'Patch Management', buildingId);
-            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true }); // Use merge and add building
-            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
-        } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+
+        if (buildingId) {
+            try {
+                const buildingRef = doc(db, 'Buildings', buildingId);
+                const formDocRef = doc(db, formDocPath, buildingId);
+                // Persist current imageUrl along with other form data
+                await setDoc(formDocRef, {
+                     formData: { ...newFormData, building: buildingRef, imageUrl: imageUrl }
+                     }, { merge: true });
+                console.log("Form data auto-saved:", { ...newFormData, building: buildingRef, imageUrl: imageUrl });
+            } catch (error) {
+                console.error("Error auto-saving form data:", error);
+                // Consider less intrusive error handling for auto-save
+                // alert("Failed to save changes. Please check your connection and try again.");
+            }
         }
     };
 
+    // handleImageChange using FileReader
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImageData(reader.result);
-        };
-        reader.readAsDataURL(file);
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImageData(reader.result);
+                setImageUrl(null); // Clear existing final URL
+                setImageUploadError(null);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setImageData(null);
+        }
     };
 
+    // handleBack simplified
     const handleBack = () => {
         navigate(-1);
     };
 
+    // handleSubmit using httpsCallable and setDoc
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -90,32 +117,51 @@ function PatchManagementPage() {
             return;
         }
 
+        let finalImageUrl = imageUrl; // Start with current URL
+
+        // Upload new image if present
         if (imageData) {
+            setLoading(true);
+            setImageUploadError(null);
             try {
-                const uploadResult = await uploadImage({ imageData: imageData });
-                setImageUrl(uploadResult.data.imageUrl);
-                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
-                setImageUploadError(null);
+                // Pass necessary identifiers if Cloud Function needs them
+                const uploadResult = await uploadImage({ imageData: imageData, buildingId: buildingId, formType: 'PatchManagement' });
+                finalImageUrl = uploadResult.data.imageUrl;
+                setImageUrl(finalImageUrl); // Update state with the confirmed URL
+                console.log('Image uploaded successfully:', finalImageUrl);
+                // Update formData state locally immediately after successful upload
+                // setFormData(prev => ({ ...prev, imageUrl: finalImageUrl }));
             } catch (error) {
                 console.error('Error uploading image:', error);
-                setImageUploadError(error.message);
+                setImageUploadError(`Image upload failed: ${error.message}. Please try again.`);
+                setLoading(false);
+                return; // Prevent form submission if image upload fails
+            } finally {
+                 setLoading(false);
             }
         }
 
+        // Save final form data
         try {
+            setLoading(true);
             const buildingRef = doc(db, 'Buildings', buildingId);
-            const formDocRef = doc(db, 'forms', 'Cybersecurity', 'Patch Management', buildingId);
-            await setDoc(formDocRef, { formData: { ...formData, building: buildingRef } }, { merge: true });
+            const formDocRef = doc(db, formDocPath, buildingId);
+            // Ensure the final data includes the correct image URL
+            const finalFormData = { ...formData, imageUrl: finalImageUrl, building: buildingRef };
+            await setDoc(formDocRef, { formData: finalFormData }, { merge: true });
+
             console.log('Form data submitted successfully!');
             alert('Form submitted successfully!');
-            navigate('/Form');
+            navigate('/Form'); // Navigate on success
         } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+            console.error("Error submitting final form data:", error);
+            alert("Failed to submit form. Please check your connection and try again.");
+            setLoading(false); // Stop loading indicator on error
         }
     };
 
-    if (loading) {
+    // Conditional Loading/Error display
+    if (loading && !Object.keys(formData).length) { // Refined loading condition
         return <div>Loading...</div>;
     }
 
@@ -123,8 +169,33 @@ function PatchManagementPage() {
         return <div>Error: {loadError}</div>;
     }
 
+    // Consolidate all questions into one array
+    const questions = [
+         // 4.1.2.2.1.1 Timeliness and Efficiency
+        { name: "patchesAppliedQuickly", label: "Are patches and security updates applied to devices quickly once released by vendors?" },
+        { name: "automatedPatchSystemsInPlace", label: "Are there automated systems to regularly check for and deploy patches across all devices?" },
+        { name: "criticalPatchProcessExists", label: "Are processes in place to ensure critical patches are prioritized and installed without delay?" },
+         // 4.1.2.2.1.2 Coverage and Scope
+        { name: "patchStrategyCoversAll", label: "Does the patch management strategy cover all OS, applications, and firmware?" },
+        { name: "thirdPartyAppsManaged", label: "Are third-party applications effectively managed with a comprehensive inventory for updates?" },
+        { name: "remoteDevicesUpdatedTimely", label: "Are there mechanisms ensuring timely updates for both on-premises and remote devices?" },
+        // 4.1.2.2.1.3 Testing and Validation
+        { name: "patchesTestedBeforeDeployment", label: "Is there a procedure for testing patches in a controlled environment before deployment?" },
+        { name: "patchValidationSuccessful", label: "Are patches validated to confirm successful installation, with steps for failures?" },
+        { name: "rollbackPlansExist", label: "Are rollback plans in place if a patch causes unforeseen issues?" },
+        // 4.1.2.2.1.4 Compliance and Reporting
+        { name: "processEnsuresCompliance", label: "Does the patch management process ensure compliance with relevant regulations (e.g., GDPR, HIPAA, PCI-DSS)?" },
+        { name: "auditTrailsDocumentStatus", label: "Are there audit trails and reporting mechanisms documenting patch status for all devices?" },
+        { name: "reportsReviewedRegularly", label: "Are patch management reports reviewed regularly by responsible parties to ensure compliance?" },
+        // 4.1.2.2.1.5 Security and Risk Management
+        { name: "patchesPrioritizedByRisk", label: "Are patches prioritized based on vulnerability severity and system criticality?" },
+        { name: "patchManagementIntegratedCybersecurity", label: "Is patch management integrated into the broader cybersecurity strategy?" },
+        { name: "emergencyPatchProceduresExist", label: "Are there procedures for handling emergency/out-of-band patches (e.g., zero-days)?" },
+    ];
+
+
     return (
-        <div className="form-page">
+        <div className="form-page"> {/* Consider removing outer div if not needed */}
             <header className="header">
                 <Navbar />
                 <button className="back-button" onClick={handleBack}>←</button>
@@ -134,86 +205,52 @@ function PatchManagementPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    <h2>4.1.2.2.1.1 Timeliness and Efficiency:</h2>
-                    {[
-                        { name: "patchTimeliness", label: "How quickly are patches and security updates applied to devices once they are released by vendors?" },
-                        { name: "automatedPatchSystems", label: "Are there automated systems in place to regularly check for and deploy patches across all devices in the network?" },
-                        { name: "criticalPatchProcesses", label: "What processes are in place to ensure that critical patches are prioritized and installed without delay to mitigate security risks?" },
-                    ].map((question, index) => (
-                        <><div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            {question.name === "patchTimeliness" || question.name === "criticalPatchProcesses" ? (
-                                <textarea name={question.name} onChange={handleChange} />
-                            ) : (
-                                <div>
-                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
-                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
-                                </div>
-                            )}
-                        </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
-
-                    ))}
-
-                    <h2>4.1.2.2.1.2 Coverage and Scope:</h2>
-                    {[
-                        { name: "patchCoverage", label: "Does the patch management strategy cover all operating systems, applications, and firmware used within the organization?" },
-                        { name: "thirdPartyManagement", label: "How are third-party applications managed, and is there a comprehensive inventory to ensure all software is up-to-date?" },
-                        { name: "remoteUpdateMechanisms", label: "Are there mechanisms to ensure that both on-premises and remote devices receive necessary updates in a timely manner?" },
-                    ].map((question, index) => (
-                        <><div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            {question.name === "thirdPartyManagement" || question.name === "remoteUpdateMechanisms" ? (
-                                <textarea name={question.name} onChange={handleChange} />
-                            ) : (
-                                <div>
-                                    <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
-                                    <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
-                                </div>
-                            )}
-                        </div><input type="text" name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange} /></>
-
-                    ))}
-
-                    <h2>4.1.2.2.1.3 Testing and Validation:</h2>
-                    {[
-                        { name: "patchTestingProcedure", label: "Is there a procedure for testing patches in a controlled environment before deployment to ensure compatibility and prevent disruption of services?" },
-                        { name: "patchValidationSteps", label: "How are patches validated to confirm successful installation, and what steps are taken if a patch fails to apply correctly?" },
-                        { name: "rollbackPlans", label: "Are rollback plans in place to revert changes if a patch causes unforeseen issues or incompatibility with existing systems?" },
-                    ].map((question, index) => (
+                    {/* Single heading for the form */}
+                    <h2>Patch Management Questions</h2>
+                    {questions.map((question, index) => (
+                        // Standard question block rendering
                         <div key={index} className="form-section">
                             <label>{question.label}</label>
-                            <textarea name={question.name} onChange={handleChange} />
+                            <div>
+                                <input
+                                    type="radio"
+                                    name={question.name}
+                                    value="yes"
+                                    checked={formData[question.name] === "yes"}
+                                    onChange={handleChange}
+                                /> Yes
+                                <input
+                                    type="radio"
+                                    name={question.name}
+                                    value="no"
+                                    checked={formData[question.name] === "no"}
+                                    onChange={handleChange}
+                                /> No
+                            </div>
+                            <input
+                                type="text"
+                                name={`${question.name}Comment`}
+                                placeholder="Additional comments"
+                                value={formData[`${question.name}Comment`] || ''}
+                                onChange={handleChange}
+                                className="comment-box" // Standard class for comments
+                            />
                         </div>
                     ))}
 
-                    <h2>4.1.2.2.1.4 Compliance and Reporting:</h2>
-                    {[
-                        { name: "complianceAssurance", label: "How does the patch management process ensure compliance with regulatory requirements and industry standards, such as GDPR, HIPAA, or PCI-DSS?" },
-                        { name: "auditTrails", label: "Are there audit trails and reporting mechanisms that document patch status, including deployed, pending, and failed updates, for all devices?" },
-                        { name: "reportReviewFrequency", label: "How often are patch management reports reviewed, and who is responsible for ensuring that devices are fully patched and compliant?" },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <textarea name={question.name} onChange={handleChange} />
-                        </div>
-                    ))}
+                    {/* Image Upload Section */}
+                    <div className="form-section">
+                        <label>Upload Supporting Image (Optional):</label>
+                        <input type="file" onChange={handleImageChange} accept="image/*" />
+                         {/* Display logic for existing or preview image */}
+                         {imageUrl && !imageData && <img src={imageUrl} alt="Current" style={{maxWidth: '200px', marginTop: '10px'}}/>}
+                         {imageData && <img src={imageData} alt="Preview" style={{maxWidth: '200px', marginTop: '10px'}}/>}
+                        {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                    </div>
 
-                    <h2>4.1.2.2.1.5 Security and Risk Management:</h2>
-                    {[
-                        { name: "patchPrioritizationStrategies", label: "What strategies are in place to prioritize patches based on the severity of vulnerabilities and the criticality of affected systems?" },
-                        { name: "cybersecurityIntegration", label: "How are patch management activities integrated into the broader cybersecurity strategy to address potential risks and minimize attack surfaces?" },
-                        { name: "emergencyPatchProcedures", label: "Are there procedures for handling out-of-band or emergency patches, particularly in response to zero-day vulnerabilities or active threats?" },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <textarea name={question.name} onChange={handleChange} />
-                        </div>
-                    ))}
-
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
-                    <button type="submit">Submit</button>
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Submitting...' : 'Submit'}
+                    </button>
                 </form>
             </main>
         </div>
