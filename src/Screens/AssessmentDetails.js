@@ -2311,7 +2311,7 @@ function AssessmentDetails() {
         "maintainingSpeakersComment": "Additional comments",
         "routineTestsComment": "Additional comments",
         "maintainingDocumentsComment": "Additional comments",
-        //SRORolesAndResponsibilities.js
+        //AndResponsibilities.js
         "sroDuties": "What specific duties do School Resource Officers (SROs) perform within the school environment?",
         "srosCollaborating": "How do SROs collaborate with school administration and staff to enhance safety?",
         "requiredTraining": "What training or qualifications are required for SROs working in schools?",
@@ -3454,6 +3454,7 @@ const formRouteMap = {
     "Assessing Community Needs And Priorities": "/assessing-community-needs-and-priorities", // Correct - Matches App.js
     "Planning Community Outreach Strategies": "/planning-community-outreach-strategies", // Correct - Matches App.js
     "Communication Channels": "/CommunicationChannels", // Corrected Case/Hyphen
+    "SRORolesAndResponsibilities": "/sro-roles-and-responsibilities", // Corrected Case/Hyphen
 
     // === Continuous Improvement - Safety and Security ===
     // "Biometric Access Control Systems": "/BiometricAccessControlSystems", // Already mapped
