@@ -1,397 +1,277 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-import { getFunctions, httpsCallable } from "firebase/functions";
+
+// Define questions array outside the component
+const accessControlSoftwareQuestions = [
+    // Functionality and Features
+    { name: "comprehensiveFunctionality", label: "Does the access control software provide comprehensive functionality for managing access?" }, // Simplified label
+    { name: "centralManagement", label: "Can it centrally manage permissions for individuals, groups, and access points?" }, // Simplified label
+    { name: "authenticationMethods", label: "Does it support various authentication methods (cards, biometrics, PINs)?" }, // Simplified label
+    { name: "realTimeMonitoring", label: "Are there features for real-time monitoring, reporting, and auditing of access events?" },
+    // Integration with Hardware
+    { name: "hardwareCompatibility", label: "Is the software compatible with required hardware (readers, scanners, locks)?" }, // Simplified label
+    { name: "integrationInfrastructure", label: "Does it seamlessly integrate with existing security infrastructure (cameras, alarms)?" },
+    // Adapted from standalone text input
+    { name: "compatibilityIssuesIdentified", label: "Are any compatibility issues or limitations identified that need addressing?" },
+    // Security and Encryption
+    { name: "encryptionSecurity", label: "Does the software employ robust encryption and security protocols?" }, // Simplified label
+    { name: "securePoliciesStorage", label: "Are access policies and credentials securely stored and transmitted?" }, // Simplified label - Renamed 'securePolicies'
+    { name: "multiFactorAuthSupport", label: "Is there support for multi-factor authentication?" }, // Simplified label - Renamed 'multiFactorAuth'
+    // Scalability and Flexibility
+    { name: "scalability", label: "Can the software scale to accommodate organizational growth?" }, // Simplified label
+    { name: "flexibility", label: "Does it offer flexibility in configuring access rules and permissions?" }, // Simplified label
+    { name: "adaptability", label: "Is it adaptable to changes in policies, personnel, and protocols?" }, // Simplified label
+    // User Interface and Ease of Use
+    { name: "userInterfaceIntuitive", label: "Is the user interface intuitive and easy to navigate?" }, // Simplified label - Renamed 'userInterface'
+    { name: "customization", label: "Are there features for customizing dashboards, reports, and workflows?" },
+    { name: "userDocumentation", label: "Does the software provide comprehensive user documentation and training resources?" },
+    // Compliance with Regulations
+    { name: "compliance", label: "Does the software comply with relevant regulations, standards, and best practices?" },
+     // Adapted from standalone text input
+    { name: "regulatoryRequirementsMet", label: "Are specific requirements/guidelines for access control software being met?" },
+    { name: "testingCertification", label: "Has the software undergone testing or certification for compliance?" },
+    // Maintenance and Support
+    { name: "supportSystem", label: "Is there a reliable support system for troubleshooting and updates?" }, // Simplified label
+    { name: "sla", label: "Are maintenance agreements or SLAs in place for timely support?" }, // Simplified label
+    { name: "disasterRecovery", label: "Are regular backups and disaster recovery plans in place for access control data?" },
+];
+
 
 function AccessControlSoftwarePage() {
   const navigate = useNavigate();
-    const { buildingId } = useBuilding();
-    const db = getFirestore();
-    const functions = getFunctions();
-    const uploadImage = httpsCallable(functions, 'uploadAccessControlSoftwareImage');
+  const { buildingId } = useBuilding();
+  const db = getFirestore();
+  const functions = getFunctions();
+  // Renamed variable for clarity
+  const uploadAccessControlSoftwareImage = httpsCallable(functions, 'uploadAccessControlSoftwareImage');
 
+  // State variables look good
+  const [formData, setFormData] = useState({});
+  const [imageData, setImageData] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [imageUploadError, setImageUploadError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
 
-    const [formData, setFormData] = useState({});
-    const [imageData, setImageData] = useState(null);
-    const [imageUrl, setImageUrl] = useState(null);
-    const [imageUploadError, setImageUploadError] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [loadError, setLoadError] = useState(null);
- 
+  // useEffect for fetching data - Looks good
+  useEffect(() => {
+    if (!buildingId) {
+      alert('No building selected. Redirecting to Building Info...');
+      navigate('/BuildingandAddress'); // Ensure path is correct
+      return;
+    }
 
-    useEffect(() => {
-        if (!buildingId) {
-            alert('No building selected. Redirecting to Building Info...');
-            navigate('BuildingandAddress');
-            return;
+    const fetchFormData = async () => {
+      setLoading(true);
+      setLoadError(null);
+      // Correct Firestore path
+      const formDocRef = doc(db, 'forms', 'Physical Security', 'Access Control Software', buildingId);
+
+      try {
+        const docSnapshot = await getDoc(formDocRef);
+        if (docSnapshot.exists()) {
+          const existingData = docSnapshot.data().formData || {};
+          setFormData(existingData);
+           if (existingData.imageUrl) { // Load existing image URL
+               setImageUrl(existingData.imageUrl);
+           }
+        } else {
+          setFormData({});
         }
-
-        const fetchFormData = async () => {
-            setLoading(true);
-            setLoadError(null); // Clear previous errors
-
-            try {
-                const formDocRef = doc(db, 'forms', 'Physical Security', 'Access Control Software', buildingId);
-                const docSnapshot = await getDoc(formDocRef);
-
-                if (docSnapshot.exists()) {
-                    setFormData(docSnapshot.data().formData || {});
-                } else {
-                    setFormData({}); // Initialize if document doesn't exist
-                }
-            } catch (error) {
-                console.error("Error fetching form data:", error);
-                setLoadError("Failed to load form data. Please try again.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchFormData();
-    }, [buildingId, db, navigate]);
-
-   
-    
-    const handleChange = async (e) => {
-                    const { name, value } = e.target;
-                    const newFormData = { ...formData, [name]: value };
-                    setFormData(newFormData);
-            
-                    try {
-                        const buildingRef = doc(db, 'Buildings', buildingId); // Create buildingRef
-                        const formDocRef = doc(db, 'forms', 'Physical Security', 'Access Control Software', buildingId);
-                        await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true }); // Use merge and add building
-                        console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
-                    } catch (error) {
-                        console.error("Error saving form data to Firestore:", error);
-                        alert("Failed to save changes. Please check your connection and try again.");
-                    }
-                };
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImageData(reader.result);
-        };
-        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error("Error fetching form data:", error);
+        setLoadError("Failed to load form data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
     };
 
+    fetchFormData();
+  }, [buildingId, db, navigate]);
 
-    const handleBack = () => {
-        navigate(-1); // Just navigate back
-    };
+  // handleChange saves data immediately with correct structure
+  const handleChange = async (e) => {
+    const { name, value } = e.target;
+    const newFormData = { ...formData, [name]: value };
+    setFormData(newFormData);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        if (!buildingId) {
-            alert('Building ID is missing. Please start from the Building Information page.');
-            return;
-        }
-
-        if (imageData) {
-            try {
-                const uploadResult = await uploadImage({ imageData: imageData });
-                setImageUrl(uploadResult.data.imageUrl);
-                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
-                setImageUploadError(null);
-            } catch (error) {
-                console.error('Error uploading image:', error);
-                setImageUploadError(error.message);
-            }
-        }
-
+    if (buildingId) {
         try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
             const formDocRef = doc(db, 'forms', 'Physical Security', 'Access Control Software', buildingId);
-            await setDoc(formDocRef, { formData: formData }, { merge: true });
-            console.log('Form data submitted successfully!');
-            alert('Form submitted successfully!');
-            navigate('/Form');
-
+            const dataToSave = {
+                 ...newFormData,
+                 building: buildingRef,
+                 ...(imageUrl && { imageUrl: imageUrl }) // Include existing imageUrl
+             };
+            await setDoc(formDocRef, { formData: dataToSave }, { merge: true });
+            // console.log("Form data updated:", dataToSave);
         } catch (error) {
             console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+            // Avoid alerting on every change
         }
+    }
+  };
+
+  // handleImageChange using base64 - Looks good
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+       const reader = new FileReader();
+       reader.onloadend = () => {
+           setImageData(reader.result);
+           setImageUrl(null);
+           setImageUploadError(null);
+       };
+       reader.readAsDataURL(file);
+    } else {
+       setImageData(null);
+    }
+  };
+
+  // handleBack - Looks good
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  // handleSubmit uses Cloud Function and setDoc with correct structure
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!buildingId) {
+      alert('Building ID is missing. Cannot submit.');
+      return;
+    }
+
+    setLoading(true);
+    let finalImageUrl = formData.imageUrl || null;
+    let submissionError = null;
+
+    if (imageData) {
+      try {
+        console.log("Uploading image via Cloud Function...");
+        // Use correct function variable name
+        const uploadResult = await uploadAccessControlSoftwareImage({
+            imageData: imageData,
+            buildingId: buildingId
+         });
+        finalImageUrl = uploadResult.data.imageUrl;
+        setImageUrl(finalImageUrl);
+        setImageUploadError(null);
+        console.log("Image uploaded successfully:", finalImageUrl);
+      } catch (error) {
+        console.error('Error uploading image via function:', error);
+        setImageUploadError(`Image upload failed: ${error.message}`);
+        submissionError = "Image upload failed. Form data saved without new image.";
+         finalImageUrl = formData.imageUrl || null;
+      }
+    }
+
+    const finalFormData = {
+         ...formData,
+         imageUrl: finalImageUrl,
     };
+    setFormData(finalFormData); // Update state to final version
 
-    if (loading) {
-        return <div>Loading...</div>;
+    try {
+      console.log("Saving final form data to Firestore...");
+      const buildingRef = doc(db, 'Buildings', buildingId);
+      const formDocRef = doc(db, 'forms', 'Physical Security', 'Access Control Software', buildingId);
+      await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
+      console.log('Form data submitted successfully!');
+      if (!submissionError) {
+          alert('Form submitted successfully!');
+      } else {
+          alert(submissionError);
+      }
+      navigate('/Form');
+    } catch (error) {
+      console.error("Error saving final form data to Firestore:", error);
+      alert("Failed to save final form data. Please check connection and try again.");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (loadError) {
-        return <div>Error: {loadError}</div>;
-    }
+  // Loading/Error Display - Looks good
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  if (loadError) {
+    return <div>Error: {loadError}</div>;
+  }
 
-    return (
-      <div>
-          <div className="form-page">
-              <header className="header">
-                  <Navbar />
-                  <button className="back-button" onClick={handleBack}>←</button>
-                  <h1>1.1.1.2.3. Access Control Software Assessment</h1>
-                  <img src={logo} alt="Logo" className="logo" />
-              </header>
-  
-              <main className="form-container">
-                  <form onSubmit={handleSubmit}>
-                      <h2>Functionality and Features:</h2>
-                      {[
-                          { name: "comprehensiveFunctionality", label: "Does the access control software provide comprehensive functionality for managing access to secondary entrances?" },
-                          { name: "centralManagement", label: "Can it centrally manage and control access permissions for individuals, groups, and access points?" },
-                          { name: "authenticationMethods", label: "Does it support various authentication methods, such as card readers, biometric scanners, or PIN codes?" },
-                          { name: "realTimeMonitoring", label: "Are there features for real-time monitoring, reporting, and auditing of access events?" },
-                      ].map((question, index) => (
-                          <div key={index} className="form-section">
-                              <label>{question.label}</label>
-                              <div>
-                                  <input
-                                      type="radio"
-                                      name={question.name}
-                                      value="yes"
-                                      checked={formData[question.name] === "yes"}
-                                      onChange={handleChange}
-                                  /> Yes
-                                  <input
-                                      type="radio"
-                                      name={question.name}
-                                      value="no"
-                                      checked={formData[question.name] === "no"}
-                                      onChange={handleChange}
-                                  /> No
-                              </div>
-                              <input
-                                  type="text"
-                                  name={`${question.name}Comment`}
-                                  placeholder="Comment (Optional)"
-                                  value={formData[`${question.name}Comment`] || ''}
-                                  onChange={handleChange}
-                              />
-                          </div>
-                      ))}
-  
-                      <h2>Integration with Hardware:</h2>
-                      {[
-                          { name: "hardwareCompatibility", label: "Is the access control software compatible with a wide range of hardware devices, including card readers, biometric scanners, and electronic locks?" },
-                          { name: "integrationInfrastructure", label: "Does it seamlessly integrate with existing security infrastructure, such as surveillance cameras and alarm systems?" },
-                      ].map((question, index) => (
-                          <div key={index} className="form-section">
-                              <label>{question.label}</label>
-                              <div>
-                                  <input
-                                      type="radio"
-                                      name={question.name}
-                                      value="yes"
-                                      checked={formData[question.name] === "yes"}
-                                      onChange={handleChange}
-                                  /> Yes
-                                  <input
-                                      type="radio"
-                                      name={question.name}
-                                      value="no"
-                                      checked={formData[question.name] === "no"}
-                                      onChange={handleChange}
-                                  /> No
-                              </div>
-                              <input
-                                  type="text"
-                                  name={`${question.name}Comment`}
-                                  placeholder="Comment (Optional)"
-                                  value={formData[`${question.name}Comment`] || ''}
-                                  onChange={handleChange}
-                              />
-                          </div>
-                      ))}
-                      <div className="form-section">
-                          <label>Are there any compatibility issues or limitations that need to be addressed?</label>
-                          <input type="text" name="compatibilityIssues" placeholder="Describe any compatibility issues" value={formData["compatibilityIssues"] || ''} onChange={handleChange} />
-                      </div>
-  
-                      <h2>Security and Encryption:</h2>
-                      {[
-                          { name: "encryptionSecurity", label: "Does the access control software employ robust encryption and security protocols to protect sensitive data and communication?" },
-                          { name: "securePolicies", label: "Are access control policies and credentials securely stored and transmitted within the software?" },
-                          { name: "multiFactorAuth", label: "Is there support for multi-factor authentication to enhance security?" },
-                      ].map((question, index) => (
-                          <div key={index} className="form-section">
-                              <label>{question.label}</label>
-                              <div>
-                                  <input
-                                      type="radio"
-                                      name={question.name}
-                                      value="yes"
-                                      checked={formData[question.name] === "yes"}
-                                      onChange={handleChange}
-                                  /> Yes
-                                  <input
-                                      type="radio"
-                                      name={question.name}
-                                      value="no"
-                                      checked={formData[question.name] === "no"}
-                                      onChange={handleChange}
-                                  /> No
-                              </div>
-                              <input
-                                  type="text"
-                                  name={`${question.name}Comment`}
-                                  placeholder="Comment (Optional)"
-                                  value={formData[`${question.name}Comment`] || ''}
-                                  onChange={handleChange}
-                              />
-                          </div>
-                      ))}
-  
-                      <h2>Scalability and Flexibility:</h2>
-                      {[
-                          { name: "scalability", label: "Can the access control software scale to accommodate the needs of your organization as it grows?" },
-                          { name: "flexibility", label: "Does it offer flexibility in configuring access control rules and permissions based on organizational requirements?" },
-                          { name: "adaptability", label: "Is it adaptable to changes in access control policies, personnel, and security protocols?" },
-                      ].map((question, index) => (
-                          <div key={index} className="form-section">
-                              <label>{question.label}</label>
-                              <div>
-                                  <input
-                                      type="radio"
-                                      name={question.name}
-                                      value="yes"
-                                      checked={formData[question.name] === "yes"}
-                                      onChange={handleChange}
-                                  /> Yes
-                                  <input
-                                      type="radio"
-                                      name={question.name}
-                                      value="no"
-                                      checked={formData[question.name] === "no"}
-                                      onChange={handleChange}
-                                  /> No
-                              </div>
-                              <input
-                                  type="text"
-                                  name={`${question.name}Comment`}
-                                  placeholder="Comment (Optional)"
-                                  value={formData[`${question.name}Comment`] || ''}
-                                  onChange={handleChange}
-                              />
-                          </div>
-                      ))}
-  
-                      <h2>User Interface and Ease of Use:</h2>
-                      {[
-                          { name: "userInterface", label: "Is the user interface intuitive and easy to navigate for administrators and end-users?" },
-                          { name: "customization", label: "Are there features for customizing dashboards, reports, and access control workflows?" },
-                          { name: "userDocumentation", label: "Does the software provide comprehensive user documentation and training resources?" },
-                      ].map((question, index) => (
-                          <div key={index} className="form-section">
-                              <label>{question.label}</label>
-                              <div>
-                                  <input
-                                      type="radio"
-                                      name={question.name}
-                                      value="yes"
-                                      checked={formData[question.name] === "yes"}
-                                      onChange={handleChange}
-                                  /> Yes
-                                  <input
-                                      type="radio"
-                                      name={question.name}
-                                      value="no"
-                                      checked={formData[question.name] === "no"}
-                                      onChange={handleChange}
-                                  /> No
-                              </div>
-                              <input
-                                  type="text"
-                                  name={`${question.name}Comment`}
-                                  placeholder="Comment (Optional)"
-                                  value={formData[`${question.name}Comment`] || ''}
-                                  onChange={handleChange}
-                              />
-                          </div>
-                      ))}
-  
-                      <h2>Compliance with Regulations:</h2>
-                      {[
-                          { name: "compliance", label: "Does the access control software comply with relevant regulations, standards, and industry best practices?" },
-                          { name: "testingCertification", label: "Has the software undergone testing or certification to verify compliance with applicable standards?" },
-                      ].map((question, index) => (
-                          <div key={index} className="form-section">
-                              <label>{question.label}</label>
-                              <div>
-                                  <input
-                                      type="radio"
-                                      name={question.name}
-                                      value="yes"
-                                      checked={formData[question.name] === "yes"}
-                                      onChange={handleChange}
-                                  /> Yes
-                                  <input
-                                      type="radio"
-                                      name={question.name}
-                                      value="no"
-                                      checked={formData[question.name] === "no"}
-                                      onChange={handleChange}
-                                  /> No
-                              </div>
-                              <input
-                                  type="text"
-                                  name={`${question.name}Comment`}
-                                  placeholder="Comment (Optional)"
-                                  value={formData[`${question.name}Comment`] || ''}
-                                  onChange={handleChange}
-                              />
-                          </div>
-                      ))}
-                      <div className="form-section">
-                          <label>Are there specific requirements or guidelines for access control software outlined by regulatory authorities or industry associations?</label>
-                          <input type="text" name="regulatoryRequirements" placeholder="Enter any regulatory requirements" value={formData["regulatoryRequirements"] || ''} onChange={handleChange} />
-                      </div>
-  
-                      <h2>Maintenance and Support:</h2>
-                      {[
-                          { name: "supportSystem", label: "Is there a reliable support system in place for troubleshooting issues, resolving technical challenges, and providing software updates?" },
-                          { name: "sla", label: "Are there maintenance agreements or service level agreements (SLAs) to ensure timely support and software updates?" },
-                          { name: "disasterRecovery", label: "Are there regular backups and disaster recovery plans in place to protect access control data?" },
-                      ].map((question, index) => (
-                          <div key={index} className="form-section">
-                              <label>{question.label}</label>
-                              <div>
-                                  <input
-                                      type="radio"
-                                      name={question.name}
-                                      value="yes"
-                                      checked={formData[question.name] === "yes"}
-                                      onChange={handleChange}
-                                  /> Yes
-                                  <input
-                                      type="radio"
-                                      name={question.name}
-                                      value="no"
-                                      checked={formData[question.name] === "no"}
-                                      onChange={handleChange}
-                                  /> No
-                              </div>
-                              <input
-                                  type="text"
-                                  name={`${question.name}Comment`}
-                                  placeholder="Comment (Optional)"
-                                  value={formData[`${question.name}Comment`] || ''}
-                                  onChange={handleChange}
-                              />
-                          </div>
-                      ))}
-  
-                      <input type="file" onChange={handleImageChange} accept="image/*" />
-                      {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                      {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
-                      <button type="submit">Submit</button>
-                  </form>
-              </main>
+  return (
+    // Removed extra outer div
+    <div className="form-page">
+      <header className="header">
+        <Navbar />
+        <button className="back-button" onClick={handleBack}>←</button>
+        {/* Title might need adjustment if the number prefix is not desired */}
+        <h1>1.1.1.2.3. Access Control Software Assessment</h1>
+        <img src={logo} alt="Logo" className="logo" />
+      </header>
+
+      <main className="form-container">
+        <form onSubmit={handleSubmit}>
+          <h2>Access Control Software Questions</h2>
+
+          {/* Single .map call for all questions with standardized rendering */}
+          {accessControlSoftwareQuestions.map((question, index) => (
+            <div key={index} className="form-section">
+              <label>{question.label}</label>
+              {/* Div for radio buttons */}
+              <div>
+                <input
+                  type="radio"
+                  id={`${question.name}_yes`}
+                  name={question.name}
+                  value="yes"
+                  checked={formData[question.name] === "yes"}
+                  onChange={handleChange}
+                /> <label htmlFor={`${question.name}_yes`}>Yes</label>
+                <input
+                  type="radio"
+                  id={`${question.name}_no`}
+                  name={question.name}
+                  value="no"
+                  checked={formData[question.name] === "no"}
+                  onChange={handleChange}
+                /> <label htmlFor={`${question.name}_no`}>No</label>
+              </div>
+              {/* Input for comments */}
+              <input
+                className='comment-input'
+                type="text"
+                name={`${question.name}Comment`}
+                placeholder="Additional comments"
+                value={formData[`${question.name}Comment`] || ''}
+                onChange={handleChange}
+              />
+            </div>
+          ))}
+
+          {/* Image upload section - Looks good */}
+          <div className="form-section">
+              <label htmlFor="imageUploadAccessSoftware">Upload Image (Optional):</label>
+              <input id="imageUploadAccessSoftware" type="file" onChange={handleImageChange} accept="image/*" />
+              {imageUrl && !imageData && <img src={imageUrl} alt="Uploaded Access Control Software related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+              {imageData && <img src={imageData} alt="Preview Access Control Software related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+              {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
           </div>
-      </div>
+
+          <button type="submit" disabled={loading}>
+            {loading ? 'Submitting...' : 'Submit Final'}
+          </button>
+        </form>
+      </main>
+    </div>
   );
 }
-  export default AccessControlSoftwarePage;
+ export default AccessControlSoftwarePage;

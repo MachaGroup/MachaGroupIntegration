@@ -7,13 +7,52 @@ import './FormQuestions.css';
 import Navbar from "./Navbar";
 import { getFunctions, httpsCallable } from "firebase/functions";
 
+// Define questions array outside the component
+const evacuationQuestions = [
+    // Evacuation Routes and Procedures
+    { name: "definedEvacuationRoutes", label: "Are there clearly defined evacuation routes posted throughout the premises, indicating primary and secondary exit paths?" },
+    // Adapted from text input
+    { name: "proceduresEstablishedForScenarios", label: "Have specific evacuation procedures been established for different scenarios (e.g., fire, bomb threat, natural disaster)?" },
+    { name: "staffTrainedOnProcedures", label: "Are staff members trained on evacuation procedures and their roles during evacuations?" },
+    // Assembly Points
+    { name: "designatedAssemblyPoints", label: "Have designated assembly points been identified outside the building where occupants should gather after evacuating?" },
+    { name: "assemblyPointSafety", label: "Are assembly points located at safe distances from the building and away from potential hazards?" },
+    { name: "assemblyPointSpace", label: "Do assembly points provide adequate space for occupants to gather?" }, // Simplified label
+    // Communication and Alert Systems
+    { name: "effectiveAlertSystem", label: "Is there an effective communication system in place to alert occupants of the need to evacuate?" },
+    { name: "alertingDevicesInstalled", label: "Are fire alarms, strobe lights, or other alerting devices installed and regularly tested?" }, // Simplified label
+    // Adapted from text input
+    { name: "broadcastingMechanismExists", label: "Is a mechanism available for broadcasting instructions/updates to all occupants (incl. disabilities/language barriers)?" },
+    // Evacuation Procedures for Special Needs
+    { name: "disabilityProcedures", label: "Are there specific procedures in place to assist occupants with disabilities or special needs during evacuations?" },
+    { name: "disabilityAssistanceTraining", label: "Are staff members trained to provide assistance to individuals requiring additional support?" }, // Simplified label
+    { name: "disabilityAccessibility", label: "Are evacuation routes and assembly points accessible to individuals with mobility impairments or other disabilities?" },
+    // Accountability
+    // Adapted from text input
+    { name: "accountabilitySystemExists", label: "Is a system (e.g., head count, check-in) in place to account for occupants post-evacuation?" },
+     // Adapted from text input
+    { name: "accountabilityCheckersAssigned", label: "Are designated individuals (e.g., floor wardens) assigned accountability check roles?" },
+    { name: "buildingReentryProcedure", label: "Are clear procedures in place for re-entry into the building after it's deemed safe?" }, // Clarified label
+    // Training and Drills
+    { name: "regularEvacuationDrills", label: "Are regular evacuation drills conducted to familiarize occupants with procedures and routes?" },
+    { name: "differentScenarioDrills", label: "Are drills tailored to address different scenarios and challenges?" }, // Simplified label
+    { name: "drillsFeedbackUsed", label: "Are feedback and lessons learned from drills used to improve procedures?" }, // Simplified label
+    // Review and Updates
+    { name: "proceduresReviewedRegularly", label: "Are evacuation procedures regularly reviewed and updated based on changes (layout, occupancy, protocols)?" }, // Simplified label
+    { name: "inputSolicited", label: "Is input from occupants, responders, and stakeholders solicited for improvements?" }, // Simplified label
+    { name: "updateCommunicationEffective", label: "Are updates communicated effectively to all occupants and staff?" }, // Simplified label
+];
+
+
 function EvacuationProceduresFormPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding();
     const db = getFirestore();
     const functions = getFunctions();
-    const uploadImage = httpsCallable(functions, 'uploadEvacuationProceduresFormImage');
+    // Renamed variable for clarity, matches function name string
+    const uploadEvacuationProceduresFormImage = httpsCallable(functions, 'uploadEvacuationProceduresFormImage');
 
+    // State variables look good
     const [formData, setFormData] = useState({});
     const [imageData, setImageData] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
@@ -21,23 +60,27 @@ function EvacuationProceduresFormPage() {
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState(null);
 
+    // useEffect for fetching data - Looks good
     useEffect(() => {
         if (!buildingId) {
             alert('No building selected. Redirecting to Building Info...');
-            navigate('BuildingandAddress');
+            navigate('/BuildingandAddress'); // Ensure path is correct
             return;
         }
 
         const fetchFormData = async () => {
             setLoading(true);
             setLoadError(null);
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Evacuation Procedures', buildingId);
 
             try {
-                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Evacuation Procedures', buildingId);
                 const docSnapshot = await getDoc(formDocRef);
-
                 if (docSnapshot.exists()) {
-                    setFormData(docSnapshot.data().formData || {});
+                    const existingData = docSnapshot.data().formData || {};
+                    setFormData(existingData);
+                    if (existingData.imageUrl) {
+                        setImageUrl(existingData.imageUrl);
+                    }
                 } else {
                     setFormData({});
                 }
@@ -52,75 +95,119 @@ function EvacuationProceduresFormPage() {
         fetchFormData();
     }, [buildingId, db, navigate]);
 
+    // handleChange saves data immediately, including buildingRef and imageUrl
     const handleChange = async (e) => {
         const { name, value } = e.target;
         const newFormData = { ...formData, [name]: value };
         setFormData(newFormData);
 
-        try {
-            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Evacuation Procedures', buildingId);
-            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
-            console.log("Form data saved to Firestore:", newFormData);
-        } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+        if (buildingId) {
+            try {
+                const buildingRef = doc(db, 'Buildings', buildingId);
+                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Evacuation Procedures', buildingId);
+                const dataToSave = {
+                     ...newFormData,
+                     building: buildingRef,
+                     ...(imageUrl && { imageUrl: imageUrl })
+                 };
+                await setDoc(formDocRef, { formData: dataToSave }, { merge: true });
+                // console.log("Form data updated:", dataToSave);
+            } catch (error) {
+                console.error("Error saving form data to Firestore:", error);
+            }
         }
     };
 
+    // handleImageChange using base64 - Looks good
     const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImageData(reader.result);
-        };
-        reader.readAsDataURL(file);
+         const file = e.target.files[0];
+         if (file) {
+             const reader = new FileReader();
+             reader.onloadend = () => {
+                 setImageData(reader.result);
+                 setImageUrl(null);
+                 setImageUploadError(null);
+             };
+             reader.readAsDataURL(file);
+         } else {
+             setImageData(null);
+         }
     };
 
+    // handleBack - Looks good
     const handleBack = () => {
         navigate(-1);
     };
 
+    // handleSubmit uses Cloud Function and setDoc - Corrected save structure
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!buildingId) {
-            alert('Building ID is missing. Please start from the Building Information page.');
+            alert('Building ID is missing. Cannot submit.');
             return;
         }
 
+        setLoading(true);
+        let finalImageUrl = formData.imageUrl || null;
+        let submissionError = null;
+
         if (imageData) {
             try {
-                const uploadResult = await uploadImage({ imageData: imageData });
-                setImageUrl(uploadResult.data.imageUrl);
-                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                console.log("Uploading image via Cloud Function...");
+                // Use the correctly named function variable
+                const uploadResult = await uploadEvacuationProceduresFormImage({
+                    imageData: imageData,
+                    buildingId: buildingId
+                 });
+                finalImageUrl = uploadResult.data.imageUrl;
+                setImageUrl(finalImageUrl);
                 setImageUploadError(null);
+                console.log("Image uploaded successfully:", finalImageUrl);
             } catch (error) {
-                console.error('Error uploading image:', error);
-                setImageUploadError(error.message);
+                console.error('Error uploading image via function:', error);
+                setImageUploadError(`Image upload failed: ${error.message}`);
+                submissionError = "Image upload failed. Form data saved without new image.";
+                 finalImageUrl = formData.imageUrl || null;
             }
         }
 
+        const finalFormData = {
+             ...formData,
+             imageUrl: finalImageUrl,
+        };
+        setFormData(finalFormData); // Update state to final version
+
         try {
+            console.log("Saving final form data to Firestore...");
+            const buildingRef = doc(db, 'Buildings', buildingId);
             const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Evacuation Procedures', buildingId);
-            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
             console.log('Form data submitted successfully!');
-            alert('Form submitted successfully!');
+            if (!submissionError) {
+                alert('Form submitted successfully!');
+            } else {
+                alert(submissionError);
+            }
             navigate('/Form');
         } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+            console.error("Error saving final form data to Firestore:", error);
+            alert("Failed to save final form data. Please check connection and try again.");
+        } finally {
+             setLoading(false);
         }
     };
 
+    // Loading/Error Display - Looks good
     if (loading) {
         return <div>Loading...</div>;
     }
-
     if (loadError) {
         return <div>Error: {loadError}</div>;
     }
 
     return (
+        // Removed extra outer div from original if present
         <div className="form-page">
             <header className="header">
                 <Navbar />
@@ -131,168 +218,54 @@ function EvacuationProceduresFormPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    <h2>Evacuation Routes and Procedures:</h2>
-                    {[
-                        { name: "defined evacuation routes", label: "Are there clearly defined evacuation routes posted throughout the premises, indicating primary and secondary exit paths?", type: "radio" },
-                        { name: "Established evacuation procedures", label: "Have evacuation procedures been established for different scenarios, such as fire emergencies, bomb threats, or natural disasters?", type: "radio" },
-                        { name: "establishedEvacuationProcedures", label: "Describe evacuation procedures", type: "text" },
-                        { name: "evacuation procedures training ", label: "Are staff members trained on evacuation procedures and their roles during evacuations?", type: "radio" },
-                    ].map((question, index) => (
+                    <h2>Evacuation Procedures Assessment Questions</h2>
+
+                    {/* Single .map call for all questions with standardized rendering */}
+                    {evacuationQuestions.map((question, index) => (
                         <div key={index} className="form-section">
                             <label>{question.label}</label>
                             <div>
-                                {question.type === "radio" ? (
-                                    <>
-                                        <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
-                                        <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
-                                        <textarea className='comment-box' name={`${question.name}-comment`} placeholder="Comment (Optional)" value={formData[`${question.name}-comment`] || ''} onChange={handleChange} />
-                                    </>
-                                ) : (
-                                    <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />
-                                )}
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_yes`}
+                                    name={question.name}
+                                    value="yes"
+                                    checked={formData[question.name] === "yes"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_yes`}>Yes</label>
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_no`}
+                                    name={question.name}
+                                    value="no"
+                                    checked={formData[question.name] === "no"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_no`}>No</label>
                             </div>
+                            {/* Use input type="text" for comments with correct name */}
+                            <input
+                                className='comment-input'
+                                type="text"
+                                name={`${question.name}Comment`} // Corrected name format
+                                placeholder="Additional comments"
+                                value={formData[`${question.name}Comment`] || ''}
+                                onChange={handleChange}
+                            />
                         </div>
                     ))}
 
-                    <h2>Assembly Points:</h2>
-                    {[
-                        { name: "designated assembly points", label: "Have designated assembly points been identified outside the building where occupants should gather after evacuating?", type: "radio" },
-                        { name: "assembly point safety", label: "Are assembly points located at safe distances from the building and away from potential hazards?", type: "radio" },
-                        { name: "assembly point space", label: "Do assembly points provide adequate space and facilities for occupants to gather and await further instructions?", type: "radio" },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.type === "radio" ? (
-                                    <>
-                                        <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
-                                        <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
-                                        <textarea className='comment-box' name={`${question.name}-comment`} placeholder="Comment (Optional)" value={formData[`${question.name}-comment`] || ''} onChange={handleChange} />
-                                    </>
-                                ) : (
-                                    <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />
-                                )}
-                            </div>
-                        </div>
-                    ))}
+                    {/* Image upload section - Looks good */}
+                    <div className="form-section">
+                        <label htmlFor="imageUploadEvacuation">Upload Image (Optional):</label>
+                        <input id="imageUploadEvacuation" type="file" onChange={handleImageChange} accept="image/*" />
+                        {imageUrl && !imageData && <img src={imageUrl} alt="Uploaded Evacuation related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                        {imageData && <img src={imageData} alt="Preview Evacuation related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                        {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                    </div>
 
-                    <h2>Communication and Alert Systems:</h2>
-                    {[
-                        { name: "effective alert system", label: "Is there an effective communication system in place to alert occupants of the need to evacuate?", type: "radio" },
-                        { name: "alerting devices installed", label: "Are fire alarms, strobe lights, or other alerting devices installed and regularly tested to ensure they are functional?", type: "radio" },
-                        { name: "broadcasting mechanism", label: "Is there a mechanism for broadcasting evacuation instructions and updates to all occupants, including those with disabilities or language barriers?", type: "radio" },
-                        { name: "broadcastingMechanism", label: "Describe the mechanism", type: "text" },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.type === "radio" ? (
-                                    <>
-                                        <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
-                                        <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
-                                        <textarea className='comment-box' name={`${question.name}-comment`} placeholder="Comment (Optional)" value={formData[`${question.name}-comment`] || ''} onChange={handleChange} />
-                                    </>
-                                ) : (
-                                    <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />
-                                )}
-                            </div>
-                        </div>
-                    ))}
-
-                    <h2>Evacuation Procedures for Special Needs:</h2>
-                    {[
-                        { name: "disability evacuation procedure", label: "Are there procedures in place to assist occupants with disabilities or special needs during evacuations?", type: "radio" },
-                        { name: "disability assistance training", label: "Are staff members trained to provide assistance to individuals who may require additional support during evacuations?", type: "radio" },
-                        { name: "disability evacuation accesibility", label: "Are evacuation routes and assembly points accessible to individuals with mobility impairments or other disabilities?", type: "radio" },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.type === "radio" ? (
-                                    <>
-                                        <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
-                                        <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
-                                        <textarea className='comment-box' name={`${question.name}-comment`} placeholder="Comment (Optional)" value={formData[`${question.name}-comment`] || ''} onChange={handleChange} />
-                                    </>
-                                ) : (
-                                    <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />
-                                )}
-                            </div>
-                        </div>
-                    ))}
-
-                    <h2>Accountability and Accountability:</h2>
-                    {[
-                        { name: "Evacuation account", label: "Is there a system in place to account for all occupants and ensure everyone has evacuated safely?", type: "radio" },
-                        { name: "evacuationAccount", label: "Describe the system", type: "text" },
-                        { name: "Assigned accountability checker", label: "Are designated individuals assigned to perform accountability checks at assembly points and report any missing persons to emergency responders?", type: "radio" },
-                        { name: "assignedAccountabilityChecker", label: "List designated individuals", type: "text" },
-                        { name: "building reentry procedure", label: "Are procedures in place for re-entry into the building after evacuations have been completed and deemed safe?", type: "radio" },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.type === "radio" ? (
-                                    <>
-                                        <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
-                                        <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
-                                        <textarea className='comment-box' name={`${question.name}-comment`} placeholder="Comment (Optional)" value={formData[`${question.name}-comment`] || ''} onChange={handleChange} />
-                                    </>
-                                ) : (
-                                    <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />
-                                )}
-                            </div>
-                        </div>
-                    ))}
-
-                    <h2>Training and Drills:</h2>
-                    {[
-                        { name: "regular evacuation drills", label: "Are regular evacuation drills conducted to familiarize occupants with evacuation procedures and routes?", type: "radio" },
-                        { name: "different scenario drills", label: "Are drills tailored to address different scenarios and challenges that may arise during evacuations?", type: "radio" },
-                        { name: "drills feedback", label: "Are feedback and lessons learned from drills used to improve evacuation procedures and preparedness?", type: "radio" },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.type === "radio" ? (
-                                    <>
-                                        <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
-                                        <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
-                                        <textarea className='comment-box' name={`${question.name}-comment`} placeholder="Comment (Optional)" value={formData[`${question.name}-comment`] || ''} onChange={handleChange} />
-                                    </>
-                                ) : (
-                                    <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />
-                                )}
-                            </div>
-                        </div>
-                    ))}
-
-                    <h2>Review and Updates:</h2>
-                    {[
-                        { name: "evacuation procedures review", label: "Are evacuation procedures regularly reviewed and updated to reflect changes in building layout, occupancy, or emergency response protocols?", type: "radio" },
-                        { name: "solicited input", label: "Is input from occupants, emergency responders, and other stakeholders solicited to identify areas for improvement in evacuation plans?", type: "radio" },
-                        { name: "effective update communication", label: "Are updates communicated effectively to all occupants and staff members to ensure they are aware of changes to evacuation procedures?", type: "radio" },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.type === "radio" ? (
-                                    <>
-                                        <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
-                                        <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
-                                        <textarea className='comment-box' name={`${question.name}-comment`} placeholder="Comment (Optional)" value={formData[`${question.name}-comment`] || ''} onChange={handleChange} />
-                                    </>
-                                ) : (
-                                    <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />
-                                )}
-                            </div>
-                        </div>
-                    ))}
-
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
-                    <button type="submit">Submit</button>
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Submitting...' : 'Submit Final'}
+                    </button>
                 </form>
             </main>
         </div>

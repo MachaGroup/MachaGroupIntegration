@@ -1,214 +1,272 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-import { getFunctions, httpsCallable } from "firebase/functions";
+
+// Define questions array outside the component
+const accessControlQuestions = [
+    { name: "accessControlOperational", label: "Are the Access Control Systems operational and functioning as intended?" },
+    { name: "authAccurate", label: "Do the systems accurately authenticate and authorize individuals' access rights?" },
+    // Adapted from text input
+    { name: "malfunctionSignsObserved", label: "Are there any signs of malfunction or system errors observed that could compromise security?" },
+    // Adapted from text input
+    { name: "authMechanismsImplemented", label: "Are appropriate authentication mechanisms (e.g., RFID, PIN, biometric) implemented and utilized?" },
+    { name: "mechanismsReliable", label: "Are these mechanisms reliable and secure for verifying individuals' identities?" },
+    { name: "multiFactor", label: "Is multi-factor authentication implemented to enhance security?" }, // Simplified label
+    // Adapted from text input
+    { name: "accessRightsProcessDefined", label: "Is there a defined process for assigning and managing access rights based on roles/responsibilities?" },
+    { name: "processDefined", label: "Is there a defined process for granting, modifying, or revoking access permissions?" }, // Simplified label
+    { name: "accessReviewed", label: "Are access rights regularly reviewed and updated?" }, // Simplified label
+    { name: "systemsIntegrated", label: "Are the Access Control Systems integrated with other security systems (cameras, alarms)?" }, // Simplified label
+    // Adapted from text input
+    { name: "integrationEffective", label: "Does the integration with other systems enhance overall security effectively?" },
+    // Adapted from text input
+    { name: "integrationIssuesIdentified", label: "Are any compatibility issues or gaps in integration identified that need addressing?" },
+    { name: "monitoringSystem", label: "Is there a centralized monitoring system in place for access control events?" }, // Simplified label
+    { name: "accessLogsGenerated", label: "Are access logs generated and maintained to track user activity?" }, // Simplified label
+    { name: "logsReviewProcess", label: "Is there a process for reviewing access logs and investigating suspicious incidents?" }, // Simplified label
+    { name: "complianceRegs", label: "Do the systems comply with relevant regulations and standards (e.g., GDPR, HIPAA, ISO 27001)?" }, // Simplified label
+    { name: "auditsConducted", label: "Have the systems undergone audits or assessments to verify compliance?" }, // Simplified label
+    { name: "maintenanceSchedule", label: "Is there a regular maintenance schedule in place?" }, // Simplified label
+    { name: "maintenanceTasksPerformed", label: "Are scheduled maintenance tasks (updates, inspections, backups) performed?" }, // Simplified label
+    { name: "maintenanceRecords", label: "Are records documenting maintenance activities, repairs, and issues kept?" }, // Simplified label
+    { name: "userTraining", label: "Have users (security, admins, end-users) received training on system usage?" }, // Simplified label
+    { name: "instructionsGuidelinesAvailable", label: "Are instructions/guidelines available regarding procedures, password management, and security awareness?" }, // Simplified label
+    { name: "reportingProcess", label: "Is there a process for reporting system errors, suspicious activities, or security incidents?" } // Simplified label
+];
+
 
 function AccessControlSystemsPage() {
-    const navigate = useNavigate();
-    const { buildingId } = useBuilding();
-    const db = getFirestore();
-    const functions = getFunctions();
-    const uploadImage = httpsCallable(functions, 'uploadAccessControlSystemsImage');
+  const navigate = useNavigate();
+  const { buildingId } = useBuilding();
+  const db = getFirestore();
+  const functions = getFunctions();
+  // Renamed variable for clarity
+  const uploadAccessControlSystemsImage = httpsCallable(functions, 'uploadAccessControlSystemsImage');
 
-    const [formData, setFormData] = useState({});
-    const [imageData, setImageData] = useState(null);
-    const [imageUrl, setImageUrl] = useState(null);
-    const [imageUploadError, setImageUploadError] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [loadError, setLoadError] = useState(null);
+  // State variables look good
+  const [formData, setFormData] = useState({});
+  const [imageData, setImageData] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [imageUploadError, setImageUploadError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
 
-    useEffect(() => {
-        if (!buildingId) {
-            alert('No building selected. Redirecting to Building Info...');
-            navigate('BuildingandAddress');
-            return;
+  // useEffect for fetching data - Looks good
+  useEffect(() => {
+    if (!buildingId) {
+      alert('No building selected. Redirecting to Building Info...');
+      navigate('/BuildingandAddress'); // Ensure path is correct
+      return;
+    }
+
+    const fetchFormData = async () => {
+      setLoading(true);
+      setLoadError(null);
+      // Correct Firestore path
+      const formDocRef = doc(db, 'forms', 'Physical Security', 'Access Control Systems', buildingId);
+
+      try {
+        const docSnapshot = await getDoc(formDocRef);
+        if (docSnapshot.exists()) {
+          const existingData = docSnapshot.data().formData || {};
+          setFormData(existingData);
+          if (existingData.imageUrl) {
+            setImageUrl(existingData.imageUrl);
+          }
+        } else {
+          setFormData({});
         }
-
-        const fetchFormData = async () => {
-            setLoading(true);
-            setLoadError(null);
-
-            try {
-                const formDocRef = doc(db, 'forms', 'Physical Security', 'Access Control Systems', buildingId);
-                const docSnapshot = await getDoc(formDocRef);
-
-                if (docSnapshot.exists()) {
-                    setFormData(docSnapshot.data().formData || {});
-                } else {
-                    setFormData({});
-                }
-            } catch (error) {
-                console.error("Error fetching form data:", error);
-                setLoadError("Failed to load form data. Please try again.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchFormData();
-    }, [buildingId, db, navigate]);
-
-    
-
-    const handleChange = async (e) => {
-                        const { name, value } = e.target;
-                        const newFormData = { ...formData, [name]: value };
-                        setFormData(newFormData);
-                
-                        try {
-                            const buildingRef = doc(db, 'Buildings', buildingId); // Create buildingRef
-                            const formDocRef = doc(db, 'forms', 'Physical Security', 'Access Control Systems', buildingId);
-                            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true }); // Use merge and add building
-                            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
-                        } catch (error) {
-                            console.error("Error saving form data to Firestore:", error);
-                            alert("Failed to save changes. Please check your connection and try again.");
-                        }
-                    };
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImageData(reader.result);
-        };
-        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error("Error fetching form data:", error);
+        setLoadError("Failed to load form data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handleBack = () => {
-        navigate(-1);
-    };
+    fetchFormData();
+  }, [buildingId, db, navigate]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  // handleChange saves data immediately with correct structure
+  const handleChange = async (e) => {
+    const { name, value } = e.target;
+    const newFormData = { ...formData, [name]: value };
+    setFormData(newFormData);
 
-        if (!buildingId) {
-            alert('Building ID is missing. Please start from the Building Information page.');
-            return;
-        }
-
-        if (imageData) {
-            try {
-                const uploadResult = await uploadImage({ imageData: imageData });
-                setImageUrl(uploadResult.data.imageUrl);
-                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
-                setImageUploadError(null);
-            } catch (error) {
-                console.error('Error uploading image:', error);
-                setImageUploadError(error.message);
-            }
-        }
-
+    if (buildingId) {
         try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
             const formDocRef = doc(db, 'forms', 'Physical Security', 'Access Control Systems', buildingId);
-            await setDoc(formDocRef, { formData: formData }, { merge: true });
-            console.log('Form data submitted successfully!');
-            alert('Form submitted successfully!');
-            navigate('/Form');
-
+            const dataToSave = {
+                 ...newFormData,
+                 building: buildingRef,
+                 ...(imageUrl && { imageUrl: imageUrl })
+             };
+            await setDoc(formDocRef, { formData: dataToSave }, { merge: true });
+            // console.log("Form data updated:", dataToSave);
         } catch (error) {
             console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+            // Avoid alerting on every change
         }
+    }
+  };
+
+  // handleImageChange using base64 - Looks good
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+     if (file) {
+         const reader = new FileReader();
+         reader.onloadend = () => {
+             setImageData(reader.result);
+             setImageUrl(null);
+             setImageUploadError(null);
+         };
+         reader.readAsDataURL(file);
+     } else {
+         setImageData(null);
+     }
+  };
+
+  // handleBack - Looks good
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  // handleSubmit uses Cloud Function and setDoc with correct structure
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!buildingId) {
+      alert('Building ID is missing. Cannot submit.');
+      return;
+    }
+
+    setLoading(true);
+    let finalImageUrl = formData.imageUrl || null;
+    let submissionError = null;
+
+    if (imageData) {
+      try {
+        console.log("Uploading image via Cloud Function...");
+        // Use correct function variable name
+        const uploadResult = await uploadAccessControlSystemsImage({
+            imageData: imageData,
+            buildingId: buildingId
+         });
+        finalImageUrl = uploadResult.data.imageUrl;
+        setImageUrl(finalImageUrl);
+        setImageUploadError(null);
+        console.log("Image uploaded successfully:", finalImageUrl);
+      } catch (error) {
+        console.error('Error uploading image via function:', error);
+        setImageUploadError(`Image upload failed: ${error.message}`);
+        submissionError = "Image upload failed. Form data saved without new image.";
+         finalImageUrl = formData.imageUrl || null;
+      }
+    }
+
+    const finalFormData = {
+         ...formData,
+         imageUrl: finalImageUrl,
     };
+    setFormData(finalFormData);
 
-    if (loading) {
-        return <div>Loading...</div>;
+    try {
+      console.log("Saving final form data to Firestore...");
+      const buildingRef = doc(db, 'Buildings', buildingId);
+      const formDocRef = doc(db, 'forms', 'Physical Security', 'Access Control Systems', buildingId);
+      await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
+      console.log('Form data submitted successfully!');
+      if (!submissionError) {
+          alert('Form submitted successfully!');
+      } else {
+          alert(submissionError);
+      }
+      navigate('/Form');
+    } catch (error) {
+      console.error("Error saving final form data to Firestore:", error);
+      alert("Failed to save final form data. Please check connection and try again.");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (loadError) {
-        return <div>Error: {loadError}</div>;
-    }
-    return (
-      <div className="form-page">
-          <header className="header">
-              <Navbar />
-              <button className="back-button" onClick={handleBack}>←</button>
-              <h1>Access Control Systems Assessment</h1>
-              <img src={logo} alt="Logo" className="logo" />
-          </header>
+  // Loading/Error Display - Looks good
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  if (loadError) {
+    return <div>Error: {loadError}</div>;
+  }
 
-          <main className="form-container">
-              <form onSubmit={handleSubmit}>
+  return (
+    <div className="form-page">
+      <header className="header">
+        <Navbar />
+        <button className="back-button" onClick={handleBack}>←</button>
+        <h1>Access Control Systems Assessment</h1>
+        <img src={logo} alt="Logo" className="logo" />
+      </header>
 
-                  {[
-                      { name: "accessControlOperational", label: "Are the Access Control Systems operational and functioning as intended?" },
-                      { name: "authAccurate", label: "Do the systems accurately authenticate and authorize individuals' access rights?" },
-                      { name: "malfunctionSigns", label: "Are there any signs of malfunction or system errors that could compromise security?" },
-                      { name: "authMechanisms", label: "What authentication mechanisms are used within the Access Control Systems (e.g., RFID cards, PIN codes, biometric scanners)?" },
-                      { name: "mechanismsReliable", label: "Are these mechanisms reliable and secure for verifying individuals' identities?" },
-                      { name: "multiFactor", label: "Is multi-factor authentication implemented to enhance security (e.g., combining a PIN code with a biometric scan)?" },
-                      { name: "accessRights", label: "How are access rights assigned and managed within the Access Control Systems?" },
-                      { name: "processDefined", label: "Is there a defined process for granting, modifying, or revoking access permissions based on individuals' roles and responsibilities?" },
-                      { name: "accessReviewed", label: "Are access rights regularly reviewed and updated to align with organizational changes and security requirements?" },
-                      { name: "systemsIntegrated", label: "Are the Access Control Systems integrated with other security systems, such as surveillance cameras, intrusion detection, or alarm systems?" },
-                      { name: "integrationEnhance", label: "How does the integration enhance overall security and situational awareness within the facility?" },
-                      { name: "integrationIssues", label: "Are there any compatibility issues or gaps in integration that need to be addressed?" },
-                      { name: "monitoringSystem", label: "Is there a centralized monitoring system in place to oversee access control events and activities?" },
-                      { name: "accessLogs", label: "Are access logs generated and maintained to track user activity, including successful and failed access attempts?" },
-                      { name: "logsReview", label: "Is there a process for reviewing access logs and investigating any suspicious or unauthorized access incidents?" },
-                      { name: "complianceRegs", label: "Do the Access Control Systems comply with relevant regulations, standards, and industry best practices (e.g., GDPR, HIPAA, ISO 27001)?" },
-                      { name: "audits", label: "Have the systems undergone any audits or assessments to verify compliance with applicable standards?" },
-                      { name: "maintenanceSchedule", label: "Is there a regular maintenance schedule in place for the Access Control Systems?" },
-                      { name: "maintenanceTasks", label: "Are maintenance tasks, such as software updates, hardware inspections, and database backups, performed according to schedule?" },
-                      { name: "maintenanceRecords", label: "Are there records documenting maintenance activities, repairs, and any issues identified during inspections?" },
-                      { name: "userTraining", label: "Have users, such as security personnel, system administrators, and end-users, received training on how to use the Access Control Systems effectively?" },
-                      { name: "instructionsGuidelines", label: "Are there instructions or guidelines available to users regarding proper access control procedures, password management, and security awareness?" },
-                      { name: "reportingProcess", label: "Is there a process for reporting system errors, suspicious activities, or security incidents related to the Access Control Systems?" }
-                  ].map((question, index) => (
-                      <div key={index} className="form-section">
-                          <label>{question.label}</label>
-                          <div>
-                              {question.name === "malfunctionSigns" || question.name === "authMechanisms" || question.name === "accessRights" || question.name === "integrationEnhance" || question.name === "integrationIssues" ? (
-                                  <input
-                                      type="text"
-                                      name={question.name}
-                                      placeholder={question.name === "malfunctionSigns" ? "Describe any malfunctions or errors" : question.name === "authMechanisms" ? "Enter the authentication mechanisms" : question.name === "accessRights" ?
-                                       "Describe how access rights are managed" : question.name === "integrationEnhance" ? "Describe the integration" : "Describe any compatibility issues"}
-                                      value={formData[question.name] || ''}
-                                      onChange={handleChange}
-                                  />
-                              ) : (
-                                  <>
-                                      <input
-                                          type="radio"
-                                          name={question.name}
-                                          value="yes"
-                                          checked={formData[question.name] === "yes"}
-                                          onChange={handleChange}
-                                      /> Yes
-                                      <input
-                                          type="radio"
-                                          name={question.name}
-                                          value="no"
-                                          checked={formData[question.name] === "no"}
-                                          onChange={handleChange}
-                                      /> No
-                                  </>
-                              )}
-                          </div>
-                          {question.name !== "malfunctionSigns" && question.name !== "authMechanisms" && question.name !== "accessRights" && question.name !== "integrationEnhance" && question.name !== "integrationIssues" && (
-                              <textarea
-                                  className='comment-box'
-                                  name={`${question.name}Comment`}
-                                  placeholder="Comment (Optional)"
-                                  value={formData[`${question.name}Comment`] || ''}
-                                  onChange={handleChange}
-                              ></textarea>
-                          )}
-                      </div>
-                  ))}
-                  <input type="file" onChange={handleImageChange} accept="image/*" />
-                  {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                  {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
-                  <button type="submit">Submit</button>
-              </form>
-          </main>
-      </div>
+      <main className="form-container">
+        <form onSubmit={handleSubmit}>
+          <h2>Access Control Systems Assessment Questions</h2>
+
+          {/* Single .map call for all questions with standardized rendering */}
+          {accessControlQuestions.map((question, index) => (
+            <div key={index} className="form-section">
+              <label>{question.label}</label>
+              {/* Div for radio buttons */}
+              <div>
+                <input
+                  type="radio"
+                  id={`${question.name}_yes`}
+                  name={question.name}
+                  value="yes"
+                  checked={formData[question.name] === "yes"}
+                  onChange={handleChange}
+                /> <label htmlFor={`${question.name}_yes`}>Yes</label>
+                <input
+                  type="radio"
+                  id={`${question.name}_no`}
+                  name={question.name}
+                  value="no"
+                  checked={formData[question.name] === "no"}
+                  onChange={handleChange}
+                /> <label htmlFor={`${question.name}_no`}>No</label>
+              </div>
+              {/* Input for comments */}
+              <input
+                className='comment-input'
+                type="text"
+                name={`${question.name}Comment`}
+                placeholder="Additional comments"
+                value={formData[`${question.name}Comment`] || ''}
+                onChange={handleChange}
+              />
+            </div>
+          ))}
+
+          {/* Image upload section - Looks good */}
+          <div className="form-section">
+              <label htmlFor="imageUploadAccessControl">Upload Image (Optional):</label>
+              <input id="imageUploadAccessControl" type="file" onChange={handleImageChange} accept="image/*" />
+              {imageUrl && !imageData && <img src={imageUrl} alt="Uploaded Access Control System" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+              {imageData && <img src={imageData} alt="Preview Access Control System" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+              {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+          </div>
+
+          <button type="submit" disabled={loading}>
+            {loading ? 'Submitting...' : 'Submit Final'}
+          </button>
+        </form>
+      </main>
+    </div>
   );
 }
 

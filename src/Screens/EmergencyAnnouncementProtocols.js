@@ -1,19 +1,47 @@
-import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore'; // Corrected import
-import { getFunctions, httpsCallable } from 'firebase/functions'; // Corrected import
+// Firestore imports aligned with the standard pattern
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore'; // Removed unused 'collection'
+// Firebase Functions imports
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext';
-import './FormQuestions.css';
-import Navbar from "./Navbar";
+import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import './FormQuestions.css'; // Assuming same CSS file
+import logo from '../assets/MachaLogo.png'; // Assuming same logo
+import Navbar from "./Navbar"; // Assuming same Navbar
+
+// Define questions array outside the component
+const announcementProtocolQuestions = [
+    // Corrected names to camelCase
+    { name: "standardizedMessageTemplates", label: "Are standardized message templates developed for various emergencies?" }, // Simplified
+    { name: "essentialInfoIncluded", label: "Do templates include essential info (nature, actions, instructions)?" }, // Simplified - Made Yes/No
+    { name: "scriptedEmergencyAnnouncements", label: "Are emergency announcements scripted for clarity and conciseness?" }, // Simplified
+    { name: "scriptsAvoidConfusion", label: "Do scripts avoid jargon or ambiguous language?" }, // Simplified
+    { name: "appropriateAnnouncements", label: "Are announcements tailored to the audience (age, language, ability)?" }, // Simplified
+    { name: "structuredScriptedMessages", label: "Do messages follow a structured format (emergency type, location, actions)?" }, // Simplified
+    { name: "messagesProvideGuidance", label: "Are messages designed to provide actionable guidance?" }, // Simplified
+    { name: "reviewedScripts", label: "Are scripts reviewed/approved by appropriate authorities (safety, emergency mgmt)?" }, // Simplified
+    // Adapted from special rendering
+    { name: "consistencyProcessExists", label: "Is there a process for ensuring consistency/accuracy (incl. periodic updates)?" },
+    { name: "trainedIndividuals", label: "Are individuals delivering announcements trained on scripts/protocols?" }, // Simplified
+    { name: "trainingProgramsIncludePractice", label: "Do training programs include practice sessions for different emergencies?" }, // Simplified - Renamed 'trainingPrograms'
+    { name: "resourcesProvided", label: "Are operators provided resources (cue cards, guides) for accurate delivery?" }, // Simplified - Renamed 'deliveringMessagesResources'
+    { name: "adaptableScriptedMessages", label: "Are scripted messages adaptable to variations in scenarios?" },
+    { name: "flexibilityInTemplates", label: "Is flexibility built into templates for real-time updates?" }, // Simplified
+    { name: "evaluatedEffectiveness", label: "Are scripted messages evaluated for effectiveness during drills/emergencies?" },
+    { name: "feedbackSolicited", label: "Is feedback solicited from occupants/stakeholders on message clarity/usefulness?" }, // Simplified
+    { name: "recommendationsRefineMessages", label: "Are recommendations used to refine messages and improve efficacy?" } // Simplified
+];
+
 
 function EmergencyAnnouncementProtocolsFormPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding();
     const db = getFirestore();
     const functions = getFunctions();
+     // Renamed variable for clarity
     const uploadEmergencyAnnouncementProtocolsImage = httpsCallable(functions, 'uploadEmergencyAnnouncementProtocolsImage');
 
+    // State aligned with the standard pattern - Looks good
     const [formData, setFormData] = useState({});
     const [imageData, setImageData] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
@@ -21,23 +49,27 @@ function EmergencyAnnouncementProtocolsFormPage() {
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState(null);
 
+    // useEffect for fetching data on load - Looks good
     useEffect(() => {
         if (!buildingId) {
             alert('No building selected. Redirecting to Building Info...');
-            navigate('BuildingandAddress');
+            navigate('/BuildingandAddress');
             return;
         }
 
         const fetchFormData = async () => {
             setLoading(true);
             setLoadError(null);
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Emergency Announcement Protocols', buildingId);
 
             try {
-                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Emergency Announcement Protocols', buildingId);
                 const docSnapshot = await getDoc(formDocRef);
-
                 if (docSnapshot.exists()) {
-                    setFormData(docSnapshot.data().formData || {});
+                    const existingData = docSnapshot.data().formData || {};
+                    setFormData(existingData);
+                     if (existingData.imageUrl) {
+                         setImageUrl(existingData.imageUrl);
+                     }
                 } else {
                     setFormData({});
                 }
@@ -52,34 +84,53 @@ function EmergencyAnnouncementProtocolsFormPage() {
         fetchFormData();
     }, [buildingId, db, navigate]);
 
+    // handleChange saves data immediately with correct structure
     const handleChange = async (e) => {
         const { name, value } = e.target;
         const newFormData = { ...formData, [name]: value };
         setFormData(newFormData);
 
-        try {
-            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Emergency Announcement Protocols', buildingId);
-            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
-            console.log("Form data saved to Firestore:", newFormData);
-        } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+        if (buildingId) {
+            try {
+                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Emergency Announcement Protocols', buildingId);
+                const buildingRef = doc(db, 'Buildings', buildingId);
+                // Include existing imageUrl in save data
+                const dataToSave = {
+                    ...newFormData,
+                    building: buildingRef,
+                    ...(imageUrl && { imageUrl: imageUrl }) // Preserve existing imageUrl
+                };
+                await setDoc(formDocRef, { formData: dataToSave }, { merge: true });
+                // console.log("Form data auto-saved:", dataToSave);
+            } catch (error) {
+                console.error("Error auto-saving form data:", error);
+                // Optionally show a non-blocking error to the user
+            }
         }
     };
 
+    // handleImageChange using FileReader - Looks good
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImageData(reader.result);
-        };
-        reader.readAsDataURL(file);
+        if (file) {
+           const reader = new FileReader();
+           reader.onloadend = () => {
+               setImageData(reader.result);
+               setImageUrl(null);
+               setImageUploadError(null);
+           };
+           reader.readAsDataURL(file);
+        } else {
+           setImageData(null);
+        }
     };
 
+    // handleBack now only navigates - Looks good
     const handleBack = () => {
         navigate(-1);
     };
 
+    // handleSubmit uses Cloud Function for upload with correct structure
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -88,128 +139,130 @@ function EmergencyAnnouncementProtocolsFormPage() {
             return;
         }
 
+        setLoading(true);
+        let finalImageUrl = formData.imageUrl || null;
+        let submissionError = null;
+
         if (imageData) {
+             setImageUploadError(null);
             try {
-                const uploadResult = await uploadEmergencyAnnouncementProtocolsImage({ imageData: imageData });
-                setImageUrl(uploadResult.data.imageUrl);
-                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
-                setImageUploadError(null);
+                console.log("Uploading image...");
+                // Use correct function variable name
+                const uploadResult = await uploadEmergencyAnnouncementProtocolsImage({
+                    imageData: imageData,
+                    buildingId: buildingId
+                 });
+                finalImageUrl = uploadResult.data.imageUrl;
+                setImageUrl(finalImageUrl);
+                console.log("Image uploaded successfully:", finalImageUrl);
             } catch (error) {
-                console.error('Error uploading image:', error);
-                setImageUploadError(error.message);
+                console.error('Error uploading image via Cloud Function:', error);
+                setImageUploadError(error.message || "Failed to upload image.");
+                submissionError = `Image upload failed: ${error.message || "Unknown error"}`;
+                 finalImageUrl = formData.imageUrl || null;
+                // alert(submissionError); // Alert moved after save attempt
             }
         }
 
+        const finalFormData = { ...formData, imageUrl: finalImageUrl };
+        setFormData(finalFormData); // Update state to final version
+
         try {
             const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Emergency Announcement Protocols', buildingId);
-            await setDoc(formDocRef, { formData: formData }, { merge: true });
-            console.log('Form data submitted successfully!');
-            alert('Form submitted successfully!');
-            navigate('/Form');
+            const buildingRef = doc(db, 'Buildings', buildingId);
+             // Save final data with correct structure, including building ref
+            await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
 
+            console.log('Form data submitted successfully!');
+            if (!submissionError) {
+                 alert('Form submitted successfully!');
+             } else {
+                 alert(submissionError); // Show image error now if save succeeded anyway
+             }
+            navigate('/Form');
         } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+            console.error("Error submitting final form data:", error);
+            alert("Failed to submit the form. Please check your connection and try again.");
+        } finally {
+             setLoading(false);
         }
     };
 
+    // Loading and Error display - Looks good
     if (loading) {
         return <div>Loading...</div>;
     }
-
     if (loadError) {
         return <div>Error: {loadError}</div>;
     }
 
     return (
-        <div>
-            <div className="form-page">
-                <header className="header">
-                    <Navbar />
-                    <button className="back-button" onClick={handleBack}>←</button>
-                    <h1>Emergency Announcement Protocols Assessment</h1>
-                    <img src={logo} alt="Logo" className="logo" />
-                </header>
+         // Removed outer wrapper div
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>Emergency Announcement Protocols Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-                <main className="form-container">
-                    <form onSubmit={handleSubmit}>
-                        <h2>Emergency Announcement Protocols Assessment</h2>
-                        {[
-                            { name: "standardizedMessageTemplates", label: "Are standardized message templates developed for various types of emergencies, such as lockdowns, evacuations, severe weather, or medical emergencies?" },
-                            { name: "essentialInfo", label: "Do these templates include essential information, such as the nature of the emergency, specific actions to take, and any additional instructions or precautions?" },
-                            { name: "scriptedEmergencyAnnouncements", label: "Are emergency announcements scripted to convey information in a clear, concise, and easily understandable manner?" },
-                            { name: "scriptsAvoidingConfusion", label: "Do scripts avoid technical jargon or ambiguous language that could cause confusion or misunderstanding during emergencies?" },
-                            { name: "appropriateAnnouncements", label: "Are announcements tailored to the intended audience, considering factors such as age, language proficiency, and cognitive ability?" },
-                            { name: "structuredScriptedMessages", label: "Do scripted messages follow a structured format that includes key elements such as the type of emergency, location or affected area, recommended actions, and any follow-up instructions?" },
-                            { name: "messagesProvidingGuidance", label: "Are messages designed to provide actionable guidance to occupants, helping them make informed decisions and respond effectively to the emergency situation?" },
-                            { name: "reviewedScripts", label: "Are emergency announcement scripts reviewed and approved by appropriate authorities, such as safety officers, emergency management personnel, or legal advisors?" },
-                            { name: "ensuringConsistency", label: "Is there a process for ensuring consistency and accuracy in scripted messages, including periodic updates to reflect changes in procedures, regulations, or best practices?" },
-                            { name: "trainedIndividuals", label: "Are individuals responsible for delivering emergency announcements trained on the use of scripted messages and communication protocols?" },
-                            { name: "trainingPrograms", label: "Do training programs include practice sessions to familiarize operators with different types of emergencies and associated message templates?" },
-                            { name: "deliveringMessagesResources", label: "Are operators provided with resources, such as cue cards or reference guides, to assist them in delivering scripted messages accurately and confidently?" },
-                            { name: "adaptableScriptedMessages", label: "Are scripted messages adaptable to accommodate variations in emergency scenarios, such as the scale, severity, or duration of the event?" },
-                            { name: "FlexibilityInTemplates", label: "Is there flexibility built into message templates to allow for real-time updates or modifications based on evolving circumstances or new information?" },
-                            { name: "evaluatedEffectiveness", label: "Are scripted messages evaluated for their effectiveness in conveying critical information and guiding appropriate responses during drills and actual emergencies?" },
-                            { name: "solicitedFeedback", label: "Is feedback solicited from occupants and stakeholders to assess the clarity, comprehensibility, and usefulness of scripted messages?" },
-                            { name: "recommendationsRefineMessages", label: "Are recommendations from evaluations used to refine scripted messages and improve their efficacy in future emergency situations?" }
-                        ].map((question, index) => (
-                            <div key={index} className="form-section">
-                                <label>{question.label}</label>
-                                <div>
-                                    {question.name === "ensuringConsistency" ? (
-                                        <>
-                                            <input
-                                                type="radio"
-                                                name={question.name}
-                                                value="yes"
-                                                checked={formData[question.name] === "yes"}
-                                                onChange={handleChange}
-                                            /> Yes
-                                            <input
-                                                type="radio"
-                                                name={question.name}
-                                                value="no"
-                                                checked={formData[question.name] === "no"}
-                                                onChange={handleChange}
-                                            /> No
-                                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                                            <input
-                                                type="text"
-                                                name={`${question.name}Process`}
-                                                placeholder="Describe the process"
-                                                value={formData[`${question.name}Process`] || ''}
-                                                onChange={handleChange}
-                                            />
-                                        </>
-                                    ) : (
-                                        <>
-                                            <input
-                                                type="radio"
-                                                name={question.name}
-                                                value="yes"
-                                                checked={formData[question.name] === "yes"}
-                                                onChange={handleChange}
-                                            /> Yes
-                                            <input
-                                                type="radio"
-                                                name={question.name}
-                                                value="no"
-                                                checked={formData[question.name] === "no"}
-                                                onChange={handleChange}
-                                            /> No
-                                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                                        </>
-                                    )}
-                                </div>
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                     <h2>Announcement Protocol Questions</h2> {/* Added main heading */}
+                    {/* Render questions dynamically using single map */}
+                    {announcementProtocolQuestions.map((question, index) => (
+                        <div key={question.name} className="form-section"> {/* Use name for key */}
+                            <label htmlFor={`${question.name}_yes`}>{question.label}</label> {/* Associate label */}
+
+                             {/* Standard Yes/No Radio + Comment Input */}
+                            <div>
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_yes`}
+                                    name={question.name}
+                                    value="yes"
+                                    checked={formData[question.name] === "yes"}
+                                    onChange={handleChange}
+                                />
+                                <label htmlFor={`${question.name}_yes`}> Yes</label>
+
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_no`}
+                                    name={question.name}
+                                    value="no"
+                                    checked={formData[question.name] === "no"}
+                                    onChange={handleChange}
+                                />
+                                <label htmlFor={`${question.name}_no`}> No</label>
                             </div>
-                        ))}
-                        <input type="file" onChange={handleImageChange} accept="image/*" />
-                        {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                        {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
-                        <button type="submit">Submit</button>
-                    </form>
-                </main>
-            </div>
+                            <input
+                                type="text"
+                                id={`${question.name}Comment`}
+                                name={`${question.name}Comment`} // Standard comment name
+                                placeholder="Additional comments"
+                                value={formData[`${question.name}Comment`] || ''}
+                                onChange={handleChange}
+                                className='comment-input' // Use consistent class
+                            />
+                        </div>
+                    ))}
+
+                    {/* File Input for Image Upload */}
+                    <div className="form-section">
+                         <label htmlFor="imageUploadAnnounceProto">Upload Image (Optional):</label>
+                         <input id="imageUploadAnnounceProto" type="file" onChange={handleImageChange} accept="image/*" />
+                         {imageUrl && !imageData && <img src={imageUrl} alt="Uploaded Announcement Protocol related" style={{ maxWidth: '200px', marginTop: '10px' }}/>}
+                         {imageData && <img src={imageData} alt="Preview Announcement Protocol related" style={{ maxWidth: '200px', marginTop: '10px' }}/>}
+                         {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                    </div>
+
+                    {/* Submit Button */}
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Submitting...' : 'Submit Final'}
+                    </button>
+                </form>
+            </main>
         </div>
     );
 }

@@ -1,109 +1,212 @@
 import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+// Corrected Firestore imports
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+// Added Functions imports
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext';
+import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
+
+// Define questions array outside the component
+const drillFrequencyQuestions = [
+    // Corrected names to camelCase
+    // Adapted from text input
+    { name: "plannedFrequencyDefined", label: "1. Is there a defined plan regarding the frequency of emergency drills?" },
+    { name: "predefinedSchedule", label: "2. Is there a predefined schedule for conducting drills (e.g., monthly, quarterly)?" }, // Typo fixed
+    { name: "regulationBasedFrequency", label: "3. Are drill frequencies based on regulations, policies, and best practices?" },
+    { name: "scheduleConsistency", label: "4. Are drills conducted consistently according to the established schedule?" },
+    { name: "deviationDocumentation", label: "5. Are deviations from the schedule documented and justified?" },
+    // Adapted from text input
+    { name: "complianceProcessExists", label: "6. Is there a process for ensuring compliance with scheduled frequencies?" },
+    { name: "scenarioDiversity", label: "7. Are different types of drills included to cover various scenarios/hazards?" },
+    { name: "multiSituationCoverage", label: "8. Do drills address various emergencies (fire, earthquake, active threat, etc.)?" },
+    { name: "locationCoverage", label: "9. Are drills conducted in different areas of the facility?" },
+    { name: "stakeholderInvolvement", label: "10. Are all relevant stakeholders (staff, occupants, management) involved?" },
+    { name: "agencyCoordination", label: "11. Are drills coordinated with external agencies (e.g., emergency responders)?" },
+    { name: "stakeholderEngagement", label: "12. Are drills used to engage/educate stakeholders on procedures/roles?" },
+    { name: "drillEffectivenessEvaluation", label: "13. Are drills evaluated for effectiveness in achieving objectives?" }, // Renamed 'Drill Effectiveness'
+    // Adapted from text input
+    { name: "feedbackMechanismsExist", label: "14. Are feedback mechanisms (surveys, debriefs) in place to capture observations?" },
+    { name: "outcomeAnalysis", label: "15. Are drill outcomes analyzed to identify strengths/areas for improvement?" },
+    { name: "frequencyAdjustment", label: "16. Is drill frequency adjusted based on risks, needs, regulations, and lessons learned?" },
+    { name: "scheduleFlexibility", label: "17. Is the drill schedule flexible to accommodate emerging threats/changes?" },
+    // Adapted from text input
+    { name: "feedbackIntegrationProcessExists", label: "18. Is there a process for incorporating feedback into future planning?" },
+    { name: "drillRecordkeeping", label: "19. Are records maintained documenting drill scheduling, execution, and outcomes?" },
+    { name: "recordsAccessibility", label: "20. Are drill records accessible for review, analysis, and compliance checks?" }, // Simplified
+    { name: "retentionPolicy", label: "21. Are drill schedules/records retained according to regulations/policies?" } // Simplified
+];
+
 
 function DrillFrequencyFormPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding();
     const db = getFirestore();
-    const storage = getStorage();
+    const functions = getFunctions();
+    // Define httpsCallable function for this component
+    const uploadDrillFrequencyImage = httpsCallable(functions, 'uploadDrillFrequencyImage');
 
+    // Corrected state variables
     const [formData, setFormData] = useState({});
-    const [image, setImage] = useState(null);
-    const [uploadProgress, setUploadProgress] = useState(0);
+    const [imageData, setImageData] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
-    const [uploadError, setUploadError] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null); // Added loadError
 
+    // useEffect using getDoc by ID
     useEffect(() => {
         if (!buildingId) {
             alert('No building selected. Redirecting to Building Info...');
-            navigate('BuildingandAddress');
+            navigate('/BuildingandAddress');
+            return;
         }
-    }, [buildingId, navigate]);
 
-    const handleImageChange = (e) => {
-        if (e.target.files[0]) {
-            setImage(e.target.files[0]);
-        }
-    };
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+            // Correct Firestore path
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Drill Frequency', buildingId);
 
-    const handleChange = (e) => {
+            try {
+                const docSnapshot = await getDoc(formDocRef);
+                if (docSnapshot.exists()) {
+                    const existingData = docSnapshot.data().formData || {};
+                    setFormData(existingData);
+                    if (existingData.imageUrl) {
+                        setImageUrl(existingData.imageUrl);
+                    }
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    // handleChange saves immediately using setDoc by ID with correct structure
+    const handleChange = async (e) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
 
-    const handleBack = async () => {
-        if (formData && buildingId) {
+        if (buildingId) {
             try {
                 const buildingRef = doc(db, 'Buildings', buildingId);
-                const formsRef = collection(db, 'forms/Emergency Preparedness/Drill Frequency');
-                await addDoc(formsRef, {
-                    building: buildingRef,
-                    formData: formData,
-                });
-                console.log('Form Data submitted successfully on back!');
-                alert('Form data saved before navigating back!');
+                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Drill Frequency', buildingId);
+                const dataToSave = {
+                     ...newFormData,
+                     building: buildingRef,
+                     ...(imageUrl && { imageUrl: imageUrl })
+                 };
+                await setDoc(formDocRef, { formData: dataToSave }, { merge: true });
+                // console.log("Form data updated:", dataToSave);
             } catch (error) {
-                console.error('Error saving form data:', error);
-                alert('Failed to save form data before navigating back. Some data may be lost.');
+                console.error("Error saving form data to Firestore:", error);
+                // Avoid alerting on every change
             }
         }
+    };
+
+    // handleImageChange using base64
+    const handleImageChange = (e) => {
+       const file = e.target.files[0];
+       if (file) {
+           const reader = new FileReader();
+           reader.onloadend = () => {
+               setImageData(reader.result);
+               setImageUrl(null);
+               setImageUploadError(null);
+           };
+           reader.readAsDataURL(file);
+       } else {
+           setImageData(null);
+       }
+    };
+
+    // handleBack simplified
+    const handleBack = () => {
         navigate(-1);
     };
 
+    // handleSubmit uses Cloud Function and setDoc by ID with correct structure
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!buildingId) {
-            alert('Building ID is missing. Please start the assessment from the correct page.');
+            alert('Building ID is missing. Cannot submit.');
             return;
         }
 
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
-            const formsRef = collection(db, 'forms/Emergency Preparedness/Drill Frequency');
-            await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-            });
+        setLoading(true);
+        let finalImageUrl = formData.imageUrl || null;
+        let submissionError = null;
 
-            if (image) {
-                const imageRef = ref(storage, `images/drillFrequency/${image.name}`);
-                const uploadTask = uploadBytesResumable(imageRef, image);
-
-                uploadTask.on('state_changed',
-                    (snapshot) => {
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        setUploadProgress(progress);
-                    },
-                    (error) => {
-                        setUploadError(error.message);
-                    },
-                    () => {
-                        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                            setImageUrl(downloadURL);
-                        });
-                    }
-                );
+        if (imageData) {
+            try {
+                console.log("Uploading image via Cloud Function...");
+                // Use correct function variable name
+                const uploadResult = await uploadDrillFrequencyImage({
+                    imageData: imageData,
+                    buildingId: buildingId
+                 });
+                finalImageUrl = uploadResult.data.imageUrl;
+                setImageUrl(finalImageUrl);
+                setImageUploadError(null);
+                console.log("Image uploaded successfully:", finalImageUrl);
+            } catch (error) {
+                console.error('Error uploading image via function:', error);
+                setImageUploadError(`Image upload failed: ${error.message}`);
+                submissionError = "Image upload failed. Form data saved without new image.";
+                 finalImageUrl = formData.imageUrl || null;
             }
-            console.log('Form Data submitted successfully!');
-            alert('Form Submitted successfully!');
+        }
+
+        const finalFormData = {
+             ...formData,
+             imageUrl: finalImageUrl,
+        };
+        setFormData(finalFormData);
+
+        try {
+            console.log("Saving final form data to Firestore...");
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Drill Frequency', buildingId);
+            // Save final data with correct structure, including building ref
+            await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
+            console.log('Form data submitted successfully!');
+            if (!submissionError) {
+                alert('Form submitted successfully!');
+            } else {
+                alert(submissionError);
+            }
             navigate('/Form');
         } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Failed to submit the form. Please try again.');
+            console.error("Error saving final form data to Firestore:", error);
+            alert("Failed to save final form data. Please check connection and try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
+    // Loading/Error Display
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
+    }
+
     return (
+        // Removed outer div if it existed
         <div className="form-page">
             <header className="header">
                 <Navbar />
@@ -114,207 +217,55 @@ function DrillFrequencyFormPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    <div className="form-section">
-                        <label>1. What is the planned frequency of emergency drills within the facility?</label>
-                        <div>
-                            <input type="text" name="plannedEmergencyDrills" placeholder="Describe the plan" onChange={handleChange} />
-                        </div>
-                    </div>
+                     <h2>Drill Frequency Questions</h2> {/* Added main heading */}
 
-                    <div className="form-section">
-                        <label>2. Is there a predefined schedule for conducting drills, such as monthly, quarterly, or semi-annually?</label>
-                        <div>
-                            <input type="radio" name="predifinedSchedule" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="predifinedSchedule" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="predifinedSchedule-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
+                    {/* Single .map call for all questions with standardized rendering */}
+                    {drillFrequencyQuestions.map((question, index) => (
+                        <div key={question.name} className="form-section"> {/* Use name for key */}
+                            <label>{question.label}</label>
+                            {/* Div for radio buttons */}
+                            <div>
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_yes`}
+                                    name={question.name}
+                                    value="yes"
+                                    checked={formData[question.name] === "yes"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_yes`}>Yes</label>
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_no`}
+                                    name={question.name}
+                                    value="no"
+                                    checked={formData[question.name] === "no"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_no`}>No</label>
+                            </div>
+                            {/* Input for comments */}
+                            <input
+                                className='comment-input'
+                                type="text"
+                                name={`${question.name}Comment`} // Corrected comment name format
+                                placeholder="Additional comments"
+                                value={formData[`${question.name}Comment`] || ''}
+                                onChange={handleChange}
+                            />
                         </div>
-                    </div>
+                    ))}
 
-                    <div className="form-section">
-                        <label>3. Are drill frequencies determined based on regulatory requirements, organizational policies, and best practices for emergency preparedness?</label>
-                        <div>
-                            <input type="radio" name="Regulation-Based Frequency" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Regulation-Based Frequency" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Regulation-Based Frequency-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
+                    {/* Image upload section - Looks good */}
+                     <div className="form-section">
+                         <label htmlFor="imageUploadDrillFreq">Upload Image (Optional):</label>
+                         <input id="imageUploadDrillFreq" type="file" onChange={handleImageChange} accept="image/*" />
+                         {imageUrl && !imageData && <img src={imageUrl} alt="Uploaded Drill Freq. related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                         {imageData && <img src={imageData} alt="Preview Drill Freq. related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                         {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                     </div>
 
-                    <div className="form-section">
-                        <label>4. Are drills conducted consistently according to the established schedule?</label>
-                        <div>
-                            <input type="radio" name="Schedule Consistency" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Schedule Consistency" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Schedule Consistency-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>5. Are deviations from the scheduled frequency documented and justified, such as rescheduling due to operational constraints or other priorities?</label>
-                        <div>
-                            <input type="radio" name="Deviation Documentation" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Deviation Documentation" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Deviation Documentation-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>6. Is there a process for ensuring compliance with scheduled drill frequencies and addressing any lapses or delays?</label>
-                        <div>
-                            <input type="radio" name="Compliance Process" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Compliance Process" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Compliance Process-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                        <div>
-                            <input type="text" name="complianceProcess" placeholder="Describe the process" onChange={handleChange} />
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>7. Are different types of emergency drills included in the drill schedule to cover a range of potential scenarios, hazards, and response actions?</label>
-                        <div>
-                            <input type="radio" name="Scenario Diversity" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Scenario Diversity" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Scenario Diversity-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>8. Do drills address various emergency situations, such as fires, earthquakes, active threats, hazardous material spills, and medical emergencies?</label>
-                        <div>
-                            <input type="radio" name="Multi-Situation Coverage" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Multi-Situation Coverage" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Multi-Situation Coverage-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>9. Are drills conducted in different areas of the facility to assess readiness and response capabilities across multiple locations?</label>
-                        <div>
-                            <input type="radio" name="Location Coverage" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Location Coverage" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Location Coverage-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>10. Are all relevant stakeholders, including staff members, occupants, management personnel, and external partners, involved in drill activities?</label>
-                        <div>
-                            <input type="radio" name="Stakeholder Involvement" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Stakeholder Involvement" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Stakeholder Involvement-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>11. Are drills coordinated with external agencies, such as emergency responders, to facilitate collaboration and mutual aid during emergencies?</label>
-                        <div>
-                            <input type="radio" name="Agency Coordination" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Agency Coordination" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Agency Coordination-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>12. Are drills used as opportunities to engage and educate stakeholders on emergency procedures, roles, and responsibilities?</label>
-                        <div>
-                            <input type="radio" name="Stakeholder Engagement" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Stakeholder Engagement" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Stakeholder Engagement-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>13. Are drills evaluated for their effectiveness in achieving desired learning objectives and improving emergency preparedness and response capabilities?</label>
-                        <div>
-                            <input type="radio" name="Drill Effectiveness" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Drill Effectiveness" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Drill Effectiveness-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>14. Are feedback mechanisms in place to capture observations, insights, and lessons learned from drill participants and observers?</label>
-                        <div>
-                            <input type="radio" name="Feedback Mechanisms" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Feedback Mechanisms" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Feedback Mechanisms-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                        <div>
-                            <input type="text" name="feedbackMechanisms" placeholder="Describe the feedback mechanisms" onChange={handleChange} />
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>15. Are drill outcomes analyzed to identify strengths, areas for improvement, and opportunities for enhancing emergency readiness?</label>
-                        <div>
-                            <input type="radio" name="Outcome Analysis" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Outcome Analysis" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Outcome Analysis-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>16. Is the drill frequency adjusted based on changing risk factors, operational needs, regulatory requirements, and lessons learned from previous drills?</label>
-                        <div>
-                            <input type="radio" name="Frequency Adjustment" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Frequency Adjustment" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Frequency Adjustment-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>17. Are drill schedules flexible to accommodate emerging threats, organizational changes, and feedback from stakeholders?</label>
-                        <div>
-                            <input type="radio" name="Schedule Flexibility" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Schedule Flexibility" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Schedule Flexibility-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>18. Is there a process for incorporating feedback and recommendations from drill evaluations into future drill planning and execution?</label>
-                        <div>
-                            <input type="radio" name="Feedback Integration" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Feedback Integration" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Feedback Integration-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                        <div>
-                            <input type="text" name="feedbackIntegration" placeholder="Describe the process" onChange={handleChange} />
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>19. Are records maintained to document the scheduling, execution, and outcomes of emergency drills?</label>
-                        <div>
-                            <input type="radio" name="Drill Recordkeeping" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Drill Recordkeeping" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Drill Recordkeeping-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>20. Are drill records accessible for review, analysis, and reporting purposes, including compliance assessments and performance evaluations?</label>
-                        <div>
-                            <input type="radio" name="Records Accessibility" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Records Accessibility" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Records Accessibility-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>21. Are drill schedules and records retained for auditing, training, and planning purposes, in accordance with applicable regulations and organizational policies?</label>
-                        <div>
-                            <input type="radio" name="Retention Policy" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="Retention Policy" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="Retention Policy-comment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                    {uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                    {uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-                    <button type="submit">Submit</button>
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Submitting...' : 'Submit Final'}
+                    </button>
                 </form>
             </main>
         </div>

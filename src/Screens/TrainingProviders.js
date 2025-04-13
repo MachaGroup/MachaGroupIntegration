@@ -1,19 +1,48 @@
+import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
+// Corrected Firestore imports
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+// Added Functions imports
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
-import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-import { getFunctions, httpsCallable } from "firebase/functions";
+
+// Define questions array outside the component
+const trainingProviderQuestions = [
+    // Corrected names to camelCase
+    { name: "providerCertification", label: "Are training providers certified/accredited?" }, // Simplified
+    { name: "providerStandardsCompliance", label: "Do providers adhere to recognized standards (e.g., ARC, AHA)?" }, // Simplified
+    { name: "instructorQualification", label: "Are instructors qualified/experienced in delivering First Aid/CPR training?" },
+    // Adapted from text input
+    { name: "instructorCertificationsExist", label: "Do instructors possess relevant certifications?" },
+    { name: "curriculumComprehensiveness", label: "Is the curriculum comprehensive and up-to-date?" }, // Simplified
+    { name: "curriculumAlignment", label: "Does the curriculum align with recognized standards/guidelines?" },
+    { name: "trainingEnvironment", label: "Are training sessions conducted in a suitable environment for hands-on practice?" },
+    { name: "trainingMethodsVariety", label: "Are various instructional methods used (accommodating learning styles)?" }, // Simplified
+    { name: "participantEngagement", label: "Are sessions interactive and engaging?" }, // Simplified
+    { name: "practiceOpportunities", label: "Are opportunities provided for supervised practice?" }, // Simplified
+    { name: "participantAssessment", label: "Are participants assessed (written/practical)?" }, // Simplified
+    { name: "instructorEvaluationFeedback", label: "Do instructors evaluate performance and provide constructive feedback?" }, // Simplified
+    { name: "participantCertification", label: "Are certifications awarded upon successful completion?" }, // Simplified
+    // Adapted from text input
+    { name: "recertificationProcessExists", label: "Is there a defined process for regular staff recertification?" },
+    // Adapted from text input
+    { name: "feedbackMechanismsExist", label: "Are feedback mechanisms (surveys, evals) used to gather input on training quality?" },
+    { name: "recommendationsImplementation", label: "Are recommendations from feedback implemented?" } // Simplified
+];
+
 
 function TrainingProvidersFormPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding();
     const db = getFirestore();
     const functions = getFunctions();
-    const uploadImage = httpsCallable(functions, 'uploadTrainingProvidersImage');
+    // Renamed variable for clarity
+    const uploadTrainingProvidersImage = httpsCallable(functions, 'uploadTrainingProvidersImage');
 
+    // State variables look good
     const [formData, setFormData] = useState({});
     const [imageData, setImageData] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
@@ -21,23 +50,28 @@ function TrainingProvidersFormPage() {
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState(null);
 
+    // useEffect for fetching data - Looks good
     useEffect(() => {
         if (!buildingId) {
             alert('No building selected. Redirecting to Building Info...');
-            navigate('BuildingandAddress');
+            navigate('/BuildingandAddress');
             return;
         }
 
         const fetchFormData = async () => {
             setLoading(true);
             setLoadError(null);
+            // Correct Firestore path
+            const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Training Providers', buildingId);
 
             try {
-                const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Training Providers', buildingId);
                 const docSnapshot = await getDoc(formDocRef);
-
                 if (docSnapshot.exists()) {
-                    setFormData(docSnapshot.data().formData || {});
+                    const existingData = docSnapshot.data().formData || {};
+                    setFormData(existingData);
+                    if (existingData.imageUrl) {
+                        setImageUrl(existingData.imageUrl);
+                    }
                 } else {
                     setFormData({});
                 }
@@ -52,76 +86,121 @@ function TrainingProvidersFormPage() {
         fetchFormData();
     }, [buildingId, db, navigate]);
 
+    // handleChange saves data immediately with correct structure
     const handleChange = async (e) => {
         const { name, value } = e.target;
         const newFormData = { ...formData, [name]: value };
         setFormData(newFormData);
- 
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId); // Create buildingRef
-            const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Training Providers', buildingId);
-            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true }); // Use merge and add building
-            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
-        } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+
+        if (buildingId) {
+            try {
+                const buildingRef = doc(db, 'Buildings', buildingId);
+                const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Training Providers', buildingId);
+                const dataToSave = {
+                     ...newFormData,
+                     building: buildingRef,
+                     ...(imageUrl && { imageUrl: imageUrl })
+                 };
+                await setDoc(formDocRef, { formData: dataToSave }, { merge: true });
+                // console.log("Form data updated:", dataToSave);
+            } catch (error) {
+                console.error("Error saving form data to Firestore:", error);
+                // Avoid alerting on every change
+            }
         }
     };
 
+    // handleImageChange using base64 - Looks good
     const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImageData(reader.result);
-        };
-        reader.readAsDataURL(file);
+       const file = e.target.files[0];
+       if (file) {
+           const reader = new FileReader();
+           reader.onloadend = () => {
+               setImageData(reader.result);
+               setImageUrl(null);
+               setImageUploadError(null);
+           };
+           reader.readAsDataURL(file);
+       } else {
+           setImageData(null);
+       }
     };
 
+    // handleBack - Looks good
     const handleBack = () => {
         navigate(-1);
     };
 
+    // handleSubmit uses Cloud Function and setDoc with correct structure
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!buildingId) {
-            alert('Building ID is missing. Please start from the Building Information page.');
+            alert('Building ID is missing. Cannot submit.');
             return;
         }
 
+        setLoading(true);
+        let finalImageUrl = formData.imageUrl || null;
+        let submissionError = null;
+
         if (imageData) {
             try {
-                const uploadResult = await uploadImage({ imageData: imageData });
-                setImageUrl(uploadResult.data.imageUrl);
-                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                console.log("Uploading image via Cloud Function...");
+                // Use correct function variable name
+                const uploadResult = await uploadTrainingProvidersImage({
+                    imageData: imageData,
+                    buildingId: buildingId
+                 });
+                finalImageUrl = uploadResult.data.imageUrl;
+                setImageUrl(finalImageUrl);
                 setImageUploadError(null);
+                console.log("Image uploaded successfully:", finalImageUrl);
             } catch (error) {
-                console.error('Error uploading image:', error);
-                setImageUploadError(error.message);
+                console.error('Error uploading image via function:', error);
+                setImageUploadError(`Image upload failed: ${error.message}`);
+                submissionError = "Image upload failed. Form data saved without new image.";
+                 finalImageUrl = formData.imageUrl || null;
             }
         }
 
+        const finalFormData = {
+             ...formData,
+             imageUrl: finalImageUrl,
+        };
+        setFormData(finalFormData);
+
         try {
+            console.log("Saving final form data to Firestore...");
+            const buildingRef = doc(db, 'Buildings', buildingId);
             const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Training Providers', buildingId);
-            await setDoc(formDocRef, { formData: formData }, { merge: true });
+             // Save final data with correct structure, including building ref
+            await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
             console.log('Form data submitted successfully!');
-            alert('Form submitted successfully!');
+            if (!submissionError) {
+                alert('Form submitted successfully!');
+            } else {
+                alert(submissionError);
+            }
             navigate('/Form');
         } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+            console.error("Error saving final form data to Firestore:", error);
+            alert("Failed to save final form data. Please check connection and try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
+    // Loading/Error Display - Looks good
     if (loading) {
         return <div>Loading...</div>;
     }
-
     if (loadError) {
         return <div>Error: {loadError}</div>;
     }
 
     return (
+         // Removed outer div if present
         <div className="form-page">
             <header className="header">
                 <Navbar />
@@ -132,65 +211,55 @@ function TrainingProvidersFormPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    <h2>Training Providers</h2>
-                    {[
-                        { name: "providerCertification", label: "Are training providers certified and accredited to deliver First Aid/CPR training programs?" },
-                        { name: "providerStandardsCompliance", label: "Do training providers adhere to recognized standards and guidelines for First Aid/CPR training, such as those established by organizations like the American Red Cross or the American Heart Association?" },
-                        { name: "instructorQualification", label: "Are instructors employed by training providers qualified and experienced in delivering First Aid/CPR training?" },
-                        { name: "instructorCertificationList", label: "Do instructors possess relevant certifications and qualifications, such as Certified First Aid/CPR Instructor credentials?" },
-                        { name: "curriculumComprehensiveness", label: "Is the training curriculum comprehensive and up-to-date, covering essential topics related to First Aid/CPR procedures, techniques, and best practices?" },
-                        { name: "curriculumAlignment", label: "Does the curriculum align with recognized standards and guidelines for First Aid/CPR training?" },
-                        { name: "trainingEnvironment", label: "Are training sessions conducted in a suitable training environment that allows for hands-on practice and skills demonstration?" },
-                        { name: "trainingMethodsVariety", label: "Are training sessions delivered using a variety of instructional methods and resources to accommodate different learning styles and preferences?" },
-                        { name: "participantEngagement", label: "Are training sessions interactive and engaging, encouraging active participation and skills development among participants?" },
-                        { name: "practiceOpportunities", label: "Are opportunities provided for participants to ask questions, seek clarification, and practice First Aid/CPR techniques under instructor supervision?" },
-                        { name: "participantAssessment", label: "Are participants assessed on their understanding and proficiency in First Aid/CPR procedures through written tests and practical skills assessments?" },
-                        { name: "instructorEvaluationFeedback", label: "Are instructors responsible for evaluating participant performance and providing constructive feedback for improvement?" },
-                        { name: "participantCertification", label: "Are participants awarded certifications upon successful completion of First Aid/CPR training courses?" },
-                        { name: "recertificationDetails", label: "Is there a process in place for recertifying staff members on a regular basis to ensure that their skills and knowledge remain current and up-to-date?" },
-                        { name: "feedbackDetails", label: "Are feedback mechanisms in place to gather input from participants regarding the quality and effectiveness of First Aid/CPR training programs?" },
-                        { name: "recommendationsImplementation", label: "Are recommendations for enhancing training content, delivery methods, or instructor performance considered and implemented based on feedback received?" }
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
+                    <h2>Training Provider Questions</h2> {/* Added main heading */}
+
+                    {/* Single .map call for all questions with standardized rendering */}
+                    {trainingProviderQuestions.map((question, index) => (
+                        <div key={question.name} className="form-section"> {/* Use name for key */}
                             <label>{question.label}</label>
-                            {question.name === "providerCertification" || question.name === "providerStandardsCompliance" || question.name === "instructorQualification" || question.name === "curriculumComprehensiveness" || question.name === "curriculumAlignment" || question.name === "trainingEnvironment" || question.name === "trainingMethodsVariety" || question.name === "participantEngagement" || question.name === "practiceOpportunities" || question.name === "participantAssessment" || question.name === "instructorEvaluationFeedback" || question.name === "participantCertification" || question.name === "recommendationsImplementation" ? (
-                                <><div>
+                            {/* Div for radio buttons */}
+                            <div>
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_yes`}
+                                    name={question.name}
+                                    value="yes"
+                                    checked={formData[question.name] === "yes"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_yes`}>Yes</label>
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_no`}
+                                    name={question.name}
+                                    value="no"
+                                    checked={formData[question.name] === "no"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_no`}>No</label>
+                            </div>
+                            {/* Input for comments */}
                             <input
-                              type="radio"
-                              name={question.name}
-                              value="yes"
-                              checked={formData[question.name] === "yes"}
-                              onChange={handleChange} /> Yes
-                            <input
-                              type="radio"
-                              name={question.name}
-                              value="no"
-                              checked={formData[question.name] === "no"}
-                              onChange={handleChange} /> No
-                          </div>
-                          <div>
-                              <input
+                                className='comment-input'
                                 type="text"
                                 name={`${question.name}Comment`}
-                                placeholder="Comments"
+                                placeholder="Additional comments"
                                 value={formData[`${question.name}Comment`] || ''}
-                                onChange={handleChange} />
-                            </div></>
-                            ) : (
-                                <input
-                                    type="text"
-                                    name={question.name}
-                                    value={formData[question.name] || ''}
-                                    onChange={handleChange}
-                                    placeholder={question.label}
-                                />
-                            )}
+                                onChange={handleChange}
+                            />
                         </div>
                     ))}
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                    {imageUploadError && <p style={{ color: "red" }}>{imageUploadError}</p>}
-                    <button type="submit">Submit</button>
+
+                    {/* Image upload section - Looks good */}
+                     <div className="form-section">
+                         <label htmlFor="imageUploadTrainingProvider">Upload Image (Optional):</label>
+                         <input id="imageUploadTrainingProvider" type="file" onChange={handleImageChange} accept="image/*" />
+                         {imageUrl && !imageData && <img src={imageUrl} alt="Uploaded Training Provider related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                         {imageData && <img src={imageData} alt="Preview Training Provider related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                         {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                     </div>
+
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Submitting...' : 'Submit Final'}
+                    </button>
                 </form>
             </main>
         </div>

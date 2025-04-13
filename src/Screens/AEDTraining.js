@@ -1,261 +1,267 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+// Added necessary imports: getDoc, setDoc, getFunctions, httpsCallable
+import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
+// Removed storage imports, addDoc
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
+// Added functions imports
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 function AEDTrainingFormPage() {
-  const navigate = useNavigate();
-  const { buildingId } = useBuilding();
-  const db = getFirestore();
-  const storage = getStorage(); // Initialize Firebase Storage
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
+    const db = getFirestore();
+    // Added functions initialization
+    const functions = getFunctions();
+    // Added httpsCallable setup for image uploads
+    const uploadImage = httpsCallable(functions, 'uploadAEDTrainingImage'); // Function name derived from component
 
-  const [formData, setFormData] = useState({});
-  const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [uploadError, setUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    // Added necessary state: imageData, imageUploadError, loading, loadError
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
+    // Removed unused state: image, uploadProgress, uploadError
 
-  useEffect(() => {
-    if (!buildingId) {
-      alert('No building selected. Redirecting to Building Info...');
-      navigate('/BuildingandAddress');
+    useEffect(() => {
+        if (!buildingId) {
+            alert('No building selected. Redirecting to Building Info...');
+            navigate('/BuildingandAddress');
+            return; // Ensure execution stops here
+        }
+
+        // Added fetchFormData function like securitygates
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+
+            try {
+                // Target specific document path
+                const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'AED Training', buildingId);
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    const loadedData = docSnapshot.data().formData || {};
+                    setFormData(loadedData);
+                    if (loadedData.imageUrl) {
+                       setImageUrl(loadedData.imageUrl);
+                    }
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    // Simplified handleChange and added auto-save like securitygates
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        // Save changes automatically
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'AED Training', buildingId);
+            const dataToSave = { ...newFormData, building: buildingRef };
+             if (imageUrl) {
+                dataToSave.imageUrl = imageUrl;
+            }
+            await setDoc(formDocRef, { formData: dataToSave }, { merge: true });
+            console.log("Form data saved to Firestore:", dataToSave);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+            // setFormData(formData); // Optional: Revert state
+        }
+    };
+
+    // handleImageChange using base64 like securitygates
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImageData(reader.result); // Store base64
+        };
+        reader.readAsDataURL(file);
+    };
+
+    // Simplified handleBack like securitygates
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    // handleSubmit using Cloud Function upload and final save like securitygates
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Please start from the Building Information page.');
+            return;
+        }
+
+        setLoading(true);
+        setImageUploadError(null);
+
+        let finalImageUrl = formData.imageUrl || null;
+
+        // 1. Upload image via Cloud Function if new one selected
+        if (imageData) {
+            try {
+                console.log("Uploading new image via Cloud Function...");
+                const uploadResult = await uploadImage({ imageData: imageData }); // Pass base64
+                finalImageUrl = uploadResult.data.imageUrl;
+                setImageUrl(finalImageUrl);
+                console.log("Image uploaded successfully:", finalImageUrl);
+            } catch (error) {
+                console.error('Error uploading image via Cloud Function:', error);
+                setImageUploadError(error.message || "Failed to upload image.");
+                setLoading(false);
+                alert("Error uploading image. Please try again.");
+                return;
+            }
+        }
+
+        // 2. Save final form data
+        try {
+            console.log("Saving final form data...");
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'AED Training', buildingId);
+
+            const finalFormData = {
+                ...formData,
+                ...(finalImageUrl && { imageUrl: finalImageUrl }),
+                building: buildingRef
+            };
+
+            await setDoc(formDocRef, { formData: finalFormData }, { merge: true });
+
+            console.log('Form data submitted successfully!');
+            alert('Form submitted successfully!');
+            setLoading(false);
+            navigate('/Form');
+        } catch (error) {
+            console.error("Error saving final form data to Firestore:", error);
+            alert("Failed to save changes. Please check your connection and try again.");
+            setLoading(false);
+        }
+    };
+
+     // Loading indicator
+    if (loading && !loadError) {
+        return <div>Loading...</div>;
     }
-  }, [buildingId, navigate]);
 
-  const handleChange = (e) => {
-    const { name, type, checked, value } = e.target;
-
-    if (type === 'radio') {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: checked ? value : '',
-      }));
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
-    }
-  };
-
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-
-  const handleBack = async () => {
-    if (formData && buildingId) {
-      try {
-        const buildingRef = doc(db, 'Buildings', buildingId);
-        const formsRef = collection(db, 'forms/Personnel Training and Awareness/AED Training');
-        await addDoc(formsRef, {
-          building: buildingRef,
-          formData: formData,
-        });
-        console.log('Form Data submitted successfully on back!');
-        alert('Form data saved before navigating back!');
-      } catch (error) {
-        console.error('Error saving form data:', error);
-        alert('Failed to save form data before navigating back. Some data may be lost.');
-      }
-    }
-    navigate(-1);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!buildingId) {
-      alert('Building ID is missing. Please start the assessment from the correct page.');
-      return;
+    // Error display
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
 
-    try {
-      const buildingRef = doc(db, 'Buildings', buildingId);
-      const formsRef = collection(db, 'forms/Personnel Training and Awareness/AED Training');
+    // Define questions in an array like securitygates
+    const questions = [
+        // Section 1
+        { name: "aed-familiarity", label: "How familiar are staff members with the location, accessibility, and operation of AEDs installed within the school premises?" },
+        { name: "aed-strategic-positioning", label: "Are AED units strategically positioned in easily accessible locations, clearly marked with signage, and consistently maintained in operational condition?" },
+        { name: "aed-availability-measures", label: "What measures are in place to ensure that AEDs are readily available for prompt deployment in response to sudden cardiac arrest emergencies?" },
+        // Section 2
+        { name: "aed-training-topics", label: "What topics and skills are covered in AED training courses to prepare staff members for effective use of AED devices during cardiac arrest emergencies?" },
+        { name: "aed-training-alignment", label: "Are training materials and resources aligned with recognized AED training programs, guidelines, and recommendations from organizations such as the American Heart Association (AHA) or similar accredited institutions?" },
+        { name: "aed-training-key-concepts", label: "How do AED training courses address key concepts such as AED functionality, electrode pad placement, device prompts interpretation, and hands-free CPR integration?" },
+        // Section 3
+        { name: "aed-practice-sessions", label: "To what extent do AED training sessions incorporate hands-on practice, skills demonstration, and scenario-based simulations to reinforce participant learning and confidence in AED use?" },
+        { name: "aed-practice-opportunities", label: "Are staff members provided with opportunities to practice AED deployment, pad placement, device operation, and CPR coordination under simulated cardiac arrest scenarios?" },
+        { name: "aed-simulation-scenarios", label: "How are AED training simulations tailored to simulate real-life emergency situations and challenge staff members to apply their knowledge and skills effectively?" },
+        // Section 4
+        { name: "aed-maintenance-procedures", label: "What procedures are in place to ensure the regular maintenance, inspection, and testing of AED equipment to verify functionality, battery readiness, and electrode pad integrity?" },
+        { name: "aed-maintenance-training", label: "Are designated staff members trained to perform routine checks, replace expired components, and troubleshoot technical issues with AED devices as part of ongoing maintenance protocols?" },
+        { name: "aed-maintenance-records", label: "How are AED maintenance records, usage logs, and performance indicators monitored and documented to ensure compliance with regulatory requirements and manufacturer recommendations?" },
+        // Section 5
+        { name: "aed-protocol-integration", label: "How are AED deployment protocols integrated into broader emergency response plans, procedures, and protocols within the school environment?" },
+        { name: "sudden-cardiac-response-training", label: "Are staff members trained to recognize the signs of sudden cardiac arrest, activate the emergency response system, and initiate AED use promptly and effectively?" },
+        { name: "aed-coordination-mechanisms", label: "What coordination mechanisms are in place to facilitate communication, collaboration, and teamwork among responders during AED deployment and CPR administration?" },
+    ];
 
-      if (image) {
-        const storageRef = ref(storage, `aedTraining_images/${Date.now()}_${image.name}`);
-        const uploadTask = uploadBytesResumable(storageRef, image);
 
-        uploadTask.on('state_changed',
-          (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            setUploadProgress(progress);
-          },
-          (error) => {
-            setUploadError(error);
-          },
-          () => {
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-              setImageUrl(downloadURL);
-              setFormData({ ...formData, imageUrl: downloadURL });
-              setUploadError(null);
-            });
-          }
-        );
-      }
+    return (
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                {/* Simplified Title */}
+                <h1>AED Training Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-      await addDoc(formsRef, {
-        building: buildingRef,
-        formData: formData,
-      });
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                     {/* Simplified Title */}
+                    <h2>AED Training Questions</h2>
 
-      console.log('Form data submitted successfully!');
-      alert('Form submitted successfully!');
-      navigate('/Form');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit the form. Please try again.');
-    }
-  };
+                    {/* Map questions using the securitygates format */}
+                    {questions.map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div> {/* Radio button container */}
+                                <input
+                                    type="radio"
+                                    id={`${question.name}-yes`}
+                                    name={question.name}
+                                    value="yes"
+                                    checked={formData[question.name] === "yes"}
+                                    onChange={handleChange}
+                                />
+                                <label htmlFor={`${question.name}-yes`}> Yes</label>
 
-  return (
-    <div className="form-page">
-      <header className="header">
-        <Navbar />
-        <button className="back-button" onClick={handleBack}>←</button>
-        <h1>3.1.1.2.7 AED Training Assessment</h1>
-        <img src={logo} alt="Logo" className="logo" />
-      </header>
+                                <input
+                                    type="radio"
+                                    id={`${question.name}-no`}
+                                    name={question.name}
+                                    value="no"
+                                    checked={formData[question.name] === "no"}
+                                    onChange={handleChange}
+                                />
+                                <label htmlFor={`${question.name}-no`}> No</label>
+                            </div>
+                             {/* Consistent comment input */}
+                            <input
+                                type="text"
+                                name={`${question.name}Comment`}
+                                placeholder="Additional comments"
+                                value={formData[`${question.name}Comment`] || ''}
+                                onChange={handleChange}
+                                className="comment-input"
+                            />
+                        </div>
+                    ))}
 
-      <main className="form-container">
-        <form onSubmit={handleSubmit}>
-          {/* 3.1.1.2.7 AED Training */}
-          <h2>3.1.1.2.7.1 AED Equipment Familiarity and Accessibility:</h2>
-          <div className="form-section">
-            <label>How familiar are staff members with the location, accessibility, and operation of AEDs installed within the school premises?</label>
-            <div>
-              <input type="text" name="aed-familiarity" placeholder="Describe how familiar they are" onChange={handleChange} />
-            </div>
-          </div>
-          {/* ...rest of your form questions... */}
-          <div className="form-section">
-        <label>Are AED units strategically positioned in easily accessible locations, clearly marked with signage, and consistently maintained in operational condition?</label>
-        <div>
-          <input type="radio" name="aed-strategic-positioning" value="yes" onChange={handleChange} /> Yes
-          <input type="radio" name="aed-strategic-positioning" value="no" onChange={handleChange} /> No
-          <textarea className='comment-box' name="aed-strategic-positioningComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
+                    {/* Image Upload Section - Consistent style */}
+                     <div className="form-section">
+                        <label htmlFor="imageUpload">Upload Supporting Image (Optional):</label>
+                        <input id="imageUpload" type="file" onChange={handleImageChange} accept="image/*" />
+                        {imageUrl && <img src={imageUrl} alt="Uploaded evidence" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                        {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                     </div>
+
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Submitting...' : 'Submit'}
+                    </button>
+                </form>
+            </main>
         </div>
-      </div>
-
-      <div className="form-section">
-        <label>What measures are in place to ensure that AEDs are readily available for prompt deployment in response to sudden cardiac arrest emergencies?</label>
-        <div>
-          <input type="text" name="aed-availability-measures" placeholder="Describe the measures" onChange={handleChange} />
-        </div>
-      </div>
-
-      <h2>3.1.1.2.7.2 AED Training Curriculum:</h2>
-      <div className="form-section">
-        <label>What topics and skills are covered in AED training courses to prepare staff members for effective use of AED devices during cardiac arrest emergencies?</label>
-        <div>
-          <input type="text" name="aed-training-topics" placeholder="List the topics/skills" onChange={handleChange} />
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Are training materials and resources aligned with recognized AED training programs, guidelines, and recommendations from organizations such as the American Heart Association (AHA) or similar accredited institutions?</label>
-        <div>
-          <input type="radio" name="aed-training-alignment" value="yes" onChange={handleChange} /> Yes
-          <input type="radio" name="aed-training-alignment" value="no" onChange={handleChange} /> No
-          <textarea className='comment-box' name="aed-training-alignmentComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>How do AED training courses address key concepts such as AED functionality, electrode pad placement, device prompts interpretation, and hands-free CPR integration?</label>
-        <div>
-          <input type="text" name="aed-training-key-concepts" placeholder="Describe how they address concepts" onChange={handleChange} />
-        </div>
-      </div>
-
-      <h2>3.1.1.2.7.3 Hands-on AED Practice and Simulation:</h2>
-      <div className="form-section">
-        <label>To what extent do AED training sessions incorporate hands-on practice, skills demonstration, and scenario-based simulations to reinforce participant learning and confidence in AED use?</label>
-        <div>
-          <input type="text" name="aed-practice-sessions" placeholder="Describe the sessions" onChange={handleChange} />
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Are staff members provided with opportunities to practice AED deployment, pad placement, device operation, and CPR coordination under simulated cardiac arrest scenarios?</label>
-        <div>
-          <input type="radio" name="aed-practice-opportunities" value="yes" onChange={handleChange} /> Yes
-          <input type="radio" name="aed-practice-opportunities" value="no" onChange={handleChange} /> No
-          <textarea className='comment-box' name="aed-practice-opportunitiesComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>How are AED training simulations tailored to simulate real-life emergency situations and challenge staff members to apply their knowledge and skills effectively?</label>
-        <div>
-          <input type="text" name="aed-simulation-scenarios" placeholder="Describe the simulations" onChange={handleChange} />
-        </div>
-      </div>
-
-      <h2>3.1.1.2.7.4 AED Maintenance and Quality Assurance:</h2>
-      <div className="form-section">
-        <label>What procedures are in place to ensure the regular maintenance, inspection, and testing of AED equipment to verify functionality, battery readiness, and electrode pad integrity?</label>
-        <div>
-          <input type="text" name="aed-maintenance-procedures" placeholder="Describe the procedures" onChange={handleChange} />
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Are designated staff members trained to perform routine checks, replace expired components, and troubleshoot technical issues with AED devices as part of ongoing maintenance protocols?</label>
-        <div>
-          <input type="radio" name="aed-maintenance-training" value="yes" onChange={handleChange} /> Yes
-          <input type="radio" name="aed-maintenance-training" value="no" onChange={handleChange} /> No
-          <textarea className='comment-box' name="aed-maintenance-trainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>How are AED maintenance records, usage logs, and performance indicators monitored and documented to ensure compliance with regulatory requirements and manufacturer recommendations?</label>
-        <div>
-          <input type="text" name="aed-maintenance-records" placeholder="Describe how they're monitored/documented" onChange={handleChange} />
-        </div>
-      </div>
-
-      <h2>3.1.1.2.7.5 Integration with Emergency Response Protocols:</h2>
-      <div className="form-section">
-        <label>How are AED deployment protocols integrated into broader emergency response plans, procedures, and protocols within the school environment?</label>
-        <div>
-          <input type="text" name="aed-protocol-integration" placeholder="Describe how they're integrated" onChange={handleChange} />
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>Are staff members trained to recognize the signs of sudden cardiac arrest, activate the emergency response system, and initiate AED use promptly and effectively?</label>
-        <div>
-          <input type="radio" name="sudden-cardiac-response-training" value="yes" onChange={handleChange} /> Yes
-          <input type="radio" name="sudden-cardiac-response-training" value="no" onChange={handleChange} /> No
-          <textarea className='comment-box' name="sudden-cardiac-response-trainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label>What coordination mechanisms are in place to facilitate communication, collaboration, and teamwork among responders during AED deployment and CPR administration?</label>
-        <div>
-          <input type="text" name="aed-coordination-mechanisms" placeholder="Describe the mechanisms" onChange={handleChange} />
-        </div>
-      </div>
-          {/* Image Upload */}
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-          {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-          {uploadError && <p style={{ color: 'red' }}>{uploadError.message}</p>}
-
-          <button type="submit">Submit</button>
-        </form>
-      </main>
-    </div>
-  )
+    );
 }
 
 export default AEDTrainingFormPage;

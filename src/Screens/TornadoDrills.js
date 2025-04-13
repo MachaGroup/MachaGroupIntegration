@@ -1,206 +1,267 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-import { getFunctions, httpsCallable } from "firebase/functions";
+
+// Define questions array outside the component
+const tornadoDrillQuestions = [
+    // Corrected names to camelCase
+    // Adapted from text input
+    { name: "conductedTornadoDrillsRegularly", label: "Are tornado drills conducted regularly?" },
+    { name: "drillSchedulingRegularity", label: "Are drills scheduled regularly for occupant familiarity?" }, // Simplified
+    { name: "drillTimingVariability", label: "Are drills conducted at different times to account for varying occupancy/shifts?" }, // Simplified
+    { name: "drillInitiationProtocol", label: "Is there a protocol for initiating drills and notifying occupants?" }, // Simplified
+    { name: "notificationMethodTesting", label: "Are notification methods tested during drills for timely dissemination?" },
+    { name: "absentIndividualsSystem", label: "Is there a system to account for individuals absent during drills?" },
+    { name: "definedDrillProcedures", label: "Are tornado drill procedures clearly defined and communicated?" },
+    { name: "occupantActionProcedures", label: "Do drills include specific actions (seeking shelter, evacuation routes)?" }, // Simplified
+    { name: "scenarioSimulationDrills", label: "Are drills conducted simulating different scenarios (time, severity)?" }, // Simplified
+    { name: "shelterAreaMarking", label: "Are designated tornado shelter areas clearly marked?" },
+    { name: "shelterAccessKnowledge", label: "Do occupants know how to access shelter areas quickly/safely?" }, // Simplified
+    { name: "mobilityShelterOptions", label: "Are alternative sheltering options available for individuals with mobility limitations?" },
+    { name: "occupantAccountabilityProcess", label: "Is there a process for accounting for occupants during drills?" }, // Simplified
+    { name: "assignedStaffRoles", label: "Are staff assigned roles for accountability/monitoring during drills?" }, // Simplified
+    { name: "participantFeedbackGathering", label: "Is feedback gathered from participants after drills?" }, // Simplified
+    { name: "drillEvaluationMechanism", label: "Is there a mechanism for evaluating drill effectiveness?" }, // Simplified
+    { name: "postDrillDebriefing", label: "Are debriefing sessions held after drills to review performance/lessons learned?" }, // Simplified
+    { name: "evaluationRecommendationsImplementation", label: "Are recommendations from evaluations implemented to enhance preparedness?" }, // Simplified
+    { name: "drillRecordsMaintenance", label: "Are records maintained for all tornado drills (date, time, participants, observations)?" },
+    { name: "periodicRecordsReview", label: "Are drill records reviewed periodically for compliance/trends?" }, // Simplified
+    { name: "deficiencyDocumentationActions", label: "Are deficiencies identified during drills documented and corrective actions taken?" } // Simplified
+];
 
 function TornadoDrillsFormPage() {
-    const navigate = useNavigate();
-    const { buildingId } = useBuilding();
-    const db = getFirestore();
-    const functions = getFunctions();
-    const uploadImage = httpsCallable(functions, 'uploadTornadoDrillsImage');
+  const navigate = useNavigate();
+  const { buildingId } = useBuilding();
+  const db = getFirestore();
+  const functions = getFunctions();
+  // Renamed variable for clarity
+  const uploadTornadoDrillsImage = httpsCallable(functions, 'uploadTornadoDrillsImage');
 
-    const [formData, setFormData] = useState({});
-    const [imageData, setImageData] = useState(null);
-    const [imageUrl, setImageUrl] = useState(null);
-    const [imageUploadError, setImageUploadError] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [loadError, setLoadError] = useState(null);
+  // State variables look good
+  const [formData, setFormData] = useState({});
+  const [imageData, setImageData] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [imageUploadError, setImageUploadError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
 
-    useEffect(() => {
-        if (!buildingId) {
-            alert('No building selected. Redirecting to Building Info...');
-            navigate('BuildingandAddress');
-            return;
-        }
-
-        const fetchFormData = async () => {
-            setLoading(true);
-            setLoadError(null);
-
-            try {
-                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Tornado Drills', buildingId);
-                const docSnapshot = await getDoc(formDocRef);
-
-                if (docSnapshot.exists()) {
-                    setFormData(docSnapshot.data().formData || {});
-                } else {
-                    setFormData({});
-                }
-            } catch (error) {
-                console.error("Error fetching form data:", error);
-                setLoadError("Failed to load form data. Please try again.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchFormData();
-    }, [buildingId, db, navigate]);
-
-    const handleChange = async (e) => {
-        const { name, value } = e.target;
-        const newFormData = { ...formData, [name]: value };
-        setFormData(newFormData);
- 
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId); // Create buildingRef
-            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Tornado Drills', buildingId);
-            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true }); // Use merge and add building
-            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
-        } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
-        }
-    };
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImageData(reader.result);
-        };
-        reader.readAsDataURL(file);
-    };
-
-    const handleBack = () => {
-        navigate(-1);
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        if (!buildingId) {
-            alert('Building ID is missing. Please start from the Building Information page.');
-            return;
-        }
-
-        if (imageData) {
-            try {
-                const uploadResult = await uploadImage({ imageData: imageData });
-                setImageUrl(uploadResult.data.imageUrl);
-                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
-                setImageUploadError(null);
-            } catch (error) {
-                console.error('Error uploading image:', error);
-                setImageUploadError(error.message);
-            }
-        }
-
-        try {
-            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Tornado Drills', buildingId);
-            await setDoc(formDocRef, { formData: formData }, { merge: true });
-            console.log('Form data submitted successfully!');
-            alert('Form submitted successfully!');
-            navigate('/Form');
-        } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
-        }
-    };
-
-    if (loading) {
-        return <div>Loading...</div>;
+  // useEffect for fetching data - Looks good
+  useEffect(() => {
+    if (!buildingId) {
+      alert('No building selected. Redirecting to Building Info...');
+      navigate('/BuildingandAddress'); // Ensure path is correct
+      return;
     }
 
-    if (loadError) {
-        return <div>Error: {loadError}</div>;
+    const fetchFormData = async () => {
+      setLoading(true);
+      setLoadError(null);
+      // Correct Firestore path
+      const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Tornado Drills', buildingId);
+
+      try {
+        const docSnapshot = await getDoc(formDocRef);
+        if (docSnapshot.exists()) {
+          const existingData = docSnapshot.data().formData || {};
+          setFormData(existingData);
+          if (existingData.imageUrl) {
+            setImageUrl(existingData.imageUrl);
+          }
+        } else {
+          setFormData({});
+        }
+      } catch (error) {
+        console.error("Error fetching form data:", error);
+        setLoadError("Failed to load form data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFormData();
+  }, [buildingId, db, navigate]);
+
+  // handleChange saves data immediately with correct structure
+  const handleChange = async (e) => {
+    const { name, value } = e.target;
+    const newFormData = { ...formData, [name]: value };
+    setFormData(newFormData);
+
+    if (buildingId) {
+        try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Tornado Drills', buildingId);
+            const dataToSave = {
+                 ...newFormData,
+                 building: buildingRef,
+                 ...(imageUrl && { imageUrl: imageUrl })
+             };
+            await setDoc(formDocRef, { formData: dataToSave }, { merge: true });
+            // console.log("Form data updated:", dataToSave);
+        } catch (error) {
+            console.error("Error saving form data to Firestore:", error);
+            // Avoid alerting on every change
+        }
+    }
+  };
+
+  // handleImageChange using base64 - Looks good
+  const handleImageChange = (e) => {
+     const file = e.target.files[0];
+     if (file) {
+         const reader = new FileReader();
+         reader.onloadend = () => {
+             setImageData(reader.result);
+             setImageUrl(null);
+             setImageUploadError(null);
+         };
+         reader.readAsDataURL(file);
+     } else {
+         setImageData(null);
+     }
+  };
+
+  // handleBack - Looks good
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  // handleSubmit uses Cloud Function and setDoc with correct structure
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!buildingId) {
+      alert('Building ID is missing. Cannot submit.');
+      return;
     }
 
-    return (
-        <div className="form-page">
-            <header className="header">
-                <Navbar />
-                <button className="back-button" onClick={handleBack}>←</button>
-                <h1>Tornado Drills Assessment</h1>
-                <img src={logo} alt="Logo" className="logo" />
-            </header>
+    setLoading(true);
+    let finalImageUrl = formData.imageUrl || null;
+    let submissionError = null;
 
-            <main className="form-container">
-                <form onSubmit={handleSubmit}>
-                    <h2>Tornado Drills</h2>
-                    {[
-                        { name: "conductedTornadoDrills", label: "How often are tornado drills conducted within the facility?" },
-                        { name: "Drill Scheduling Regularity", label: "Are tornado drills scheduled regularly to ensure all occupants are familiar with tornado procedures?" },
-                        { name: "Drill Timing Variability", label: "Are drills conducted at different times of the day to account for varying occupancy levels and staff shifts?" },
-                        { name: "Drill Initiation Protocol", label: "Is there a protocol for initiating tornado drills, including how and when occupants are notified?" },
-                        { name: "Notification Method Testing", label: "Are notification methods tested during drills to ensure timely dissemination of tornado warnings?" },
-                        { name: "Absent Individuals System", label: "Is there a system in place to account for individuals who may not be present during scheduled drills?" },
-                        { name: "Defined Drill Procedures", label: "Are tornado drill procedures clearly defined and communicated to all occupants?" },
-                        { name: "Occupant Action Procedures", label: "Do drills include specific actions to be taken by occupants, such as seeking shelter in designated areas or following evacuation routes?" },
-                        { name: "Scenario Simulation Drills", label: "Are drills conducted to simulate different scenarios, such as daytime vs. nighttime, or varying severity levels of tornadoes?" },
-                        { name: "Shelter Area Marking", label: "Are designated tornado shelter areas identified and clearly marked throughout the facility?" },
-                        { name: "Shelter Access Knowledge", label: "Do occupants know how to access shelter areas quickly and safely during tornado drills?" },
-                        { name: "Mobility Shelter Options", label: "Are there alternative sheltering options available for individuals with mobility limitations or disabilities?" },
-                        { name: "Occupant Accountability Process", label: "Is there a process for accounting for all occupants during tornado drills?" },
-                        { name: "Assigned Staff Roles", label: "Are staff members assigned roles and responsibilities to assist with accountability and monitoring efforts?" },
-                        { name: "Participant Feedback Gathering", label: "Is feedback gathered from participants after drills to identify any issues or concerns with procedures?" },
-                        { name: "Drill Evaluation Mechanism", label: "Is there a mechanism for evaluating the effectiveness of tornado drills and identifying areas for improvement?" },
-                        { name: "Post-Drill Debriefing", label: "Are debriefing sessions held after drills to review performance and discuss lessons learned?" },
-                        { name: "Evaluation Recommendations Implementation", label: "Are recommendations from drill evaluations implemented to enhance tornado preparedness and response procedures?" },
-                        { name: "Drill Records Maintenance", label: "Are records maintained for all tornado drills, including dates, times, participants, and observations?" },
-                        { name: "Periodic Records Review", label: "Are drill records reviewed periodically to ensure compliance with regulations and identify trends or patterns?" },
-                        { name: "Deficiency Documentation Actions", label: "Are deficiencies or issues identified during drills documented, with corrective actions implemented as needed?" }
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            {question.name === "Drill Scheduling Regularity" || question.name === "Drill Timing Variability" || question.name === "Drill Initiation Protocol" || question.name === "Notification Method Testing" || question.name === "Absent Individuals System" || question.name === "Defined Drill Procedures" || question.name === "Occupant Action Procedures" || question.name === "Scenario Simulation Drills" || question.name === "Shelter Area Marking" || question.name === "Shelter Access Knowledge" || question.name === "Mobility Shelter Options" || question.name === "Occupant Accountability Process" || question.name === "Assigned Staff Roles" || question.name === "Participant Feedback Gathering" || question.name === "Drill Evaluation Mechanism" || question.name === "Post-Drill Debriefing" || question.name === "Evaluation Recommendations Implementation" || question.name === "Drill Records Maintenance" || question.name === "Periodic Records Review" || question.name === "Deficiency Documentation Actions" ? (
-                                <><div>
-                                    <input
-                                        type="radio"
-                                        name={question.name}
-                                        value="yes"
-                                        checked={formData[question.name] === "yes"}
-                                        onChange={handleChange} /> Yes
-                                    <input
-                                        type="radio"
-                                        name={question.name}
-                                        value="no"
-                                        checked={formData[question.name] === "no"}
-                                        onChange={handleChange} /> No
+    if (imageData) {
+      try {
+        console.log("Uploading image via Cloud Function...");
+         // Use correct function variable name
+        const uploadResult = await uploadTornadoDrillsImage({
+            imageData: imageData,
+            buildingId: buildingId
+         });
+        finalImageUrl = uploadResult.data.imageUrl;
+        setImageUrl(finalImageUrl);
+        setImageUploadError(null);
+        console.log("Image uploaded successfully:", finalImageUrl);
+      } catch (error) {
+        console.error('Error uploading image via function:', error);
+        setImageUploadError(`Image upload failed: ${error.message}`);
+        submissionError = "Image upload failed. Form data saved without new image.";
+         finalImageUrl = formData.imageUrl || null;
+      }
+    }
 
-                                </div>
-                                <div>
-                                        <input
-                                            type="text"
-                                            name={`${question.name}Comment`}
-                                            placeholder="Comments"
-                                            value={formData[`${question.name}Comment`] || ''}
-                                            onChange={handleChange} />
-                                </div></>
-                            ) : (
-                                <input
-                                    type="text"
-                                    name={question.name}
-                                    value={formData[question.name] || ''}
-                                    onChange={handleChange}
-                                    placeholder={question.label}
-                                />
-                            )}
-                        </div>
-                    ))}
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                    {imageUploadError && <p style={{ color: "red" }}>{imageUploadError}</p>}
-                    <button type="submit">Submit</button>
-                </form>
-            </main>
-        </div>
-    );
+    const finalFormData = {
+         ...formData,
+         imageUrl: finalImageUrl,
+    };
+    setFormData(finalFormData);
+
+    try {
+      console.log("Saving final form data to Firestore...");
+      const buildingRef = doc(db, 'Buildings', buildingId);
+      const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Tornado Drills', buildingId);
+      await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
+      console.log('Form data submitted successfully!');
+      if (!submissionError) {
+          alert('Form submitted successfully!');
+      } else {
+          alert(submissionError);
+      }
+      navigate('/Form');
+    } catch (error) {
+      console.error("Error saving final form data to Firestore:", error);
+      alert("Failed to save final form data. Please check connection and try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Loading/Error Display - Looks good
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  if (loadError) {
+    return <div>Error: {loadError}</div>;
+  }
+
+  return (
+    <div className="form-page">
+      <header className="header">
+        <Navbar />
+        <button className="back-button" onClick={handleBack}>←</button>
+        <h1>Tornado Drills Assessment</h1>
+        <img src={logo} alt="Logo" className="logo" />
+      </header>
+
+      <main className="form-container">
+        <form onSubmit={handleSubmit}>
+          <h2>Tornado Drill Assessment Questions</h2> {/* Added main heading */}
+
+          {/* Single .map call for all questions with standardized rendering */}
+          {tornadoDrillQuestions.map((question, index) => (
+            <div key={question.name} className="form-section"> {/* Use name for key */}
+              <label>{question.label}</label>
+              {/* Div for radio buttons */}
+              <div>
+                <input
+                  type="radio"
+                  id={`${question.name}_yes`}
+                  name={question.name}
+                  value="yes"
+                  checked={formData[question.name] === "yes"}
+                  onChange={handleChange}
+                /> <label htmlFor={`${question.name}_yes`}>Yes</label>
+                <input
+                  type="radio"
+                  id={`${question.name}_no`}
+                  name={question.name}
+                  value="no"
+                  checked={formData[question.name] === "no"}
+                  onChange={handleChange}
+                /> <label htmlFor={`${question.name}_no`}>No</label>
+              </div>
+              {/* Input for comments */}
+              <input
+                className='comment-input'
+                type="text"
+                name={`${question.name}Comment`}
+                placeholder="Additional comments"
+                value={formData[`${question.name}Comment`] || ''}
+                onChange={handleChange}
+              />
+            </div>
+          ))}
+
+          {/* Image upload section - Looks good */}
+           <div className="form-section">
+               <label htmlFor="imageUploadTornadoDrill">Upload Image (Optional):</label>
+               <input id="imageUploadTornadoDrill" type="file" onChange={handleImageChange} accept="image/*" />
+               {imageUrl && !imageData && <img src={imageUrl} alt="Uploaded Tornado Drill related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+               {imageData && <img src={imageData} alt="Preview Tornado Drill related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+               {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+           </div>
+
+          <button type="submit" disabled={loading}>
+            {loading ? 'Submitting...' : 'Submit Final'}
+          </button>
+        </form>
+      </main>
+    </div>
+  );
 }
 
 export default TornadoDrillsFormPage;

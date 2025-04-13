@@ -1,365 +1,272 @@
 import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc, getDocs, query, where, setDoc } from 'firebase/firestore';
+// Corrected Firestore imports
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+// Added Functions imports
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext';
+import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-import { getFunctions, httpsCallable } from "firebase/functions";
+
+// Define questions array outside the component
+const contactInfoQuestions = [
+    // Corrected names to camelCase
+    // Existence of Contact Information Database
+    { name: "centralizedSystem", label: "Is there a centralized database/system for storing emergency alert contact info?" }, // Simplified
+    { name: "includesContactDetails", label: "Does the database include up-to-date details (phone, email, preferences)?" }, // Simplified
+    // Data Accuracy and Currency
+    // Adapted from text input
+    { name: "databaseReviewedRegularly", label: "Is the contact database reviewed/updated regularly for accuracy?" },
+    { name: "verifyingContactDetails", label: "Are procedures established to verify contact details periodically/upon change?" }, // Simplified
+    // Inclusion of Key Stakeholders
+    { name: "includesKeyStakeholders", label: "Does the database include key stakeholders (staff, students, parents, contractors)?" }, // Simplified - Renamed 'contactInformationDatabaseList'
+    { name: "categorizingContactDetails", label: "Are contacts categorized/segmented for targeted communication?" }, // Simplified
+    // Accessibility and Security
+    { name: "authorizedPersonnelAccess", label: "Is database access restricted to authorized personnel managing alerts?" }, // Simplified - Renamed 'authorizedDatabaseManaging'
+    { name: "implementedSecurityMeasures", label: "Are appropriate security measures implemented to protect contact info?" },
+    // Integration with Alerting Systems
+    { name: "integratedAlertingSystems", label: "Is the database integrated with text/email alerting systems?" }, // Simplified
+    { name: "syncProceduresExist", label: "Are procedures established for synchronizing contact info between systems?" }, // Simplified - Renamed 'synchronizingProcedures'
+    // Opt-In/Opt-Out Mechanisms
+    { name: "optInOptOutMechanisms", label: "Are mechanisms in place for individuals to opt-in/opt-out of alerts?" }, // Simplified
+    { name: "updatingContactInformation", label: "Is there a process for individuals to update their info/preferences?" }, // Simplified
+    // Training and User Support
+    { name: "accessingDatabaseTraining", label: "Are staff trained on accessing/using the database for alerts?" }, // Simplified
+    { name: "userSupport", label: "Is user support provided for database navigation/troubleshooting?" }, // Simplified
+    // Compliance with Privacy Regulations
+    { name: "applicablePrivacyRegulations", label: "Does contact info management adhere to applicable privacy regulations (FERPA, HIPAA)?" },
+    { name: "safeguardingPersonalData", label: "Are protocols established for safeguarding data and obtaining consent?" } // Simplified
+];
+
 
 function ContactInformationDatabaseFormPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding();
     const db = getFirestore();
     const functions = getFunctions();
+    // Define httpsCallable function matching component name
     const uploadContactInformationDatabaseFormPageImage = httpsCallable(functions, 'uploadContactInformationDatabaseFormPageImage');
 
+    // Corrected state variables
     const [formData, setFormData] = useState({});
-    const storage = getStorage();
-    const [image, setImage] = useState(null);
-    const [uploadProgress, setUploadProgress] = useState(0);
+    const [imageData, setImageData] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
-    const [uploadError, setUploadError] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null); // Added loadError
 
+    // useEffect using getDoc by ID with CORRECT path
     useEffect(() => {
         if (!buildingId) {
             alert('No building selected. Redirecting to Building Info...');
             navigate('/BuildingandAddress');
-        } else {
-            loadFormData();
+            return;
         }
-    }, [buildingId, navigate]);
 
-    const loadFormData = async () => {
-        setLoading(true);
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
-            const formsRef = collection(db, 'forms/Emergency Preparedness/Drill Frequency');
-            const q = query(formsRef, where('building', '==', buildingRef));
-            const querySnapshot = await getDocs(q);
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+            // Correct Firestore path for this component
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Contact Information Database', buildingId);
 
-            if (!querySnapshot.empty) {
-                const docData = querySnapshot.docs[0].data().formData;
-                setFormData(docData);
+            try {
+                const docSnapshot = await getDoc(formDocRef);
+                if (docSnapshot.exists()) {
+                    const existingData = docSnapshot.data().formData || {};
+                    setFormData(existingData);
+                    if (existingData.imageUrl) {
+                        setImageUrl(existingData.imageUrl);
+                    }
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
             }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    // handleChange saves immediately using setDoc by ID with correct structure
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        if (buildingId) {
+            try {
+                const buildingRef = doc(db, 'Buildings', buildingId);
+                 // Correct Firestore path
+                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Contact Information Database', buildingId);
+                const dataToSave = {
+                     ...newFormData,
+                     building: buildingRef,
+                     ...(imageUrl && { imageUrl: imageUrl })
+                 };
+                await setDoc(formDocRef, { formData: dataToSave }, { merge: true });
+                // console.log("Form data updated:", dataToSave);
+            } catch (error) {
+                console.error("Error saving form data to Firestore:", error);
+                // Avoid alerting on every change
+            }
+        }
+    };
+
+    // handleImageChange using base64
+    const handleImageChange = (e) => {
+       const file = e.target.files[0];
+       if (file) {
+           const reader = new FileReader();
+           reader.onloadend = () => {
+               setImageData(reader.result);
+               setImageUrl(null);
+               setImageUploadError(null);
+           };
+           reader.readAsDataURL(file);
+       } else {
+           setImageData(null);
+       }
+    };
+
+    // handleBack simplified
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    // handleSubmit uses Cloud Function and setDoc by ID with correct structure
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Cannot submit.');
+            return;
+        }
+
+        setLoading(true);
+        let finalImageUrl = formData.imageUrl || null;
+        let submissionError = null;
+
+        if (imageData) {
+            try {
+                console.log("Uploading image via Cloud Function...");
+                // Use correct function variable name
+                const uploadResult = await uploadContactInformationDatabaseFormPageImage({
+                    imageData: imageData,
+                    buildingId: buildingId
+                 });
+                finalImageUrl = uploadResult.data.imageUrl;
+                setImageUrl(finalImageUrl);
+                setImageUploadError(null);
+                console.log("Image uploaded successfully:", finalImageUrl);
+            } catch (error) {
+                console.error('Error uploading image via function:', error);
+                setImageUploadError(`Image upload failed: ${error.message}`);
+                submissionError = "Image upload failed. Form data saved without new image.";
+                 finalImageUrl = formData.imageUrl || null;
+            }
+        }
+
+        const finalFormData = {
+             ...formData,
+             imageUrl: finalImageUrl,
+        };
+        setFormData(finalFormData);
+
+        try {
+            console.log("Saving final form data to Firestore...");
+            const buildingRef = doc(db, 'Buildings', buildingId);
+             // Correct Firestore path
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Contact Information Database', buildingId);
+            await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
+            console.log('Form data submitted successfully!');
+            if (!submissionError) {
+                alert('Form submitted successfully!');
+            } else {
+                alert(submissionError);
+            }
+            navigate('/Form');
         } catch (error) {
-            console.error('Error loading form data:', error);
+            console.error("Error saving final form data to Firestore:", error);
+            alert("Failed to save final form data. Please check connection and try again.");
         } finally {
             setLoading(false);
         }
     };
 
-    const handleImageChange = (e) => {
-        if (e.target.files[0]) {
-            setImage(e.target.files[0]);
-        }
-    };
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
-
-    const handleBack = async () => {
-        if (formData && buildingId) {
-            try {
-                const buildingRef = doc(db, 'Buildings', buildingId);
-                const formsRef = collection(db, 'forms/Emergency Preparedness/Drill Frequency');
-                const q = query(formsRef, where('building', '==', buildingRef));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    await addDoc(formsRef, {
-                        building: buildingRef,
-                        formData: formData,
-                    });
-                } else {
-                    const docId = querySnapshot.docs[0].id;
-                    const formDocRef = doc(db, 'forms/Emergency Preparedness/Drill Frequency', docId);
-                    await setDoc(formDocRef, {
-                        building: buildingRef,
-                        formData: formData,
-                    }, { merge: true });
-                }
-                console.log('Form Data submitted successfully on back!');
-                alert('Form data saved before navigating back!');
-            } catch (error) {
-                console.error('Error saving form data:', error);
-                alert('Failed to save form data before navigating back. Some data may be lost.');
-            }
-        }
-        navigate(-1);
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        if (!buildingId) {
-            alert('Building ID is missing. Please start the assessment from the correct page.');
-            return;
-        }
-
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
-            const formsRef = collection(db, 'forms/Emergency Preparedness/Drill Frequency');
-            const q = query(formsRef, where('building', '==', buildingRef));
-            const querySnapshot = await getDocs(q);
-
-            if (querySnapshot.empty) {
-                await addDoc(formsRef, {
-                    building: buildingRef,
-                    formData: formData,
-                });
-            } else {
-                const docId = querySnapshot.docs[0].id;
-                const formDocRef = doc(db, 'forms/Emergency Preparedness/Drill Frequency', docId);
-                await setDoc(formDocRef, {
-                    building: buildingRef,
-                    formData: formData,
-                }, { merge: true });
-            }
-            console.log('Form data submitted successfully!');
-            alert('Form submitted successfully!');
-            navigate('/Form');
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Failed to submit the form. Please try again.');
-        }
-    };
-
+    // Loading/Error Display
     if (loading) {
         return <div>Loading...</div>;
     }
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
+    }
 
     return (
+        // Removed outer div if present
         <div className="form-page">
             <header className="header">
                 <Navbar />
                 <button className="back-button" onClick={handleBack}>←</button>
-                <h1>2.4.1.1.4 Contact Information Database Assessment</h1>
+                <h1>Contact Information Database Assessment</h1> {/* Simplified Title */}
                 <img src={logo} alt="Logo" className="logo" />
             </header>
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    <h2>Existence of Contact Information Database:</h2>
-                    {[
-                        { name: "centralizedSystem", label: "Is there a centralized database or system in place to store contact information for individuals who will receive text/email alerts during emergencies?", type: "radio", options: ["yes", "no"] },
-                        { name: "includingContactDetails", label: "Does the database include up-to-date contact details, such as phone numbers, email addresses, and preferred communication methods, for all relevant stakeholders?", type: "radio", options: ["yes", "no"] },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
+                     <h2>Contact Information Database Questions</h2> {/* Added main heading */}
+
+                    {/* Single .map call for all questions with standardized rendering */}
+                    {contactInfoQuestions.map((question, index) => (
+                        <div key={question.name} className="form-section"> {/* Use name for key */}
                             <label>{question.label}</label>
+                            {/* Div for radio buttons */}
                             <div>
-                                {question.type === "text" && <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />}
-                                {question.options && question.options.map((option) => (
-                                    <React.Fragment key={option}>
-                                        <input
-                                            type="radio"
-                                            name={question.name}
-                                            value={option}
-                                            checked={formData[question.name] === option}
-                                            onChange={handleChange}
-                                        />
-                                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                                    </React.Fragment>
-                                ))}
-                                <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_yes`}
+                                    name={question.name}
+                                    value="yes"
+                                    checked={formData[question.name] === "yes"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_yes`}>Yes</label>
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_no`}
+                                    name={question.name}
+                                    value="no"
+                                    checked={formData[question.name] === "no"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_no`}>No</label>
                             </div>
+                            {/* Input for comments */}
+                            <input
+                                className='comment-input'
+                                type="text"
+                                name={`${question.name}Comment`}
+                                placeholder="Additional comments"
+                                value={formData[`${question.name}Comment`] || ''}
+                                onChange={handleChange}
+                            />
                         </div>
                     ))}
 
-                    <h2>Data Accuracy and Currency:</h2>
-                    {[
-                        { name: "reviewedDatabase", label: "How frequently is the contact information database reviewed and updated to ensure accuracy and currency?", type: "text" },
-                        { name: "verifyingContactDetails", label: "Are procedures established to verify contact details periodically or in response to changes, such as staff turnover, new enrollments, or updates to contact preferences?", type: "radio", options: ["yes", "no"] },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.type === "text" && <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />}
-                                {question.options && question.options.map((option) => (
-                                    <React.Fragment key={option}>
-                                        <input
-                                            type="radio"
-                                            name={question.name}
-                                            value={option}
-                                            checked={formData[question.name] === option}
-                                            onChange={handleChange}
-                                        />
-                                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                                    </React.Fragment>
-                                ))}
-                                <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                            </div>
-                        </div>
-                    ))}
+                    {/* Image upload section - Looks good */}
+                     <div className="form-section">
+                         <label htmlFor="imageUploadContactInfo">Upload Image (Optional):</label>
+                         <input id="imageUploadContactInfo" type="file" onChange={handleImageChange} accept="image/*" />
+                         {imageUrl && !imageData && <img src={imageUrl} alt="Uploaded Contact Info related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                         {imageData && <img src={imageData} alt="Preview Contact Info related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                         {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                     </div>
 
-                    <h2>Inclusion of Key Stakeholders:</h2>
-                    {[
-                        { name: "contactInformationDatabaseList", label: "Does the contact information database encompass a comprehensive list of key stakeholders, including staff members, students, parents/guardians, contractors, and external partners?", type: "radio", options: ["yes", "no"] },
-                        { name: "categorizingContactDetails", label: "Are contact details categorized or segmented based on roles, responsibilities, or affiliations to facilitate targeted communication during emergencies?", type: "radio", options: ["yes", "no"] },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.type === "text" && <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />}
-                                {question.options && question.options.map((option) => (
-                                    <React.Fragment key={option}>
-                                        <input
-                                            type="radio"
-                                            name={question.name}
-                                            value={option}
-                                            checked={formData[question.name] === option}
-                                            onChange={handleChange}
-                                        />
-                                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                                    </React.Fragment>
-                                ))}
-                                <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                            </div>
-                        </div>
-                    ))}
-
-                    <h2>Accessibility and Security:</h2>
-                    {[
-                        { name: "authorizedDatabaseManaging", label: "Is the contact information database accessible to authorized personnel responsible for managing and disseminating emergency alerts?", type: "radio", options: ["yes", "no"] },
-                        { name: "implementedSecurityMeasures", label: "Are appropriate security measures implemented to protect the confidentiality, integrity, and availability of contact information stored in the database?", type: "radio", options: ["yes", "no"] },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.type === "text" && <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />}
-                                {question.options && question.options.map((option) => (
-                                    <React.Fragment key={option}>
-                                        <input
-                                            type="radio"
-                                            name={question.name}
-                                            value={option}
-                                            checked={formData[question.name] === option}
-                                            onChange={handleChange}
-                                        />
-                                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                                    </React.Fragment>
-                                ))}
-                                <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                            </div>
-                        </div>
-                    ))}
-
-                    <h2>Integration with Alerting Systems:</h2>
-                    {[
-                        { name: "integratedAlertingSystems", label: "Is the contact information database integrated with text/email alerting systems to facilitate rapid and automated distribution of emergency notifications?", type: "radio", options: ["yes", "no"] },
-                        { name: "synchronizingProcedures", label: "Are procedures established for synchronizing or synchronizing contact information between the database and alerting systems to ensure consistency and reliability?", type: "radio", options: ["yes", "no"] },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.type === "text" && <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />}
-                                {question.options && question.options.map((option) => (
-                                    <React.Fragment key={option}>
-                                        <input
-                                            type="radio"
-                                            name={question.name}
-                                            value={option}
-                                            checked={formData[question.name] === option}
-                                            onChange={handleChange}
-                                        />
-                                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                                    </React.Fragment>
-                                ))}
-                                <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                            </div>
-                        </div>
-                    ))}
-
-                    <h2>Opt-In/Opt-Out Mechanisms:</h2>
-                    {[
-                        { name: "optInOptOutMechanisms", label: "Are mechanisms in place for individuals to opt in or opt out of receiving text/email alerts, and are these preferences documented and honored?", type: "radio", options: ["yes", "no"] },
-                        { name: "updatingContactInformation", label: "Is there a process for individuals to update their contact information or communication preferences, and are changes promptly reflected in the database and alerting systems?", type: "radio", options: ["yes", "no"] },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.type === "text" && <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />}
-                                {question.options && question.options.map((option) => (
-                                    <React.Fragment key={option}>
-                                        <input
-                                            type="radio"
-                                            name={question.name}
-                                            value={option}
-                                            checked={formData[question.name] === option}
-                                            onChange={handleChange}
-                                        />
-                                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                                    </React.Fragment>
-                                ))}
-                                <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                            </div>
-                        </div>
-                    ))}
-
-                    <h2>Training and User Support:</h2>
-                    {[
-                        { name: "accessingDatabaseTraining", label: "Are staff members trained on how to access and use the contact information database for sending emergency alerts?", type: "radio", options: ["yes", "no"] },
-                        { name: "userSupport", label: "Is user support provided to assist personnel in navigating the database, troubleshooting issues, and managing contact lists effectively?", type: "radio", options: ["yes", "no"] },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.type === "text" && <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />}
-                                {question.options && question.options.map((option) => (
-                                    <React.Fragment key={option}>
-                                        <input
-                                            type="radio"
-                                            name={question.name}
-                                            value={option}
-                                            checked={formData[question.name] === option}
-                                            onChange={handleChange}
-                                        />
-                                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                                    </React.Fragment>
-                                ))}
-                                <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                            </div>
-                        </div>
-                    ))}
-
-                    <h2>Compliance with Privacy Regulations:</h2>
-                    {[
-                        { name: "applicablePrivacyRegulations", label: "Does the management of contact information adhere to applicable privacy regulations, such as the Family Educational Rights and Privacy Act (FERPA) or the Health Insurance Portability and Accountability Act (HIPAA)?", type: "radio", options: ["yes", "no"] },
-                        { name: "safeguardingPersonalData", label: "Are protocols established for safeguarding personal data and obtaining consent for the collection and use of contact information for emergency communication purposes?", type: "radio", options: ["yes", "no"] },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.type === "text" && <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />}
-                                {question.options && question.options.map((option) => (
-                                    <React.Fragment key={option}>
-                                        <input
-                                            type="radio"
-                                            name={question.name}
-                                            value={option}
-                                            checked={formData[question.name] === option}
-                                            onChange={handleChange}
-                                        />
-                                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                                    </React.Fragment>
-                                ))}
-                                <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                            </div>
-                        </div>
-                    ))}
-
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                    {uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                    {uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-                    <button type="submit">Submit</button>
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Submitting...' : 'Submit Final'}
+                    </button>
                 </form>
             </main>
         </div>

@@ -1,19 +1,50 @@
 import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
+// Corrected Firestore imports
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+// Firebase Functions imports
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import Navbar from "./Navbar";
-import { getFunctions, httpsCallable } from "firebase/functions";
+
+// Define questions array outside the component
+const evacuationRouteQuestions = [
+    // Corrected names to camelCase
+    // Adapted from text input
+    { name: "routesReviewedRegularly", label: "Are evacuation routes reviewed and updated regularly?" },
+    { name: "regularIntervalReview", label: "Are reviews conducted at regular intervals?" }, // Simplified
+    // Adapted from text input
+    { name: "scheduleProcedureExists", label: "Is there a defined schedule or procedure for routine reviews?" },
+    // Adapted from text input
+    { name: "structuredProcessExists", label: "Is there a structured process for reviews (incl. designated personnel)?" },
+    { name: "comprehensiveCoverage", label: "Are reviews comprehensive, covering all areas and routes?" }, // Simplified
+    { name: "obstacleAssessment", label: "Do reviews assess signage, lighting, obstacles, etc.?" }, // Simplified
+    { name: "regulationCompliance", label: "Are routes reviewed for compliance with regulations/codes?" }, // Simplified
+    { name: "knowledgeableReviewers", label: "Are reviews conducted by individuals knowledgeable about requirements?" }, // Simplified
+    { name: "disabilityAccess", label: "Are routes reviewed for accessibility for individuals with disabilities?" },
+     // Adapted from text input
+    { name: "occupantProvisionsExist", label: "Are provisions in place to accommodate the needs of all occupants (e.g., assistance)?" },
+    { name: "signInspection", label: "Are evacuation route signs inspected during reviews?" }, // Simplified
+    { name: "signUpdates", label: "Are signs updated/replaced as needed?" }, // Simplified
+    { name: "wayfindingReview", label: "Are wayfinding aids (maps, plans) reviewed for accuracy?" }, // Simplified
+    { name: "planAlignment", label: "Are routes reviewed in conjunction with broader emergency plans?" }, // Simplified
+    { name: "responseIntegration", label: "Do reviews consider integration with sheltering/communication protocols?" }, // Simplified
+    { name: "outcomeRecordsMaintained", label: "Are records maintained documenting review outcomes (issues, changes, actions)?" },
+    { name: "accessibleRecords", label: "Are review records accessible to relevant stakeholders?" },
+    { name: "trendTracking", label: "Are review findings used to track trends and inform future updates?" } // Simplified
+];
 
 function EvacuationRoutesReviewFormPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding();
     const db = getFirestore();
     const functions = getFunctions();
-    const uploadImage = httpsCallable(functions, 'uploadEvacuationRoutesReviewFormPageImage');
+    // Renamed variable for clarity
+    const uploadEvacuationRoutesReviewFormPageImage = httpsCallable(functions, 'uploadEvacuationRoutesReviewFormPageImage');
 
+    // State variables look good
     const [formData, setFormData] = useState({});
     const [imageData, setImageData] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
@@ -21,23 +52,28 @@ function EvacuationRoutesReviewFormPage() {
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState(null);
 
+    // useEffect for fetching data - Looks good
     useEffect(() => {
         if (!buildingId) {
             alert('No building selected. Redirecting to Building Info...');
-            navigate('BuildingandAddress');
+            navigate('/BuildingandAddress');
             return;
         }
 
         const fetchFormData = async () => {
             setLoading(true);
             setLoadError(null);
+            // Correct Firestore path
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Evacuation Routes Review', buildingId);
 
             try {
-                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Evacuation Routes Review', buildingId);
                 const docSnapshot = await getDoc(formDocRef);
-
                 if (docSnapshot.exists()) {
-                    setFormData(docSnapshot.data().formData || {});
+                    const existingData = docSnapshot.data().formData || {};
+                    setFormData(existingData);
+                    if (existingData.imageUrl) {
+                        setImageUrl(existingData.imageUrl);
+                    }
                 } else {
                     setFormData({});
                 }
@@ -52,75 +88,120 @@ function EvacuationRoutesReviewFormPage() {
         fetchFormData();
     }, [buildingId, db, navigate]);
 
+    // handleChange saves data immediately with correct structure
     const handleChange = async (e) => {
         const { name, value } = e.target;
         const newFormData = { ...formData, [name]: value };
         setFormData(newFormData);
 
-        try {
-            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Evacuation Routes Review', buildingId);
-            await setDoc(formDocRef, { formData: newFormData }, { merge: true });
-            console.log("Form data saved to Firestore:", newFormData);
-        } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+        if (buildingId) {
+            try {
+                const buildingRef = doc(db, 'Buildings', buildingId);
+                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Evacuation Routes Review', buildingId);
+                const dataToSave = {
+                     ...newFormData,
+                     building: buildingRef,
+                     ...(imageUrl && { imageUrl: imageUrl })
+                 };
+                await setDoc(formDocRef, { formData: dataToSave }, { merge: true });
+                // console.log("Form data updated:", dataToSave);
+            } catch (error) {
+                console.error("Error saving form data to Firestore:", error);
+                // Avoid alerting on every change
+            }
         }
     };
 
+    // handleImageChange using base64 - Looks good
     const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImageData(reader.result);
-        };
-        reader.readAsDataURL(file);
+       const file = e.target.files[0];
+       if (file) {
+           const reader = new FileReader();
+           reader.onloadend = () => {
+               setImageData(reader.result);
+               setImageUrl(null);
+               setImageUploadError(null);
+           };
+           reader.readAsDataURL(file);
+       } else {
+           setImageData(null);
+       }
     };
 
+    // handleBack - Looks good
     const handleBack = () => {
         navigate(-1);
     };
 
+    // handleSubmit uses Cloud Function and setDoc with correct structure
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!buildingId) {
-            alert('Building ID is missing. Please start from the Building Information page.');
+            alert('Building ID is missing. Cannot submit.');
             return;
         }
 
+        setLoading(true);
+        let finalImageUrl = formData.imageUrl || null;
+        let submissionError = null;
+
         if (imageData) {
             try {
-                const uploadResult = await uploadImage({ imageData: imageData });
-                setImageUrl(uploadResult.data.imageUrl);
-                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                console.log("Uploading image via Cloud Function...");
+                 // Use correct function variable name
+                const uploadResult = await uploadEvacuationRoutesReviewFormPageImage({
+                    imageData: imageData,
+                    buildingId: buildingId
+                 });
+                finalImageUrl = uploadResult.data.imageUrl;
+                setImageUrl(finalImageUrl);
                 setImageUploadError(null);
+                console.log("Image uploaded successfully:", finalImageUrl);
             } catch (error) {
-                console.error('Error uploading image:', error);
-                setImageUploadError(error.message);
+                console.error('Error uploading image via function:', error);
+                setImageUploadError(`Image upload failed: ${error.message}`);
+                submissionError = "Image upload failed. Form data saved without new image.";
+                 finalImageUrl = formData.imageUrl || null;
             }
         }
 
+        const finalFormData = {
+             ...formData,
+             imageUrl: finalImageUrl,
+        };
+        setFormData(finalFormData);
+
         try {
+            console.log("Saving final form data to Firestore...");
+            const buildingRef = doc(db, 'Buildings', buildingId);
             const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Evacuation Routes Review', buildingId);
-            await setDoc(formDocRef, { formData: formData }, { merge: true });
+            await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
             console.log('Form data submitted successfully!');
-            alert('Form submitted successfully!');
+            if (!submissionError) {
+                alert('Form submitted successfully!');
+            } else {
+                alert(submissionError);
+            }
             navigate('/Form');
         } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+            console.error("Error saving final form data to Firestore:", error);
+            alert("Failed to save final form data. Please check connection and try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
+    // Loading/Error Display - Looks good
     if (loading) {
         return <div>Loading...</div>;
     }
-
     if (loadError) {
         return <div>Error: {loadError}</div>;
     }
 
     return (
+         // Removed outer div if present
         <div className="form-page">
             <header className="header">
                 <Navbar />
@@ -131,70 +212,55 @@ function EvacuationRoutesReviewFormPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    <h2>Evacuation Routes Review Assessment</h2>
-                    {[
-                        { name: "reviewedEvacuationRoutes", label: "How often are evacuation routes reviewed and updated within the facility?" },
-                        { name: "Regular Interval", label: "Are reviews conducted at regular intervals to ensure that evacuation routes remain current and effective?" },
-                        { name: "Schedule Procedure", label: "Is there a schedule or procedure in place for conducting routine reviews of evacuation routes?" },
-                        { name: "structuredProcess", label: "Is there a structured process for reviewing evacuation routes, including designated personnel responsible for conducting reviews?" },
-                        { name: "Comprehensive Coverage", label: "Are reviews comprehensive, covering all areas of the facility, including primary and alternative evacuation routes?" },
-                        { name: "Obstacle Assessment", label: "Do reviews include assessments of signage, lighting, obstacles, and other factors that may impact the usability of evacuation routes?" },
-                        { name: "Regulation Compliance", label: "Are evacuation routes reviewed to ensure compliance with relevant regulations, codes, and standards, such as building codes and fire safety regulations?" },
-                        { name: "Knowledgeable Reviewers", label: "Are reviews conducted by individuals knowledgeable about regulatory requirements and best practices for evacuation route design and signage?" },
-                        { name: "Disability Access", label: "Are evacuation routes reviewed to ensure accessibility for individuals with disabilities or mobility limitations?" },
-                        { name: "Occupant Provisions", label: "Are there provisions in place to accommodate the needs of all occupants, including those who may require assistance during evacuations?" },
-                        { name: "Sign Inspection", label: "Are evacuation route signs inspected as part of the review process to ensure they are clear, visible, and properly positioned?" },
-                        { name: "Sign Updates", label: "Are signs updated or replaced as needed to maintain legibility and compliance with standards?" },
-                        { name: "Wayfinding Review", label: "Are wayfinding aids, such as floor plans or maps, reviewed to ensure they accurately depict evacuation routes and assembly areas?" },
-                        { name: "Plan Alignment", label: "Are evacuation routes reviewed in conjunction with broader emergency response plans to ensure alignment and consistency?" },
-                        { name: "Response Integration", label: "Do reviews consider how evacuation routes integrate with other emergency preparedness and response measures, such as sheltering procedures and communication protocols?" },
-                        { name: "Outcome Records", label: "Are records maintained to document the outcomes of evacuation route reviews, including any identified issues, recommended changes, and actions taken?" },
-                        { name: "Accessible Records", label: "Are review records accessible to relevant stakeholders for reference and follow-up?" },
-                        { name: "Trend Tracking", label: "Are review findings used to track trends, monitor compliance, and inform future updates to evacuation routes and emergency plans?" }
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
+                     <h2>Evacuation Route Review Questions</h2> {/* Added main heading */}
+
+                    {/* Single .map call for all questions with standardized rendering */}
+                    {evacuationRouteQuestions.map((question, index) => (
+                        <div key={question.name} className="form-section"> {/* Use name for key */}
                             <label>{question.label}</label>
+                            {/* Div for radio buttons */}
                             <div>
-                                {question.name === "reviewedEvacuationRoutes" || question.name === "scheduleProcedure" || question.name === "structuredProcess" || question.name === "occupantProvisions"? (
-                                    <input
-                                        type="text"
-                                        name={question.name}
-                                        placeholder={question.name === "reviewedEvacuationRoutes" ? "How often" : question.name === "scheduleProcedure" ? "Describe the schedule or procedure" : question.name === "structuredProcess" ? "Describe the process" : "Describe the provisions"}
-                                        value={formData[question.name] || ''}
-                                        onChange={handleChange}
-                                    />
-                                ) : (
-                                    <>
-                                        <input
-                                            type="radio"
-                                            name={question.name}
-                                            value="yes"
-                                            checked={formData[question.name] === "yes"}
-                                            onChange={handleChange}
-                                        /> Yes
-                                        <input
-                                            type="radio"
-                                            name={question.name}
-                                            value="no"
-                                            checked={formData[question.name] === "no"}
-                                            onChange={handleChange}
-                                        /> No
-                                        <input
-                                            type="text"
-                                            name={`${question.name}-comment`}
-                                            placeholder="Additional comments"
-                                            value={formData[`${question.name}-comment`] || ''}
-                                            onChange={handleChange}
-                                        />
-                                    </>
-                                )}
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_yes`}
+                                    name={question.name}
+                                    value="yes"
+                                    checked={formData[question.name] === "yes"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_yes`}>Yes</label>
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_no`}
+                                    name={question.name}
+                                    value="no"
+                                    checked={formData[question.name] === "no"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_no`}>No</label>
                             </div>
+                            {/* Input for comments */}
+                            <input
+                                className='comment-input'
+                                type="text"
+                                name={`${question.name}Comment`} // Corrected name format
+                                placeholder="Additional comments"
+                                value={formData[`${question.name}Comment`] || ''}
+                                onChange={handleChange}
+                            />
                         </div>
                     ))}
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
-                    <button type="submit">Submit</button>
+
+                    {/* Image upload section - Looks good */}
+                     <div className="form-section">
+                         <label htmlFor="imageUploadEvacReview">Upload Image (Optional):</label>
+                         <input id="imageUploadEvacReview" type="file" onChange={handleImageChange} accept="image/*" />
+                         {imageUrl && !imageData && <img src={imageUrl} alt="Uploaded Evacuation Route Review related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                         {imageData && <img src={imageData} alt="Preview Evacuation Route Review related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                         {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                     </div>
+
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Submitting...' : 'Submit Final'}
+                    </button>
                 </form>
             </main>
         </div>

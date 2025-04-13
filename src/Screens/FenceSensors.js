@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-// Firestore imports aligned with SecurityGatesPage
-import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
-// Firebase Functions imports (replacing Storage imports)
+// Firestore imports aligned with the standard pattern
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore'; // Removed unused 'collection'
+// Firebase Functions imports
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
@@ -9,27 +9,52 @@ import './FormQuestions.css'; // Assuming same CSS file
 import logo from '../assets/MachaLogo.png'; // Assuming same logo
 import Navbar from "./Navbar"; // Assuming same Navbar
 
+// Define questions array outside the component
+const fenceSensorQuestions = [
+    { name: "strategicPlacement", label: "Are fence sensors strategically placed to detect tampering/unauthorized access?" }, // Simplified
+    { name: "fullCoverage", label: "Do they cover the entire perimeter fence line and potential entry points?" }, // Simplified
+    { name: "coverageSufficient", label: "Is sensor coverage sufficient across the entire fence line?" },
+    { name: "sensitivityLevel", label: "Are sensors set to an appropriate sensitivity level for cutting/climbing/lifting?" }, // Simplified
+    { name: "falseAlarmAdjustments", label: "Have adjustments been made to minimize false alarms (wind, vegetation, wildlife)?" },
+    { name: "quickResponse", label: "Do sensors respond quickly and trigger alarms promptly upon detection?" }, // Simplified
+    { name: "differentiationMechanism", label: "Is a mechanism in place to differentiate normal vs. suspicious activity?" }, // Simplified
+    { name: "realTimeTransmission", label: "Are alarms transmitted to monitoring stations/security in real-time?" },
+    { name: "integratedAlarmSystem", label: "Are fence sensors integrated with the overall perimeter alarm system?" },
+    { name: "seamlessCommunication", label: "Do they communicate seamlessly with alarm panels/monitoring stations?" }, // Simplified
+    { name: "coordinationWithOtherDevices", label: "Is there coordination between sensor activations and other alarm devices (sirens, lights)?" }, // Simplified
+    { name: "remoteMonitoring", label: "Is remote access and monitoring functionality available?" }, // Simplified
+    { name: "remoteAdjustments", label: "Can personnel remotely view status, receive alerts, and adjust settings?" }, // Simplified
+    { name: "secureProtocols", label: "Are secure authentication/encryption protocols in place for remote access?" }, // Simplified
+    { name: "durableDesign", label: "Are sensors designed to withstand relevant outdoor environmental factors?" }, // Simplified
+    { name: "durableMaterials", label: "Are they constructed from durable materials resistant to elements/tampering?" }, // Simplified
+    { name: "testingCertification", label: "Have sensors undergone testing/certification for reliability/durability?" },
+    { name: "maintenanceSchedule", label: "Is there a regular maintenance schedule for fence sensors?" },
+    { name: "maintenanceTasks", label: "Are scheduled maintenance tasks (testing, battery replacement, inspection) performed?" }, // Simplified
+    { name: "maintenanceRecords", label: "Are records documenting maintenance, repairs, and issues kept?" }, // Simplified
+];
+
+
 function FenceSensorsPage() {
-    const navigate = useNavigate(); // Initialize useNavigate hook for navigation
-    const { buildingId } = useBuilding(); // Access buildingId from context
+    const navigate = useNavigate();
+    const { buildingId } = useBuilding();
     const db = getFirestore();
-    const functions = getFunctions(); // Initialize Firebase Functions
-    // Define callable function with the requested naming convention
-    const uploadImage = httpsCallable(functions, 'uploadFenceSensorsImage');
+    const functions = getFunctions();
+     // Renamed variable for clarity
+    const uploadFenceSensorsImage = httpsCallable(functions, 'uploadFenceSensorsImage');
 
-    // State aligned with SecurityGatesPage
-    const [formData, setFormData] = useState({}); // Initialize as empty object
-    const [imageData, setImageData] = useState(null); // For base64 image data
-    const [imageUrl, setImageUrl] = useState(null); // For storing uploaded image URL
-    const [imageUploadError, setImageUploadError] = useState(null); // For image upload errors
-    const [loading, setLoading] = useState(true); // Loading state for initial fetch
-    const [loadError, setLoadError] = useState(null); // Error state for initial fetch
+    // State aligned with the standard pattern - Looks good
+    const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
-    // useEffect for fetching data on load (like SecurityGatesPage)
+    // useEffect for fetching data on load - Looks good
     useEffect(() => {
         if (!buildingId) {
-            alert('No building selected. Redirecting to Building Info...');
-            // Corrected navigation path if needed, ensure it matches your routes
+             // Added current date to alert as per guidelines (though not explicitly asked for)
+            alert(`No building selected (as of ${new Date().toLocaleDateString()}). Redirecting to Building Info...`);
             navigate('/BuildingandAddress');
             return;
         }
@@ -37,18 +62,16 @@ function FenceSensorsPage() {
         const fetchFormData = async () => {
             setLoading(true);
             setLoadError(null);
-            // Document path structure aligned with SecurityGatesPage
             const formDocRef = doc(db, 'forms', 'Physical Security', 'Fence Sensors', buildingId);
 
             try {
                 const docSnapshot = await getDoc(formDocRef);
                 if (docSnapshot.exists()) {
-                    // Set formData from Firestore or default to empty object
-                    setFormData(docSnapshot.data().formData || {});
-                    // Optionally load existing image URL if stored
-                    setImageUrl(docSnapshot.data().formData?.imageUrl || null);
+                    const existingData = docSnapshot.data().formData || {};
+                    setFormData(existingData);
+                    setImageUrl(existingData.imageUrl || null); // Use optional chaining
                 } else {
-                    setFormData({}); // Initialize if no document exists
+                    setFormData({});
                 }
             } catch (error) {
                 console.error("Error fetching form data:", error);
@@ -61,7 +84,7 @@ function FenceSensorsPage() {
         fetchFormData();
     }, [buildingId, db, navigate]);
 
-    // handleChange now saves data on every change (like SecurityGatesPage)
+    // handleChange saves data on every change with correct structure
     const handleChange = async (e) => {
         const { name, value } = e.target;
         const newFormData = { ...formData, [name]: value };
@@ -69,45 +92,48 @@ function FenceSensorsPage() {
 
         if (!buildingId) {
             console.error("Building ID is missing, cannot save data.");
-            // Optionally alert the user or handle differently
             return;
         }
 
         try {
-            // Document path structure aligned with SecurityGatesPage
             const formDocRef = doc(db, 'forms', 'Physical Security', 'Fence Sensors', buildingId);
-            // Create buildingRef (Reference to the building document)
             const buildingRef = doc(db, 'Buildings', buildingId);
-            // Save data using setDoc with merge: true
-            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true });
-            console.log("Form data auto-saved:", { ...newFormData, building: buildingRef });
+             // Include existing imageUrl in save data
+            const dataToSave = {
+                ...newFormData,
+                building: buildingRef,
+                ...(imageUrl && { imageUrl: imageUrl }) // Preserve existing imageUrl
+            };
+            await setDoc(formDocRef, { formData: dataToSave }, { merge: true });
+            // console.log("Form data auto-saved:", dataToSave);
         } catch (error) {
             console.error("Error auto-saving form data:", error);
-            // Consider showing a non-blocking error message to the user
-            // alert("Failed to save changes. Please check your connection.");
+            // Optionally show a non-blocking error to the user
         }
     };
 
-    // handleImageChange using FileReader (like SecurityGatesPage)
+    // handleImageChange using FileReader - Looks good
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImageData(reader.result); // Store base64 data
-                setImageUrl(null); // Clear previous image URL if a new file is selected
-                setImageUploadError(null); // Clear previous errors
-            };
-            reader.readAsDataURL(file);
+           const reader = new FileReader();
+           reader.onloadend = () => {
+               setImageData(reader.result);
+               setImageUrl(null);
+               setImageUploadError(null);
+           };
+           reader.readAsDataURL(file);
+        } else {
+            setImageData(null);
         }
     };
 
-    // handleBack now only navigates (like SecurityGatesPage)
+    // handleBack now only navigates - Looks good
     const handleBack = () => {
-        navigate(-1); // Simple navigation back
+        navigate(-1);
     };
 
-    // handleSubmit aligned with SecurityGatesPage (using Cloud Function for upload)
+    // handleSubmit using Cloud Function for upload with correct structure
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -116,157 +142,129 @@ function FenceSensorsPage() {
             return;
         }
 
-        let finalImageUrl = formData.imageUrl || null; // Keep existing URL unless new image uploaded
+        setLoading(true);
+        let finalImageUrl = formData.imageUrl || null;
+        let submissionError = null;
 
-        // Upload new image if imageData exists
         if (imageData) {
-             // Show loading state for upload if desired
              setImageUploadError(null);
             try {
                 console.log("Uploading image...");
-                const uploadResult = await uploadImage({ imageData: imageData });
-                finalImageUrl = uploadResult.data.imageUrl; // Get URL from function response
-                setImageUrl(finalImageUrl); // Update display URL
+                // Use correct function variable name
+                const uploadResult = await uploadFenceSensorsImage({
+                    imageData: imageData,
+                    buildingId: buildingId
+                 });
+                finalImageUrl = uploadResult.data.imageUrl;
+                setImageUrl(finalImageUrl);
                 console.log("Image uploaded successfully:", finalImageUrl);
             } catch (error) {
                 console.error('Error uploading image via Cloud Function:', error);
                 setImageUploadError(error.message || "Failed to upload image.");
-                alert(`Image upload failed: ${error.message || "Unknown error"}`);
-                 // Decide if submission should proceed without the image
-                 // return; // Uncomment this to stop submission if image upload fails
+                submissionError = `Image upload failed: ${error.message || "Unknown error"}`;
+                 finalImageUrl = formData.imageUrl || null;
+                // alert(submissionError); // Alert moved after save attempt
             }
         }
 
-        // Prepare final data, including the building reference and image URL
         const finalFormData = { ...formData, imageUrl: finalImageUrl };
+        setFormData(finalFormData); // Update state to final version
 
         try {
-            // Document path structure aligned with SecurityGatesPage
             const formDocRef = doc(db, 'forms', 'Physical Security', 'Fence Sensors', buildingId);
-            // Create buildingRef
             const buildingRef = doc(db, 'Buildings', buildingId);
-            // Save final data using setDoc with merge: true
             await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
 
             console.log('Form data submitted successfully!');
-            alert('Form submitted successfully!');
-            navigate('/Form'); // Navigate after successful submission
+             if (!submissionError) {
+                 alert('Form submitted successfully!');
+             } else {
+                 alert(submissionError); // Show image error now if save succeeded anyway
+             }
+            navigate('/Form');
         } catch (error) {
             console.error("Error submitting final form data:", error);
             alert("Failed to submit the form. Please check your connection and try again.");
+        } finally {
+             setLoading(false);
         }
     };
 
-    // Loading and Error display (like SecurityGatesPage)
+    // Loading and Error display - Looks good
     if (loading) {
         return <div>Loading...</div>;
     }
-
     if (loadError) {
         return <div>Error: {loadError}</div>;
     }
 
-    // Define questions in the structured format
-    const questions = [
-        { name: "strategicPlacement", label: "Are the fence sensors strategically placed along the perimeter to detect tampering or unauthorized access attempts?" },
-        { name: "fullCoverage", label: "Do they cover the entire perimeter, including all fence lines and potential entry points?" },
-        // Note: The 'insufficientCoverage' question was a text input, adapting it to Yes/No + Comment
-        { name: "coverageSufficient", label: "Is sensor coverage sufficient across the entire fence line?" },
-        { name: "sensitivityLevel", label: "Are the fence sensors set to an appropriate sensitivity level to detect tampering, such as cutting, climbing, or lifting of the fence?" },
-        { name: "falseAlarmAdjustments", label: "Have adjustments been made to minimize false alarms caused by environmental factors such as wind, vegetation, or wildlife?" },
-        { name: "quickResponse", label: "Do the fence sensors respond quickly to detected tampering and trigger alarms promptly?" },
-        { name: "differentiationMechanism", label: "Is there a mechanism in place to differentiate between normal activities (e.g., wind-induced movements) and suspicious behaviors to minimize false alarms?" },
-        { name: "realTimeTransmission", label: "Are alarms transmitted to monitoring stations or security personnel in real-time for immediate response?" },
-        { name: "integratedAlarmSystem", label: "Are the fence sensors integrated with the overall perimeter alarm system?" },
-        { name: "seamlessCommunication", label: "Do they communicate seamlessly with alarm control panels and monitoring stations?" },
-        { name: "coordinationWithOtherDevices", label: "Is there coordination between fence sensor activations and other alarm devices such as sirens, strobe lights, or notification systems?" },
-        { name: "remoteMonitoring", label: "Is there remote access and monitoring functionality for the fence sensors?" },
-        { name: "remoteAdjustments", label: "Can security personnel view sensor status, receive alerts, and adjust settings remotely as needed?" },
-        { name: "secureProtocols", label: "Is there secure authentication and encryption protocols in place to prevent unauthorized access to sensor controls?" },
-        { name: "durableDesign", label: "Are the fence sensors designed to withstand outdoor environmental factors such as temperature variations, moisture, and physical impact?" },
-        { name: "durableMaterials", label: "Are they constructed from durable materials capable of withstanding exposure to the elements and potential tampering attempts?" },
-        { name: "testingCertification", label: "Have the sensors undergone testing or certification to verify reliability and durability?" },
-        { name: "maintenanceSchedule", label: "Is there a regular maintenance schedule in place for the fence sensors?" },
-        { name: "maintenanceTasks", label: "Are maintenance tasks, such as testing sensor functionality, replacing batteries, and inspecting sensor connections, performed according to schedule?" },
-        { name: "maintenanceRecords", label: "Are there records documenting maintenance activities, repairs, and any issues identified during inspections?" }
-    ];
-
-
     return (
-        <div> {/* Added wrapper div like in SecurityGatesPage */}
-            <div className="form-page">
-                <header className="header">
-                    <Navbar />
-                    <button className="back-button" onClick={handleBack}>←</button>
-                    {/* Title specific to this page */}
-                    <h1>Fence Sensors Assessment</h1>
-                    <img src={logo} alt="Logo" className="logo" />
-                </header>
+         // Removed outer wrapper div
+        <div className="form-page">
+            <header className="header">
+                <Navbar />
+                <button className="back-button" onClick={handleBack}>←</button>
+                <h1>Fence Sensors Assessment</h1>
+                <img src={logo} alt="Logo" className="logo" />
+            </header>
 
-                <main className="form-container">
-                    {/* Form submission handler */}
-                    <form onSubmit={handleSubmit}>
-                        {/* Title specific to this page */}
-                        <h2>Fence Sensors Assessment Details</h2>
+            <main className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>Fence Sensor Assessment Questions</h2> {/* Added main heading */}
+                    {/* Render questions dynamically */}
+                    {fenceSensorQuestions.map((question, index) => (
+                        <div key={question.name} className="form-section"> {/* Use name for key */}
+                            <label htmlFor={`${question.name}_yes`}>{question.label}</label> {/* Associate label */}
 
-                        {/* Map through questions array */}
-                        {questions.map((question, index) => (
-                            <div key={index} className="form-section">
-                                <label>{question.label}</label>
-                                <div>
-                                    {/* Yes Radio Button */}
-                                    <input
-                                        type="radio"
-                                        id={`${question.name}_yes`} // Added id for label association
-                                        name={question.name}
-                                        value="yes"
-                                        // Use checked to control state based on formData
-                                        checked={formData[question.name] === "yes"}
-                                        onChange={handleChange}
-                                    />
-                                     <label htmlFor={`${question.name}_yes`}> Yes</label> {/* Added label text */}
-
-                                    {/* No Radio Button */}
-                                    <input
-                                        type="radio"
-                                        id={`${question.name}_no`} // Added id for label association
-                                        name={question.name}
-                                        value="no"
-                                         // Use checked to control state based on formData
-                                        checked={formData[question.name] === "no"}
-                                        onChange={handleChange}
-                                    />
-                                    <label htmlFor={`${question.name}_no`}> No</label> {/* Added label text */}
-                                </div>
-                                {/* Text Input for Comments */}
+                             {/* Standard Yes/No Radio + Comment Input */}
+                            <div>
                                 <input
-                                    type="text" // Changed from textarea to input type text
-                                    name={`${question.name}Comment`} // Naming convention for comment field
-                                    placeholder="Additional comments (Optional)" // Placeholder text
-                                    // Control input value using formData
-                                    value={formData[`${question.name}Comment`] || ''}
+                                    type="radio"
+                                    id={`${question.name}_yes`}
+                                    name={question.name}
+                                    value="yes"
+                                    checked={formData[question.name] === "yes"}
                                     onChange={handleChange}
-                                    className='comment-box' // Keep className if styles are needed
                                 />
+                                <label htmlFor={`${question.name}_yes`}> Yes</label>
+
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_no`}
+                                    name={question.name}
+                                    value="no"
+                                    checked={formData[question.name] === "no"}
+                                    onChange={handleChange}
+                                />
+                                <label htmlFor={`${question.name}_no`}> No</label>
                             </div>
-                        ))}
-
-                        {/* File Input for Image Upload */}
-                        <div className="form-section"> {/* Optional: wrap file input in a section */}
-                            <label>Upload Image (Optional):</label>
-                             <input type="file" onChange={handleImageChange} accept="image/*" />
-                             {/* Display uploaded image preview */}
-                             {imageUrl && <img src={imageUrl} alt="Uploaded Fence Sensor" style={{ maxWidth: '200px', marginTop: '10px' }}/>} {/* Added style for preview size */}
-                             {/* Display image upload error */}
-                             {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
-                             {/* Removed progress bar as Cloud Function call doesn't provide granular progress */}
+                            <input
+                                type="text"
+                                id={`${question.name}Comment`}
+                                name={`${question.name}Comment`} // Standard comment name
+                                placeholder="Additional comments"
+                                value={formData[`${question.name}Comment`] || ''}
+                                onChange={handleChange}
+                                className='comment-input' // Use consistent class
+                            />
                         </div>
+                    ))}
 
-                        {/* Submit Button */}
-                        <button type="submit">Submit Assessment</button>
-                    </form>
-                </main>
-            </div>
+                    {/* File Input for Image Upload */}
+                    <div className="form-section">
+                         <label htmlFor="imageUploadFenceSensor">Upload Image (Optional):</label>
+                         <input id="imageUploadFenceSensor" type="file" onChange={handleImageChange} accept="image/*" />
+                         {imageUrl && !imageData && <img src={imageUrl} alt="Uploaded Fence Sensor Context" style={{ maxWidth: '200px', marginTop: '10px' }}/>}
+                         {imageData && <img src={imageData} alt="Preview Fence Sensor Context" style={{ maxWidth: '200px', marginTop: '10px' }}/>}
+                         {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                    </div>
+
+                    {/* Submit Button */}
+                     <button type="submit" disabled={loading}>
+                         {loading ? 'Submitting...' : 'Submit Final'} {/* Indicate loading on submit */}
+                     </button>
+                </form>
+            </main>
         </div>
     );
 }

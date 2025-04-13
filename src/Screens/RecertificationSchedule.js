@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, doc, getDoc, setDoc, } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore'; // Corrected import
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
@@ -7,14 +7,46 @@ import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
 import { getFunctions, httpsCallable } from "firebase/functions";
 
+// Define questions array outside the component
+const recertificationQuestions = [
+    // Adapted from text input
+    { name: "recertificationFrequencyEstablished", label: "Is there an established frequency for recertifying staff in First Aid/CPR?" },
+    // Adapted from text input
+    { name: "scheduleDeterminationBasedOnFactors", label: "Is the recertification schedule determined based on specific factors/regulations?" },
+    { name: "recertificationVariations", label: "Are there variations in recertification requirements based on roles/needs/standards?" }, // Simplified
+    // Adapted from text input
+    { name: "notificationMethodsExist", label: "Are staff members notified of upcoming recertification deadlines?" },
+    { name: "reminderSystem", label: "Is there a reminder system to alert staff in advance?" }, // Simplified
+    // Adapted from text input
+    { name: "communicationChannelsUsed", label: "Are appropriate communication channels utilized for reminders?" },
+    // Adapted from text input
+    { name: "recertificationProcessDefined", label: "Is there a defined process for staff to recertify?" },
+    { name: "recertificationOptionsOffered", label: "Are various recertification options offered (on-site, online, external)?" }, // Simplified - Renamed 'recertificationOptions'
+    // Adapted from text input
+    { name: "recertificationSupportProvided", label: "Is support provided for recertification (scheduling flexibility, financial)?" },
+    // Adapted from text input
+    { name: "recertificationRecordsMaintained", label: "Are records of recertification status/completion maintained and up-to-date?" },
+     // Adapted from text input
+    { name: "certificateDistributionProcess", label: "Is there a process for issuing/distributing recertification credentials?" },
+     // Adapted from text input
+    { name: "recordsIntegrityMeasures", label: "Are measures in place to ensure accuracy/integrity of recertification records?" },
+    // Adapted from text input
+    { name: "evaluationFeedbackMechanism", label: "Is the effectiveness of the recertification process evaluated (e.g., via feedback)?" },
+    { name: "staffFeedbackSolicited", label: "Are staff given opportunities to provide input on the recertification process?" }, // Simplified - Renamed 'staffFeedback'
+    // Adapted from text input
+    { name: "lessonsLearnedApplied", label: "Are lessons learned used to refine the recertification process?" } // Simplified - Renamed 'lessonsLearned'
+];
+
 
 function RecertificationScheduleFormPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding();
     const db = getFirestore();
     const functions = getFunctions();
+    // Renamed variable for clarity
     const uploadRecertificationScheduleImage = httpsCallable(functions, 'uploadRecertificationScheduleImage');
 
+    // State variables look good
     const [formData, setFormData] = useState({});
     const [imageData, setImageData] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
@@ -22,23 +54,28 @@ function RecertificationScheduleFormPage() {
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState(null);
 
+    // useEffect for fetching data - Looks good
     useEffect(() => {
         if (!buildingId) {
             alert('No building selected. Redirecting to Building Info...');
-            navigate('BuildingandAddress');
+            navigate('/BuildingandAddress');
             return;
         }
 
         const fetchFormData = async () => {
             setLoading(true);
             setLoadError(null);
+             // Correct Firestore path
+            const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Recertification Schedule', buildingId);
 
             try {
-                const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Recertification Schedule', buildingId);
                 const docSnapshot = await getDoc(formDocRef);
-
                 if (docSnapshot.exists()) {
-                    setFormData(docSnapshot.data().formData || {});
+                    const existingData = docSnapshot.data().formData || {};
+                    setFormData(existingData);
+                     if (existingData.imageUrl) {
+                         setImageUrl(existingData.imageUrl);
+                     }
                 } else {
                     setFormData({});
                 }
@@ -53,95 +90,121 @@ function RecertificationScheduleFormPage() {
         fetchFormData();
     }, [buildingId, db, navigate]);
 
+    // handleChange saves data immediately with correct structure
     const handleChange = async (e) => {
         const { name, value } = e.target;
         const newFormData = { ...formData, [name]: value };
         setFormData(newFormData);
- 
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId); // Create buildingRef
-            const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Recertification Schedule', buildingId);
-            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true }); // Use merge and add building
-            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
-        } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+
+        if (buildingId) {
+            try {
+                const buildingRef = doc(db, 'Buildings', buildingId);
+                const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Recertification Schedule', buildingId);
+                const dataToSave = {
+                     ...newFormData,
+                     building: buildingRef,
+                     ...(imageUrl && { imageUrl: imageUrl })
+                 };
+                await setDoc(formDocRef, { formData: dataToSave }, { merge: true });
+                // console.log("Form data updated:", dataToSave);
+            } catch (error) {
+                console.error("Error saving form data to Firestore:", error);
+                // Avoid alerting on every change
+            }
         }
     };
 
+    // handleImageChange using base64 - Looks good
     const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImageData(reader.result);
-        };
-        reader.readAsDataURL(file);
+       const file = e.target.files[0];
+       if (file) {
+           const reader = new FileReader();
+           reader.onloadend = () => {
+               setImageData(reader.result);
+               setImageUrl(null);
+               setImageUploadError(null);
+           };
+           reader.readAsDataURL(file);
+       } else {
+           setImageData(null);
+       }
     };
 
+    // handleBack - Looks good
     const handleBack = () => {
         navigate(-1);
     };
 
+    // handleSubmit uses Cloud Function and setDoc with correct structure
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!buildingId) {
-            alert('Building ID is missing. Please start from the Building Information page.');
+            alert('Building ID is missing. Cannot submit.');
             return;
         }
 
+        setLoading(true);
+        let finalImageUrl = formData.imageUrl || null;
+        let submissionError = null;
+
         if (imageData) {
             try {
-                const uploadResult = await uploadRecertificationScheduleImage({ imageData: imageData });
-                setImageUrl(uploadResult.data.imageUrl);
-                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                console.log("Uploading image via Cloud Function...");
+                // Use correct function variable name
+                const uploadResult = await uploadRecertificationScheduleImage({
+                    imageData: imageData,
+                    buildingId: buildingId
+                 });
+                finalImageUrl = uploadResult.data.imageUrl;
+                setImageUrl(finalImageUrl);
                 setImageUploadError(null);
+                console.log("Image uploaded successfully:", finalImageUrl);
             } catch (error) {
-                console.error('Error uploading image:', error);
-                setImageUploadError(error.message);
+                console.error('Error uploading image via function:', error);
+                setImageUploadError(`Image upload failed: ${error.message}`);
+                submissionError = "Image upload failed. Form data saved without new image.";
+                 finalImageUrl = formData.imageUrl || null;
             }
         }
 
+        const finalFormData = {
+             ...formData,
+             imageUrl: finalImageUrl,
+        };
+        setFormData(finalFormData);
+
         try {
+            console.log("Saving final form data to Firestore...");
             const buildingRef = doc(db, 'Buildings', buildingId);
             const formDocRef = doc(db, 'forms', 'Personnel Training and Awareness', 'Recertification Schedule', buildingId);
-            await setDoc(formDocRef, { formData: { ...formData, building: buildingRef } }, { merge: true });
+            // Save final data with correct structure, including building ref
+            await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
             console.log('Form data submitted successfully!');
-            alert('Form submitted successfully!');
+            if (!submissionError) {
+                alert('Form submitted successfully!');
+            } else {
+                alert(submissionError);
+            }
             navigate('/Form');
         } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+            console.error("Error saving final form data to Firestore:", error);
+            alert("Failed to save final form data. Please check connection and try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
+    // Loading/Error Display - Looks good
     if (loading) {
         return <div>Loading...</div>;
     }
-
     if (loadError) {
         return <div>Error: {loadError}</div>;
     }
 
-    const questions = [
-        { name: "recertificationFrequency", label: "What is the established frequency for recertifying staff members in First Aid/CPR training (e.g., every two years, annually)? (Describe the method for recertifying)", type: "text" },
-        { name: "recertificationScheduleDetermination", label: "How is the recertification schedule determined, and are there specific factors or regulations guiding this decision? (Describe how the schedule is determined)", type: "text" },
-        { name: "recertificationVariations", label: "Are there variations in recertification requirements based on job roles, departmental needs, or regulatory standards?", type: "radio" },
-        { name: "notificationMethods", label: "How are staff members notified of upcoming recertification deadlines for First Aid/CPR training? (Describe how the staff is notified)", type: "text" },
-        { name: "reminderSystem", label: "Is there a reminder system in place to alert staff members well in advance of their recertification expiration dates?", type: "radio" },
-        { name: "communicationChannels", label: "What communication channels are utilized to ensure that staff members receive timely reminders about recertification requirements? (List the communication channels)", type: "text" },
-        { name: "recertificationProcess", label: "What is the process for staff members to recertify in First Aid/CPR training, and are there specific steps or procedures they need to follow? (Describe the process)", type: "text" },
-        { name: "recertificationOptions", label: "Are recertification courses offered on-site, online, or through external training providers, and how are these options determined?", type: "radio" },
-        { name: "recertificationSupport", label: "How are staff members supported in completing recertification requirements, such as scheduling flexibility or financial assistance? (Describe how the staff is supported to complete requirements)", type: "text" },
-        { name: "recertificationRecords", label: "How are records of staff members' recertification status and completion maintained, and are these records kept up to date? (Describe how the records are maintained)", type: "text" },
-        { name: "certificateDistribution", label: "Are recertification certificates or credentials issued to staff members upon successful completion, and how are these documents distributed or stored? (Describe how they are distributed or stored)", type: "text" },
-        { name: "recordsIntegrity", label: "What measures are in place to ensure the accuracy and integrity of recertification records, including verification of course completion and instructor credentials? (Describe the measures)", type: "text" },
-        { name: "evaluationFeedback", label: "How is the effectiveness of the recertification process evaluated, and are there mechanisms for gathering feedback from staff members? (Describe the mechanisms)", type: "text" },
-        { name: "staffFeedback", label: "Are staff members given the opportunity to provide input on the recertification courses, instructors, or content to identify areas for improvement?", type: "radio" },
-        { name: "lessonsLearned", label: "How are lessons learned from previous recertification cycles used to refine and enhance the recertification process for future iterations? (Describe how lessons are learned)", type: "text" },
-    ];
-
     return (
+        // Removed outer div if present
         <div className="form-page">
             <header className="header">
                 <Navbar />
@@ -152,24 +215,55 @@ function RecertificationScheduleFormPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    {questions.map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            {question.type === "radio" ? (
-                                <><div>
-                            <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
-                            <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
-                          </div><textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea></>
+                    <h2>Recertification Questions</h2> {/* Added main heading */}
 
-                            ) : (
-                                <input type="text" name={question.name} placeholder={question.label.substring(question.label.indexOf('(') +1, question.label.lastIndexOf(')'))} value={formData[question.name] || ''} onChange={handleChange} />
-                            )}
+                    {/* Single .map call for all questions with standardized rendering */}
+                    {recertificationQuestions.map((question, index) => (
+                        <div key={question.name} className="form-section"> {/* Use name for key */}
+                            <label>{question.label}</label>
+                            {/* Div for radio buttons */}
+                            <div>
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_yes`}
+                                    name={question.name}
+                                    value="yes"
+                                    checked={formData[question.name] === "yes"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_yes`}>Yes</label>
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_no`}
+                                    name={question.name}
+                                    value="no"
+                                    checked={formData[question.name] === "no"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_no`}>No</label>
+                            </div>
+                            {/* Input for comments */}
+                            <input
+                                className='comment-input'
+                                type="text"
+                                name={`${question.name}Comment`}
+                                placeholder="Additional comments"
+                                value={formData[`${question.name}Comment`] || ''}
+                                onChange={handleChange}
+                            />
                         </div>
                     ))}
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                    {imageUploadError && <p style={{ color: "red" }}>{imageUploadError}</p>}
-                    <button type="submit">Submit</button>
+
+                    {/* Image upload section - Looks good */}
+                     <div className="form-section">
+                         <label htmlFor="imageUploadRecert">Upload Image (Optional):</label>
+                         <input id="imageUploadRecert" type="file" onChange={handleImageChange} accept="image/*" />
+                         {imageUrl && !imageData && <img src={imageUrl} alt="Uploaded Recertification related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                         {imageData && <img src={imageData} alt="Preview Recertification related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                         {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                     </div>
+
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Submitting...' : 'Submit Final'}
+                    </button>
                 </form>
             </main>
         </div>

@@ -1,318 +1,290 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+// Firestore imports adjusted to match SecurityGatesPage
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+// Firebase Functions import added
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
 
+// Define questions in an array like SecurityGatesPage
+const doorLockQuestions = [
+    { name: "operational", label: "1. Are the electronic door locks operational and functioning as intended?" },
+    { name: "secureLocks", label: "2. Do the locks reliably secure doors to prevent unauthorized access?" },
+    { name: "malfunction", label: "3. Are there any signs of malfunction or errors in the locking mechanisms?" },
+    { name: "backupSystems", label: "4. Are backup systems in place in case of power outages or malfunctions?" },
+    // Question 5 adapted to Yes/No format
+    { name: "authMethodsDefined", label: "5. Are specific authentication methods (e.g., RFID, key codes, biometrics) defined and used?" },
+    { name: "authSecure", label: "6. Are these authentication methods secure and resistant to unauthorized duplication or bypass?" },
+    { name: "mfa", label: "7. Is multi-factor authentication implemented to enhance security (e.g., combining a PIN code with a biometric scan)?" },
+    // Question 8 adapted to Yes/No format
+    { name: "accessRightsManaged", label: "8. Is there a defined process for managing and enforcing access rights through the locks?" },
+    { name: "validCredentials", label: "9. Is access restricted to individuals with valid credentials or authorization?" },
+    { name: "accessPermissionsProcess", label: "10. Is there a process for granting, modifying, or revoking access permissions as needed?" },
+    { name: "integrationSecuritySystems", label: "11. Are the electronic door locks integrated with other security systems (e.g., access control software, cameras, alarms)?" },
+    { name: "realTimeMonitoring", label: "12. Do they communicate seamlessly with integrated systems for real-time monitoring and response?" },
+    { name: "accessEventsLogging", label: "13. Are access events logged and recorded for audit and analysis purposes?" },
+    { name: "durability", label: "14. Are the locks made from durable materials designed to withstand tampering or forced entry?" },
+    { name: "antiTamper", label: "15. Are there anti-tamper features or sensors to detect/respond to unauthorized manipulation?" },
+    { name: "environmentalResistance", label: "16. Are the locks resistant to environmental factors (e.g., moisture, temperature, wear)?" },
+    { name: "maintenanceSchedule", label: "17. Is there a regular maintenance schedule in place for the electronic door locks?" },
+    { name: "maintenanceTasks", label: "18. Are scheduled maintenance tasks (e.g., battery replacement, updates, inspections) performed?" },
+    { name: "maintenanceRecords", label: "19. Are there records documenting maintenance activities, repairs, and issues?" },
+    { name: "userTraining", label: "20. Have users (security, staff, authorized individuals) received training on proper lock usage?" },
+    { name: "userInstructions", label: "21. Are instructions or guidelines available to users regarding access procedures and protocols?" },
+    { name: "reportingProcess", label: "22. Is there a process for reporting malfunctions, damage, or security incidents related to the locks?" }
+];
+
+
 function DoorLocksPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding();
     const db = getFirestore();
-    const storage = getStorage();
+    // Firebase Functions setup added
+    const functions = getFunctions();
+    // httpsCallable setup - NameOfFile = DoorLocks
+    const uploadImage = httpsCallable(functions, 'uploadDoorLocksImage');
 
     const [formData, setFormData] = useState({});
-    const [image, setImage] = useState(null);
-    const [uploadProgress, setUploadProgress] = useState(0);
+    // State for base64 image data, like SecurityGatesPage
+    const [imageData, setImageData] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
-    const [uploadError, setUploadError] = useState(null);
+    // Renamed error state for consistency
+    const [imageUploadError, setImageUploadError] = useState(null);
+    // Loading/Error states for fetching data added
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
 
+    // useEffect to fetch data, similar to SecurityGatesPage
     useEffect(() => {
         if (!buildingId) {
             alert('No building selected. Redirecting to Building Info...');
-            navigate('BuildingandAddress');
+            navigate('/BuildingandAddress'); // Ensure path is correct
+            return;
         }
-    }, [buildingId, navigate]);
 
-    const handleImageChange = (e) => {
-        if (e.target.files[0]) {
-            setImage(e.target.files[0]);
-        }
-    };
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+            // Define the specific document reference for this form/building
+            const formDocRef = doc(db, 'forms', 'Physical Security', 'Door Locks', buildingId);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
-
-    const handleBack = async () => {
-        if (formData && buildingId) {
             try {
-                const buildingRef = doc(db, 'Buildings', buildingId);
-                const formsRef = collection(db, 'forms/Physical Security/Door Locks');
-                await addDoc(formsRef, {
-                    building: buildingRef,
-                    formData: formData,
-                });
-                console.log('Form Data submitted successfully on back!');
-                alert('Form data saved before navigating back!');
+                const docSnapshot = await getDoc(formDocRef);
+
+                if (docSnapshot.exists()) {
+                    const existingData = docSnapshot.data().formData || {};
+                    setFormData(existingData);
+                    // If image URL was previously saved, set it
+                    if (existingData.imageUrl) {
+                         setImageUrl(existingData.imageUrl);
+                    }
+                } else {
+                    setFormData({}); // Initialize empty if no data exists
+                }
             } catch (error) {
-                console.error('Error saving form data:', error);
-                alert('Failed to save form data before navigating back. Some data may be lost.');
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    // handleChange updated to save data immediately, like SecurityGatesPage
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        // Save changes to Firestore immediately
+        if (buildingId) {
+            try {
+                const buildingRef = doc(db, 'Buildings', buildingId); // Get building reference
+                const formDocRef = doc(db, 'forms', 'Physical Security', 'Door Locks', buildingId);
+                 // Include buildingRef and potentially existing imageUrl
+                const dataToSave = {
+                     ...newFormData,
+                     building: buildingRef,
+                     ...(imageUrl && { imageUrl: imageUrl }) // Keep existing imageUrl if present
+                 };
+                await setDoc(formDocRef, { formData: dataToSave }, { merge: true });
+                console.log("Form data updated in Firestore:", dataToSave);
+            } catch (error) {
+                console.error("Error saving form data to Firestore:", error);
+                // Optionally alert user, but avoid excessive alerts on every change
+                // alert("Failed to save changes. Please check connection.");
             }
         }
+    };
+
+    // handleImageChange updated to use base64, like SecurityGatesPage
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImageData(reader.result); // Store as base64
+                 setImageUrl(null); // Clear previous preview if a new file is selected
+                 setImageUploadError(null); // Clear previous errors
+            };
+            reader.readAsDataURL(file);
+        } else {
+             setImageData(null);
+        }
+    };
+
+    // handleBack simplified, data saved on change
+    const handleBack = () => {
         navigate(-1);
     };
 
+    // handleSubmit updated to use Cloud Function and setDoc
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!buildingId) {
-            alert('Building ID is missing. Please start the assessment from the correct page.');
+            alert('Building ID is missing. Cannot submit.');
             return;
         }
 
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
-            const formsRef = collection(db, 'forms/Physical Security/Door Locks');
-            await addDoc(formsRef, {
-                building: buildingRef,
-                formData: formData,
-            });
+        setLoading(true); // Indicate submission process
+        let finalImageUrl = formData.imageUrl || null; // Start with existing URL if any
+        let submissionError = null;
 
-            if (image) {
-                const imageRef = ref(storage, `images/doorLocks/${image.name}`);
-                const uploadTask = uploadBytesResumable(imageRef, image);
-
-                uploadTask.on('state_changed',
-                    (snapshot) => {
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        setUploadProgress(progress);
-                    },
-                    (error) => {
-                        setUploadError(error.message);
-                    },
-                    () => {
-                        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                            setImageUrl(downloadURL);
-                        });
-                    }
-                );
+        // Upload image via Cloud Function if new image data exists
+        if (imageData) {
+            try {
+                console.log("Uploading image via Cloud Function...");
+                // Ensure imageData includes the base64 prefix if necessary for your function
+                const uploadResult = await uploadImage({
+                    imageData: imageData,
+                    buildingId: buildingId // Pass buildingId if needed by function for path/naming
+                 });
+                finalImageUrl = uploadResult.data.imageUrl; // Get URL from function response
+                setImageUrl(finalImageUrl); // Update display URL
+                setImageUploadError(null);
+                console.log("Image uploaded successfully:", finalImageUrl);
+            } catch (error) {
+                console.error('Error uploading image via function:', error);
+                setImageUploadError(`Image upload failed: ${error.message}`);
+                submissionError = "Image upload failed. Form data saved without new image.";
+                // Decide if you want to stop submission or save form data without the image
+                // Set finalImageUrl back to existing URL if upload failed
+                 finalImageUrl = formData.imageUrl || null;
+                 // setLoading(false); // Stop loading indicator if stopping submission
+                 // return; // Stop submission if image upload is critical
             }
-            console.log('Form Data submitted successfully!');
-            alert('Form Submitted successfully!');
-            navigate('/Form');
+        }
+
+        // Prepare final form data including the image URL
+         const finalFormData = {
+             ...formData,
+             imageUrl: finalImageUrl // Use the result from upload attempt or existing URL
+         };
+         setFormData(finalFormData); // Update state
+
+        // Save final form data to Firestore
+        try {
+            console.log("Saving final form data to Firestore...");
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Physical Security', 'Door Locks', buildingId);
+            await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
+            console.log('Form data submitted successfully!');
+             // Only show success alert if no previous submission error occurred
+             if (!submissionError) {
+                 alert('Form submitted successfully!');
+             } else {
+                 alert(submissionError); // Show the earlier error message
+             }
+            navigate('/Form'); // Navigate after successful save
         } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Failed to submit the form. Please try again.');
+            console.error("Error saving final form data to Firestore:", error);
+            alert("Failed to save final form data. Please check connection and try again.");
+             submissionError = "Failed to save final form data."; // Update error status
+        } finally {
+             setLoading(false); // Stop loading indicator
         }
     };
 
+    // Loading and error display added
+    if (loading && !formData) { // Show initial loading state
+        return <div>Loading...</div>;
+    }
+
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
+    }
+
     return (
+        // Outer div removed to match SecurityGatesPage structure
         <div className="form-page">
             <header className="header">
                 <Navbar />
                 <button className="back-button" onClick={handleBack}>←</button>
-                <h1>Door Locks (e.g., electronic locks) Assessment</h1>
+                {/* Title updated slightly for consistency */}
+                <h1>Door Locks Assessment</h1>
                 <img src={logo} alt="Logo" className="logo" />
             </header>
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    <div className="form-section">
-                        <label>1. Are the electronic door locks operational and functioning as intended?</label>
-                        <div>
-                            <input type="radio" name="operational" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="operational" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="operationalComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
+                    {/* Added h2 like SecurityGatesPage */}
+                    <h2>Door Locks Assessment Questions</h2>
+
+                    {/* Use .map to render questions */}
+                    {doorLockQuestions.map((question, index) => (
+                        <div key={index} className="form-section">
+                            <label>{question.label}</label>
+                            <div>
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_yes`} // Add unique ID for label association
+                                    name={question.name}
+                                    value="yes"
+                                    checked={formData[question.name] === "yes"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_yes`}>Yes</label> {/* Label for radio */}
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_no`} // Add unique ID
+                                    name={question.name}
+                                    value="no"
+                                    checked={formData[question.name] === "no"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_no`}>No</label> {/* Label for radio */}
+                            </div>
+                             {/* Text input for comments like SecurityGatesPage */}
+                            <input
+                                 className='comment-input' // Use a more specific class if needed
+                                type="text"
+                                name={`${question.name}Comment`}
+                                placeholder="Additional comments"
+                                value={formData[`${question.name}Comment`] || ''}
+                                onChange={handleChange}
+                            />
                         </div>
+                    ))}
+
+                    {/* Image upload section */}
+                    <div className="form-section">
+                         <label htmlFor="imageUpload">Upload Image (Optional):</label>
+                         <input id="imageUpload" type="file" onChange={handleImageChange} accept="image/*" />
+                         {/* Show preview from state imageUrl (updated after successful upload) or from imageData (for immediate preview before upload) */}
+                         {imageUrl && !imageData && <img src={imageUrl} alt="Uploaded Door Lock" style={{ maxWidth: '200px', marginTop: '10px' }}/>}
+                         {imageData && <img src={imageData} alt="Preview Door Lock" style={{ maxWidth: '200px', marginTop: '10px' }}/>}
+                         {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
                     </div>
 
-                    <div className="form-section">
-                        <label>2. Do the locks reliably secure doors to prevent unauthorized access?</label>
-                        <div>
-                            <input type="radio" name="secureLocks" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="secureLocks" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="secureLocksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
 
-                    <div className="form-section">
-                        <label>3. Are there any signs of malfunction or errors in the locking mechanisms?</label>
-                        <div>
-                            <input type="radio" name="malfunction" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="malfunction" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="malfunctionComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>4. Are backup systems in place in case of power outages or malfunctions?</label>
-                        <div>
-                            <input type="radio" name="backupSystems" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="backupSystems" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="backupSystemsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>5. What authentication methods are used with the electronic door locks (e.g., RFID cards, key codes, biometric scans)?</label>
-                        <div>
-                            <input type="text" name="authenticationMethods" placeholder="Enter authentication methods" onChange={handleChange} />
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>6. Are these authentication methods secure and resistant to unauthorized duplication or bypass?</label>
-                        <div>
-                            <input type="radio" name="authSecure" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="authSecure" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="authSecureComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>7. Is multi-factor authentication implemented to enhance security (e.g., combining a PIN code with a biometric scan)?</label>
-                        <div>
-                            <input type="radio" name="MFA" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="MFA" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="MFAComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>8. How are access rights managed and enforced through the electronic door locks?</label>
-                        <div>
-                            <input type="text" name="accessRightsManagement" placeholder="Describe access rights management" onChange={handleChange} />
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>9. Is access restricted to individuals with valid credentials or authorization?</label>
-                        <div>
-                            <input type="radio" name="validCredentials" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="validCredentials" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="validCredentialsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>10. Is there a process for granting, modifying, or revoking access permissions as needed?</label>
-                        <div>
-                            <input type="radio" name="accessPermissions" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="accessPermissions" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="accessPermissionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>11. Are the electronic door locks integrated with other security systems, such as access control software, surveillance cameras, or alarm systems?</label>
-                        <div>
-                            <input type="radio" name="integrationSecuritySystems" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="integrationSecuritySystems" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="integrationSecuritySystemsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>12. Do they communicate seamlessly with these systems to provide real-time monitoring and response to security events?</label>
-                        <div>
-                            <input type="radio" name="realTimeMonitoring" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="realTimeMonitoring" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="realTimeMonitoringComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>13. Are access events logged and recorded for audit and analysis purposes?</label>
-                        <div>
-                            <input type="radio" name="accessEventsLogging" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="accessEventsLogging" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="accessEventsLoggingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>14. Are the electronic door locks made from durable materials and designed to withstand tampering or forced entry attempts?</label>
-                        <div>
-                            <input type="radio" name="durability" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="durability" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="durabilityComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>15. Are there anti-tamper features or sensors to detect and respond to unauthorized manipulation?</label>
-                        <div>
-                            <input type="radio" name="antiTamper" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="antiTamper" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="antiTamperComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>16. Are the locks resistant to environmental factors such as moisture, temperature extremes, or physical wear?</label>
-                        <div>
-                            <input type="radio" name="environmentalResistance" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="environmentalResistance" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="environmentalResistanceComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>17. Is there a regular maintenance schedule in place for the electronic door locks?</label>
-                        <div>
-                            <input type="radio" name="maintenanceSchedule" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="maintenanceSchedule" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="maintenanceScheduleComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>18. Are maintenance tasks, such as battery replacement, software updates, and inspection of locking mechanisms, performed according to schedule?</label>
-                        <div>
-                            <input type="radio" name="maintenanceTasks" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="maintenanceTasks" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="maintenanceTasksComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>19. Are there records documenting maintenance activities, repairs, and any issues identified during inspections?</label>
-                        <div>
-                            <input type="radio" name="maintenanceRecords" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="maintenanceRecords" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="maintenanceRecordsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>20. Have users, such as security personnel, staff, and authorized individuals, received training on how to use the electronic door locks properly?</label>
-                        <div>
-                            <input type="radio" name="userTraining" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="userTraining" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="userTrainingComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>21. Are there instructions or guidelines available to users regarding proper door access procedures and security protocols?</label>
-                        <div>
-                            <input type="radio" name="userInstructions" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="userInstructions" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="userInstructionsComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label>22. Is there a process for reporting malfunctions, damage, or security incidents related to the electronic door locks?</label>
-                        <div>
-                            <input type="radio" name="reportingProcess" value="yes" onChange={handleChange} /> Yes
-                            <input type="radio" name="reportingProcess" value="no" onChange={handleChange} /> No
-                            <textarea className='comment-box' name="reportingProcessComment" placeholder="Comment (Optional)" onChange={handleChange}></textarea>
-                        </div>
-                    </div>
-
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                    {uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                    {uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-                    <button type="submit">Submit</button>
+                    {/* Submit button */}
+                    <button type="submit" disabled={loading}>
+                         {loading ? 'Submitting...' : 'Submit Final'}
+                    </button>
                 </form>
             </main>
         </div>

@@ -1,260 +1,274 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-import { getFunctions, httpsCallable } from "firebase/functions";
+
+// Define questions array outside the component
+const keypadQuestions = [
+    // Functionality and Reliability
+    { name: "operational", label: "Are the access control keypads operational and functioning as intended?" },
+    { name: "reliablyAuthenticate", label: "Do the keypads reliably authenticate users and grant access?" }, // Simplified
+    { name: "malfunction", label: "Are there any signs of malfunction or errors in the keypad operation?" },
+    { name: "backupSystems", label: "Are backup systems in place for power outages or malfunctions?" }, // Simplified
+    // Security of Access Codes
+    { name: "secureCodes", label: "Are access codes sufficiently secure (e.g., complexity, length)?" }, // Simplified
+    { name: "instructions", label: "Are users instructed not to share codes and keep them confidential?" },
+    { name: "changeCodes", label: "Is there a process for periodically changing access codes?" },
+    // Integration with Access Control Systems
+    { name: "integrated", label: "Are the keypads integrated with the overall access control system?" }, // Simplified
+    { name: "communicateSeamlessly", label: "Do they communicate seamlessly with access control software/databases?" }, // Simplified
+    { name: "realTimeMonitoring", label: "Is there real-time monitoring and logging of access events from keypads?" }, // Simplified
+    { name: "accessRightsManaged", label: "Are access rights managed centrally and synchronized with the keypad system?" },
+    // Durability and Resistance to Tampering
+    { name: "durableMaterials", label: "Are keypads made from durable materials resistant to force/tampering?" }, // Simplified
+    { name: "tamperAlarms", label: "Are additional security features (tamper alarms, anti-tamper enclosures) present?" }, // Simplified
+    { name: "testedReliability", label: "Have keypads been tested for reliability and environmental resistance?" }, // Simplified
+    // Accessibility and Ease of Use
+    { name: "accessible", label: "Are keypads easily accessible and operable for authorized users?" }, // Simplified
+    { name: "clearInstructions", label: "Do they provide clear instructions for entering codes?" }, // Simplified
+    { name: "disabilityAccessibility", label: "Are there accessibility features/considerations for individuals with disabilities?" },
+    // Maintenance and Upkeep
+    { name: "maintenanceSchedule", label: "Is there a regular maintenance schedule for the keypads?" }, // Simplified
+    { name: "maintenanceTasks", label: "Are scheduled maintenance tasks (cleaning, inspection, replacement) performed?" }, // Simplified
+    { name: "maintenanceRecords", label: "Are records documenting maintenance, repairs, and issues kept?" }, // Simplified
+    // User Training and Awareness
+    { name: "userTraining", label: "Have users received training on proper keypad usage?" }, // Simplified
+    { name: "instructionsAvailable", label: "Are instructions/guidelines available regarding code usage and security protocols?" }, // Simplified
+    { name: "reportingProcess", label: "Is there a process for reporting malfunctions, damage, or security incidents?" } // Simplified
+];
 
 function AccessControlKeypadsPage() {
-    const navigate = useNavigate();
-    const { buildingId } = useBuilding();
-    const db = getFirestore();
-    const functions = getFunctions();
-    const uploadAccessControlKeypadsImage = httpsCallable(functions, 'uploadAccessControlKeypadsImage');
+  const navigate = useNavigate();
+  const { buildingId } = useBuilding();
+  const db = getFirestore();
+  const functions = getFunctions();
+  // Renamed variable for clarity
+  const uploadAccessControlKeypadsImage = httpsCallable(functions, 'uploadAccessControlKeypadsImage');
 
-    const [formData, setFormData] = useState({});
-    const [imageData, setImageData] = useState(null);
-    const [imageUrl, setImageUrl] = useState(null);
-    const [imageUploadError, setImageUploadError] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [loadError, setLoadError] = useState(null);
+  // State variables look good
+  const [formData, setFormData] = useState({});
+  const [imageData, setImageData] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [imageUploadError, setImageUploadError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
 
-    useEffect(() => {
-        if (!buildingId) {
-            alert('No building selected. Redirecting to Building Info...');
-            navigate('BuildingandAddress');
-            return;
+  // useEffect for fetching data - Looks good
+  useEffect(() => {
+    if (!buildingId) {
+      alert('No building selected. Redirecting to Building Info...');
+      navigate('/BuildingandAddress'); // Ensure path is correct
+      return;
+    }
+
+    const fetchFormData = async () => {
+      setLoading(true);
+      setLoadError(null);
+      // Correct Firestore path
+      const formDocRef = doc(db, 'forms', 'Physical Security', 'Access Control Keypads', buildingId);
+
+      try {
+        const docSnapshot = await getDoc(formDocRef);
+        if (docSnapshot.exists()) {
+          const existingData = docSnapshot.data().formData || {};
+          setFormData(existingData);
+          if (existingData.imageUrl) {
+            setImageUrl(existingData.imageUrl);
+          }
+        } else {
+          setFormData({});
         }
-
-        const fetchFormData = async () => {
-            setLoading(true);
-            setLoadError(null);
-
-            try {
-                const formDocRef = doc(db, 'forms', 'Physical Security', 'Access Control Keypads', buildingId);
-                const docSnapshot = await getDoc(formDocRef);
-
-                if (docSnapshot.exists()) {
-                    setFormData(docSnapshot.data().formData || {});
-                } else {
-                    setFormData({});
-                }
-            } catch (error) {
-                console.error("Error fetching form data:", error);
-                setLoadError("Failed to load form data. Please try again.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchFormData();
-    }, [buildingId, db, navigate]);
-
-    const handleChange = async (e) => {
-            const { name, value } = e.target;
-            const newFormData = { ...formData, [name]: value };
-            setFormData(newFormData);
-    
-            try {
-                const buildingRef = doc(db, 'Buildings', buildingId); // Create buildingRef
-                const formDocRef = doc(db, 'forms', 'Physical Security', 'Access Control Keypads', buildingId);
-                await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true }); // Use merge and add building
-                console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
-            } catch (error) {
-                console.error("Error saving form data to Firestore:", error);
-                alert("Failed to save changes. Please check your connection and try again.");
-            }
-        };
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImageData(reader.result);
-        };
-        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error("Error fetching form data:", error);
+        setLoadError("Failed to load form data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handleBack = () => {
-        navigate(-1);
-    };
+    fetchFormData();
+  }, [buildingId, db, navigate]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  // handleChange saves data immediately with correct structure
+  const handleChange = async (e) => {
+    const { name, value } = e.target;
+    const newFormData = { ...formData, [name]: value };
+    setFormData(newFormData);
 
-        if (!buildingId) {
-            alert('Building ID is missing. Please start the assessment from the correct page.');
-            return;
-        }
-
-        if (imageData) {
-            try {
-                const uploadResult = await uploadAccessControlKeypadsImage({ imageData: imageData });
-                setImageUrl(uploadResult.data.imageUrl);
-                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
-                setImageUploadError(null);
-            } catch (error) {
-                console.error('Error uploading image:', error);
-                setImageUploadError(error.message);
-            }
-        }
-
+    if (buildingId) {
         try {
+            const buildingRef = doc(db, 'Buildings', buildingId);
             const formDocRef = doc(db, 'forms', 'Physical Security', 'Access Control Keypads', buildingId);
-            await setDoc(formDocRef, { formData: formData }, { merge: true });
-            console.log('Form data submitted successfully!');
-            alert('Form submitted successfully!');
-            navigate('/Form');
+            const dataToSave = {
+                 ...newFormData,
+                 building: buildingRef,
+                 ...(imageUrl && { imageUrl: imageUrl })
+             };
+            await setDoc(formDocRef, { formData: dataToSave }, { merge: true });
+            // console.log("Form data updated:", dataToSave);
         } catch (error) {
             console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+            // Avoid alerting on every change
         }
+    }
+  };
+
+  // handleImageChange using base64 - Looks good
+  const handleImageChange = (e) => {
+     const file = e.target.files[0];
+     if (file) {
+         const reader = new FileReader();
+         reader.onloadend = () => {
+             setImageData(reader.result);
+             setImageUrl(null);
+             setImageUploadError(null);
+         };
+         reader.readAsDataURL(file);
+     } else {
+         setImageData(null);
+     }
+  };
+
+  // handleBack - Looks good
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  // handleSubmit uses Cloud Function and setDoc with correct structure
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!buildingId) {
+      alert('Building ID is missing. Cannot submit.');
+      return;
+    }
+
+    setLoading(true);
+    let finalImageUrl = formData.imageUrl || null;
+    let submissionError = null;
+
+    if (imageData) {
+      try {
+        console.log("Uploading image via Cloud Function...");
+        // Use correct function variable name
+        const uploadResult = await uploadAccessControlKeypadsImage({
+            imageData: imageData,
+            buildingId: buildingId
+         });
+        finalImageUrl = uploadResult.data.imageUrl;
+        setImageUrl(finalImageUrl);
+        setImageUploadError(null);
+        console.log("Image uploaded successfully:", finalImageUrl);
+      } catch (error) {
+        console.error('Error uploading image via function:', error);
+        setImageUploadError(`Image upload failed: ${error.message}`);
+        submissionError = "Image upload failed. Form data saved without new image.";
+         finalImageUrl = formData.imageUrl || null;
+      }
+    }
+
+    const finalFormData = {
+         ...formData,
+         imageUrl: finalImageUrl,
     };
+    setFormData(finalFormData);
 
-    if (loading) {
-        return <div>Loading...</div>;
+    try {
+      console.log("Saving final form data to Firestore...");
+      const buildingRef = doc(db, 'Buildings', buildingId);
+      const formDocRef = doc(db, 'forms', 'Physical Security', 'Access Control Keypads', buildingId);
+      await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
+      console.log('Form data submitted successfully!');
+      if (!submissionError) {
+          alert('Form submitted successfully!');
+      } else {
+          alert(submissionError);
+      }
+      navigate('/Form');
+    } catch (error) {
+      console.error("Error saving final form data to Firestore:", error);
+      alert("Failed to save final form data. Please check connection and try again.");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (loadError) {
-        return <div>Error: {loadError}</div>;
-    }
+  // Loading/Error Display - Looks good
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  if (loadError) {
+    return <div>Error: {loadError}</div>;
+  }
 
-    return (
-        <div className="form-page">
-            <header className="header">
-                <Navbar />
-                <button className="back-button" onClick={handleBack}>←</button>
-                <h1>Access Control Keypads Assessment</h1>
-                <img src={logo} alt="Logo" className="logo" />
-            </header>
+  return (
+    <div className="form-page">
+      <header className="header">
+        <Navbar />
+        <button className="back-button" onClick={handleBack}>←</button>
+        <h1>Access Control Keypads Assessment</h1>
+        <img src={logo} alt="Logo" className="logo" />
+      </header>
 
-            <main className="form-container">
-                <form onSubmit={handleSubmit}>
-                    <h2>Functionality and Reliability:</h2>
-                    {[
-                        { name: "operational", label: "Are the access control keypads operational and functioning as intended?" },
-                        { name: "reliablyAuthenticate", label: "Do the keypads reliably authenticate users and grant access to restricted areas?" },
-                        { name: "malfunction", label: "Are there any signs of malfunction or errors in the keypad operation?" },
-                        { name: "backupSystems", label: "Are backup systems in place in case of power outages or malfunctions?" }
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
-                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
-                            </div>
-                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                        </div>
-                    ))}
+      <main className="form-container">
+        <form onSubmit={handleSubmit}>
+          <h2>Keypad Assessment Questions</h2> {/* Simplified main heading */}
 
-                    <h2>Security of Access Codes:</h2>
-                    {[
-                        { name: "secureCodes", label: "Are access codes used with the keypads sufficiently secure and resistant to unauthorized access or guessing?" },
-                        { name: "instructions", label: "Are users instructed not to share their access codes and to keep them confidential?" },
-                        { name: "changeCodes", label: "Is there a process for periodically changing access codes to enhance security?" }
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
-                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
-                            </div>
-                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                        </div>
-                    ))}
+          {/* Single .map call for all questions with standardized rendering */}
+          {keypadQuestions.map((question, index) => (
+            <div key={question.name} className="form-section"> {/* Use name for key */}
+              <label>{question.label}</label>
+              {/* Div for radio buttons */}
+              <div>
+                <input
+                  type="radio"
+                  id={`${question.name}_yes`}
+                  name={question.name}
+                  value="yes"
+                  checked={formData[question.name] === "yes"}
+                  onChange={handleChange}
+                /> <label htmlFor={`${question.name}_yes`}>Yes</label>
+                <input
+                  type="radio"
+                  id={`${question.name}_no`}
+                  name={question.name}
+                  value="no"
+                  checked={formData[question.name] === "no"}
+                  onChange={handleChange}
+                /> <label htmlFor={`${question.name}_no`}>No</label>
+              </div>
+              {/* Input for comments */}
+              <input
+                className='comment-input'
+                type="text"
+                name={`${question.name}Comment`}
+                placeholder="Additional comments"
+                value={formData[`${question.name}Comment`] || ''}
+                onChange={handleChange}
+              />
+            </div>
+          ))}
 
-                    <h2>Integration with Access Control Systems:</h2>
-                    {[
-                        { name: "integrated", label: "Are the access control keypads integrated with the overall access control system?" },
-                        { name: "communicateSeamlessly", label: "Do they communicate seamlessly with access control software and databases?" },
-                        { name: "realTimeMonitoring", label: "Is there real-time monitoring and logging of access events captured by the keypads?" },
-                        { name: "accessRightsManaged", label: "Are access rights managed centrally and synchronized with the keypad system?" }
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
-                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
-                            </div>
-                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                        </div>
-                    ))}
+          {/* Image upload section - Looks good */}
+          <div className="form-section">
+               <label htmlFor="imageUploadKeypad">Upload Image (Optional):</label>
+               <input id="imageUploadKeypad" type="file" onChange={handleImageChange} accept="image/*" />
+               {imageUrl && !imageData && <img src={imageUrl} alt="Uploaded Keypad" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+               {imageData && <img src={imageData} alt="Preview Keypad" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+               {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+          </div>
 
-                    <h2>Durability and Resistance to Tampering:</h2>
-                    {[
-                        { name: "durableMaterials", label: "Are the access control keypads made from durable materials capable of withstanding physical force or tampering attempts?" },
-                        { name: "tamperAlarms", label: "Are there additional security features, such as tamper alarms or anti-tamper enclosures, to deter unauthorized access or vandalism?" },
-                        { name: "testedReliability", label: "Have the keypads been tested for reliability and resistance to environmental factors such as moisture, temperature extremes, or physical wear?" }
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
-                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
-                            </div>
-                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                        </div>
-                    ))}
-
-                    <h2>Accessibility and Ease of Use:</h2>
-                    {[
-                        { name: "accessible", label: "Are the access control keypads easily accessible and operable for authorized users?" },
-                        { name: "clearInstructions", label: "Do they provide clear instructions for entering access codes and accessing restricted areas?" },
-                        { name: "disabilityAccessibility", label: "Are there any accessibility features or considerations for individuals with disabilities?" }
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
-                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
-                            </div>
-                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                        </div>
-                    ))}
-
-                    <h2>Maintenance and Upkeep:</h2>
-                    {[
-                        { name: "maintenanceSchedule", label: "Is there a regular maintenance schedule in place for the access control keypads?" },
-                        { name: "maintenanceTasks", label: "Are maintenance tasks, such as cleaning, inspection of keypads and wiring, and replacement of worn-out components, performed according to schedule?" },
-                        { name: "maintenanceRecords", label: "Are there records documenting maintenance activities, repairs, and any issues identified during inspections?" }
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
-                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
-                            </div>
-                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                        </div>
-                    ))}
-
-                    <h2>User Training and Awareness:</h2>
-                    {[
-                        { name: "userTraining", label: "Have users, such as security personnel and authorized individuals, received training on how to use the access control keypads properly?" },
-                        { name: "instructionsAvailable", label: "Are there instructions or guidelines available to users regarding proper access code usage and security protocols?" },
-                        { name: "reportingProcess", label: "Is there a process for reporting malfunctions, damage, or security incidents related to the access control keypads?" }
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                <input type="radio" name={question.name} value="yes" checked={formData[question.name] === 'yes'} onChange={handleChange} /> Yes
-                                <input type="radio" name={question.name} value="no" checked={formData[question.name] === 'no'} onChange={handleChange} /> No
-                            </div>
-                            <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                        </div>
-                    ))}
-
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
-
-                    <button type="submit">Submit</button>
-                </form>
-            </main>
-        </div>
-    );
+          <button type="submit" disabled={loading}>
+            {loading ? 'Submitting...' : 'Submit Final'}
+          </button>
+        </form>
+      </main>
+    </div>
+  );
 }
 
 export default AccessControlKeypadsPage;

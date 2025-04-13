@@ -1,142 +1,212 @@
 import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext';
-import './FormQuestions.css';
-import Navbar from "./Navbar";
+// Corrected Firestore imports
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+// Firebase Functions imports
 import { getFunctions, httpsCallable } from "firebase/functions";
+import { useNavigate } from 'react-router-dom';
+import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import './FormQuestions.css'; // Assuming same CSS file
+import Navbar from "./Navbar"; // Assuming same Navbar
+
+// Define questions array outside the component
+const debriefingQuestions = [
+    // Corrected names to camelCase
+    // Debriefing Process
+    { name: "structuredDebriefing", label: "Is there a structured process for post-drill debriefing (timeframe, location)?" }, // Details in comments now
+    { name: "facilitatorTraining", label: "Are debriefing sessions facilitated by trained personnel (e.g., safety officers)?" },
+    { name: "stakeholderParticipation", label: "Are all relevant stakeholders (staff, occupants, management) invited?" }, // Simplified
+    { name: "objectiveEstablishment", label: "Are clear objectives established for debriefings (assess, identify, capture lessons)?" }, // Details in comments now
+    { name: "outcomeFocus", label: "Are debriefings focused on specific outcomes (enhance preparedness, refine procedures)?" }, // Simplified
+    // Feedback and Participation
+    { name: "participantContribution", label: "Are participants encouraged to actively contribute observations/feedback?" }, // Simplified
+    { name: "feedbackSolicitation", label: "Is feedback solicited on drill execution aspects (communication, coordination, etc.)?" }, // Simplified
+    { name: "facilitatorSkills", label: "Are facilitators skilled in promoting open communication?" }, // Simplified
+    // Documentation and Records
+    { name: "observationRecords", label: "Are detailed notes/records maintained during debriefings?" }, // Simplified
+    { name: "structuredDocumentation", label: "Are observations documented in a structured format for analysis/follow-up?" },
+    { name: "stakeholderAccess", label: "Are debriefing records accessible to relevant stakeholders?" }, // Simplified
+    // Action Items and Follow-Up
+    { name: "actionableItems", label: "Are actionable items identified during debriefings to address issues?" }, // Simplified
+    { name: "priorityAssessment", label: "Are action items prioritized based on urgency/impact/feasibility?" },
+    { name: "responsibilityAssignment", label: "Are responsible parties assigned to action items with target dates?" }, // Simplified
+    // Adapted from text input
+    { name: "trackingProcessExists", label: "Is there a process for tracking the implementation of action items?" },
+    { name: "accountabilityMechanism", label: "Are responsible parties held accountable for completing action items?" },
+    { name: "progressUpdates", label: "Are progress updates provided to stakeholders on action item status?" },
+    // Continuous Improvement
+    { name: "drivingImprovements", label: "Are debriefing recommendations used for continuous improvement?" }, // Simplified
+    { name: "feedbackIntegration", label: "Are debriefings integrated into a broader feedback loop for training/planning?" }, // Simplified
+    { name: "insightSharing", label: "Are insights/best practices shared with relevant stakeholders?" } // Simplified
+];
+
 
 function DebriefingAndFeedbackFormPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding();
     const db = getFirestore();
     const functions = getFunctions();
+    // Correct httpsCallable definition - Name matches component
     const uploadDebriefingAndFeedbackFormPageImage = httpsCallable(functions, 'uploadDebriefingAndFeedbackFormPageImage');
 
+    // Corrected state variables
     const [formData, setFormData] = useState({});
-    const storage = getStorage();
-    const [image, setImage] = useState(null);
-    const [uploadProgress, setUploadProgress] = useState(0);
+    const [imageData, setImageData] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
-    const [uploadError, setUploadError] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null); // Added loadError
 
+    // useEffect using getDoc by ID
     useEffect(() => {
         if (!buildingId) {
             alert('No building selected. Redirecting to Building Info...');
             navigate('/BuildingandAddress');
-        } else {
-            loadFormData();
+            return;
         }
-    }, [buildingId, navigate]);
 
-    const loadFormData = async () => {
-        setLoading(true);
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
-            const formsRef = collection(db, 'forms/Emergency Preparedness/Debriefing and Feedback');
-            const q = query(formsRef, where('building', '==', buildingRef));
-            const querySnapshot = await getDocs(q);
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+            // Correct Firestore path
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Debriefing and Feedback', buildingId);
 
-            if (!querySnapshot.empty) {
-                const docData = querySnapshot.docs[0].data().formData;
-                setFormData(docData);
+            try {
+                const docSnapshot = await getDoc(formDocRef);
+                if (docSnapshot.exists()) {
+                    const existingData = docSnapshot.data().formData || {};
+                    setFormData(existingData);
+                    if (existingData.imageUrl) {
+                        setImageUrl(existingData.imageUrl);
+                    }
+                } else {
+                    setFormData({});
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
             }
+        };
+
+        fetchFormData();
+    }, [buildingId, db, navigate]);
+
+    // handleChange saves immediately using setDoc by ID with correct structure
+    const handleChange = async (e) => {
+        const { name, value } = e.target;
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
+
+        if (buildingId) {
+            try {
+                const buildingRef = doc(db, 'Buildings', buildingId);
+                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Debriefing and Feedback', buildingId);
+                const dataToSave = {
+                     ...newFormData,
+                     building: buildingRef,
+                     ...(imageUrl && { imageUrl: imageUrl })
+                 };
+                await setDoc(formDocRef, { formData: dataToSave }, { merge: true });
+                // console.log("Form data updated:", dataToSave);
+            } catch (error) {
+                console.error("Error saving form data to Firestore:", error);
+                // Avoid alerting on every change
+            }
+        }
+    };
+
+    // handleImageChange using base64
+    const handleImageChange = (e) => {
+       const file = e.target.files[0];
+       if (file) {
+           const reader = new FileReader();
+           reader.onloadend = () => {
+               setImageData(reader.result);
+               setImageUrl(null);
+               setImageUploadError(null);
+           };
+           reader.readAsDataURL(file);
+       } else {
+           setImageData(null);
+       }
+    };
+
+    // handleBack simplified
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    // handleSubmit uses Cloud Function and setDoc by ID with correct structure
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!buildingId) {
+            alert('Building ID is missing. Cannot submit.');
+            return;
+        }
+
+        setLoading(true);
+        let finalImageUrl = formData.imageUrl || null;
+        let submissionError = null;
+
+        if (imageData) {
+            try {
+                console.log("Uploading image via Cloud Function...");
+                 // Use correct function variable name
+                const uploadResult = await uploadDebriefingAndFeedbackFormPageImage({
+                    imageData: imageData,
+                    buildingId: buildingId
+                 });
+                finalImageUrl = uploadResult.data.imageUrl;
+                setImageUrl(finalImageUrl);
+                setImageUploadError(null);
+                console.log("Image uploaded successfully:", finalImageUrl);
+            } catch (error) {
+                console.error('Error uploading image via function:', error);
+                setImageUploadError(`Image upload failed: ${error.message}`);
+                submissionError = "Image upload failed. Form data saved without new image.";
+                 finalImageUrl = formData.imageUrl || null;
+            }
+        }
+
+        const finalFormData = {
+             ...formData,
+             imageUrl: finalImageUrl,
+        };
+        setFormData(finalFormData);
+
+        try {
+            console.log("Saving final form data to Firestore...");
+            const buildingRef = doc(db, 'Buildings', buildingId);
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Debriefing and Feedback', buildingId);
+            await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
+            console.log('Form data submitted successfully!');
+            if (!submissionError) {
+                alert('Form submitted successfully!');
+            } else {
+                alert(submissionError);
+            }
+            navigate('/Form');
         } catch (error) {
-            console.error('Error loading form data:', error);
+            console.error("Error saving final form data to Firestore:", error);
+            alert("Failed to save final form data. Please check connection and try again.");
         } finally {
             setLoading(false);
         }
     };
 
-    const handleImageChange = (e) => {
-        if (e.target.files[0]) {
-            setImage(e.target.files[0]);
-        }
-    };
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
-
-    const handleBack = async () => {
-        if (formData && buildingId) {
-            try {
-                const buildingRef = doc(db, 'Buildings', buildingId);
-                const formsRef = collection(db, 'forms/Emergency Preparedness/Debriefing and Feedback');
-                const q = query(formsRef, where('building', '==', buildingRef));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    await addDoc(formsRef, {
-                        building: buildingRef,
-                        formData: formData,
-                    });
-                } else {
-                    const docId = querySnapshot.docs[0].id;
-                    const formDocRef = doc(db, 'forms/Emergency Preparedness/Debriefing and Feedback', docId);
-                    await setDoc(formDocRef, {
-                        building: buildingRef,
-                        formData: formData,
-                    }, { merge: true });
-                }
-                console.log('Form Data submitted successfully on back!');
-                alert('Form data saved before navigating back!');
-            } catch (error) {
-                console.error('Error saving form data:', error);
-                alert('Failed to save form data before navigating back. Some data may be lost.');
-            }
-        }
-        navigate(-1);
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        if (!buildingId) {
-            alert('Building ID is missing. Please start the assessment from the correct page.');
-            return;
-        }
-
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
-            const formsRef = collection(db, 'forms/Emergency Preparedness/Debriefing and Feedback');
-            const q = query(formsRef, where('building', '==', buildingRef));
-            const querySnapshot = await getDocs(q);
-
-            if (querySnapshot.empty) {
-                await addDoc(formsRef, {
-                    building: buildingRef,
-                    formData: formData,
-                });
-            } else {
-                const docId = querySnapshot.docs[0].id;
-                const formDocRef = doc(db, 'forms/Emergency Preparedness/Debriefing and Feedback', docId);
-                await setDoc(formDocRef, {
-                    building: buildingRef,
-                    formData: formData,
-                }, { merge: true });
-            }
-            console.log('Form data submitted successfully!');
-            alert('Form submitted successfully!');
-            navigate('/Form');
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Failed to submit the form. Please try again.');
-        }
-    };
-
+    // Loading/Error Display
     if (loading) {
         return <div>Loading...</div>;
     }
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
+    }
 
     return (
+        // Removed outer div
         <div className="form-page">
             <header className="header">
                 <Navbar />
@@ -147,53 +217,55 @@ function DebriefingAndFeedbackFormPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    <h2>Debriefing Process:</h2>
-                    {[
-                        { name: "structuredDebriefing", label: "Is there a structured process for conducting debriefing sessions after drills, including designated timeframes and locations?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "structuredDebriefingProcess", label: "Describe the process:", type: "text", securityGatesFormat: true },
-                        { name: "facilitatorTraining", label: "Are debriefing sessions facilitated by trained personnel, such as safety officers or drill coordinators, to ensure effectiveness and objectivity?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "stakeholderParticipation", label: "Are all relevant stakeholders, including staff members, occupants, and management personnel, invited to participate in debriefing sessions?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "objectiveEstablishment", label: "Are clear objectives established for debriefing sessions, such as assessing performance, identifying strengths and areas for improvement, and capturing lessons learned?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "objectiveEstablishmentDescription", label: "Describe the sessions:", type: "text", securityGatesFormat: true },
-                        { name: "outcomeFocus", label: "Are debriefing sessions focused on achieving specific outcomes, such as enhancing preparedness, refining procedures, or addressing deficiencies identified during drills?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "participantContribution", label: "Are participants encouraged to actively contribute to debriefing sessions by sharing their observations, experiences, and feedback?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "feedbackSolicitation", label: "Is feedback solicited from participants on various aspects of drill execution, including communication, coordination, procedures, and individual performance?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "facilitatorSkills", label: "Are facilitators skilled in promoting open communication and constructive dialogue among participants during debriefing sessions?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "observationRecords", label: "Are detailed notes or records maintained during debriefing sessions to capture key observations, insights, and recommendations?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "structuredDocumentation", label: "Are observations documented in a structured format to facilitate analysis, follow-up actions, and integration into future planning and training efforts?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "stakeholderAccess", label: "Are records of debriefing sessions accessible to relevant stakeholders for reference and review?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "actionableItems", label: "Are actionable items identified during debriefing sessions to address deficiencies, capitalize on strengths, and implement improvements identified during drills?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "priorityAssessment", label: "Are action items prioritized based on their urgency, impact on safety, and feasibility of implementation?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "responsibilityAssignment", label: "Are responsible parties assigned to each action item, along with target completion dates and follow-up mechanisms to track progress?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "trackingProcess", label: "Is there a process for tracking the implementation of action items resulting from debriefing sessions?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "trackingProcessDescription", label: "Describe the process:", type: "text", securityGatesFormat: true },
-                        { name: "accountabilityMechanism", label: "Are responsible parties held accountable for completing assigned action items within established timelines?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "progressUpdates", label: "Are progress updates provided to stakeholders on the status of action item implementation, including any challenges encountered and lessons learned?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "drivingImprovements", label: "Are recommendations from debriefing sessions used to drive continuous improvement in emergency preparedness and response capabilities?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "feedbackIntegration", label: "Are debriefing sessions integrated into a broader feedback loop to ensure that lessons learned from drills are incorporated into training, planning, and policy development?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                        { name: "insightSharing", label: "Are opportunities sought to share insights and best practices identified during debriefing sessions with relevant stakeholders across the organization?", type: "radio", options: ["yes", "no"], securityGatesFormat: true },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
+                    <h2>Debriefing & Feedback Questions</h2> {/* Added main heading */}
+
+                    {/* Single .map call for all questions with standardized rendering */}
+                    {debriefingQuestions.map((question, index) => (
+                        <div key={question.name} className="form-section"> {/* Use name for key */}
                             <label>{question.label}</label>
+                            {/* Div for radio buttons */}
                             <div>
-                                {question.type === "text" && <input type="text" name={question.name} value={formData[question.name] || ''} placeholder={question.placeholder} onChange={handleChange} />}
-                                {question.type === "radio" && (
-                                    <div>
-                                        <input type="radio" name={question.name} value="yes" checked={formData[question.name] === "yes"} onChange={handleChange} /> Yes
-                                        <input type="radio" name={question.name} value="no" checked={formData[question.name] === "no"} onChange={handleChange} /> No
-                                        <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                                    </div>
-                                )}
-                                {question.securityGatesFormat && <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>}
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_yes`}
+                                    name={question.name}
+                                    value="yes"
+                                    checked={formData[question.name] === "yes"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_yes`}>Yes</label>
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_no`}
+                                    name={question.name}
+                                    value="no"
+                                    checked={formData[question.name] === "no"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_no`}>No</label>
                             </div>
+                            {/* Input for comments */}
+                            <input
+                                className='comment-input'
+                                type="text"
+                                name={`${question.name}Comment`}
+                                placeholder="Additional comments"
+                                value={formData[`${question.name}Comment`] || ''}
+                                onChange={handleChange}
+                            />
                         </div>
                     ))}
 
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                    {uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                    {uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-                    <button type="submit">Submit</button>
+                    {/* Image upload section - Looks good */}
+                     <div className="form-section">
+                         <label htmlFor="imageUploadDebrief">Upload Image (Optional):</label>
+                         <input id="imageUploadDebrief" type="file" onChange={handleImageChange} accept="image/*" />
+                         {imageUrl && !imageData && <img src={imageUrl} alt="Uploaded Debriefing related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                         {imageData && <img src={imageData} alt="Preview Debriefing related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                         {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                     </div>
+
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Submitting...' : 'Submit Final'}
+                    </button>
                 </form>
             </main>
         </div>

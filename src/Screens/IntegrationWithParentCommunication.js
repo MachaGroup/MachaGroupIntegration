@@ -1,43 +1,81 @@
-import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
-import { useBuilding } from '../Context/BuildingContext';
-import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
-import Navbar from "./Navbar";
+import React, { useState, useEffect } from 'react';
+// Corrected Firestore imports
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+// Added Functions imports
 import { getFunctions, httpsCallable } from "firebase/functions";
+import { useNavigate } from 'react-router-dom';
+import { useBuilding } from '../Context/BuildingContext'; // Context for buildingId
+import './FormQuestions.css';
+import Navbar from "./Navbar";
+
+// Define questions array outside the component
+const parentCommIntegrationQuestions = [
+    // Corrected names to camelCase
+    // Adapted from text input
+    { name: "integratingMechanismExists", label: "Is a mechanism in place to integrate alerts with parent communication systems?" },
+    // Adapted from text input
+    { name: "connectionProtocolsEstablished", label: "Are established protocols/interfaces defined for connecting alerting systems with parent platforms?" },
+    { name: "automaticNotificationConfigurations", label: "Are automatic notification configurations set up for including parent contacts?" }, // Simplified
+    // Adapted from text input
+    { name: "syncProceduresEstablished", label: "Are procedures established for syncing/updating parent contact details between systems?" },
+    { name: "optInOptOutMechanisms", label: "Are mechanisms in place for parents to opt-in/opt-out of alerts?" }, // Simplified
+    // Adapted from text input
+    { name: "consentProcessExists", label: "Is there a process for obtaining parental consent for emergency notifications?" },
+    { name: "implementingSafeguardMeasures", label: "Are appropriate measures implemented to safeguard parent contact information?" }, // Simplified
+    { name: "integrationMechanismsCompliant", label: "Do integration mechanisms comply with relevant privacy regulations/policies?" }, // Simplified - Renamed 'integrationMechanisms'
+    // Adapted from text input
+    { name: "coordinationProtocolsEstablished", label: "Are communication protocols established for coordination with parents during emergencies?" },
+    // Adapted from text input
+    { name: "parentCommunicationChannelDefined", label: "Is there a designated method/channel for communicating updates/addressing concerns with parents?" },
+    { name: "informingParentsIntegration", label: "Are parents informed about the integration and notification procedures?" }, // Simplified
+    { name: "helpingParentsResources", label: "Are resources provided to help parents manage preferences/contact info?" }, // Simplified
+    // Adapted from text input
+    { name: "feedbackMechanismsExist", label: "Are feedback mechanisms in place to solicit parent input on alert effectiveness?" },
+    { name: "evaluatingParentFeedback", label: "Is parent feedback used to evaluate and improve the integrated system?" }, // Simplified
+    { name: "testingIntegrationMechanisms", label: "Are integration mechanisms tested periodically for accuracy/reliability?" }, // Simplified
+    { name: "testingScenarios", label: "Are test scenarios conducted to assess the reliability of the integrated system?" } // Simplified
+];
+
 
 function IntegrationWithParentCommunicationFormPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding();
     const db = getFirestore();
     const functions = getFunctions();
+    // Define httpsCallable function matching component name
     const uploadIntegrationWithParentCommunicationImage = httpsCallable(functions, 'uploadIntegrationWithParentCommunicationImage');
 
+    // Corrected state variables
     const [formData, setFormData] = useState({});
     const [imageData, setImageData] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
     const [imageUploadError, setImageUploadError] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [loadError, setLoadError] = useState(null);
+    const [loadError, setLoadError] = useState(null); // Added loadError
 
+    // useEffect using getDoc by ID with CORRECT path
     useEffect(() => {
         if (!buildingId) {
             alert('No building selected. Redirecting to Building Info...');
-            navigate('BuildingandAddress');
+            navigate('/BuildingandAddress');
             return;
         }
 
         const fetchFormData = async () => {
             setLoading(true);
             setLoadError(null);
+            // Correct Firestore path for this component
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Integration with Parent Communication', buildingId);
 
             try {
-                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Drill Frequency', buildingId);
                 const docSnapshot = await getDoc(formDocRef);
-
                 if (docSnapshot.exists()) {
-                    setFormData(docSnapshot.data().formData || {});
+                    const existingData = docSnapshot.data().formData || {};
+                    setFormData(existingData);
+                    if (existingData.imageUrl) {
+                        setImageUrl(existingData.imageUrl);
+                    }
                 } else {
                     setFormData({});
                 }
@@ -52,77 +90,122 @@ function IntegrationWithParentCommunicationFormPage() {
         fetchFormData();
     }, [buildingId, db, navigate]);
 
+    // handleChange saves immediately using setDoc by ID with correct structure
     const handleChange = async (e) => {
         const { name, value } = e.target;
         const newFormData = { ...formData, [name]: value };
         setFormData(newFormData);
 
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
-            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Drill Frequency', buildingId);
-            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true });
-            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
-        } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+        if (buildingId) {
+            try {
+                const buildingRef = doc(db, 'Buildings', buildingId);
+                 // Correct Firestore path
+                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Integration with Parent Communication', buildingId);
+                const dataToSave = {
+                     ...newFormData,
+                     building: buildingRef,
+                     ...(imageUrl && { imageUrl: imageUrl })
+                 };
+                await setDoc(formDocRef, { formData: dataToSave }, { merge: true });
+                // console.log("Form data updated:", dataToSave);
+            } catch (error) {
+                console.error("Error saving form data to Firestore:", error);
+                // Avoid alerting on every change
+            }
         }
     };
 
+    // handleImageChange using base64
     const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImageData(reader.result);
-        };
-        reader.readAsDataURL(file);
+       const file = e.target.files[0];
+       if (file) {
+           const reader = new FileReader();
+           reader.onloadend = () => {
+               setImageData(reader.result);
+               setImageUrl(null);
+               setImageUploadError(null);
+           };
+           reader.readAsDataURL(file);
+       } else {
+           setImageData(null);
+       }
     };
 
+    // handleBack simplified
     const handleBack = () => {
         navigate(-1);
     };
 
+    // handleSubmit uses Cloud Function and setDoc by ID with correct structure
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!buildingId) {
-            alert('Building ID is missing. Please start from the Building Information page.');
+            alert('Building ID is missing. Cannot submit.');
             return;
         }
 
+        setLoading(true);
+        let finalImageUrl = formData.imageUrl || null;
+        let submissionError = null;
+
         if (imageData) {
             try {
-                const uploadResult = await uploadIntegrationWithParentCommunicationImage({ imageData: imageData });
-                setImageUrl(uploadResult.data.imageUrl);
-                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                console.log("Uploading image via Cloud Function...");
+                 // Use correct function variable name
+                const uploadResult = await uploadIntegrationWithParentCommunicationImage({
+                    imageData: imageData,
+                    buildingId: buildingId
+                 });
+                finalImageUrl = uploadResult.data.imageUrl;
+                setImageUrl(finalImageUrl);
                 setImageUploadError(null);
+                console.log("Image uploaded successfully:", finalImageUrl);
             } catch (error) {
-                console.error('Error uploading image:', error);
-                setImageUploadError(error.message);
+                console.error('Error uploading image via function:', error);
+                setImageUploadError(`Image upload failed: ${error.message}`);
+                submissionError = "Image upload failed. Form data saved without new image.";
+                 finalImageUrl = formData.imageUrl || null;
             }
         }
 
+        const finalFormData = {
+             ...formData,
+             imageUrl: finalImageUrl,
+        };
+        setFormData(finalFormData);
+
         try {
+            console.log("Saving final form data to Firestore...");
             const buildingRef = doc(db, 'Buildings', buildingId);
-            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Drill Frequency', buildingId);
-            await setDoc(formDocRef, { formData: { ...formData, building: buildingRef } }, { merge: true });
+             // Correct Firestore path
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Integration with Parent Communication', buildingId);
+            await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
             console.log('Form data submitted successfully!');
-            alert('Form submitted successfully!');
+            if (!submissionError) {
+                alert('Form submitted successfully!');
+            } else {
+                alert(submissionError);
+            }
             navigate('/Form');
         } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+            console.error("Error saving final form data to Firestore:", error);
+            alert("Failed to save final form data. Please check connection and try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
+    // Loading/Error Display
     if (loading) {
         return <div>Loading...</div>;
     }
-
     if (loadError) {
         return <div>Error: {loadError}</div>;
     }
 
     return (
+        // Removed outer div if present
         <div className="form-page">
             <header className="header">
                 <Navbar />
@@ -133,66 +216,55 @@ function IntegrationWithParentCommunicationFormPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    <h2>Integration with Parent Communication Assessment</h2>
-                    {[
-                        { name: "integratingMechanism", label: "Is there a mechanism in place to integrate text/email alerts with parent communication systems to facilitate automatic notifications during emergencies?" },
-                        { name: "connectingAlertSystem", label: "Are there established protocols or interfaces for connecting the alerting system with parent communication platforms or databases?" },
-                        { name: "automaticNotificationConfigurations", label: "Are automatic notification configurations set up to ensure that parent contact information is automatically included in text/email alerts during emergencies?" },
-                        { name: "syncingContactDetails", label: "Are procedures established for syncing or updating parent contact details between the alerting system and parent communication databases?" },
-                        { name: "optInOptOutAlerts", label: "Are parents provided with opportunities to opt in or opt out of receiving text/email alerts, and are their preferences documented and respected?" },
-                        { name: "obtainingConsent", label: "Is there a process for obtaining consent from parents for the inclusion of their contact information in emergency notifications?" },
-                        { name: "implementingSafeguardMeasures", label: "Are appropriate measures implemented to safeguard the security and privacy of parent contact information stored or transmitted through the alerting system?" },
-                        { name: "integrationMechanisms", label: "Do integration mechanisms comply with relevant privacy regulations and organizational policies governing the handling of sensitive data?" },
-                        { name: "facilitatingCoordination", label: "Are communication protocols established to facilitate coordination between school authorities and parents during emergency situations?" },
-                        { name: "communicationWithParents", label: "Is there a designated method or channel for communicating with parents, providing updates, and addressing concerns or inquiries?" },
-                        { name: "informingParentsIntegration", label: "Are parents informed about the integration of text/email alerts with parent communication systems and the procedures for receiving emergency notifications?" },
-                        { name: "helpingParentsResources", label: "Are resources or educational materials provided to help parents understand how to opt in or opt out of receiving alerts and how to update their contact information?" },
-                        { name: "effectivenessMechanismsFeedback", label: "Are feedback mechanisms in place to solicit input from parents regarding the effectiveness and usefulness of text/email alerts during emergencies?" },
-                        { name: "evaluatingParentFeedback", label: "Is parent feedback used to evaluate and improve the integration of alerting systems with parent communication platforms over time?" },
-                        { name: "testingIntegrationMechanisms", label: "Are integration mechanisms tested and verified periodically to ensure that parent contact information is accurately included in text/email alerts and that notifications are delivered as intended?" },
-                        { name: "testingScenarios", label: "Are test scenarios conducted to simulate emergency situations and assess the reliability and responsiveness of the integrated alerting system?" }
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
+                     <h2>Parent Communication Integration Questions</h2> {/* Added main heading */}
+
+                    {/* Single .map call for all questions with standardized rendering */}
+                    {parentCommIntegrationQuestions.map((question, index) => (
+                        <div key={question.name} className="form-section"> {/* Use name for key */}
                             <label>{question.label}</label>
+                            {/* Div for radio buttons */}
                             <div>
                                 <input
                                     type="radio"
+                                    id={`${question.name}_yes`}
                                     name={question.name}
                                     value="yes"
                                     checked={formData[question.name] === "yes"}
                                     onChange={handleChange}
-                                /> Yes
+                                /> <label htmlFor={`${question.name}_yes`}>Yes</label>
                                 <input
                                     type="radio"
+                                    id={`${question.name}_no`}
                                     name={question.name}
                                     value="no"
                                     checked={formData[question.name] === "no"}
                                     onChange={handleChange}
-                                /> No
-                                {question.name === "integratingMechanism" || question.name === "connectingAlertSystem" || question.name === "syncingContactDetails" || question.name === "obtainingConsent" || question.name === "facilitatingCoordination" || question.name === "communicationWithParents" || question.name === "effectivenessMechanismsFeedback" ? (
-                                    <input
-                                        type="text"
-                                        name={`${question.name}Text`}
-                                        placeholder={`Describe the ${question.label.toLowerCase().split(' ').pop()}`}
-                                        value={formData[`${question.name}Text`] || ''}
-                                        onChange={handleChange}
-                                    />
-                                ) : (
-                                    <textarea
-                                        className='comment-box'
-                                        name={`${question.name}Comment`}
-                                        placeholder="Comment (Optional)"
-                                        value={formData[`${question.name}Comment`] || ''}
-                                        onChange={handleChange}
-                                    />
-                                )}
+                                /> <label htmlFor={`${question.name}_no`}>No</label>
                             </div>
+                            {/* Input for comments */}
+                            <input
+                                className='comment-input'
+                                type="text"
+                                name={`${question.name}Comment`}
+                                placeholder="Additional comments"
+                                value={formData[`${question.name}Comment`] || ''}
+                                onChange={handleChange}
+                            />
                         </div>
                     ))}
-                    <input type="file" onChange={handleImageChange} accept="image/*" />
-                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
-                    <button type="submit">Submit</button>
+
+                    {/* Image upload section - Looks good */}
+                     <div className="form-section">
+                         <label htmlFor="imageUploadParentComm">Upload Image (Optional):</label>
+                         <input id="imageUploadParentComm" type="file" onChange={handleImageChange} accept="image/*" />
+                         {imageUrl && !imageData && <img src={imageUrl} alt="Uploaded Parent Comm. Integration related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                         {imageData && <img src={imageData} alt="Preview Parent Comm. Integration related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                         {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                     </div>
+
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Submitting...' : 'Submit Final'}
+                    </button>
                 </form>
             </main>
         </div>

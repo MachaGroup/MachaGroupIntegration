@@ -1,139 +1,213 @@
+import logo from '../assets/MachaLogo.png';
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, addDoc, doc, getDocs, query, where, setDoc } from 'firebase/firestore';
+// Imports adjusted: Added getDoc, removed getDocs, query, where, addDoc, storage
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
-import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
 import { getFunctions, httpsCallable } from "firebase/functions";
+
+// Define questions array outside the component
+const conflictResolutionQuestions = [
+    // Training and Skills
+    { name: "conflictResolutionTraining", label: "Are security personnel trained in conflict resolution techniques, including de-escalation strategies?" },
+    { name: "specializedTraining", label: "Have they received specialized training to handle diverse conflict scenarios effectively?" },
+    { name: "personnelSkills", label: "Do security personnel possess the necessary communication and interpersonal skills to manage conflicts professionally?" }, // Simplified label
+    // Recognition and Assessment
+    { name: "recognizeEarlySigns", label: "Are security personnel trained to recognize early signs of potential conflicts or escalating situations?" }, // Simplified label
+    { name: "assessSeverity", label: "Do they assess the nature and severity of conflicts quickly and accurately?" }, // Simplified label
+    { name: "responseProtocolsExist", label: "Are appropriate response protocols in place based on the level of conflict and potential risks involved?" }, // Changed to Yes/No, details in comment
+    // De-escalation Techniques
+    { name: "deescalationTechniquesEmployed", label: "Do security personnel employ de-escalation techniques to defuse tensions?" }, // Simplified label
+    { name: "remainCalmTraining", label: "Are they trained to remain calm and composed while interacting with individuals in conflicts?" }, // Simplified label
+    { name: "activeListeningEmpathy", label: "Do personnel use active listening, empathy, and effective communication to resolve conflicts peacefully?" }, // Simplified label
+    // Physical Restraint and Intervention
+    { name: "restraintTechniquesTraining", label: "Are security personnel trained in safe and effective physical restraint techniques, if necessary?" },
+    { name: "physicalInterventionLastResort", label: "Do they use physical intervention only as a last resort after other strategies are exhausted?" }, // Simplified label
+    { name: "interventionProtocolsExist", label: "Are protocols in place to minimize injury risk during physical intervention?" }, // Changed to Yes/No, details in comment
+    // Teamwork and Collaboration
+    { name: "collaborateTraining", label: "Are personnel trained to work collaboratively with colleagues, responders, and stakeholders during crises?" }, // Simplified label
+    { name: "coordinateEfforts", label: "Do they coordinate efforts effectively to manage conflicts and ensure safety?" }, // Simplified label
+    { name: "clearCommunicationCoordination", label: "Is there clear communication and coordination between security and other emergency teams?" }, // Simplified label
+    // Documentation and Reporting
+    { name: "documentationProcess", label: "Are incidents involving conflict resolution documented accurately and promptly?" }, // Simplified label
+    { name: "reportingProcessStandardized", label: "Is there a standardized reporting process for conflict details, interventions, and outcomes?" }, // Changed to Yes/No, details in comment
+    { name: "reportsReviewed", label: "Are reports reviewed regularly to identify trends and areas for improvement?" }, // Simplified label
+    // Continuous Improvement
+    { name: "ongoingTraining", label: "Is there ongoing training and development for personnel to enhance conflict resolution skills?" }, // Simplified label
+    { name: "debriefingsConducted", label: "Are debriefings conducted after incidents to evaluate responses and identify lessons learned?" },
+    { name: "feedbackUsed", label: "Is feedback from personnel and stakeholders used to improve strategies and procedures?" }, // Simplified label
+];
+
 
 function ConflictResolutionFormPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding();
     const db = getFirestore();
     const functions = getFunctions();
-    const uploadConflictResolutionFormPageImage = httpsCallable(functions, 'uploadConflictResolutionFormPageImage');
+    // Correct httpsCallable definition
+    const uploadImage = httpsCallable(functions, 'uploadConflictResolutionFormPageImage'); // Renamed var
 
+    // Updated state variables
     const [formData, setFormData] = useState({});
-    const storage = getStorage();
-    const [image, setImage] = useState(null);
-    const [uploadProgress, setUploadProgress] = useState(0);
+    const [imageData, setImageData] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
-    const [uploadError, setUploadError] = useState(null);
+    const [imageUploadError, setImageUploadError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null); // Added loadError state
 
+    // useEffect using getDoc based on buildingId as document ID
     useEffect(() => {
         if (!buildingId) {
             alert('No building selected. Redirecting to Building Info...');
             navigate('/BuildingandAddress');
-        } else {
-            loadFormData();
+            return;
         }
-    }, [buildingId, navigate]);
 
-    const loadFormData = async () => {
-        setLoading(true);
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
-            const formsRef = collection(db, 'forms/Emergency Preparedness/Conflict Resolution');
-            const q = query(formsRef, where('building', '==', buildingRef));
-            const querySnapshot = await getDocs(q);
+        const fetchFormData = async () => {
+            setLoading(true);
+            setLoadError(null);
+            // Assume buildingId is the document ID in this subcollection
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Conflict Resolution', buildingId);
 
-            if (!querySnapshot.empty) {
-                const docData = querySnapshot.docs[0].data().formData;
-                setFormData(docData);
+            try {
+                console.log("Fetching data for doc:", formDocRef.path);
+                const docSnapshot = await getDoc(formDocRef);
+                if (docSnapshot.exists()) {
+                    console.log("Document data:", docSnapshot.data());
+                    const existingData = docSnapshot.data().formData || {};
+                    setFormData(existingData);
+                    if (existingData.imageUrl) {
+                        setImageUrl(existingData.imageUrl);
+                    }
+                } else {
+                    console.log("No such document!");
+                    setFormData({}); // Initialize empty if no doc found
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                setLoadError("Failed to load form data. Please try again.");
+            } finally {
+                setLoading(false);
             }
-        } catch (error) {
-            console.error('Error loading form data:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+        };
 
-    const handleImageChange = (e) => {
-        if (e.target.files[0]) {
-            setImage(e.target.files[0]);
-        }
-    };
+        fetchFormData();
+    }, [buildingId, db, navigate]);
 
-    const handleChange = (e) => {
+    // handleChange saves data immediately using setDoc on the specific doc ID
+    const handleChange = async (e) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
+        const newFormData = { ...formData, [name]: value };
+        setFormData(newFormData);
 
-    const handleBack = async () => {
-        if (formData && buildingId) {
+        if (buildingId) {
             try {
                 const buildingRef = doc(db, 'Buildings', buildingId);
-                const formsRef = collection(db, 'forms/Emergency Preparedness/Conflict Resolution');
-                const q = query(formsRef, where('building', '==', buildingRef));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    await addDoc(formsRef, {
-                        building: buildingRef,
-                        formData: formData,
-                    });
-                } else {
-                    const docId = querySnapshot.docs[0].id;
-                    const formDocRef = doc(db, 'forms/Emergency Preparedness/Conflict Resolution', docId);
-                    await setDoc(formDocRef, {
-                        building: buildingRef,
-                        formData: formData,
-                    }, { merge: true });
-                }
-                console.log('Form Data submitted successfully on back!');
-                alert('Form data saved before navigating back!');
+                // Use buildingId directly as the document ID
+                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Conflict Resolution', buildingId);
+                const dataToSave = {
+                     ...newFormData,
+                     building: buildingRef,
+                     ...(imageUrl && { imageUrl: imageUrl })
+                 };
+                // Use setDoc with merge to create or update the specific document
+                await setDoc(formDocRef, { formData: dataToSave }, { merge: true });
+                 // console.log("Form data updated:", dataToSave);
             } catch (error) {
-                console.error('Error saving form data:', error);
-                alert('Failed to save form data before navigating back. Some data may be lost.');
+                console.error("Error saving form data:", error);
             }
         }
+    };
+
+    // handleImageChange uses base64
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+             const reader = new FileReader();
+             reader.onloadend = () => {
+                 setImageData(reader.result);
+                 setImageUrl(null);
+                 setImageUploadError(null);
+             };
+             reader.readAsDataURL(file);
+        } else {
+            setImageData(null);
+        }
+    };
+
+    // handleBack is simplified
+    const handleBack = () => {
         navigate(-1);
     };
 
+    // handleSubmit uses Cloud Function and setDoc on the specific doc ID
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!buildingId) {
-            alert('Building ID is missing. Please start the assessment from the correct page.');
+            alert('Building ID is missing. Cannot submit.');
             return;
         }
 
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
-            const formsRef = collection(db, 'forms/Emergency Preparedness/Conflict Resolution');
-            const q = query(formsRef, where('building', '==', buildingRef));
-            const querySnapshot = await getDocs(q);
+        setLoading(true);
+        let finalImageUrl = formData.imageUrl || null;
+        let submissionError = null;
 
-            if (querySnapshot.empty) {
-                await addDoc(formsRef, {
-                    building: buildingRef,
-                    formData: formData,
-                });
-            } else {
-                const docId = querySnapshot.docs[0].id;
-                const formDocRef = doc(db, 'forms/Emergency Preparedness/Conflict Resolution', docId);
-                await setDoc(formDocRef, {
-                    building: buildingRef,
-                    formData: formData,
-                }, { merge: true });
+        if (imageData) {
+            try {
+                console.log("Uploading image via Cloud Function...");
+                const uploadResult = await uploadImage({ // Use correct var name
+                    imageData: imageData,
+                    buildingId: buildingId
+                 });
+                finalImageUrl = uploadResult.data.imageUrl;
+                setImageUrl(finalImageUrl);
+                setImageUploadError(null);
+                console.log("Image uploaded successfully:", finalImageUrl);
+            } catch (error) {
+                console.error('Error uploading image via function:', error);
+                setImageUploadError(`Image upload failed: ${error.message}`);
+                submissionError = "Image upload failed. Form data saved without new image.";
+                 finalImageUrl = formData.imageUrl || null;
             }
+        }
+
+        const finalFormData = {
+             ...formData,
+             imageUrl: finalImageUrl
+        };
+        setFormData(finalFormData);
+
+        try {
+            console.log("Saving final form data to Firestore...");
+            const buildingRef = doc(db, 'Buildings', buildingId);
+             // Use buildingId directly as the document ID
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Conflict Resolution', buildingId);
+            // Use setDoc with merge to create or update the specific document
+            await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
             console.log('Form data submitted successfully!');
-            alert('Form submitted successfully!');
+            if (!submissionError) {
+                alert('Form submitted successfully!');
+            } else {
+                alert(submissionError);
+            }
             navigate('/Form');
         } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Failed to submit the form. Please try again.');
+            console.error("Error saving final form data to Firestore:", error);
+            alert("Failed to save final form data. Please check connection and try again.");
+        } finally {
+             setLoading(false);
         }
     };
 
-    if (loading) {
+    // Loading/Error Display
+    if (loading) { // Simplified loading check
         return <div>Loading...</div>;
+    }
+    if (loadError) {
+        return <div>Error: {loadError}</div>;
     }
 
     return (
@@ -147,198 +221,54 @@ function ConflictResolutionFormPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    <h2>Training and Skills:</h2>
-                    {[
-                        { name: "conflictResolution", label: "Are security personnel trained in conflict resolution techniques, including de-escalation strategies?", type: "radio", options: ["yes", "no"] },
-                        { name: "specializedTraining", label: "Have they received specialized training to handle diverse conflict scenarios effectively?", type: "radio", options: ["yes", "no"] },
-                        { name: "securityPersonnelSkills", label: "Do security personnel possess the necessary communication and interpersonal skills to manage conflicts professionally and calmly?", type: "radio", options: ["yes", "no"] },
-                    ].map((question, index) => (
+                    <h2>Conflict Resolution Assessment Questions</h2>
+
+                    {/* Single .map call for all questions */}
+                    {conflictResolutionQuestions.map((question, index) => (
                         <div key={index} className="form-section">
                             <label>{question.label}</label>
                             <div>
-                                {question.options && question.options.map((option) => (
-                                    <React.Fragment key={option}>
-                                        <input
-                                            type="radio"
-                                            name={question.name}
-                                            value={option}
-                                            checked={formData[question.name] === option}
-                                            onChange={handleChange}
-                                        />
-                                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                                    </React.Fragment>
-                                ))}
-                                <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_yes`}
+                                    name={question.name}
+                                    value="yes"
+                                    checked={formData[question.name] === "yes"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_yes`}>Yes</label>
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_no`}
+                                    name={question.name}
+                                    value="no"
+                                    checked={formData[question.name] === "no"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_no`}>No</label>
                             </div>
+                            {/* Use input type="text" for comments */}
+                            <input
+                                className='comment-input'
+                                type="text"
+                                name={`${question.name}Comment`}
+                                placeholder="Additional comments"
+                                value={formData[`${question.name}Comment`] || ''}
+                                onChange={handleChange}
+                            />
                         </div>
                     ))}
 
-                    <h2>Recognition and Assessment:</h2>
-                    {[
-                        { name: "trainedSecurity", label: "Are security personnel trained to recognize early signs of potential conflicts or escalating situations?", type: "radio", options: ["yes", "no"] },
-                        { name: "assessingSeverityOfConflicts", label: "Do they assess the nature and severity of conflicts quickly and accurately?", type: "radio", options: ["yes", "no"] },
-                        { name: "appropiateResponseProtocols", label: "Are there protocols in place for security personnel to determine appropriate responses based on the level of conflict and potential risks involved?", type: "radio", options: ["yes", "no"] },
-                        { name: "appropiateResponseProtocolsText", label: "Describe the protocols", type: "text" },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.options && question.options.map((option) => (
-                                    <React.Fragment key={option}>
-                                        <input
-                                            type="radio"
-                                            name={question.name}
-                                            value={option}
-                                            checked={formData[question.name] === option}
-                                            onChange={handleChange}
-                                        />
-                                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                                    </React.Fragment>
-                                ))}
-                                {question.type === "text" && <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />}
-                                <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                            </div>
-                        </div>
-                    ))}
+                    {/* Image upload section */}
+                    <div className="form-section">
+                        <label htmlFor="imageUploadConflict">Upload Image (Optional):</label>
+                        <input id="imageUploadConflict" type="file" onChange={handleImageChange} accept="image/*" />
+                        {imageUrl && !imageData && <img src={imageUrl} alt="Uploaded Conflict Resolution related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                        {imageData && <img src={imageData} alt="Preview Conflict Resolution related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                        {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                    </div>
 
-                    <h2>De-escalation Techniques:</h2>
-                    {[
-                        { name: "de-escalationTechinques", label: "Do security personnel employ de-escalation techniques to defuse tensions and reduce the intensity of conflicts?", type: "radio", options: ["yes", "no"] },
-                        { name: "composedTraining", label: "Are they trained to remain calm and composed while interacting with individuals involved in conflicts?", type: "radio", options: ["yes", "no"] },
-                        { name: "securityAddressingIssues", label: "Do security personnel use active listening, empathy, and effective communication to address underlying issues and resolve conflicts peacefully?", type: "radio", options: ["yes", "no"] },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.options && question.options.map((option) => (
-                                    <React.Fragment key={option}>
-                                        <input
-                                            type="radio"
-                                            name={question.name}
-                                            value={option}
-                                            checked={formData[question.name] === option}
-                                            onChange={handleChange}
-                                        />
-                                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                                    </React.Fragment>
-                                ))}
-                                <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                            </div>
-                        </div>
-                    ))}
-
-                    <h2>Physical Restraint and Intervention:</h2>
-                    {[
-                        { name: "restraintTechniquesTraining", label: "Are security personnel trained in safe and effective physical restraint techniques, if necessary?", type: "radio", options: ["yes", "no"] },
-                        { name: "physicalInterventionLastResort", label: "Do they use physical intervention as a last resort, only when other de-escalation strategies have been exhausted?", type: "radio", options: ["yes", "no"] },
-                        { name: "physicalInterventionProtocols", label: "Are there protocols in place to ensure that physical intervention is performed in a manner that minimizes the risk of injury to all parties involved?", type: "radio", options: ["yes", "no"] },
-                        { name: "physicalInterventionProtocolsText", label: "Describe the protocols", type: "text" },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.options && question.options.map((option) => (
-                                    <React.Fragment key={option}>
-                                        <input
-                                            type="radio"
-                                            name={question.name}
-                                            value={option}
-                                            checked={formData[question.name] === option}
-                                            onChange={handleChange}
-                                        />
-                                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                                    </React.Fragment>
-                                ))}
-                                {question.type === "text" && <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />}
-                                <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                            </div>
-                        </div>
-                    ))}
-
-                    <h2>Teamwork and Collaboration:</h2>
-                    {[
-                        { name: "collaborateSecurityTraining", label: "Are security personnel trained to work collaboratively with colleagues, emergency responders, and other stakeholders during crisis situations?", type: "radio", options: ["yes", "no"] },
-                        { name: "coordinatingEffortsEffectively", label: "Do they coordinate their efforts effectively to manage conflicts and ensure the safety of individuals and property?", type: "radio", options: ["yes", "no"] },
-                        { name: "clearCommunication", label: "Is there clear communication and coordination between security personnel and other teams involved in emergency response?", type: "radio", options: ["yes", "no"] },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.options && question.options.map((option) => (
-                                    <React.Fragment key={option}>
-                                        <input
-                                            type="radio"
-                                            name={question.name}
-                                            value={option}
-                                            checked={formData[question.name] === option}
-                                            onChange={handleChange}
-                                        />
-                                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                                    </React.Fragment>
-                                ))}
-                                <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                            </div>
-                        </div>
-                    ))}
-
-                    <h2>Documentation and Reporting:</h2>
-                    {[
-                        { name: "conflictResolutionDocumentation", label: "Are incidents involving conflict resolution documented accurately and promptly?", type: "radio", options: ["yes", "no"] },
-                        { name: "standardizedReportingProcess", label: "Is there a standardized reporting process for documenting details of conflicts, interventions, and outcomes?", type: "radio", options: ["yes", "no"] },
-                        { name: "standardizedReportingProcessText", label: "Describe the reporting process", type: "text" },
-                        { name: "reviewingReports", label: "Are reports reviewed regularly to identify trends, areas for improvement, and opportunities for further training or intervention?", type: "radio", options: ["yes", "no"] },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.options && question.options.map((option) => (
-                                    <React.Fragment key={option}>
-                                        <input
-                                            type="radio"
-                                            name={question.name}
-                                            value={option}
-                                            checked={formData[question.name] === option}
-                                            onChange={handleChange}
-                                        />
-                                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                                    </React.Fragment>
-                                ))}
-                                {question.type === "text" && <input type="text" name={question.name} placeholder={question.label} value={formData[question.name] || ''} onChange={handleChange} />}
-                                <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                            </div>
-                        </div>
-                    ))}
-
-                    <h2>Continuous Improvement:</h2>
-                    {[
-                        { name: "conflictResolutionTraining", label: "Is there ongoing training and development for security personnel to enhance their conflict resolution skills?", type: "radio", options: ["yes", "no"] },
-                        { name: "conductedDebriefings", label: "Are debriefings conducted after incidents to evaluate responses, identify lessons learned, and implement corrective actions?", type: "radio", options: ["yes", "no"] },
-                        { name: "feedbackImprovingStrategies", label: "Is feedback from security personnel and stakeholders used to improve conflict resolution strategies and procedures over time?", type: "radio", options: ["yes", "no"] },
-                    ].map((question, index) => (
-                        <div key={index} className="form-section">
-                            <label>{question.label}</label>
-                            <div>
-                                {question.options && question.options.map((option) => (
-                                    <React.Fragment key={option}>
-                                        <input
-                                            type="radio"
-                                            name={question.name}
-                                            value={option}
-                                            checked={formData[question.name] === option}
-                                            onChange={handleChange}
-                                        />
-                                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                                    </React.Fragment>
-                                ))}
-                                <textarea className='comment-box' name={`${question.name}Comment`} placeholder="Comment (Optional)" value={formData[`${question.name}Comment`] || ''} onChange={handleChange}></textarea>
-                            </div>
-                        </div>
-                    ))}
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                    {uploadProgress > 0 && <p>Upload Progress: {uploadProgress.toFixed(2)}%</p>}
-                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                    {uploadError && <p style={{ color: "red" }}>{uploadError}</p>}
-                    <button type="submit">Submit</button>
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Submitting...' : 'Submit Final'}
+                    </button>
                 </form>
             </main>
         </div>

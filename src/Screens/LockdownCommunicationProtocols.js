@@ -1,19 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useNavigate } from 'react-router-dom';
 import { useBuilding } from '../Context/BuildingContext';
 import './FormQuestions.css';
 import logo from '../assets/MachaLogo.png';
 import Navbar from "./Navbar";
-import { getFunctions, httpsCallable } from "firebase/functions";
+
+// Define questions array outside the component
+const lockdownCommunicationQuestions = [
+    // Adapted from text input
+    { name: "dedicatedSystemsExist", label: "Are dedicated communication systems established to alert authorities/personnel during lockdowns?" },
+    { name: "variousChannels", label: "Do these systems include appropriate channels (e.g., silent alarms, intercoms, mobile alerts)?" }, // Simplified label
+    { name: "systemsTestedRegularly", label: "Are communication systems tested regularly to ensure function and reliability?" }, // Simplified label
+    { name: "silentAlarmsInstalled", label: "Are silent alarm systems installed throughout the premises?" }, // Simplified label
+    { name: "silentAlarmsActivateDiscreetly", label: "Do silent alarms activate without audible alerts to avoid escalating situations?" }, // Simplified label
+    // Adapted from text input
+    { name: "personnelTrainedOnSilentAlarms", label: "Are designated personnel trained to recognize and respond promptly to silent alarm activations?" },
+    // Adapted from text input
+    { name: "activationProtocolsExist", label: "Are established protocols defined for activating silent alarms in different scenarios (e.g., intruder, medical)?" },
+    { name: "staffTrainedOnActivation", label: "Are staff members trained on when and how to activate silent alarms and follow response procedures?" }, // Simplified label
+    // Adapted from text input
+    { name: "centralizedMonitoringExists", label: "Is a centralized monitoring system established to receive/respond to silent alarm activations?" },
+    { name: "personnelAssignedMonitoring", label: "Are designated personnel or security teams tasked with monitoring silent alarms and coordinating response?" }, // Simplified label
+    { name: "verificationEscalationProcess", label: "Is there a process for verifying alarm activations and escalating responses as needed?" }, // Simplified label
+    { name: "silentAlarmsIntegrated", label: "Are silent alarms integrated into the overall emergency response plan?" }, // Simplified label
+    { name: "alarmsTriggerResponse", label: "Do alarm activations trigger appropriate response actions (e.g., lockdown, notifications)?" }, // Simplified label
+    { name: "coordinationWithSecurity", label: "Is there coordination between silent alarms and other security measures for a comprehensive response?" }, // Simplified label
+    { name: "staffOccupantTraining", label: "Are staff/occupants trained on the purpose and function of silent alarms?" }, // Simplified label
+    { name: "trainingIncludesScenarios", label: "Do training programs include scenarios/simulations for activating and responding to alarms?" }, // Simplified label
+    { name: "drillsEvaluateEffectiveness", label: "Are regular drills conducted to evaluate the effectiveness of silent alarm systems/procedures?" }, // Simplified label
+    { name: "activationRecordsMaintained", label: "Are records maintained for all silent alarm activations (date, time, location, response)?" }, // Simplified label
+    { name: "recordsReviewed", label: "Are activation records reviewed regularly to identify trends and areas for improvement?" }, // Simplified label
+    { name: "deficienciesAddressed", label: "Are deficiencies identified during testing/drills addressed promptly with corrective actions?" }, // Simplified label
+];
 
 function LockdownCommunicationProtocolsFormPage() {
     const navigate = useNavigate();
     const { buildingId } = useBuilding();
     const db = getFirestore();
     const functions = getFunctions();
+    // Correct httpsCallable definition
     const uploadLockdownCommunicationProtocolsImage = httpsCallable(functions, 'uploadLockdownCommunicationProtocolsImage');
 
+    // State variables look good
     const [formData, setFormData] = useState({});
     const [imageData, setImageData] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
@@ -21,23 +51,28 @@ function LockdownCommunicationProtocolsFormPage() {
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState(null);
 
+    // useEffect fetching data from the CORRECT path
     useEffect(() => {
         if (!buildingId) {
             alert('No building selected. Redirecting to Building Info...');
-            navigate('BuildingandAddress');
+            navigate('/BuildingandAddress'); // Ensure path is correct
             return;
         }
 
         const fetchFormData = async () => {
             setLoading(true);
             setLoadError(null);
+            // Correct Firestore path
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Lockdown Communication Protocols', buildingId);
 
             try {
-                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Fire Alarm Systems', buildingId);
                 const docSnapshot = await getDoc(formDocRef);
-
                 if (docSnapshot.exists()) {
-                    setFormData(docSnapshot.data().formData || {});
+                    const existingData = docSnapshot.data().formData || {};
+                    setFormData(existingData);
+                    if (existingData.imageUrl) {
+                        setImageUrl(existingData.imageUrl);
+                    }
                 } else {
                     setFormData({});
                 }
@@ -52,72 +87,115 @@ function LockdownCommunicationProtocolsFormPage() {
         fetchFormData();
     }, [buildingId, db, navigate]);
 
+    // handleChange saves data immediately to the CORRECT path with CORRECT structure
     const handleChange = async (e) => {
         const { name, value } = e.target;
         const newFormData = { ...formData, [name]: value };
         setFormData(newFormData);
 
-        try {
-            const buildingRef = doc(db, 'Buildings', buildingId);
-            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Fire Alarm Systems', buildingId);
-            await setDoc(formDocRef, { formData: { ...newFormData, building: buildingRef } }, { merge: true });
-            console.log("Form data saved to Firestore:", { ...newFormData, building: buildingRef });
-        } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+        if (buildingId) {
+            try {
+                const buildingRef = doc(db, 'Buildings', buildingId);
+                // Correct Firestore path
+                const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Lockdown Communication Protocols', buildingId);
+                const dataToSave = {
+                     ...newFormData,
+                     building: buildingRef,
+                     ...(imageUrl && { imageUrl: imageUrl })
+                 };
+                await setDoc(formDocRef, { formData: dataToSave }, { merge: true });
+                // console.log("Form data updated:", dataToSave);
+            } catch (error) {
+                console.error("Error saving form data to Firestore:", error);
+            }
         }
     };
 
+    // handleImageChange using base64 - Looks good
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImageData(reader.result);
-        };
-        reader.readAsDataURL(file);
+         if (file) {
+             const reader = new FileReader();
+             reader.onloadend = () => {
+                 setImageData(reader.result);
+                 setImageUrl(null);
+                 setImageUploadError(null);
+             };
+             reader.readAsDataURL(file);
+         } else {
+             setImageData(null);
+         }
     };
 
+    // handleBack - Looks good
     const handleBack = () => {
         navigate(-1);
     };
 
+    // handleSubmit uses Cloud Function and setDoc on CORRECT path with CORRECT structure
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!buildingId) {
-            alert('Building ID is missing. Please start from the Building Information page.');
+            alert('Building ID is missing. Cannot submit.');
             return;
         }
 
+        setLoading(true);
+        let finalImageUrl = formData.imageUrl || null;
+        let submissionError = null;
+
         if (imageData) {
             try {
-                const uploadResult = await uploadLockdownCommunicationProtocolsImage({ imageData: imageData });
-                setImageUrl(uploadResult.data.imageUrl);
-                setFormData({ ...formData, imageUrl: uploadResult.data.imageUrl });
+                console.log("Uploading image via Cloud Function...");
+                // Use correct function variable name
+                const uploadResult = await uploadLockdownCommunicationProtocolsImage({
+                    imageData: imageData,
+                    buildingId: buildingId
+                 });
+                finalImageUrl = uploadResult.data.imageUrl;
+                setImageUrl(finalImageUrl);
                 setImageUploadError(null);
+                console.log("Image uploaded successfully:", finalImageUrl);
             } catch (error) {
-                console.error('Error uploading image:', error);
-                setImageUploadError(error.message);
+                console.error('Error uploading image via function:', error);
+                setImageUploadError(`Image upload failed: ${error.message}`);
+                submissionError = "Image upload failed. Form data saved without new image.";
+                 finalImageUrl = formData.imageUrl || null;
             }
         }
 
+        const finalFormData = {
+             ...formData,
+             imageUrl: finalImageUrl,
+        };
+        setFormData(finalFormData);
+
         try {
+            console.log("Saving final form data to Firestore...");
             const buildingRef = doc(db, 'Buildings', buildingId);
-            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Fire Alarm Systems', buildingId);
-            await setDoc(formDocRef, { formData: { ...formData, building: buildingRef } }, { merge: true });
+             // Correct Firestore path
+            const formDocRef = doc(db, 'forms', 'Emergency Preparedness', 'Lockdown Communication Protocols', buildingId);
+            await setDoc(formDocRef, { formData: { ...finalFormData, building: buildingRef } }, { merge: true });
             console.log('Form data submitted successfully!');
-            alert('Form submitted successfully!');
+            if (!submissionError) {
+                alert('Form submitted successfully!');
+            } else {
+                alert(submissionError);
+            }
             navigate('/Form');
         } catch (error) {
-            console.error("Error saving form data to Firestore:", error);
-            alert("Failed to save changes. Please check your connection and try again.");
+            console.error("Error saving final form data to Firestore:", error);
+            alert("Failed to save final form data. Please check connection and try again.");
+        } finally {
+             setLoading(false);
         }
     };
 
+    // Loading/Error Display - Looks good
     if (loading) {
         return <div>Loading...</div>;
     }
-
     if (loadError) {
         return <div>Error: {loadError}</div>;
     }
@@ -133,72 +211,54 @@ function LockdownCommunicationProtocolsFormPage() {
 
             <main className="form-container">
                 <form onSubmit={handleSubmit}>
-                    <h2>Lockdown Communication Protocols Assessment</h2>
-                    {[
-                        { name: "dedicatedCommunicationSystemsText", label: "Are there dedicated communication systems in place to alert authorities and relevant personnel during emergencies?" },
-                        { name: "variousChannels", label: "Do these systems include various channels such as silent alarms, intercoms, emergency call boxes, or mobile alerts?" },
-                        { name: "regularTestedCommunicationSystems", label: "Are communication systems tested regularly to ensure they are functional and reliable?" },
-                        { name: "silentAlarmSystemsInstalled", label: "Are silent alarm systems installed throughout the premises to discreetly signal emergencies without alerting potential threats?" },
-                        { name: "activatingSilentAlarms", label: "Do silent alarms activate without audible alerts to avoid escalating situations or causing panic among occupants?" },
-                        { name: "recognizingSilentAlarmTrainingText", label: "Are designated personnel trained to recognize and respond to silent alarm activations promptly?" },
-                        { name: "activatingSilentAlarmsProtocolsText", label: "Are there established protocols for activating silent alarms in different emergency scenarios, such as intruders, medical emergencies, or security breaches?" },
-                        { name: "activatingSilentAlarmTraining", label: "Are staff members trained on when and how to activate silent alarms and the appropriate response procedures to follow?" },
-                        { name: "centralizedMonitoringSystemText", label: "Is there a centralized monitoring system to receive and respond to silent alarm activations?" },
-                        { name: "monitoringSilentAlarms", label: "Are designated personnel or security teams tasked with monitoring silent alarms and coordinating response efforts?" },
-                        { name: "verifyingAlarmActivationsProcess", label: "Is there a process for verifying alarm activations and escalating responses as needed based on the severity of the situation?" },
-                        { name: "integratedSilentAlarms", label: "Are silent alarms integrated into the overall emergency response plan for the premises?" },
-                        { name: "alarmsTriggeringResponseActions", label: "Do alarm activations trigger appropriate response actions such as lockdowns, evacuations, or notifications to law enforcement?" },
-                        { name: "silentAlarmSystemsCooedination", label: "Is there coordination between silent alarm systems and other security measures to ensure a comprehensive and effective emergency response?" },
-                        { name: "purposeAndFunctionTraining", label: "Are staff members and occupants trained in the purpose and function of silent alarms as part of their emergency preparedness training?" },
-                        { name: "trainingPrograms", label: "Do training programs include scenarios and simulations to practice activating silent alarms and responding to alarm activations?" },
-                        { name: "effectivenessDrills", label: "Are there regular drills or exercises conducted to evaluate the effectiveness of silent alarm systems and response procedures?" },
-                        { name: "maintainingRecords", label: "Are records maintained for all silent alarm activations, including dates, times, locations, and responses?" },
-                        { name: "reviewingRecords", label: "Are alarm activation records reviewed regularly to identify trends, areas for improvement, and opportunities for further training or intervention?" },
-                        { name: "identifyingDeficiencies", label: "Are deficiencies or issues identified during alarm testing or response drills addressed promptly, with corrective actions implemented as needed?" }
-                    ].map((question, index) => (
+                    <h2>Lockdown Communication Protocols Assessment Questions</h2>
+
+                    {/* Single .map call for all questions with standardized rendering */}
+                    {lockdownCommunicationQuestions.map((question, index) => (
                         <div key={index} className="form-section">
                             <label>{question.label}</label>
                             <div>
-                                {question.name === "variousChannels" || question.name === "regularTestedCommunicationSystems" || question.name === "silentAlarmSystemsInstalled" || question.name === "activatingSilentAlarms" || question.name === "activatingSilentAlarmTraining" || question.name === "monitoringSilentAlarms" || question.name === "integratedSilentAlarms" || question.name === "alarmsTriggeringResponseActions" || question.name === "silentAlarmSystemsCooedination" || question.name === "purposeAndFunctionTraining" || question.name === "trainingPrograms" || question.name === "effectivenessDrills" || question.name === "maintainingRecords" || question.name === "reviewingRecords" || question.name === "identifyingDeficiencies" ? (
-                                    <>
-                                        <input
-                                            type="radio"
-                                            name={`${question.name.split('Text')[0]}`}
-                                            value="yes"
-                                            checked={formData[`${question.name.split('Text')[0]}`] === "yes"}
-                                            onChange={handleChange}
-                                        /> Yes
-                                        <input
-                                            type="radio"
-                                            name={`${question.name.split('Text')[0]}`}
-                                            value="no"
-                                            checked={formData[`${question.name.split('Text')[0]}`] === "no"}
-                                            onChange={handleChange}
-                                        /> No
-                                        <textarea
-                                            className='comment-box'
-                                            name={`${question.name}Comment`}
-                                            placeholder="Comment (Optional)"
-                                            value={formData[`${question.name}Comment`] || ''}
-                                            onChange={handleChange}
-                                        />
-                                    </>
-                                ) : (
-                                    <input
-                                        type="text"
-                                        name={question.name}
-                                        placeholder={question.label}
-                                        value={formData[question.name] || ''}
-                                        onChange={handleChange}
-                                    />
-                                )}
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_yes`}
+                                    name={question.name}
+                                    value="yes"
+                                    checked={formData[question.name] === "yes"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_yes`}>Yes</label>
+                                <input
+                                    type="radio"
+                                    id={`${question.name}_no`}
+                                    name={question.name}
+                                    value="no"
+                                    checked={formData[question.name] === "no"}
+                                    onChange={handleChange}
+                                /> <label htmlFor={`${question.name}_no`}>No</label>
                             </div>
+                            {/* Use input type="text" for comments */}
+                            <input
+                                className='comment-input'
+                                type="text"
+                                name={`${question.name}Comment`}
+                                placeholder="Additional comments"
+                                value={formData[`${question.name}Comment`] || ''}
+                                onChange={handleChange}
+                            />
                         </div>
                     ))}
-                    <input type="file" onChange={handleImageChange} accept="image/*" />
-                    {imageUrl && <img src={imageUrl} alt="Uploaded Image" />}
-                    {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
-                    <button type="submit">Submit</button>
+
+                    {/* Image upload section - Looks good */}
+                    <div className="form-section">
+                         <label htmlFor="imageUploadLockdownComm">Upload Image (Optional):</label>
+                         <input id="imageUploadLockdownComm" type="file" onChange={handleImageChange} accept="image/*" />
+                         {imageUrl && !imageData && <img src={imageUrl} alt="Uploaded Lockdown Comm related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                         {imageData && <img src={imageData} alt="Preview Lockdown Comm related" style={{ maxWidth: '200px', marginTop: '10px' }} />}
+                         {imageUploadError && <p style={{ color: 'red' }}>{imageUploadError}</p>}
+                    </div>
+
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Submitting...' : 'Submit Final'}
+                    </button>
                 </form>
             </main>
         </div>
