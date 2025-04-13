@@ -22,8 +22,29 @@ function PastAssessments() {
     ];
 
     const subCategories = {
-        "Community Partnership": [],
+        "Community Partnership": [
+            "Active Shooter Drills with Police",
+            "Assessing Community Needs and Priorities",
+            "Back-to-School Nights",
+            "Classroom Helpers",
+            "Crisis Intervention Workshops",
+            "Emergency Response Training2",
+            "Feedback Collection from Community",
+            "Fire Department Access to School Facilities",
+            "Fire Drills and Evacuation Planning",
+            "Fire Safety Education for Students",
+            "Firefighter Training Sessions",
+            "Fundraising Events",
+            "Mutual Aid Agreements",
+            "Parent Chaperones for Field Trips",
+            "Parent Workshops on Student Safety",
+            "Parent-Teacher Conferences",
+            "Planning Community Outreach Strategies",
+            "SRO Roles and Responsibilities",
+            "SRO Training and Certification"
+        ],
         "Continuous Improvement - Safety and Security": [
+            
             "Biometric Access Control Systems"
         ],
         "Cybersecurity": [
@@ -131,17 +152,31 @@ function PastAssessments() {
             "Stationed Guards",
             "Turnstiles",
             "Vehicle Barrier",
+            "Vehicle Barriers",
             "Visitor Check-In",
             "WeatherProof Cameras",
+            "Weatherproof Cameras",
             "Window Locks"
         ],
         "Policy and Compliance": [
             "Access Restrictions",
+            "Compliance with Regulations",
+            "Consent Management",
+            "Data Access Controls",
+            "Data Breach Notification Procedures",
             "Data Classification",
             "Data Minimization",
+            "Data Protection Impact Assessments",
             "Data Retention Periods",
+            "Data Security Requirements",
             "Data Sharing Policies",
+            "Documentation Of Policy Changes",
+            "Effectiveness In Addressing Security Risks",
+            "Encrpytion Requirements",
             "Personal Device Usage",
+            "Policy Revision Approval Workflow",
+            "Staff input On Policy Impact",
+            "Student Data Privacy Policies",
             "Student Privacy Rights"
         ]
     };
