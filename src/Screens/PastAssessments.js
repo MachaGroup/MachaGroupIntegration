@@ -70,7 +70,7 @@ function PastAssessments() {
             "Lockdown Drills 3",
             "Perimter Security Evaluations",
             "Perimter Security Fencing",
-            "Physical Hazards Assesment",
+            "Physical Hazards Assessment",
             "Regular Data Backups",
             "Response To Security Threats",
             "Roles and Responsilibilities of Emergency Response Team",
