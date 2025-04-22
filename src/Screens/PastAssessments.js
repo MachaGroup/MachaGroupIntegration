@@ -393,7 +393,7 @@ function PastAssessments() {
                                 <li key={assessment.id}>
                                     <h3>{assessment.formName || 'N/A'}</h3>
                                     <p>Form Type: {assessment.formType || 'N/A'}</p>
-                                    <p>Building: {assessment.building?.id || 'Building ID not found'}</p>
+                                    <p>Building: {assessment.building?.id || 'Assessment ID not found'}</p>
                                     <button onClick={() => handleViewDetails(assessment)}>View Details</button>
                                 </li>
                             );
